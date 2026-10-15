@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'active_support/core_ext/enumerable'
+require 'active_support/core_ext/enumerable'
 require 'active_support/core_ext/module/delegation'
 require 'woods/published_index'
 
@@ -74,7 +75,7 @@ module WoodsMap
 
     def provenance_facts
       provenance = manifest['provenance'] || {}
-      PROVENANCE_KEYS.to_h { |key| [key, manifest.fetch(key) { provenance[key] }] }
+      PROVENANCE_KEYS.index_with { |key| manifest.fetch(key) { provenance[key] } }
     end
   end
 end
