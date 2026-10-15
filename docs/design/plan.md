@@ -15,17 +15,17 @@ testbed suite in `woods-testbed`.
 
 | Milestone | Repository | Scope | Exit criterion | Tracking |
 |---|---|---|---|---|
-| M0 · Data | woods | W-1 reference spans, W-2 method table, W-3 commit table, W-4 job facts, W-5 model lifecycle entries, W-6 method-level span targets, W-7 per-action controller and mailer facts, W-8 filter applicability, W-9 container attribution, W-10 facet diff, W-11 generation pin, W-12 `woods:impact` and `impact.json`, W-13 inverted flow index, W-14 best-effort flow precomputation | Published by full and incremental runs; incremental equivalence spec green; verified on testbed rails-8.0, 7.2 and 6.0 | epic in woods (see links below) |
-| M1 · Reading | woods-map | Gem skeleton, Engine with self-served assets and import map, authentication (token exchange and host hook), Repository over one pinned generation, search palette and full-text code search, unit pages for all types, two-lens code viewer (as-written default, remembered per browser) with marginalia, outline, peek, confidence marks, reading trail, file view | Both design-study scenarios navigable by clicking only on a Rails 6.0 and an 8.0 testbed host; works with JavaScript disabled except peek and hover | issue |
-| M2 · Passage | woods-map | Filter matrix, data passage for actions and mailers, mismatch flags, callback ladder, passage export | The unassigned instance-variable flag reproduces on a seeded testbed bug | issue |
-| M4b · Impact | woods-map (page) + woods (report) | Impact page with focus URLs, `?since=` highlighting across views, pre-change blast radius; consumes W-12 | A pull request in the testbed gets a Markdown impact comment from CI; the focus link opens the page with the changed template highlighted | issue |
-| M3 · Diagrams | woods-map | Lifecycle tab with sequence, flowchart, swimlane and C4-notation renderings; Schema tab and `/woods/erd`; Landscape page (L1, L2); Mermaid, Structurizr DSL and LikeC4 exports | Diagrams match the flow document and model facts on the testbed; chunking verified on a 300-model fixture | issue |
-| M4 · History | woods-map | History tab hunk cards, gutter heat, neighbourhood timeline, snapshot picker, unit diff across retained generations | Co-change query answers design-study scenario 2 step 3 from the commit table | issue |
-| M5 · Graph | woods-map | Neighbourhood endpoint, Cytoscape component, Graph tab, full-screen graph page, blast radius, butterfly layout | 300-node neighbourhood renders under 500 ms on the testbed; keyboard list equivalent | issue |
-| M6 · Trail | woods-map | LifecycleBuilder across async hops, lanes, flags, board state, export | Design-study scenario 2 reproducible end to end from one URL | issue |
-| M7 · Guide | woods-map | RubyLLM agent, MCP attachment over stdio, SSE streaming into Turbo Streams, seven actions, budgets | All actions produce linked answers on the testbed with one provider; disabled by default; unavailable below Ruby 3.2 with a clear message | issue |
-| M8 · Staging | woods-map + woods | Threat-model document, CSP, rate limits, deployment guide beside `MCP_HTTP_TRANSPORT.md` | Non-loopback boot refuses without a token; origin guard tests | issue |
-| T · Testbed suite | woods-testbed | Blog scenario (Post, Comment, Tag, NotifySubscribersJob, MailingListMailer, templates, one deliberate unassigned instance variable) in rails-8.0, mirrored in rails-6.0; the map mounted in every variant; smoke scripts under `scripts/` | Both scenarios run unchanged against every variant | issue |
+| M0 · Data | woods | W-1 reference spans, W-2 method table, W-3 commit table, W-4 job facts, W-5 model lifecycle entries, W-6 method-level span targets, W-7 per-action controller and mailer facts, W-8 filter applicability, W-9 container attribution, W-10 facet diff, W-11 generation pin, W-12 `woods:impact` and `impact.json`, W-13 inverted flow index, W-14 best-effort flow precomputation | Published by full and incremental runs; incremental equivalence spec green; verified on testbed rails-8.0, 7.2 and 6.0 | [woods#750](https://github.com/lost-in-the/woods/issues/750) |
+| M1 · Reading | woods-map | Gem skeleton, Engine with self-served assets and import map, authentication (token exchange and host hook), Repository over one pinned generation, search palette and full-text code search, unit pages for all types, two-lens code viewer (as-written default, remembered per browser) with marginalia, outline, peek, confidence marks, reading trail, file view | Both design-study scenarios navigable by clicking only on a Rails 6.0 and an 8.0 testbed host; works with JavaScript disabled except peek and hover | [woods-map#2](https://github.com/lost-in-the/woods-map/issues/2) |
+| M2 · Passage | woods-map | Filter matrix, data passage for actions and mailers, mismatch flags, callback ladder, passage export | The unassigned instance-variable flag reproduces on a seeded testbed bug | [woods-map#3](https://github.com/lost-in-the/woods-map/issues/3) |
+| M4b · Impact | woods-map (page) + woods (report) | Impact page with focus URLs, `?since=` highlighting across views, pre-change blast radius; consumes W-12 | A pull request in the testbed gets a Markdown impact comment from CI; the focus link opens the page with the changed template highlighted | [woods-map#4](https://github.com/lost-in-the/woods-map/issues/4), report in [woods#762](https://github.com/lost-in-the/woods/issues/762) |
+| M3 · Diagrams | woods-map | Lifecycle tab with sequence, flowchart, swimlane and C4-notation renderings; Schema tab and `/woods/erd`; Landscape page (L1, L2); Mermaid, Structurizr DSL and LikeC4 exports | Diagrams match the flow document and model facts on the testbed; chunking verified on a 300-model fixture | [woods-map#5](https://github.com/lost-in-the/woods-map/issues/5) |
+| M4 · History | woods-map | History tab hunk cards, gutter heat, neighbourhood timeline, snapshot picker, unit diff across retained generations | Co-change query answers design-study scenario 2 step 3 from the commit table | [woods-map#6](https://github.com/lost-in-the/woods-map/issues/6) |
+| M5 · Graph | woods-map | Neighbourhood endpoint, Cytoscape component, Graph tab, full-screen graph page, blast radius, butterfly layout | 300-node neighbourhood renders under 500 ms on the testbed; keyboard list equivalent | [woods-map#7](https://github.com/lost-in-the/woods-map/issues/7) |
+| M6 · Trail | woods-map | LifecycleBuilder across async hops, lanes, flags, board state, export | Design-study scenario 2 reproducible end to end from one URL | [woods-map#8](https://github.com/lost-in-the/woods-map/issues/8) |
+| M7 · Guide | woods-map | RubyLLM agent, MCP attachment over stdio, SSE streaming into Turbo Streams, seven actions, budgets | All actions produce linked answers on the testbed with one provider; disabled by default; unavailable below Ruby 3.2 with a clear message | [woods-map#9](https://github.com/lost-in-the/woods-map/issues/9) |
+| M8 · Staging | woods-map + woods | Threat-model document, CSP, rate limits, deployment guide beside `MCP_HTTP_TRANSPORT.md` | Non-loopback boot refuses without a token; origin guard tests | [woods-map#10](https://github.com/lost-in-the/woods-map/issues/10) |
+| T · Testbed suite | woods-testbed | Blog scenario (Post, Comment, Tag, NotifySubscribersJob, MailingListMailer, templates, one deliberate unassigned instance variable) in rails-8.0, mirrored in rails-6.0; the map mounted in every variant; smoke scripts under `scripts/` | Both scenarios run unchanged against every variant | [woods-testbed#38](https://github.com/lost-in-the/woods-testbed/issues/38) |
 
 ## Dependencies
 
@@ -65,4 +65,29 @@ Run this before a milestone issue is opened and again before it closes.
 
 ## Issue links
 
-Filled in as issues are created.
+| Item | Issue |
+|---|---|
+| Design spec handoff | [woods-map#1](https://github.com/lost-in-the/woods-map/issues/1) |
+| M0 epic | [woods#750](https://github.com/lost-in-the/woods/issues/750) |
+| W-1 reference spans | [woods#751](https://github.com/lost-in-the/woods/issues/751) |
+| W-2 method table | [woods#752](https://github.com/lost-in-the/woods/issues/752) |
+| W-3 commit table | [woods#753](https://github.com/lost-in-the/woods/issues/753) |
+| W-4 job resilience facts | [woods#754](https://github.com/lost-in-the/woods/issues/754) |
+| W-5 model lifecycle entries | [woods#755](https://github.com/lost-in-the/woods/issues/755) |
+| W-6 method-level span targets | [woods#756](https://github.com/lost-in-the/woods/issues/756) |
+| W-7 per-action facts | [woods#757](https://github.com/lost-in-the/woods/issues/757) |
+| W-8 filter applicability | [woods#758](https://github.com/lost-in-the/woods/issues/758) |
+| W-9 container attribution | [woods#759](https://github.com/lost-in-the/woods/issues/759) |
+| W-10 facet diff | [woods#760](https://github.com/lost-in-the/woods/issues/760) |
+| W-11 generation pin | [woods#761](https://github.com/lost-in-the/woods/issues/761) |
+| W-12 impact report | [woods#762](https://github.com/lost-in-the/woods/issues/762) |
+| W-13 inverted flow index | [woods#763](https://github.com/lost-in-the/woods/issues/763) |
+| W-14 best-effort flows | [woods#764](https://github.com/lost-in-the/woods/issues/764) |
+| M1 to M8 | woods-map#2 to #10 as listed in the milestone table |
+| T testbed suite | [woods-testbed#38](https://github.com/lost-in-the/woods-testbed/issues/38) |
+
+The GitHub integration available to the session that created these issues
+could not add them to the Woods Development project (organization project
+fields are not accessible to it). Add them from the project board, or enable
+the project's auto-add workflow for the three repositories, and record the
+result in [woods-map#1](https://github.com/lost-in-the/woods-map/issues/1).
