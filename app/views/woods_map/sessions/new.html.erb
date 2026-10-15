@@ -1,0 +1,8 @@
+<% content_for :title, 'Woods Map · sign in' %>
+<h1>Enter the Woods Map token</h1>
+<p>This mount is not on loopback. Paste the value of <code>WOODS_MAP_TOKEN</code> to open a session in this browser.</p>
+<%= form_with url: woods_map.session_path, method: :post, local: true do |form| %>
+  <%= form.label :token, 'Token' %>
+  <%= form.password_field :token, autocomplete: 'off', required: true %>
+  <%= form.submit 'Open session' %>
+<% end %>

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+bundle install
+bundle binstubs rake rspec-core rubocop --force >/dev/null
