@@ -45,12 +45,7 @@ module WoodsMap
     #
     # @return [Hash{String => Object}]
     def status
-      provenance = manifest['provenance'] || {}
-      facts = { 'generation' => generation_number, 'extracted_at' => manifest['extracted_at'] }
-      facts['total_units'] = manifest.fetch('total_units') { manifest['total'] }
-      facts['counts'] = manifest.fetch('counts', {})
-      PROVENANCE_KEYS.each { |key| facts[key] = manifest.fetch(key) { provenance[key] } }
-      facts
+      { 'generation' => generation_number }.merge(manifest_facts).merge(provenance_facts)
     end
 
     # @param type [String, nil]
@@ -64,6 +59,21 @@ module WoodsMap
     # @return [Hash, nil]
     def unit(identifier, type: nil)
       @index.unit(identifier, type: type)
+    end
+
+    private
+
+    def manifest_facts
+      {
+        'extracted_at' => manifest['extracted_at'],
+        'total_units' => manifest.fetch('total_units') { manifest['total'] },
+        'counts' => manifest.fetch('counts', {})
+      }
+    end
+
+    def provenance_facts
+      provenance = manifest['provenance'] || {}
+      PROVENANCE_KEYS.to_h { |key| [key, manifest.fetch(key) { provenance[key] }] }
     end
   end
 end
