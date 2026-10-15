@@ -1,0 +1,1438 @@
+<title>Woods Map Design Study</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a fixed-width reading column (72ch) for prose, with wireframes, tables and diagrams allowed to break out to 1100px. A sticky section nav rides the top. */
+:root{
+  --bg:#f5f7f3; --bg-2:#eceee8; --panel:#ffffff; --fg:#1d221f; --fg-2:#4f5a53; --line:#d4d9d1;
+  --accent:#2f6b45; --accent-2:#8a5a1e; --accent-soft:#dfeae1; --warn:#b4462f; --info:#2d5f8a;
+  --wf-fill:#eef1ec; --wf-line:#8e9a90; --code-bg:#f0f2ee;
+  --font-display:"Bricolage Grotesque","Avenir Next","Helvetica Neue",Arial,sans-serif;
+  --font-body:"IBM Plex Sans","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141917; --bg-2:#1b211e; --panel:#1f2622; --fg:#e4e8e2; --fg-2:#a4ada6; --line:#34403a;
+  --accent:#7fbf95; --accent-2:#d7a35c; --accent-soft:#223229; --warn:#e2876f; --info:#7fb0d8;
+  --wf-fill:#232b27; --wf-line:#6c7a70; --code-bg:#1a211d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141917; --bg-2:#1b211e; --panel:#1f2622; --fg:#e4e8e2; --fg-2:#a4ada6; --line:#34403a;
+  --accent:#7fbf95; --accent-2:#d7a35c; --accent-soft:#223229; --warn:#e2876f; --info:#7fb0d8;
+  --wf-fill:#232b27; --wf-line:#6c7a70; --code-bg:#1a211d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);line-height:1.55;font-size:16px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+a{color:var(--accent)}
+h1,h2,h3,h4{font-family:var(--font-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2rem,4.5vw,3.2rem);font-weight:700;letter-spacing:-.01em}
+h2{font-size:1.75rem;font-weight:700;margin-top:3.5rem;padding-top:1.25rem;border-top:2px solid var(--line)}
+h3{font-size:1.25rem;font-weight:700;margin-top:2rem}
+h4{font-size:1.02rem;font-weight:700;margin-top:1.4rem;color:var(--fg)}
+p,li{max-width:72ch}
+.wrap{max-width:1100px;margin:0 auto}
+.col{max-width:72ch}
+.eyebrow{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-2)}
+header.hero{padding-block:2.5rem 1.5rem;border-bottom:1px solid var(--line)}
+header.hero p.lede{font-size:1.12rem;color:var(--fg-2);max-width:66ch;margin:.9rem 0 0}
+nav.toc{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);
+  display:flex;gap:.25rem .9rem;flex-wrap:wrap;padding:.5rem 0;font-size:.86rem;margin-bottom:1rem}
+nav.toc a{text-decoration:none;color:var(--fg-2);padding:.15rem .35rem;border-radius:4px}
+nav.toc a:hover,nav.toc a:focus-visible{background:var(--accent-soft);color:var(--fg);outline:none}
+.decisions{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.6rem;margin:1.25rem 0 0}
+.decision{background:var(--panel);border:1px solid var(--line);padding:.7rem .85rem;border-radius:6px}
+.decision .k{font-family:var(--font-mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--fg-2)}
+.decision .v{font-weight:600;margin-top:.15rem}
+table{border-collapse:collapse;width:100%;font-size:.92rem;margin:1rem 0}
+.tbl{overflow-x:auto;min-width:0}
+th,td{text-align:left;vertical-align:top;padding:.5rem .6rem;border-bottom:1px solid var(--line)}
+th{font-family:var(--font-mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--fg-2);font-weight:500;background:var(--bg-2)}
+td code,p code,li code{font-family:var(--font-mono);font-size:.86em;background:var(--code-bg);padding:.05em .3em;border-radius:3px}
+pre{font-family:var(--font-mono);font-size:.84rem;background:var(--code-bg);border:1px solid var(--line);padding:.9rem 1rem;border-radius:6px;overflow-x:auto;line-height:1.5}
+pre.mermaid{background:var(--panel);text-align:center;white-space:pre}
+pre.mermaid svg{max-width:100%;height:auto}
+pre.mermaid[data-processed]{overflow-x:auto}
+.pick{display:inline-block;font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:3px;padding:0 .35em;margin-left:.3em;vertical-align:middle}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:.72rem;padding:.05em .45em;border-radius:3px;background:var(--accent-soft);color:var(--fg)}
+.tag.warn{background:transparent;border:1px solid var(--warn);color:var(--warn)}
+.tag.info{background:transparent;border:1px solid var(--info);color:var(--info)}
+.callout{border-left:3px solid var(--accent);background:var(--panel);padding:.8rem 1rem;margin:1.2rem 0;max-width:72ch}
+.callout.warn{border-color:var(--warn)}
+.callout .eyebrow{display:block;margin-bottom:.25rem}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem;margin:1rem 0}
+.grid2>div{min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:1rem 1.1rem;min-width:0}
+.card h4{margin-top:0}
+.card ul{padding-left:1.1rem;margin:.4rem 0 0}
+/* ---------- wireframes ---------- */
+.wf{background:var(--bg-2);border:1px solid var(--line);border-radius:8px;padding:.75rem;margin:1.25rem 0;min-width:0}
+.wf .screen{background:var(--panel);border:1px solid var(--wf-line);border-radius:4px;display:grid;gap:6px;padding:6px;font-family:var(--font-mono);font-size:.68rem;color:var(--fg-2)}
+.wf .box{background:var(--wf-fill);border:1px dashed var(--wf-line);border-radius:3px;padding:6px 8px;min-width:0;position:relative;min-height:30px}
+.wf .box.solid{border-style:solid}
+.wf .box b{display:block;color:var(--fg);font-weight:500;font-family:var(--font-body);font-size:.78rem;margin-bottom:2px}
+.wf .box .n{position:absolute;top:-8px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:.62rem;display:grid;place-items:center;font-weight:600}
+.wf .bar{display:flex;gap:6px;align-items:center}
+.wf .bar .box{flex:1;min-height:26px;padding:4px 8px}
+.wf .nodes{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;padding:14px 6px}
+.wf .node{border:1.5px solid var(--wf-line);border-radius:999px;padding:2px 9px;background:var(--panel);color:var(--fg);font-size:.66rem}
+.wf .node.hub{border-color:var(--accent);border-width:2.5px;font-weight:600}
+.wf .node.ctl{border-radius:3px}
+.wf .edge{color:var(--fg-2);font-size:.6rem}
+.wf .lines span{display:block;border-bottom:1px solid var(--line);padding:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wf .lines span u{text-decoration:underline dotted var(--accent);text-decoration-thickness:1.5px;color:var(--fg)}
+.wf .lane{display:grid;grid-template-columns:90px 1fr;gap:6px;align-items:center}
+.wf .lane .steps{display:flex;gap:6px;flex-wrap:wrap}
+.wf .lane .step{border:1px solid var(--wf-line);background:var(--panel);border-radius:3px;padding:2px 7px;color:var(--fg);font-size:.64rem}
+.wf .lane .step.err{border-color:var(--warn);color:var(--warn)}
+.wf .legend{font-size:.8rem;color:var(--fg-2);margin:.6rem 0 0;padding-left:1.1rem}
+.wf .legend li{margin:.1rem 0}
+.wf .caption{font-size:.8rem;color:var(--fg-2);margin:0 0 .5rem;font-style:italic}
+/* grid areas per wireframe */
+.wf-atlas{grid-template-columns:150px 1fr 230px;grid-template-rows:auto 1fr auto;grid-template-areas:"top top top" "filters canvas inspector" "time time time";min-height:340px}
+.wf-guide{grid-template-columns:170px 1fr 220px;grid-template-rows:auto 1fr;grid-template-areas:"top top top" "tree code ctx";min-height:360px}
+.wf-trail{grid-template-columns:1fr 240px;grid-template-rows:auto auto 1fr auto;grid-template-areas:"top top" "entry pin" "lanes pin" "time pin";min-height:360px}
+.wf-chat{grid-template-columns:1fr 260px;grid-template-rows:auto 1fr;grid-template-areas:"top top" "page chat";min-height:300px}
+.a-top{grid-area:top}.a-filters{grid-area:filters}.a-canvas{grid-area:canvas}.a-inspector{grid-area:inspector}.a-time{grid-area:time}
+.a-tree{grid-area:tree}.a-code{grid-area:code}.a-ctx{grid-area:ctx}.a-entry{grid-area:entry}.a-pin{grid-area:pin}.a-lanes{grid-area:lanes}.a-page{grid-area:page}.a-chat{grid-area:chat}
+@media (max-width:760px){
+  .wf .screen{grid-template-columns:1fr !important;grid-template-areas:none !important}
+  .wf .screen > *{grid-area:auto !important}
+  h2{font-size:1.45rem}
+}
+
+/* ---------- C4 notation (own SVG) ---------- */
+:root{--c4-person:#1f3d5c;--c4-container:#2f6b45;--c4-component:#4d8a63;--c4-ext:#6f766f;--c4-ink:#ffffff;--c4-line:#4f5a53;--c4-boundary:#8e9a90}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--c4-person:#2f5a86;--c4-container:#3f8a5c;--c4-component:#5aa374;--c4-ext:#5a6560;--c4-ink:#f3f6f2;--c4-line:#a4ada6;--c4-boundary:#6c7a70}}
+:root[data-theme="dark"]{--c4-person:#2f5a86;--c4-container:#3f8a5c;--c4-component:#5aa374;--c4-ext:#5a6560;--c4-ink:#f3f6f2;--c4-line:#a4ada6;--c4-boundary:#6c7a70}
+.c4fig{margin:1.25rem 0;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.75rem;min-width:0;overflow-x:auto}
+.c4fig figcaption{font-size:.85rem;color:var(--fg-2);margin:0 0 .5rem}
+.c4fig svg{width:100%;max-width:960px;height:auto;display:block;font-family:var(--font-body)}
+.c4fig .c4-person rect{fill:var(--c4-person)}.c4fig .c4-container rect,.c4fig .c4-container path{fill:var(--c4-container)}
+.c4fig .c4-component rect{fill:var(--c4-component)}.c4fig .c4-ext rect{fill:var(--c4-ext)}
+.c4fig text{fill:var(--c4-ink);text-anchor:middle;font-size:12px}
+.c4fig .c4-st{font-size:10px;font-style:italic;opacity:.85}.c4fig .c4-name{font-size:14px;font-weight:600}.c4fig .c4-tech{font-size:11px;font-style:italic;opacity:.9}.c4fig .c4-desc{font-size:11px}
+.c4fig .c4-bl{fill:var(--fg);text-anchor:start;font-size:13px;font-weight:600}.c4fig .c4-bl .c4-st{fill:var(--fg-2)}
+.c4fig .c4-rel line,.c4fig .c4-rel path{stroke:var(--c4-line);stroke-width:1.4;fill:none}
+.c4fig .c4-rel text{fill:var(--fg);text-anchor:start;font-size:11px}.c4fig .c4-rel .c4-mech{fill:var(--fg-2);font-style:italic;font-family:var(--font-mono);font-size:10px}
+.c4fig .c4-num{fill:var(--accent)}.c4fig .c4-numt{fill:#fff;font-size:11px;font-weight:700;text-anchor:middle}
+.steps-list li{margin:.35rem 0}
+.matrix td:first-child{font-weight:600}
+.score{font-family:var(--font-mono);font-size:.78rem}
+.foot{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--fg-2);font-size:.85rem}
+@media (prefers-reduced-motion: no-preference){a{transition:background .15s}}
+</style>
+
+<div class="wrap">
+<header class="hero">
+  <span class="eyebrow">Design study · woods-map · revision 4 · 15 October 2026</span>
+  <h1>Woods Map Design Study</h1>
+  <p class="lede">Three design directions for an in-app web explorer over the Woods index, the chosen direction iterated twice toward code comprehension, and the storage facts, requirements, tooling, build plan and RubyLLM 2.1 guide that go with them.</p>
+  <div class="decisions" aria-label="Decisions recorded during the interview">
+    <div class="decision"><div class="k">Data source</div><div class="v">Published index only</div></div>
+    <div class="decision"><div class="k">Front-end delivery</div><div class="v">Importmap + Hotwire, no build step</div></div>
+    <div class="decision"><div class="k">Audience</div><div class="v">Dev in-app, plus shareable staging / team</div></div>
+    <div class="decision"><div class="k">V1 scope</div><div class="v">Search + code, graph, flows + ERD, git timeline</div></div>
+    <div class="decision"><div class="k">LLM</div><div class="v">Chat plus "explain this" actions</div></div>
+    <div class="decision"><div class="k">Packaging</div><div class="v">Separate gem <code>woods-map</code></div></div>
+    <div class="decision"><div class="k">Floors</div><div class="v">railties ≥ 6.0, Ruby ≥ 3.0, same as Woods</div></div>
+    <div class="decision"><div class="k">Chosen direction</div><div class="v">B · Field Guide, comprehension first (section 7)</div></div>
+    <div class="decision"><div class="k">C4</div><div class="v">Concepts yes, tools no (own SVG notation)</div></div>
+    <div class="decision"><div class="k">Spike</div><div class="v">Change impact with sharable focus URLs (section 8)</div></div>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Sections">
+  <a href="#storage">1 · Storage</a>
+  <a href="#foundation">2 · Shared foundation</a>
+  <a href="#atlas">3 · Atlas</a>
+  <a href="#guide">4 · Field Guide</a>
+  <a href="#trail">5 · Trail</a>
+  <a href="#compare">6 · Comparison</a>
+  <a href="#iterations">7 · Field Guide iterations</a>
+  <a href="#c4">7 · C4</a>
+  <a href="#mermaid">7 · Mermaid types</a>
+  <a href="#impact">8 · Change impact</a>
+  <a href="#tooling">9 · Tooling</a>
+  <a href="#gaps">10 · What we must build</a>
+  <a href="#llm">11 · RubyLLM guide</a>
+  <a href="#roadmap">12 · Roadmap</a>
+  <a href="#questions">13 · Open questions</a>
+</nav>
+
+<h2 id="storage">1 · How Woods stores data on extract</h2>
+<div class="col">
+<p>Every Woods entry point (full extract, incremental, refresh, the watch daemon) ends in one atomic publication. The writer fills an immutable payload directory, flushes it, then replaces the one-line pointer <code>generation.json</code> last. A reader that captures the pointer once has a complete, consistent snapshot; the explorer must read exactly that way and never mix files from two generations.</p>
+</div>
+
+<pre class="mermaid">
+flowchart LR
+  subgraph root["index root  (tmp/woods)"]
+    gen["generation.json\nnumber · token · payload"]
+    woodsjson["woods.json (config)"]
+    dumps["dumps/ (vector snapshots)"]
+    tasks["tasks/, watch status, locks"]
+    sqlite["woods.sqlite3\nwoods_snapshots · woods_snapshot_units"]
+    subgraph payload["payloads/gen-N  (immutable)"]
+      manifest["manifest.json"]
+      graph["dependency_graph.json\nnodes · edges · reverse · reverse_via\nfile_map · type_index · variants"]
+      ga["graph_analysis.json\norphans · hubs · cycles · bridges\nunmodelled_tables"]
+      units["type/_index.json + one JSON per unit\nmodels/ controllers/ jobs/ mailers/ views/ …"]
+      flows["flows/flow_index.json + flow docs\n(controller actions, opt-in)"]
+      si["source_inputs.json · source_references.json\nskipped_files.json · SUMMARY.md"]
+    end
+  end
+  gen -- "names" --> payload
+  classDef dim fill:none,stroke-dasharray:3 3;
+  class woodsjson,dumps,tasks dim
+</pre>
+
+<div class="col">
+<p>Only the structural payload and the snapshot database matter to the explorer. The vector dumps, config artifact, task records and locks have their own lifecycles and must never be read as if the pointer committed them.</p>
+</div>
+
+<h3>What each artifact gives the explorer</h3>
+<div class="tbl"><table>
+<thead><tr><th>Artifact</th><th>Shape (as written today)</th><th>Feeds</th></tr></thead>
+<tbody>
+<tr><td><code>&lt;type&gt;/&lt;unit&gt;.json</code></td><td><code>type</code>, <code>identifier</code>, <code>file_path</code>, <code>namespace</code>, <code>source_code</code> (concerns inlined, schema/route headers prepended), <code>metadata</code>, <code>dependencies[{type,target,via}]</code>, <code>dependents[{type,identifier}]</code>, <code>chunks</code>, <code>source_hash</code>, <code>extracted_at</code>. <code>metadata.source_line_map</code> maps annotated lines back to file lines.</td><td>Unit pages, code viewer, click-through, schema cards</td></tr>
+<tr><td>Model <code>metadata</code></td><td><code>table_name</code>, <code>database</code>, <code>columns</code>, <code>column_names</code>, <code>foreign_keys</code>, <code>associations</code> (macro, target, through, polymorphic, foreign_key, inverse_of, from_db/to_db), <code>validations</code>, <code>callbacks</code> (kind, filter, conditions, <code>side_effects</code> from CallbackAnalyzer), <code>scopes</code> (with source), <code>enums</code>, STI flags, <code>class_methods</code>, <code>instance_methods</code>, <code>inlined_concerns</code>, Active Storage / Action Text facts</td><td>ERD, lifecycle flows, model page</td></tr>
+<tr><td>Controller <code>metadata</code></td><td><code>actions</code>, <code>action_sources</code> (per-action source and <code>declaration_line</code>), <code>routes</code>, <code>filters</code> (before/after/around with only/except), <code>responds_to</code>, <code>ancestors</code>, <code>included_concerns</code>, <code>flow_paths</code> when flows were precomputed</td><td>Request flow, "how data is passed" view, routes</td></tr>
+<tr><td>View template / mailer / job <code>metadata</code></td><td>Views: <code>partials_rendered</code>, <code>instance_variables</code>, <code>helpers_called</code>, <code>template_engine</code>, <code>is_partial</code>. Mailers: <code>actions</code>, <code>templates</code>, <code>layout</code>, <code>delivery_method</code>. Jobs: <code>queue</code>, <code>job_type</code>, <code>sidekiq_options</code>.</td><td>"Locate the views", mailer templates, job pages</td></tr>
+<tr><td><code>dependency_graph.json</code></td><td>Typed nodes keyed by <code>(identifier, type)</code>; forward edges carry <code>via</code> (about 45 labels: <code>belongs_to</code>, <code>has_many</code>, <code>render</code>, <code>link_to</code>, <code>redirect_to</code>, <code>form_action</code>, <code>job_enqueue</code>, <code>code_reference</code>, <code>include</code>, <code>reads_table</code>, <code>writes_table</code>, <code>mount</code>, <code>route_dispatch</code>, …) plus <code>through</code>/<code>through_db</code>/<code>disable_joins</code>; <code>reverse_via</code> gives inbound records per target; <code>file_map</code> maps a source path to its units.</td><td>Relationship graph, blast radius, file → unit jump</td></tr>
+<tr><td><code>graph_analysis.json</code></td><td><code>orphans</code>, <code>dead_ends</code>, <code>hubs</code>, <code>cycles</code>, <code>bridges</code>, <code>stats</code>, <code>unmodelled_tables</code>; PageRank is computed by <code>DependencyGraph#pagerank</code> and surfaced through the MCP <code>pagerank</code> tool and the Obsidian exporter.</td><td>Node sizing, hub warnings, domain overview</td></tr>
+<tr><td><code>flows/*.json</code></td><td><code>FlowDocument</code>: <code>entry_point</code>, <code>route</code>, ordered <code>steps[{unit,type,file_path,operations}]</code>. Operation types: <code>call</code>, <code>async</code> (job enqueue, with target and method), <code>transaction</code> (nested), <code>conditional</code> (nested), <code>response</code>, <code>dynamic_dispatch</code>; each carries a line. Precomputed only for controller actions and only when <code>precompute_flows</code> is on; <code>FlowAssembler</code> can assemble any unit (job, mailer, service) on demand from the unit JSON alone.</td><td>Lifecycle flowcharts</td></tr>
+<tr><td><code>metadata.git</code> (per unit)</td><td><code>last_modified</code>, <code>last_author</code>, <code>commit_count</code>, <code>contributors</code> (top 5), <code>recent_commits</code> (last 5: sha, message, date, author), <code>change_frequency</code> (new / hot / active / stable / dormant). HEAD-reachable history, 365-day window.</td><td>"Who touched this", heat colouring, timeline rows</td></tr>
+<tr><td>Snapshot DB (SQLite)</td><td><code>woods_snapshots</code> (git_sha, branch, extracted_at, unit counts, added/modified/deleted) and <code>woods_snapshot_units</code> (per-unit source/metadata/dependency hashes). MCP tools <code>list_snapshots</code>, <code>snapshot_diff</code>, <code>unit_history</code>, <code>snapshot_detail</code> already read it.</td><td>Generation-to-generation diffs on the timeline</td></tr>
+<tr><td><code>manifest.json</code>, <code>source_inputs.json</code></td><td>Counts per extractor, provenance (branch, sha, rails/ruby versions, writer mode), captured source identities for freshness.</td><td>Status bar: generation, HEAD, "index is stale" banner</td></tr>
+</tbody></table></div>
+
+<div class="callout">
+<span class="eyebrow">Reading contract</span>
+Ruby readers go through <code>Woods::PublishedIndex</code> (pin one generation, <code>unit</code>, <code>units(type:)</code>, <code>edges(via:)</code>, <code>dependents_of</code>) or the MCP server's <code>IndexReader</code> (<code>find_unit</code>, <code>list_units</code>, <code>search</code>, <code>recent_changes</code>, <code>dependency_graph</code>, <code>graph_analysis</code>, <code>with_pinned_generation</code>). Both resolve every file through the payload the pointer names, hold a shared <code>flock</code> on the payload manifest so retention cannot delete it mid-read, and read JSON as UTF-8 through <code>AtomicFile</code>. The explorer should wrap each HTTP request in one pinned generation and never open a payload path it derived itself.
+</div>
+
+<h3>Where the stored data falls short of the two scenarios</h3>
+<div class="col">
+<ul>
+<li><strong>Click-through needs positions, not just names.</strong> Units know which constants they depend on (<code>dependencies</code>) and which methods they define (<code>instance_methods</code>), but not <em>where</em> in the source each reference or definition sits. The source-reference pass collects constant reads with lexical context during extraction, and Prism is already in use, so emitting per-unit reference spans and a method table is a small extraction-side addition (see <a href="#gaps">section 10</a>).</li>
+<li><strong>Git insight is five commits deep.</strong> A cross-file timeline for a neighbourhood built from five commits per unit is lossy. <code>GitHistory</code> already streams every HEAD-reachable touched-path event for the 365-day window; writing the commit → paths table once per generation gives the explorer a complete local timeline with no git calls at read time.</li>
+<li><strong>Flows are precomputed for controllers only.</strong> Job, mailer and model-callback entry points can be assembled on demand from unit JSON (<code>trace_flow</code> already does this), which keeps the explorer index-only, but the first request for each entry pays the parse. Cache per generation.</li>
+<li><strong>Model callbacks link to side effects, not to the job's own callbacks.</strong> The chain <em>Post after_commit → NotifySubscribersJob → MailingListMailer → template</em> is three edges (<code>job_enqueue</code>, <code>code_reference</code>, mailer <code>templates</code>) that the explorer must stitch; nothing stores the stitched lifecycle today.</li>
+</ul>
+</div>
+
+<h2 id="foundation">2 · Shared foundation (all three directions)</h2>
+<div class="col">
+<p>The directions differ in what the screen is organised around. They share the same gem, data access, delivery and security layer, so that choosing a direction is a UI decision and not a rewrite.</p>
+</div>
+
+<pre class="mermaid">
+flowchart TB
+  subgraph host["Host Rails app (development / staging)"]
+    engine["WoodsMap::Engine\nmounted at /woods"]
+  end
+  subgraph standalone["woods-map serve ./tmp/woods"]
+    mini["Minimal Rails::Application\n(railties only) mounting the same Engine"]
+  end
+  engine --> auth
+  mini --> auth
+  auth["Woods::MCP::OriginGuard → BearerAuth\n(token exchanged for a signed cookie)"] --> ctrl
+  ctrl["Controllers: units, search, graph, flows, erd, timeline, chat"] --> repo
+  repo["WoodsMap::Repository\nPublishedIndex / IndexReader, one pinned generation per request\nper-generation caches: search index, neighbourhoods, mermaid, ERD"]
+  repo --> payload["payloads/gen-N (read-only)"]
+  repo --> sqlite["woods.sqlite3 snapshots"]
+  ctrl --> views["Server-rendered ERB + Turbo Frames\nrouge highlighting · reference spans"]
+  views --> js["importmap pins (vendored ESM)\nturbo · stimulus · cytoscape · mermaid · vis-timeline · highlight.js"]
+  ctrl --> llm["WoodsMap::Guide (RubyLLM::Agent)\nIndex MCP server attached · SSE → Turbo Streams"]
+  llm --> mcp["woods-mcp (stdio) or woods-mcp-http"]
+  mcp --> payload
+</pre>
+
+<div class="grid2">
+<div class="card"><h4>Gem and packaging</h4><ul>
+<li><code>woods-map</code> depends on <code>woods ~> 2.1</code>, <code>railties >= 6.0</code> and <code>rouge</code>; nothing else at runtime. <code>ruby_llm ~> 2.1</code> is a soft dependency that activates when present and Ruby is 3.2 or newer; everything else runs on Ruby 3.0, matching Woods.</li>
+<li>No dependency on importmap-rails, turbo-rails or an asset pipeline (turbo-rails 2.x needs Rails 7.1, which would break the floor). The Engine serves its vendored JavaScript itself at <code>/woods/assets/*</code> with content-hash filenames and far-future caching, and its layout emits a literal <code>&lt;script type="importmap"&gt;</code>. Import maps and Turbo's browser library need no Rails gem; hosts on Sprockets, Propshaft or Webpacker are untouched.</li>
+<li>Pattern still follows mission_control-jobs for layout and Stimulus controller organisation, with the asset-serving layer swapped for the engine's own route.</li>
+<li>Host mounts explicitly: <code>mount WoodsMap::Engine => "/woods"</code> inside <code>if Rails.env.development? || ENV["WOODS_EXPLORER"]</code>. Standalone: <code>woods-map serve DIR</code> boots a minimal <code>Rails::Application</code> defined in the gem so views, Turbo and the import map behave identically. <code>ActionController::Live</code> (used for guide streaming) exists since Rails 4.</li>
+</ul></div>
+<div class="card"><h4>Security posture (staging-capable)</h4><ul>
+<li>Reuses <code>Woods::MCP::OriginGuard</code> and <code>Woods::MCP::BearerAuth</code>. Browsers cannot send bearer headers on navigations, so a token-entry page exchanges the token for a signed, <code>HttpOnly</code>, <code>SameSite=Strict</code> cookie; every request still passes the origin guard.</li>
+<li>Loopback without a token boots with a warning; anything non-loopback refuses to boot without <code>WOODS_EXPLORER_TOKEN</code> (identical to <code>woods-mcp-http</code>).</li>
+<li>Strictly read-only: no live database, no git subprocess, no file system paths from the client. Routes take identifiers and generation numbers; files are reached only through <code>file_map</code>.</li>
+<li>The index already contains application source; the explorer exposes nothing the index does not. Document this in the host's threat model, and gate the LLM behind a second flag with a per-session token budget.</li>
+<li>CSP with <code>script-src 'self'</code> (all JS vendored, nothing from a CDN at runtime), CSRF on the chat POST, rate limit on search and chat.</li>
+</ul></div>
+<div class="card"><h4>Performance budgets</h4><ul>
+<li>Unit page server time under 150 ms with a warm per-generation cache; search under 100 ms (the IndexReader identifier index is built once per generation).</li>
+<li>Graph neighbourhood responses capped at 300 nodes / 1 500 edges by default (depth 1 to 2, type and <code>via</code> filters); the full graph is never shipped to the browser. Target hosts with up to 5 000 units.</li>
+<li>Mermaid diagrams split at about 150 nodes (ERD per namespace or database; flows per entry point); <code>maxTextSize</code> raised explicitly.</li>
+<li>Caches are keyed by <code>(generation number, token)</code> so a publication invalidates everything at once; <code>IndexReader#ensure_fresh!</code> already detects the pointer moving.</li>
+</ul></div>
+<div class="card"><h4>Common requirement spec</h4><ul>
+<li><strong>FR-1</strong> Resolve exactly one published generation per request; show its number, HEAD sha, branch and age in a status bar; banner when <code>source_freshness</code> is <code>drifted</code>.</li>
+<li><strong>FR-2</strong> Search by name, regex, prefix/suffix, type and file path with the MCP <code>search</code> completeness semantics (<code>complete</code> / <code>partial</code>).</li>
+<li><strong>FR-3</strong> Unit page for every type with metadata cards, highlighted source, inlined concerns visibly delimited, file path with original line numbers via <code>source_line_map</code>.</li>
+<li><strong>FR-4</strong> Click a constant, association, route helper, callback method or job class in source and land on the target unit, or a disambiguation list when several types share the name.</li>
+<li><strong>FR-5</strong> Interactive graph around a unit with edges coloured by <code>via</code>, dependents/dependencies toggles, depth, type filters, PageRank sizing, hub and cycle badges.</li>
+<li><strong>FR-6</strong> Lifecycle flowchart for any entry point (controller action, job, mailer, model callback) and an ERD for a model's neighbourhood or a whole database.</li>
+<li><strong>FR-7</strong> Per-unit git card and a cross-unit timeline for a selected set; snapshot diff between two generations.</li>
+<li><strong>FR-8</strong> LLM guide panel (section 11) seeded with page context, with "explain this" actions on units, flows and selections.</li>
+<li><strong>NFR-1</strong> No Node toolchain at any point; all JS vendored and served by the engine. <strong>NFR-2</strong> Rails 6.0 to 8.x hosts and Ruby 3.0+, the same floors as Woods; the guide alone needs Ruby 3.2. <strong>NFR-3</strong> Keyboard navigable; graph and diagrams have list equivalents. <strong>NFR-4</strong> Every page works without JS except the canvas and diagrams.</li>
+</ul></div>
+</div>
+
+<h2 id="atlas">3 · Direction A: Atlas (graph-first)</h2>
+<div class="col">
+<p><strong>Thesis.</strong> The dependency graph is the home screen. You arrive at a unit's neighbourhood, see every relationship as a coloured edge, and everything else (code, schema, flow, history) is an inspector on the selected node. This is Obsidian's graph view with Woods' typed edges, built on Cytoscape.js.</p>
+<p><strong>Navigation model.</strong> Click a node to select it, double-click to re-centre the neighbourhood on it, shift-click to add it to the selection. Filters on the left narrow by unit type, edge <code>via</code>, depth and package. The bottom strip is a timeline of commits across the nodes currently visible.</p>
+</div>
+
+<div class="wf">
+  <p class="caption">Wireframe A1: Atlas home, centred on <code>Post</code> (model), depth 2, showing dependents and dependencies.</p>
+  <div class="screen wf-atlas">
+    <div class="box a-top bar"><span class="box solid" style="flex:0 0 110px">Woods · gen 42</span><span class="box">⌕ Search units, files, routes…  (Post)</span><span class="box solid" style="flex:0 0 120px">main @ 361468d</span><span class="box solid" style="flex:0 0 70px">Guide ▸</span><span class="n">1</span></div>
+    <div class="box a-filters"><b>Filters</b>Types ☑ model ☑ controller ☑ job ☑ mailer ☐ view ☐ test<br><br>Edges ☑ belongs_to ☑ has_many ☑ job_enqueue ☑ render ☐ code_reference<br><br>Depth ◉ 1 ○ 2 ○ 3<br>Direction ◉ both<br><br>Packages ▾<br>Hide gem-owned ☑<span class="n">2</span></div>
+    <div class="box a-canvas" style="min-height:190px"><b>Canvas (Cytoscape.js, fcose layout)</b>
+      <div class="nodes">
+        <span class="node">User</span><span class="edge">◀ belongs_to</span>
+        <span class="node hub">Post</span><span class="edge">has_many ▶</span><span class="node">Comment</span><br>
+        <span class="node ctl">PostsController</span><span class="edge">code_reference ▶ Post</span>
+        <span class="node">NotifySubscribersJob</span><span class="edge">◀ job_enqueue (after_commit)</span><br>
+        <span class="node">MailingListMailer</span><span class="edge">◀ code_reference</span>
+        <span class="node">posts/show.html.erb</span><span class="edge">◀ render</span>
+        <span class="node">Taggable (concern)</span><span class="edge">◀ include</span>
+      </div>
+      <span class="edge">legend: edge colour = via · node size = PageRank · ring = hub / cycle · shape = type</span><span class="n">3</span></div>
+    <div class="box a-inspector"><b>Inspector: Post (model)</b>app/models/post.rb · 184 LOC · table posts (14 cols)<br><br>[Overview] [Code] [Schema] [Flow] [History]<br><br>Associations 4 · Callbacks 3 (after_commit → NotifySubscribersJob) · Validations 5<br><br>Last: Leah · 3 days ago · hot<br><br>▸ Centre here  ▸ Blast radius  ▸ Explain<span class="n">4</span></div>
+    <div class="box a-time"><b>Timeline for visible nodes (vis-timeline)</b>Post ───●──●────●──   Comment ──●──────●─   NotifySubscribersJob ────────●●─   MailingListMailer ─────────●──<span class="n">5</span></div>
+  </div>
+  <ol class="legend">
+    <li>Global bar: search opens a command palette (units, files, routes, tables); generation and HEAD always visible.</li>
+    <li>Filter rail drives the neighbourhood query; the URL encodes centre, depth, direction and filters so a view is shareable.</li>
+    <li>Canvas: compound nodes group namespaces or Packwerk packages; a hub badge comes from <code>graph_analysis.hubs</code>; a cycle marker from <code>graph_analysis.cycles</code>. "Blast radius" tints every transitive dependent.</li>
+    <li>Inspector tabs load as Turbo Frames from the same unit routes the other directions use; "Flow" renders Mermaid for the selected entry point; "Schema" renders a mini ERD of the node and its associations.</li>
+    <li>Timeline rows are the visible nodes; items are commits from the generation's commit table; clicking a commit highlights every visible node it touched.</li>
+  </ol>
+</div>
+
+<h3>How the four capabilities surface in Atlas</h3>
+<div class="tbl"><table>
+<thead><tr><th>Capability</th><th>Atlas treatment</th></tr></thead>
+<tbody>
+<tr><td>Search, unit pages, code</td><td>Search recentres the canvas. Full unit pages exist at <code>/woods/units/:type/:id</code> but the primary reading surface is the inspector's Code tab (narrow, with a "open full page" escape). Reference spans are clickable and re-centre the graph.</td></tr>
+<tr><td>Relationship graph</td><td>Primary. Neighbourhood query, edge filters, blast radius, compound grouping, PageRank sizing, cycle/hub decoration, "butterfly" layout option (dependents left, dependencies right, dagre).</td></tr>
+<tr><td>Flows and ERD</td><td>Flow: selecting a controller action or job and pressing "Trace" animates the flow's path across the canvas (edges highlighted in step order) and shows the Mermaid flowchart in the inspector. ERD: the Schema tab renders a Mermaid <code>erDiagram</code> of the selected model plus one hop.</td></tr>
+<tr><td>Git timeline</td><td>Bottom strip bound to the visible node set. Nodes tint by <code>change_frequency</code>; "commit lens" dims every node a selected commit did not touch.</td></tr>
+</tbody></table></div>
+
+<h3>Scenario walkthroughs</h3>
+<div class="grid2">
+<div class="card"><h4>1 · Plan auto-tagging on posts</h4><ol class="steps-list">
+<li>Search "Post", land on the neighbourhood. The <code>include ▶ Taggable</code> edge is immediately visible if a tagging concern already exists.</li>
+<li>Toggle "Blast radius" to see which controllers, views, jobs and serializers depend on Post: the surface area a new <code>tags</code> column will touch.</li>
+<li>Inspector → Schema shows the posts table and associations; Flow on <code>PostsController#create</code> highlights the path through validations, <code>after_commit</code> and the enqueued job, which is where a tagging job would attach.</li>
+<li>Filter to views, read <code>posts/show.html.erb</code> partials and instance variables to decide where to render tags.</li>
+<li>"Explain" asks the guide to summarise the lifecycle and propose the attachment points, with every unit it names linked back into the canvas.</li>
+</ol></div>
+<div class="card"><h4>2 · Mailing list job failing after post creation</h4><ol class="steps-list">
+<li>Search the job, centre on it. Inbound <code>job_enqueue</code> edges show every enqueue site; a <code>Post after_commit</code> edge confirms the trigger.</li>
+<li>Trace from the job's <code>perform</code>: the canvas highlights <code>MailingListMailer → template → User</code> and the Flow tab lists operations in line order, including the conditional branches.</li>
+<li>The timeline strip shows two commits last week touching the mailer and the job together; selecting one highlights the touched nodes and the inspector's History tab shows author and message.</li>
+<li>Open the mailer's Code tab, click the template reference, read the ERB.</li>
+</ol></div>
+</div>
+
+<h3>Direction-specific requirements and technology</h3>
+<div class="grid2">
+<div class="card"><h4>Requirements</h4><ul>
+<li><strong>A-1</strong> Neighbourhood endpoint <code>/woods/graph/neighbourhood?centre=&amp;type=&amp;depth=&amp;direction=&amp;types[]=&amp;via[]=</code> returning Cytoscape elements JSON with node attributes (type, pagerank, change_frequency, hub, cycle, package) and edge attributes (<code>via</code>, through, cross-database).</li>
+<li><strong>A-2</strong> Server-side truncation with a visible "n more hidden" count and an "expand" affordance per boundary node.</li>
+<li><strong>A-3</strong> Layout stability: cache fcose positions per (generation, query) so revisiting a view does not reshuffle.</li>
+<li><strong>A-4</strong> Flow overlay: map flow steps to graph edges and animate in order; steps with no graph edge appear in a side list.</li>
+<li><strong>A-5</strong> Keyboard: arrow keys move selection along edges; list view of the neighbourhood for screen readers.</li>
+<li><strong>A-6</strong> Timeline bound to visible node set, with commit → node highlighting.</li>
+</ul></div>
+<div class="card"><h4>Technology</h4><ul>
+<li>Cytoscape.js 3.34 (ESM, MIT) with <code>cytoscape-fcose</code> for the overview and <code>@dagrejs/dagre</code> for the butterfly and flow overlays. fcose is UMD-only: ship it as a vendored classic script.</li>
+<li>vis-timeline 8.5 standalone ESM for the strip; Mermaid 12 for inspector diagrams; rouge server-side for code.</li>
+<li>Stimulus controllers: <code>graph</code>, <code>graph-filters</code>, <code>timeline</code>, <code>inspector</code>; Turbo Frames for inspector tabs.</li>
+<li>Escape hatch above about 3 000 visible nodes: sigma.js 3 (WebGL). Not needed with the neighbourhood cap.</li>
+</ul></div>
+</div>
+<div class="callout warn"><span class="eyebrow">Risks</span>Graph-first UIs read badly for code: a narrow inspector is a poor place to study a 180-line model, so Atlas needs a full-page fallback. Node clutter from <code>code_reference</code> edges is real; default those off. Layout jitter undermines spatial memory unless positions are cached. The approach shines for impact analysis and weakest for the "read the controller and the view" steps both scenarios end with.</div>
+
+<h2 id="guide">4 · Direction B: Field Guide (document-first code navigator)</h2>
+<div class="col">
+<p><strong>Thesis.</strong> A unit page is the home screen, built the way GitHub and Sourcegraph present a file: a tree on the left, highlighted source in the middle with hover cards and jump-to-definition on every resolved reference, and a context column on the right that answers "what is this, what touches it, who changed it" without leaving the code. Graphs and diagrams are embedded sections of the page, not a separate world.</p>
+<p><strong>Navigation model.</strong> Breadcrumbs and reference links. Every identifier in source, metadata or diagram is a link to the unit page it names; the browser's back button is the history. The right column's "Used by" and "Depends on" lists are the graph in list form; a "Graph" tab opens the same neighbourhood as Atlas when a picture is needed.</p>
+</div>
+
+<div class="wf">
+  <p class="caption">Wireframe B1: unit page for <code>Post</code>, Code tab, with a hover card open on a callback target.</p>
+  <div class="screen wf-guide">
+    <div class="box a-top bar"><span class="box solid" style="flex:0 0 100px">Woods · gen 42</span><span class="box">⌕  Post</span><span class="box solid" style="flex:0 0 300px">models › Post &nbsp;·&nbsp; app/models/post.rb</span><span class="box solid" style="flex:0 0 70px">Guide ▸</span><span class="n">1</span></div>
+    <div class="box a-tree"><b>Units</b>▾ models (23)<br>&nbsp;&nbsp;Comment<br>&nbsp;&nbsp;<u>Post</u> ●<br>&nbsp;&nbsp;Tag<br>&nbsp;&nbsp;User<br>▸ controllers (11)<br>▸ jobs (6)<br>▸ mailers (3)<br>▸ views (41)<br>▸ concerns (7)<br>▸ tables (26)<br><br>[by type] [by file] [by package]<span class="n">2</span></div>
+    <div class="box a-code"><b>[Code] [Schema] [Lifecycle] [Graph] [History]</b>
+      <div class="lines">
+        <span>12  class Post &lt; ApplicationRecord</span>
+        <span>13    include <u>Taggable</u>            ┊ inlined below ↓</span>
+        <span>14    belongs_to :<u>author</u>, class_name: "User"</span>
+        <span>15    has_many :<u>comments</u>, dependent: :destroy</span>
+        <span>18    after_commit :<u>notify_subscribers</u>, on: :create</span>
+        <span>   ┌ notify_subscribers → NotifySubscribersJob (job) · enqueues perform_later · line 61 · last: Leah, 3d ┐</span>
+        <span>19    validates :title, presence: true</span>
+        <span>61    def notify_subscribers</span>
+        <span>62      <u>NotifySubscribersJob</u>.perform_later(id)</span>
+        <span>── Included from: Taggable (app/models/concerns/taggable.rb) ──────────────</span>
+      </div>
+      <span class="edge">gutter: original file line numbers (source_line_map) · heat bar by commit age · "N definitions" popover for ambiguous names</span><span class="n">3</span></div>
+    <div class="box a-ctx"><b>Context</b><b>Table</b> posts · 14 columns · 3 indexes · FK author_id → users<br><br><b>Used by (12)</b> PostsController · Api::PostsController · posts/show · posts/_card · PostSerializer · PublishPostJob …<br><br><b>Depends on (6)</b> User · Comment · Tag · Taggable · NotifySubscribersJob<br><br><b>Callbacks</b> after_commit → NotifySubscribersJob (create)<br><br><b>History</b> Leah · 3d · hot · 23 commits/yr<br>▸ Explain this model<span class="n">4</span></div>
+  </div>
+  <ol class="legend">
+    <li>Breadcrumb shows type and file path; the path copies to clipboard and links to the file's other units via <code>file_map</code>.</li>
+    <li>Tree groups by type (default), file tree or Packwerk package; counts come from the manifest. Selected unit is marked; "hot" units carry a dot.</li>
+    <li>Code: rouge-highlighted source with reference spans wrapped as links; a Stimulus hover card shows type, PageRank, enqueue method and last author; inlined concerns are collapsible blocks with their own file link. Method names in the class are anchors (<code>#notify_subscribers</code>).</li>
+    <li>Context column cards are the same partials the other directions use in their inspectors; each list item is a link; counts are exact.</li>
+  </ol>
+</div>
+
+<div class="wf">
+  <p class="caption">Wireframe B2: Lifecycle tab on <code>PostsController#create</code>. The flow document renders as a Mermaid flowchart beside the step table; both are generated from the same JSON.</p>
+  <div class="screen" style="grid-template-columns:1fr 1fr">
+    <div class="box"><b>Flowchart (Mermaid, generated)</b>
+      <pre class="mermaid" style="font-size:.7rem;margin:0;border:none;background:transparent">
+flowchart TD
+  R["POST /posts"] --> C["PostsController#create"]
+  C --> V{"@post.save?"}
+  V -- "true" --> TX["Post: validations · before_save"]
+  TX --> AC["after_commit :notify_subscribers"]
+  AC -. "perform_later" .-> J["NotifySubscribersJob#perform"]
+  J --> M["MailingListMailer#new_post"]
+  M --> T["mailing_list_mailer/new_post.html.erb"]
+  V -- "true" --> RD["redirect_to post_path"]
+  V -- "false" --> RN["render :new (422)"]
+      </pre></div>
+    <div class="box"><b>Steps (same document, line order)</b>
+      <div class="lines">
+        <span>1 PostsController#create &nbsp; app/controllers/posts_controller.rb</span>
+        <span>&nbsp;&nbsp;call &nbsp;&nbsp;&nbsp; Post.new(post_params) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; L14</span>
+        <span>&nbsp;&nbsp;conditional &nbsp;@post.save &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; L16</span>
+        <span>&nbsp;&nbsp;response &nbsp; redirect_to @post (302) &nbsp;&nbsp;&nbsp;&nbsp; L17</span>
+        <span>&nbsp;&nbsp;response &nbsp; render :new (422) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; L19</span>
+        <span>2 Post (model) · callbacks on create: after_commit notify_subscribers</span>
+        <span>&nbsp;&nbsp;async &nbsp;&nbsp;&nbsp;&nbsp; NotifySubscribersJob.perform_later &nbsp; L62</span>
+        <span>3 NotifySubscribersJob#perform · queue mailers</span>
+        <span>&nbsp;&nbsp;call &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MailingListMailer.new_post(...).deliver_later L9</span>
+        <span>4 MailingListMailer#new_post · templates: new_post.html.erb, new_post.text.erb</span>
+      </div>
+      <span class="edge">every step and line is a link into the Code tab of that unit · "Explain this lifecycle" seeds the guide with this document</span></div>
+  </div>
+</div>
+
+<h3>How the four capabilities surface in Field Guide</h3>
+<div class="tbl"><table>
+<thead><tr><th>Capability</th><th>Field Guide treatment</th></tr></thead>
+<tbody>
+<tr><td>Search, unit pages, code</td><td>Primary. Command palette search (<kbd>/</kbd>), unit pages per type with type-specific metadata cards (schema for models, routes and filters for controllers, templates for mailers, queue for jobs, partials and ivars for views), rouge highlighting, reference spans with hover cards, "N definitions" popover for ambiguous short names, file-level view listing every unit in a file.</td></tr>
+<tr><td>Relationship graph</td><td>Graph tab on each unit page embedding the Atlas neighbourhood component at depth 1 (expandable), plus list-form "Used by" and "Depends on" grouped by type and <code>via</code>. A global <code>/woods/graph</code> page for domain clusters and hubs.</td></tr>
+<tr><td>Flows and ERD</td><td>Lifecycle tab on controllers, jobs, mailers and models (model: one flow per callback event). Schema tab on models renders a Mermaid <code>erDiagram</code> of the model and one hop; <code>/woods/erd</code> renders a whole database or namespace, chunked.</td></tr>
+<tr><td>Git timeline</td><td>History tab: GitHub-style hunk cards (author, message, age heat bar) using <code>recent_commits</code>, plus a "related files" timeline for the unit's neighbourhood; a generation picker diffs two snapshots and marks added/modified/deleted units in the tree.</td></tr>
+</tbody></table></div>
+
+<h3>Scenario walkthroughs</h3>
+<div class="grid2">
+<div class="card"><h4>1 · Plan auto-tagging on posts</h4><ol class="steps-list">
+<li>Type "Post", open the model. Schema card: no tags column; associations show no Tag. Context "Used by" lists the controllers, serializer and 9 views.</li>
+<li>Lifecycle tab on <code>PostsController#create</code> shows save → after_commit → job; the natural attachment point for an <code>AutoTagJob</code> is obvious and the mailer precedent is one click away.</li>
+<li>Click <code>PostsController</code> in "Used by": the routes header and filters show where params are permitted; the Code tab's <code>post_params</code> is where <code>tag_ids</code> would be added.</li>
+<li>Follow <code>render</code> links to <code>posts/show.html.erb</code> and <code>posts/_card.html.erb</code>; instance variables and partials tell you which template owns the layout.</li>
+<li>"Explain this model" produces a plan grounded in the units just visited.</li>
+</ol></div>
+<div class="card"><h4>2 · Mailing list job failing after post creation</h4><ol class="steps-list">
+<li>Search the job. Its page shows queue, enqueue sites (inbound <code>job_enqueue</code> edges) and the mailer it calls.</li>
+<li>Lifecycle tab from <code>NotifySubscribersJob#perform</code>: the conditional around <code>user.subscribed?</code> and the <code>deliver_later</code> call are listed with lines; click into the mailer, then the template.</li>
+<li>History tab: the job and mailer were both touched in one commit 6 days ago by a teammate; the message names a "digest" refactor. Snapshot diff between gen 40 and gen 42 confirms the mailer's metadata hash changed.</li>
+<li>Click the commit's author to filter the timeline to their changes across the neighbourhood.</li>
+</ol></div>
+</div>
+
+<h3>Direction-specific requirements and technology</h3>
+<div class="grid2">
+<div class="card"><h4>Requirements</h4><ul>
+<li><strong>B-1</strong> Reference spans from the index (section 10) rendered as anchors with <code>data-target</code>, <code>data-type</code>, <code>data-kind</code>; unresolved or ambiguous names render as a popover listing candidates with types and paths.</li>
+<li><strong>B-2</strong> Line gutter shows original file lines via <code>source_line_map</code>; annotated header and concern blocks are visibly separate and collapsible.</li>
+<li><strong>B-3</strong> Hover card within 100 ms from a prefetched per-page JSON of referenced units (type, path, PageRank, last author, change_frequency).</li>
+<li><strong>B-4</strong> Type-specific metadata cards defined as one partial per unit type with a generic fallback that renders any metadata hash.</li>
+<li><strong>B-5</strong> File view (<code>/woods/files/*path</code> resolved through <code>file_map</code> only) listing each unit the file defines.</li>
+<li><strong>B-6</strong> History tab hunk cards and a neighbourhood timeline; generation picker backed by the snapshot store.</li>
+</ul></div>
+<div class="card"><h4>Technology</h4><ul>
+<li>rouge 5.x for Ruby, ERB, Haml, Slim, YAML; line-table formatter; spans injected server-side by position after highlighting (token boundaries respected).</li>
+<li>Turbo Frames for tabs and the context column; Turbo Drive for navigation; three Stimulus controllers (<code>hovercard</code>, <code>palette</code>, <code>collapse</code>).</li>
+<li>Mermaid 12 for Lifecycle and Schema tabs (ESM pin); Cytoscape only inside the Graph tab (lazy import).</li>
+<li>vis-timeline or Observable Plot for the History tab; Plot is smaller if only dots and a heat strip are needed.</li>
+</ul></div>
+</div>
+<div class="callout"><span class="eyebrow">Why this direction fits the stated scenarios</span>Both scenarios start from a unit the developer already knows by name and end in code, a controller and a template. Field Guide makes those steps first class and treats graphs and diagrams as evidence on the page. It is also the cheapest to make accessible and the easiest to keep working without JavaScript.</div>
+
+<h2 id="trail">5 · Direction C: Trail (investigation workbench)</h2>
+<div class="col">
+<p><strong>Thesis.</strong> Developers arrive with a question, not a file. Trail starts from an entry point or a question ("what happens when a post is created?", "why does this job fail?") and builds a swimlane lifecycle across layers: request, controller, model callbacks, jobs, mailers, templates. Each step expands into code and history in place. Everything you touch is pinned into an investigation that persists in the URL, feeds the guide and can be exported as Markdown with Mermaid for a PR description or an issue.</p>
+<p><strong>Navigation model.</strong> Choose an entry (route, action, job, mailer, callback event or a free-text question the guide resolves to an entry). Expand steps inline. Pin units to the board. The board is the unit of sharing and the guide's working memory.</p>
+</div>
+
+<div class="wf">
+  <p class="caption">Wireframe C1: investigation "mailing list failures", entry <code>NotifySubscribersJob#perform</code>, swimlanes by layer, history strip scoped to pinned units.</p>
+  <div class="screen wf-trail">
+    <div class="box a-top bar"><span class="box solid" style="flex:0 0 100px">Woods · gen 42</span><span class="box">Investigation: mailing list failures &nbsp;·&nbsp; 6 pinned &nbsp;·&nbsp; share · export .md</span><span class="box solid" style="flex:0 0 70px">Guide ▸</span><span class="n">1</span></div>
+    <div class="box a-entry"><b>Entry</b>◉ Job NotifySubscribersJob#perform &nbsp; ○ Route POST /posts &nbsp; ○ Callback Post after_commit(create) &nbsp; ○ Ask: "why do mailing list jobs fail after a post is created?" &nbsp;&nbsp; depth 3 · include templates ☑<span class="n">2</span></div>
+    <div class="box a-lanes" style="min-height:170px"><b>Lifecycle (swimlanes, generated from flow + edges)</b>
+      <div class="lane"><span>request</span><div class="steps"><span class="step">POST /posts</span><span class="step">PostsController#create</span></div></div>
+      <div class="lane"><span>model</span><div class="steps"><span class="step">Post.save (5 validations)</span><span class="step">after_commit :notify_subscribers</span></div></div>
+      <div class="lane"><span>jobs</span><div class="steps"><span class="step">NotifySubscribersJob.perform_later</span><span class="step err">perform · rescue_from? none · retry_on? none</span></div></div>
+      <div class="lane"><span>mail</span><div class="steps"><span class="step">MailingListMailer.new_post(user, post)</span><span class="step">deliver_later → queue mailers</span></div></div>
+      <div class="lane"><span>views</span><div class="steps"><span class="step">new_post.html.erb</span><span class="step">new_post.text.erb</span><span class="step">_post_summary.html.erb</span></div></div>
+      <span class="edge">▸ expand a step: code excerpt (method only) · metadata · last commit &nbsp;&nbsp; ⚑ markers: conditional branch · unresolved call · cross-database edge</span><span class="n">3</span></div>
+    <div class="box a-pin"><b>Pinned (6)</b>Post · NotifySubscribersJob · MailingListMailer · new_post.html.erb · User · PostsController<br><br><b>Notes</b> "job has no retry_on; mailer template calls user.name which can be nil?"<br><br>▸ Graph of pinned<br>▸ ERD of pinned models<br>▸ Explain this investigation<br>▸ Draft a fix plan<span class="n">4</span></div>
+    <div class="box a-time"><b>History of pinned units (vis-timeline)</b>Post ──●─────●──── &nbsp; Job ────────●●──── &nbsp; Mailer ────────●──── &nbsp; template ────────●──── &nbsp;&nbsp; ← both touched in a1b2c3d "digest refactor" · 6d · T.<span class="n">5</span></div>
+  </div>
+  <ol class="legend">
+    <li>The investigation name, pinned count and export are in the title bar; the whole board state is in the URL (entry, depth, pins, notes hash) so it can be pasted into an issue.</li>
+    <li>Entry chooser accepts any unit the <code>FlowAssembler</code> can start from; the "Ask" option sends the question to the guide, which uses <code>search</code> and <code>trace_flow</code> and proposes entries.</li>
+    <li>Swimlanes are the flow document regrouped by unit type; async hops (<code>perform_later</code>, <code>deliver_later</code>) are dashed boundaries between lanes. Flags are derived facts: a job without <code>retry_on</code>, a conditional with no else branch, an unresolved dynamic dispatch.</li>
+    <li>The pinboard is the guide's context and the export's content. "Graph of pinned" opens the Atlas component on exactly those nodes.</li>
+    <li>History strip is scoped to pinned units; a commit that touches two pinned units is drawn as a connected pair, which is the "who changed the mailer and the job together" question answered visually.</li>
+  </ol>
+</div>
+
+<h3>How the four capabilities surface in Trail</h3>
+<div class="tbl"><table>
+<thead><tr><th>Capability</th><th>Trail treatment</th></tr></thead>
+<tbody>
+<tr><td>Search, unit pages, code</td><td>Search chooses entries and pins. Code appears as method-level excerpts inside expanded steps (the flow carries line numbers, so the excerpt is the called method, not the whole file), with a link to the full unit page (the Field Guide page, reused).</td></tr>
+<tr><td>Relationship graph</td><td>Secondary: "Graph of pinned" and "blast radius of entry" open the Atlas component scoped to the board; the swimlane itself is a directed, layered view of a slice of the graph.</td></tr>
+<tr><td>Flows and ERD</td><td>Primary. The swimlane is the flow. A Mermaid export (flowchart with subgraphs per lane, or <code>sequenceDiagram</code> for the async hops) is one click; "ERD of pinned models" renders the models on the board and their tables.</td></tr>
+<tr><td>Git timeline</td><td>Scoped to the board; co-change pairs are the headline feature. Snapshot diffs annotate steps that changed between two generations ("this mailer's metadata changed in gen 41").</td></tr>
+</tbody></table></div>
+
+<h3>Scenario walkthroughs</h3>
+<div class="grid2">
+<div class="card"><h4>1 · Plan auto-tagging on posts</h4><ol class="steps-list">
+<li>New investigation "auto tagging", entry <code>Post after_commit(create)</code> and <code>PostsController#create</code> (a board can hold several entries).</li>
+<li>The lanes show where asynchronous work already attaches to post creation; pin the job, mailer and the views that render a post.</li>
+<li>"ERD of pinned models" gives the posts, users, comments tables to design a <code>tags</code>/<code>taggings</code> addition against.</li>
+<li>"Draft a fix plan" (here, an implementation plan) asks the guide to propose an <code>AutoTagJob</code> enqueued from the same callback, a migration, serializer and view changes, citing the pinned units.</li>
+<li>Export the board as Markdown with the Mermaid lifecycle for the planning issue.</li>
+</ol></div>
+<div class="card"><h4>2 · Mailing list job failing after post creation</h4><ol class="steps-list">
+<li>Entry: the job. The lane view immediately flags "no retry_on / rescue_from" and a conditional with no else branch in the mailer.</li>
+<li>Expand the mailer step: the method excerpt shows <code>user.name</code>; expand the template step: it also reads <code>@user.preferences</code>.</li>
+<li>The history strip shows the job and mailer were changed together six days ago; expanding the commit shows message and author.</li>
+<li>Pin the two, write a note, share the URL in the incident thread; "Explain this investigation" summarises the evidence.</li>
+</ol></div>
+</div>
+
+<h3>Direction-specific requirements and technology</h3>
+<div class="grid2">
+<div class="card"><h4>Requirements</h4><ul>
+<li><strong>C-1</strong> Lifecycle builder: given an entry, assemble the flow (precomputed or on demand), then extend across async boundaries by following <code>job_enqueue</code> and mailer edges and the job's own <code>perform</code> flow, up to a depth budget; group steps into lanes by unit type.</li>
+<li><strong>C-2</strong> Derived flags: missing <code>retry_on</code>/<code>discard_on</code>, callbacks with conditions, conditionals without else, <code>dynamic_dispatch</code>, cross-database association edges, hub units.</li>
+<li><strong>C-3</strong> Board state serialised in the URL (compressed) with an optional server-side save under <code>&lt;index&gt;/explorer/boards/</code> for named investigations.</li>
+<li><strong>C-4</strong> Export: Markdown with Mermaid flowchart and erDiagram, unit links as repository paths with line numbers.</li>
+<li><strong>C-5</strong> Co-change detection: commits touching two or more pinned units, from the generation's commit table.</li>
+</ul></div>
+<div class="card"><h4>Technology</h4><ul>
+<li>Lanes are plain HTML/CSS grid (no graph library); step expansion is a Turbo Frame.</li>
+<li>Mermaid 12 for export and the optional diagram view; <code>@dagrejs/dagre</code> if a layered SVG of the lanes is wanted in-page.</li>
+<li>vis-timeline for the strip; Cytoscape only when "Graph of pinned" is opened.</li>
+<li>Ruby: a <code>LifecycleBuilder</code> over <code>FlowAssembler</code> + the graph; a <code>FlagDetector</code> over unit metadata (job <code>rescue_from</code>/<code>retry_on</code> facts must be present in job metadata; add if missing).</li>
+</ul></div>
+</div>
+<div class="callout warn"><span class="eyebrow">Risks</span>Trail is the most novel and the most dependent on flow quality: receiverless local calls can remain unexpanded and dynamic dispatch is opaque, so lanes will have gaps that must be shown honestly. It also needs job metadata that may not exist yet (retry and rescue declarations). As a sole surface it is weak for browsing; it is strongest as the page you reach once you know your entry point.</div>
+
+<h2 id="compare">6 · Comparison and recommendation</h2>
+<div class="tbl"><table class="matrix">
+<thead><tr><th>Criterion</th><th>A · Atlas</th><th>B · Field Guide</th><th>C · Trail</th></tr></thead>
+<tbody>
+<tr><td>Fit: scenario 1 (plan a feature around Post)</td><td class="score">●●○ blast radius is excellent; reading code is weak</td><td class="score">●●● every step is a page the developer expects</td><td class="score">●●○ great once the entry is chosen</td></tr>
+<tr><td>Fit: scenario 2 (debug a failing job)</td><td class="score">●●○</td><td class="score">●●○ needs History + Lifecycle tabs together</td><td class="score">●●● built for exactly this</td></tr>
+<tr><td>Build cost to v1 (all four capabilities)</td><td class="score">High: graph UX, layout caching, flow overlay</td><td class="score">Medium: mostly server-rendered pages</td><td class="score">High: lifecycle builder, flags, board state</td></tr>
+<tr><td>Works without JavaScript</td><td class="score">No</td><td class="score">Yes (except Graph tab and diagrams)</td><td class="score">Mostly (lanes are HTML)</td></tr>
+<tr><td>Accessibility and keyboard</td><td class="score">Hard</td><td class="score">Natural</td><td class="score">Natural</td></tr>
+<tr><td>Performance risk on 5 000-unit apps</td><td class="score">Medium (neighbourhood cap, layout cost)</td><td class="score">Low</td><td class="score">Medium (on-demand flow assembly)</td></tr>
+<tr><td>Dependence on new Woods data (section 10)</td><td class="score">commit table</td><td class="score">reference spans, method table, commit table</td><td class="score">job retry facts, commit table</td></tr>
+<tr><td>LLM synergy</td><td class="score">Medium: selection as context</td><td class="score">Medium: page as context</td><td class="score">High: the board is the context</td></tr>
+<tr><td>Shareability (URL as artefact)</td><td class="score">Good</td><td class="score">Good</td><td class="score">Best (board + export)</td></tr>
+<tr><td>Novelty / differentiation</td><td class="score">Familiar (Obsidian, CodeSee)</td><td class="score">Familiar (GitHub, Sourcegraph)</td><td class="score">New: lifecycle + co-change + guide</td></tr>
+</tbody></table></div>
+
+<div class="callout"><span class="eyebrow">Recommendation</span>
+<p style="margin:.2rem 0 .6rem">Build <strong>Field Guide as the spine</strong>, make <strong>Trail's lifecycle board a first-class route</strong> reached from any unit page, and ship <strong>Atlas as a component</strong> (the Graph tab, "graph of pinned", and a full-screen <code>/woods/graph</code> page) rather than as the home screen.</p>
+<ul>
+<li>Field Guide covers the most steps of both scenarios with the least JavaScript, and its unit pages and context cards are the partials the other two directions need anyway.</li>
+<li>Trail is where the product differentiates (lifecycle across async boundaries, co-change history, a board the guide reasons over). Making it a route instead of the home screen avoids its browsing weakness.</li>
+<li>Atlas as a component keeps the Cytoscape work bounded to one Stimulus controller and one JSON endpoint; promoting it to a home screen later is cheap if usage shows people start from the graph.</li>
+</ul>
+</div>
+
+<h2 id="iterations">7 · Field Guide iterations: understanding the code first</h2>
+<div class="col">
+<p>Direction B is the chosen spine. The two iterations below push it toward one goal above all others: a developer standing in front of a model, controller, job or template understands what the code does, in Rails terms, faster and more reliably than by reading the file in an editor. Woods' advantage here is that its index records what Rails resolved at runtime (the callback chain in order, which filters apply to which action, which concern supplied a method, what a callback writes or enqueues), and almost none of that is visible in the file itself.</p>
+</div>
+
+<h3>Iteration 2 · Read the code as Rails runs it</h3>
+<div class="col">
+<p>The code viewer becomes the centre of the unit page rather than one tab among five. It offers two lenses over the same lines, keeps every Rails fact in the margin next to the line it belongs to, lets you peek at any referenced definition without leaving, and never asks you to guess whether a link is trustworthy.</p>
+</div>
+
+<div class="wf">
+  <p class="caption">Wireframe B3: reading mode for <code>Post</code> in the "Effective class" lens, with the outline open, marginalia on the right, and a peek drawer expanded under line 62.</p>
+  <div class="screen" style="grid-template-columns:170px 1fr 230px;grid-template-areas:'top top top' 'outline code margin'">
+    <div class="box bar" style="grid-area:top"><span class="box solid" style="flex:0 0 90px">Post · model</span><span class="box solid" style="flex:0 0 240px">Lens: ○ As written &nbsp;◉ Effective class</span><span class="box">⌕ search in code… &nbsp;·&nbsp; wrap · A A · #L61-L64 · copy path:line · open in editor</span><span class="box solid" style="flex:0 0 120px">Trail: Post ‹ PostsController ‹ posts/show</span><span class="n">1</span></div>
+    <div class="box" style="grid-area:outline"><b>Outline</b>
+      <b style="margin-top:6px">Lifecycle · create</b>1 before_validation :normalize_title<br>2 validations (5)<br>3 before_save :set_slug<br>4 after_create :count_author ⟵ Countable<br>5 after_commit :notify_subscribers<br>
+      <b style="margin-top:6px">Associations</b>author · comments · tags ⟵ Taggable<br>
+      <b style="margin-top:6px">Methods (Post)</b>publish! · notify_subscribers · to_param<br>
+      <b style="margin-top:6px">Methods (Taggable)</b>tag_list · tag_list=<br>
+      <b style="margin-top:6px">Scopes</b>published · recent<span class="n">2</span></div>
+    <div class="box" style="grid-area:code"><b>Code</b>
+      <div class="lines">
+        <span>12  class Post &lt; ApplicationRecord</span>
+        <span>13    include <u>Taggable</u> ✓ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▸ 2 methods, 1 association, 1 callback (collapsed)</span>
+        <span>14    belongs_to :<u>author</u> ✓, class_name: "User"</span>
+        <span>15    has_many :<u>comments</u> ✓, dependent: :destroy</span>
+        <span>18    after_commit :<u>notify_subscribers</u> ✓, on: :create</span>
+        <span>19    validates :title, presence: true, length: { maximum: 140 }</span>
+        <span>…</span>
+        <span>61    def notify_subscribers</span>
+        <span>62      <u>NotifySubscribersJob</u> ✓.<u>perform_later</u>(id)</span>
+        <span>   ╭ peek · NotifySubscribersJob#perform · app/jobs/notify_subscribers_job.rb:7 · queue mailers · no retry_on ─ open ↗ ╮</span>
+        <span>   │  7  def perform(post_id)</span>
+        <span>   │  8    post = Post.find(post_id)</span>
+        <span>   │  9    post.author.followers.find_each { |u| MailingListMailer.new_post(u, post).deliver_later }</span>
+        <span>   ╰──────────────────────────────────────────────────────────────────────────╯</span>
+        <span>63    end</span>
+      </div>
+      <span class="edge">✓ runtime-verified · ◌ static · ? ambiguous (click lists candidates) · gutter heat = commit age · line numbers are the file's own</span><span class="n">3</span></div>
+    <div class="box" style="grid-area:margin"><b>Marginalia (aligned to lines)</b>
+      L13 · Taggable from app/models/concerns/taggable.rb; adds tags, tag_list, before_save :normalize_tags<br><br>
+      L14 · posts.author_id → users.id (FK, indexed) · inverse_of :posts<br><br>
+      L15 · comments.post_id · dependent: destroy runs 1 query per comment<br><br>
+      L18 · chain position 5 of 5 on create · condition: none · writes: — · enqueues: NotifySubscribersJob · calls: —<br><br>
+      L19 · validation 1 of 5 · also: uniqueness(slug), presence(author)<br><br>
+      L61 · called from: after_commit (this class) · PostsController#republish (static ◌)<br>last changed 3 d ago by Leah · "notify on commit, not save"<span class="n">4</span></div>
+  </div>
+  <ol class="legend">
+    <li>Lens toggle: "As written" is the file's bytes with original numbering; "Effective class" is Woods' annotated source (schema header, concern bodies inlined and collapsible, superclass methods on request) mapped to the same file lines through <code>source_line_map</code>. The reading trail is a breadcrumb stack of the units you came through.</li>
+    <li>Outline groups what the class <em>is</em> at runtime: callback chains per event in resolved order (with the owning concern), associations, methods grouped by owner, scopes. Clicking scrolls and highlights; the outline doubles as the keyboard map.</li>
+    <li>Every reference is a link with a confidence mark. Click opens a peek drawer under the line showing the target method (sliced by the method table) with its own key facts; "open" navigates. Gutter heat uses the commit table.</li>
+    <li>Marginalia are the Rails facts Woods already extracts, placed beside the line they explain: association storage facts, callback chain position and side effects, validation sets, filter applicability, route for an action, callers of a method.</li>
+  </ol>
+</div>
+
+<div class="grid2">
+<div class="card"><h4>What this adds for the two scenarios</h4><ul>
+<li>Scenario 1: the lifecycle outline shows where an <code>AutoTagJob</code> enqueue would sit in the create chain and whether a concern already owns tagging; the marginalia on <code>has_many :tags</code> reveals the join table and FK before any migration is written.</li>
+<li>Scenario 2: peeking from the <code>perform_later</code> line into the job shows "no retry_on" and the <code>find_each</code> loop over followers without ever leaving the model; the L61 margin shows a second, static caller the developer did not know about.</li>
+</ul></div>
+<div class="card"><h4>Requirements (extend B-1 to B-6)</h4><ul>
+<li><strong>B-7</strong> Two lenses over one line model; the lens is remembered per browser; permalinks (<code>#L61-L64</code>) resolve in both lenses.</li>
+<li><strong>B-8</strong> Outline with callback chains per event in resolved order, methods grouped by owner (class, each concern, superclass), associations, scopes, enums; keyboard navigation (<kbd>j</kbd>/<kbd>k</kbd>, <kbd>gd</kbd> definition, <kbd>gr</kbd> references, <kbd>p</kbd> peek).</li>
+<li><strong>B-9</strong> Peek drawer: slice the target's method by the method table; nested peeks up to depth 3; "open" pushes onto the reading trail.</li>
+<li><strong>B-10</strong> Marginalia: a renderer per unit type mapping metadata facts to lines (callbacks, associations, validations, scopes, filters, routes, renders, enqueues); every fact links to its source unit.</li>
+<li><strong>B-11</strong> Confidence marks on every link: runtime-verified (from the typed registry), static (collector only), ambiguous (candidate list). Never a silent wrong jump.</li>
+<li><strong>B-12</strong> Full-text code search across units (the reader already supports <code>source_code</code> as a search field) with snippet results and a type filter.</li>
+<li><strong>B-13</strong> Callers panel for the current method from method-level reference spans and flow operations.</li>
+<li><strong>B-14</strong> Unit diff across retained generations (default three): unified diff of <code>source_code</code> with the metadata changes listed alongside.</li>
+<li><strong>B-15</strong> Reading ergonomics: wrap, font size, copy <code>path:line</code>, configurable "open in editor" link scheme (a link only; the explorer never touches the file system).</li>
+</ul></div>
+</div>
+
+<h3>Iteration 3 · Follow the data across layers</h3>
+<div class="col">
+<p>Both scenarios end with the same question: how does data travel from request to template, or from callback to mail? Iteration 3 adds a "data passage" view for actions and mailers and a "callback ladder" for models. These are the places where the file alone misleads: a filter applies to an action it does not mention; a template reads an instance variable no action assigns; a callback runs under a condition declared in a concern.</p>
+</div>
+
+<div class="wf">
+  <p class="caption">Wireframe B4: data passage for <code>PostsController#show</code>. Filters above, then the passage from params through the action to the templates that read what it assigned.</p>
+  <div class="screen" style="grid-template-columns:1fr">
+    <div class="box"><b>Filter matrix (resolved only/except)</b>
+      <div class="lines">
+        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;index &nbsp;show &nbsp;new &nbsp;create &nbsp;edit &nbsp;update &nbsp;destroy</span>
+        <span>before authenticate_user! (ApplicationController) &nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✓</span>
+        <span>before set_post &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✓</span>
+        <span>before authorize_author! ⟵ Authorizable &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✓</span>
+        <span>after track_view (if: -&gt; { request.get? }) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·</span>
+      </div></div>
+    <div class="box"><b>Passage · GET /posts/:id → PostsController#show</b>
+      <div class="lane"><span>reads</span><div class="steps"><span class="step">params[:id] (set_post)</span><span class="step">current_user</span></div></div>
+      <div class="lane"><span>assigns</span><div class="steps"><span class="step">@post ⟵ set_post (L71)</span><span class="step">@comments ⟵ show (L23)</span><span class="step err">@related ⟵ nowhere</span></div></div>
+      <div class="lane"><span>renders</span><div class="steps"><span class="step">posts/show.html.erb (implicit)</span><span class="step">→ posts/_card (locals: post)</span><span class="step">→ comments/_list (locals: comments)</span><span class="step">→ layouts/application</span></div></div>
+      <div class="lane"><span>reads in views</span><div class="steps"><span class="step">@post · @comments</span><span class="step err">@related (show.html.erb:41) never assigned</span><span class="step">helpers: post_path, time_ago_in_words, markdown</span></div></div>
+      <div class="lane"><span>responds</span><div class="steps"><span class="step">html</span><span class="step">json → PostSerializer</span></div></div>
+      <span class="edge">⚑ an instance variable read by a template and assigned by no action or filter is flagged · every chip links to its line</span></div>
+    <div class="box"><b>Callback ladder · Post · on create (model page equivalent)</b>
+      <div class="lines">
+        <span>1 before_validation normalize_title &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Post &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; writes title</span>
+        <span>2 validate &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; presence(title, author) · length(title) · uniqueness(slug)</span>
+        <span>3 before_save &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; set_slug &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Post &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; writes slug · if: title_changed?</span>
+        <span>4 before_save &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; normalize_tags &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Taggable &nbsp;&nbsp;&nbsp;&nbsp; writes tag_list</span>
+        <span>5 after_create &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; count_author &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Countable &nbsp;&nbsp;&nbsp;&nbsp; calls User#increment!</span>
+        <span>6 after_commit &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; notify_subscribers &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Post &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; enqueues NotifySubscribersJob</span>
+      </div>
+      <span class="edge">event tabs: create · update · destroy · touch · commit &nbsp;·&nbsp; order is the resolved runtime chain, not file order</span></div>
+  </div>
+</div>
+
+<div class="grid2">
+<div class="card"><h4>What this adds for the two scenarios</h4><ul>
+<li>Scenario 1: the passage for <code>show</code> and <code>index</code> names the exact template and partial that render a post and which locals they take, so "where do tags render" has a one-screen answer; the matrix shows which filters a new <code>tags</code> action inherits.</li>
+<li>Scenario 2: the mailer's passage shows the template reading <code>@user.preferences</code> while the mailer action assigns only <code>@user</code> and <code>@post</code>; a read with no assignment is the class of bug that fails "occasionally". The ladder shows the enqueue runs after commit, which rules out the rollback theory.</li>
+</ul></div>
+<div class="card"><h4>Requirements</h4><ul>
+<li><strong>B-16</strong> Filter matrix per controller: filters in chain order (including inherited and concern-supplied) against actions, with resolved only/except and conditions shown on hover.</li>
+<li><strong>B-17</strong> Data passage per action and per mailer action: params read and permitted, instance variables assigned (with owner method and line), render targets and partial chain with locals, instance variables and helpers read in each template, response formats and serializers.</li>
+<li><strong>B-18</strong> Mismatch flags: template reads an unassigned instance variable; permitted param with no matching column or attribute; partial rendered with a local the partial never reads.</li>
+<li><strong>B-19</strong> Callback ladder per model event in resolved chain order with owner, conditions and side effects; each row links into the Code tab at its line.</li>
+<li><strong>B-20</strong> Mermaid export of a passage (<code>flowchart LR</code>) for issues and PRs.</li>
+</ul></div>
+</div>
+
+<div class="callout"><span class="eyebrow">Extraction-side additions these iterations need</span>
+<ul style="margin:.3rem 0 0">
+<li><strong>W-6</strong> Method-level targets in reference spans: when a receiver resolves to a unit, record <code>method</code> on the span (<code>NotifySubscribersJob.perform_later</code>, <code>MailingListMailer.new_post</code>), so callers panels and peeks can slice the right method.</li>
+<li><strong>W-7</strong> Per-action controller and mailer facts: <code>assigns[{ivar, line, method}]</code>, <code>params[{key, permitted, line}]</code>, <code>renders[{template, partial, locals, line}]</code>, <code>redirects</code>, <code>respond_to</code> formats, from the action sources Woods already captures, with Prism. Views already record <code>instance_variables</code>, <code>helpers_called</code> and <code>partials_rendered</code>, so the passage is a join.</li>
+<li><strong>W-8</strong> Filter applicability per action: the runtime filter chain already records only/except; publish the resolved action list per filter so the matrix needs no re-derivation.</li>
+<li>W-1 (spans), W-2 (method table) and W-3 (commit table) from section 9 remain prerequisites.</li>
+</ul>
+</div>
+
+<h3 id="c4">C4 model: does it add useful context?</h3>
+<div class="col">
+<p>The C4 model (Simon Brown) describes a system at four zoom levels, Context, Containers, Components and Code, with a fixed notation per element (name, type, technology, one-line description) and two supplementary views: dynamic diagrams for a runtime scenario with numbered interactions, and deployment diagrams. Its value for the explorer is the <em>zoom ladder</em> and the <em>vocabulary</em>, not any particular tool. Today the explorer's charts live at Code level (units) and at a neighbourhood of Code level (the graph). They have no view of the system as a whole, and the lifecycle charts have no agreed notation for "which process does this run in". C4 supplies both.</p>
+</div>
+
+<div class="tbl"><table>
+<thead><tr><th>C4 level</th><th>What it would show for a Rails app</th><th>Where Woods already has the facts</th><th>Gap</th></tr></thead>
+<tbody>
+<tr><td>L1 · System context</td><td>The application, its users (roles), and the external systems it talks to.</td><td><code>external_consumer</code> units (declared external calls), mailer <code>delivery_method</code>, Active Storage service, GraphQL and route surfaces for inbound APIs.</td><td>Users are not in the index; take them from Devise/Pundit role facts when present, otherwise from a host-provided list. Low cost.</td></tr>
+<tr><td>L2 · Containers</td><td>Web process, job runner, databases, cache, mail delivery, mounted engines, object storage.</td><td>The <code>BehavioralProfile</code> configuration unit records <code>database</code>, <code>background_processing</code>, <code>caching</code>, <code>email</code> and <code>frameworks_active</code>; model <code>database</code> and <code>database_table</code> units give multi-database layout; <code>engine</code> and <code>middleware</code> units give the request stack.</td><td>Deployment topology (how many processes, where) is not a Woods concern; L2 stays logical, not physical.</td></tr>
+<tr><td>L3 · Components</td><td>Packwerk packages, namespaces or detected domain clusters inside each container, with the relationships between them.</td><td><code>package</code> units and <code>package_dependency</code> edges; <code>domain_clusters</code> from graph analysis; namespaces from unit metadata.</td><td>None. This is the Cytoscape compound-node view with C4 labelling.</td></tr>
+<tr><td>L4 · Code</td><td>Classes, methods, templates, tables.</td><td>Every unit page.</td><td>None; C4 itself recommends generating this level from code rather than drawing it, which is exactly what Woods does.</td></tr>
+<tr><td>Dynamic</td><td>One scenario across containers with numbered steps: request → controller → model → job → mailer → SMTP.</td><td>Flow documents, extended across async hops by the Trail lifecycle builder; container membership from unit type and queue facts.</td><td>None. Equivalent to the Trail swimlane, in a notation other teams already know.</td></tr>
+<tr><td>Deployment</td><td>Nodes, instances, infrastructure.</td><td>Not in the index.</td><td>Out of scope; the explorer is index-only.</td></tr>
+</tbody></table></div>
+
+<h4>Can Mermaid draw the C4 notation natively?</h4>
+<div class="col"><p>Yes. The experimental C4 diagram type is the problem, not Mermaid. A plain flowchart with HTML labels, a subgraph for the system boundary and three <code>classDef</code>s reproduces the notation, follows the theme, lays out with dagre or ELK, and supports <code>click</code> links on every node when the explorer renders it with <code>securityLevel: "loose"</code> (trusted, self-generated text). The same text is the export. The newer <code>architecture</code> diagram (Mermaid 11.1+) is a second native option for the container level with built-in server, database and disk icons.</p></div>
+
+<pre class="mermaid">
+flowchart LR
+  author(["«person»<br/><b>Author</b><br/>Signs in, writes posts"])
+  subscriber(["«person»<br/><b>Subscriber</b><br/>Receives the mailing list"])
+  subgraph blog["Blog · Rails 8.0 &nbsp;[software system]"]
+    direction LR
+    web["«container»<br/><b>Web process</b><br/><i>[Rails, Puma]</i><br/>Controllers, views, Turbo"]
+    jobs["«container»<br/><b>Job runner</b><br/><i>[Solid Queue]</i><br/>NotifySubscribersJob, PublishPostJob"]
+    db[("«container · db»<br/><b>Primary database</b><br/><i>[PostgreSQL]</i>")]
+    cache[("«container · db»<br/><b>Cache</b><br/><i>[Solid Cache]</i>")]
+  end
+  smtp["«external system»<br/><b>Mail delivery</b><br/><i>[SMTP via Action Mailer]</i>"]
+  s3["«external system»<br/><b>Object storage</b><br/><i>[Active Storage, S3]</i>"]
+  author -- "creates posts [HTTPS]" --> web
+  web -- "enqueues [perform_later]" --> jobs
+  web -- "reads, writes [Active Record]" --> db
+  jobs -- "reads [Active Record]" --> db
+  web -- "reads, writes [Rails.cache]" --> cache
+  jobs -- "delivers [deliver_later]" --> smtp
+  smtp -- "new-post email" --> subscriber
+  web -- "uploads [Active Storage]" --> s3
+  classDef person fill:#1f3d5c,color:#ffffff,stroke:#1f3d5c
+  classDef container fill:#2f6b45,color:#ffffff,stroke:#2f6b45
+  classDef ext fill:#6f766f,color:#ffffff,stroke:#6f766f
+  class author,subscriber person
+  class web,jobs,db,cache container
+  class smtp,s3 ext
+</pre>
+
+<pre class="mermaid">
+architecture-beta
+  group blog(cloud)[Blog Rails 8]
+  service web(server)[Web process] in blog
+  service jobs(server)[Job runner] in blog
+  service db(database)[Primary database] in blog
+  service cache(disk)[Cache] in blog
+  service smtp(internet)[Mail delivery]
+  service s3(disk)[Object storage]
+  web:R --> L:jobs
+  web:B --> T:db
+  jobs:B --> T:cache
+  jobs:R --> L:smtp
+  web:L --> R:s3
+</pre>
+
+<div class="col"><p>What Mermaid cannot do natively is the free-form, numbered dynamic view with containers as lanes. For that the choices are a sequence diagram (below), Mermaid 12's swimlanes diagram once the explorer vendors Mermaid 12, or the explorer's own SVG shown next. The SVG examples stay as the fallback where edge routing must be controlled.</p></div>
+
+<div class="col"><p>The same two views as the explorer's own SVG: each box carries stereotype, name, technology and one line of description; each arrow carries its mechanism. This is the fallback for views where edge routing must be controlled, such as the numbered dynamic view.</p></div>
+
+<figure class="c4fig">
+<figcaption>Container view of the blog, derived from <code>BehavioralProfile</code>, engines and external consumers.</figcaption>
+<svg viewBox="0 0 960 560" role="img" aria-label="C4 container view: Author uses the web process; the web process enqueues to the job runner, reads and writes the primary database and cache, and uploads to object storage; the job runner reads the database and delivers mail; mail delivery reaches the subscriber">
+  <defs><marker id="c4arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--c4-line)"/></marker></defs>
+  <!-- system boundary -->
+  <rect x="20" y="150" width="640" height="330" rx="6" fill="none" stroke="var(--c4-boundary)" stroke-dasharray="6 4"/>
+  <text x="34" y="172" class="c4-bl">Blog · Rails 8.0 <tspan class="c4-st">[software system]</tspan></text>
+  <!-- persons -->
+  <g class="c4-person"><rect x="40" y="20" width="200" height="96" rx="10"/><text x="140" y="42" class="c4-st">«person»</text><text x="140" y="66" class="c4-name">Author</text><text x="140" y="90" class="c4-desc">Signs in, writes posts</text></g>
+  <g class="c4-person"><rect x="720" y="20" width="200" height="96" rx="10"/><text x="820" y="42" class="c4-st">«person»</text><text x="820" y="66" class="c4-name">Subscriber</text><text x="820" y="90" class="c4-desc">Receives the mailing list</text></g>
+  <!-- containers -->
+  <g class="c4-container"><rect x="50" y="200" width="200" height="100" rx="6"/><text x="150" y="222" class="c4-st">«container»</text><text x="150" y="246" class="c4-name">Web process</text><text x="150" y="266" class="c4-tech">[Rails, Puma]</text><text x="150" y="288" class="c4-desc">Controllers, views, Turbo</text></g>
+  <g class="c4-container"><rect x="300" y="200" width="200" height="100" rx="6"/><text x="400" y="222" class="c4-st">«container»</text><text x="400" y="246" class="c4-name">Job runner</text><text x="400" y="266" class="c4-tech">[Solid Queue]</text><text x="400" y="288" class="c4-desc">NotifySubscribersJob, PublishPostJob</text></g>
+  <g class="c4-container"><path d="M50,352 a100,12 0 0,1 200,0 v76 a100,12 0 0,1 -200,0 z"/><path d="M50,352 a100,12 0 0,0 200,0" fill="none" stroke="var(--c4-ink)" stroke-opacity=".35"/><text x="150" y="376" class="c4-st">«container · db»</text><text x="150" y="398" class="c4-name">Primary database</text><text x="150" y="416" class="c4-tech">[PostgreSQL]</text><text x="150" y="434" class="c4-desc">posts, users, comments, tags</text></g>
+  <g class="c4-container"><path d="M300,352 a100,12 0 0,1 200,0 v76 a100,12 0 0,1 -200,0 z"/><path d="M300,352 a100,12 0 0,0 200,0" fill="none" stroke="var(--c4-ink)" stroke-opacity=".35"/><text x="400" y="376" class="c4-st">«container · db»</text><text x="400" y="398" class="c4-name">Cache</text><text x="400" y="416" class="c4-tech">[Solid Cache]</text><text x="400" y="434" class="c4-desc">fragment and query caches</text></g>
+  <!-- externals -->
+  <g class="c4-ext"><rect x="720" y="200" width="200" height="90" rx="6"/><text x="820" y="222" class="c4-st">«external system»</text><text x="820" y="246" class="c4-name">Mail delivery</text><text x="820" y="268" class="c4-tech">[SMTP via Action Mailer]</text></g>
+  <g class="c4-ext"><rect x="720" y="400" width="200" height="90" rx="6"/><text x="820" y="422" class="c4-st">«external system»</text><text x="820" y="446" class="c4-name">Object storage</text><text x="820" y="468" class="c4-tech">[Active Storage, S3]</text></g>
+  <!-- relationships -->
+  <g class="c4-rel">
+    <line x1="140" y1="116" x2="148" y2="200" marker-end="url(#c4arrow)"/><text x="160" y="150">Creates and edits posts</text><text x="160" y="164" class="c4-mech">[HTTPS]</text>
+    <line x1="250" y1="250" x2="300" y2="250" marker-end="url(#c4arrow)"/><text x="275" y="238" text-anchor="middle">Enqueues</text><text x="275" y="266" text-anchor="middle" class="c4-mech">[perform_later]</text>
+    <line x1="120" y1="300" x2="120" y2="352" marker-end="url(#c4arrow)"/><text x="126" y="322">Reads and writes</text><text x="126" y="336" class="c4-mech">[Active Record]</text>
+    <line x1="320" y1="300" x2="220" y2="352" marker-end="url(#c4arrow)"/><text x="262" y="314">Reads</text>
+    <line x1="420" y1="300" x2="400" y2="352" marker-end="url(#c4arrow)"/><text x="426" y="322">Reads and writes</text><text x="426" y="336" class="c4-mech">[Rails.cache]</text>
+    <line x1="500" y1="245" x2="720" y2="245" marker-end="url(#c4arrow)"/><text x="610" y="236" text-anchor="middle">Delivers mail</text><text x="610" y="262" text-anchor="middle" class="c4-mech">[deliver_later]</text>
+    <line x1="820" y1="200" x2="820" y2="116" marker-end="url(#c4arrow)"/><text x="828" y="162">New-post email</text>
+    <path d="M80,300 L80,520 L700,520 L700,445 L720,445" fill="none" marker-end="url(#c4arrow)"/><text x="390" y="512" text-anchor="middle">Uploads attachments</text><text x="390" y="540" text-anchor="middle" class="c4-mech">[Active Storage]</text>
+  </g>
+</svg>
+</figure>
+
+<figure class="c4fig">
+<figcaption>Dynamic view of one flow document, "post created, mailing list sent", across two containers. Numbers are the flow's step order; dashed arrows are asynchronous hops.</figcaption>
+<svg viewBox="0 0 960 300" role="img" aria-label="C4 dynamic view: PostsController#create saves Post (1), Post inserts into the database (2), Post enqueues NotifySubscribersJob after commit (3), the job calls MailingListMailer#new_post (4), the mailer delivers via SMTP (5)">
+  <defs><marker id="c4arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--c4-line)"/></marker></defs>
+  <rect x="20" y="30" width="440" height="250" rx="6" fill="none" stroke="var(--c4-boundary)" stroke-dasharray="6 4"/><text x="34" y="52" class="c4-bl">Web process <tspan class="c4-st">[container · Rails, Puma]</tspan></text>
+  <rect x="490" y="30" width="450" height="250" rx="6" fill="none" stroke="var(--c4-boundary)" stroke-dasharray="6 4"/><text x="504" y="52" class="c4-bl">Job runner <tspan class="c4-st">[container · Solid Queue]</tspan></text>
+  <g class="c4-component"><rect x="40" y="80" width="190" height="72" rx="6"/><text x="135" y="100" class="c4-st">«component»</text><text x="135" y="120" class="c4-name">PostsController#create</text><text x="135" y="140" class="c4-tech">[action · POST /posts]</text></g>
+  <g class="c4-component"><rect x="255" y="80" width="190" height="72" rx="6"/><text x="350" y="100" class="c4-st">«component»</text><text x="350" y="120" class="c4-name">Post</text><text x="350" y="140" class="c4-tech">[model · after_commit]</text></g>
+  <g class="c4-component"><rect x="510" y="80" width="190" height="72" rx="6"/><text x="605" y="100" class="c4-st">«component»</text><text x="605" y="120" class="c4-name">NotifySubscribersJob#perform</text><text x="605" y="140" class="c4-tech">[Active Job · queue mailers]</text></g>
+  <g class="c4-component"><rect x="730" y="80" width="190" height="72" rx="6"/><text x="825" y="100" class="c4-st">«component»</text><text x="825" y="120" class="c4-name">MailingListMailer#new_post</text><text x="825" y="140" class="c4-tech">[mailer · new_post.html.erb]</text></g>
+  <g class="c4-container"><path d="M255,206 a95,10 0 0,1 190,0 v44 a95,10 0 0,1 -190,0 z"/><text x="350" y="232" class="c4-name">Primary database</text><text x="350" y="250" class="c4-tech">[PostgreSQL]</text></g>
+  <g class="c4-ext"><rect x="730" y="200" width="190" height="60" rx="6"/><text x="825" y="226" class="c4-name">Mail delivery</text><text x="825" y="246" class="c4-tech">[SMTP]</text></g>
+  <g class="c4-rel">
+    <line x1="230" y1="116" x2="255" y2="116" marker-end="url(#c4arrow2)"/><circle cx="242" cy="100" r="9" class="c4-num"/><text x="242" y="104" class="c4-numt">1</text><text x="242" y="134" text-anchor="middle" class="c4-mech">save</text>
+    <line x1="350" y1="152" x2="350" y2="206" marker-end="url(#c4arrow2)"/><circle cx="332" cy="178" r="9" class="c4-num"/><text x="332" y="182" class="c4-numt">2</text><text x="358" y="182" class="c4-mech">INSERT posts</text>
+    <line x1="445" y1="116" x2="510" y2="116" stroke-dasharray="5 4" marker-end="url(#c4arrow2)"/><circle cx="477" cy="100" r="9" class="c4-num"/><text x="477" y="104" class="c4-numt">3</text><text x="477" y="134" text-anchor="middle" class="c4-mech">perform_later</text><text x="477" y="148" text-anchor="middle" class="c4-mech">after commit</text>
+    <line x1="700" y1="116" x2="730" y2="116" marker-end="url(#c4arrow2)"/><circle cx="715" cy="100" r="9" class="c4-num"/><text x="715" y="104" class="c4-numt">4</text><text x="715" y="134" text-anchor="middle" class="c4-mech">new_post</text>
+    <line x1="825" y1="152" x2="825" y2="200" stroke-dasharray="5 4" marker-end="url(#c4arrow2)"/><circle cx="807" cy="176" r="9" class="c4-num"/><text x="807" y="180" class="c4-numt">5</text><text x="833" y="180" class="c4-mech">deliver_later</text>
+  </g>
+</svg>
+</figure>
+
+<h4>Tooling for C4</h4>
+<div class="tbl"><table>
+<thead><tr><th>Tool</th><th>Status</th><th>Fit for the explorer</th></tr></thead>
+<tbody>
+<tr><td>Mermaid C4 (<code>C4Context</code>, <code>C4Container</code>, <code>C4Component</code>, <code>C4Dynamic</code>, <code>C4Deployment</code>)</td><td>Still marked experimental in the Mermaid docs; PlantUML-compatible syntax; fixed styling that ignores Mermaid themes; layout steered only by <code>UpdateLayoutConfig</code> row counts.</td><td>Tried in revision 3: overlapping labels, fixed colours that ignore the theme, and no control over edge routing. Export only.</td></tr>
+<tr><td>Structurizr</td><td>Structurizr Lite is end of life, replaced by a <code>local</code> command in the consolidated self-hosted tool (Spring Boot, Java); the cloud service ends on 30 September 2026. The DSL and JSON workspace format remain the lingua franca.</td><td>Not embeddable in a Ruby gem. Worth an <em>export</em>: a Structurizr DSL workspace generated from L1 to L3 facts lets teams that already keep architecture in Structurizr ingest Woods' view.</td></tr>
+<tr><td>LikeC4</td><td>MIT, TypeScript; flexible element types; CLI, VS Code extension, React components; exports Mermaid, D2, PlantUML, DrawIO.</td><td>Needs Node, which the explorer does not have. Its DSL is a second useful export target; its interaction model (zoom into a container to see components, keep the frame) is the pattern to copy.</td></tr>
+<tr><td>C4-PlantUML, IcePanel</td><td>Java renderer or Kroki server; commercial SaaS.</td><td>No.</td></tr>
+</tbody></table></div>
+
+<div class="callout"><span class="eyebrow">Verdict</span>
+<p style="margin:.2rem 0 .6rem">Yes to the concepts, no to the C4 tools. Mermaid draws the notation natively with a flowchart; the explorer draws the dynamic view itself.</p>
+<ul>
+<li><strong>Adopt the zoom ladder.</strong> Add a Landscape page at L1 and L2 as the explorer's front door, with L3 as the compound graph by package or namespace and L4 as the unit pages. Zooming keeps the parent frame visible (LikeC4's pattern), so a developer new to the app reads "which process, which database, which external system" before reading a class.</li>
+<li><strong>Adopt the notation.</strong> Every box in the explorer's own diagrams carries name, type, technology and one line of description; every arrow carries its mechanism (<code>perform_later</code>, <code>belongs_to</code>, <code>render</code>, <code>deliver_later</code>). This is already what the <code>via</code> labels are; C4 gives it a shape readers recognise.</li>
+<li><strong>Adopt the dynamic view as an alternative rendering of flows.</strong> The same flow document renders as the Trail swimlane, a Mermaid flowchart, a sequence diagram, or a C4 dynamic diagram; the dynamic form is the one to paste into architecture reviews.</li>
+<li><strong>Do not adopt a C4 tool.</strong> Render the notation with a Mermaid flowchart (themed, linkable, exportable) or the architecture diagram; keep the explorer's own SVG for the numbered dynamic view; Structurizr DSL and LikeC4 DSL are export formats only.</li>
+</ul>
+</div>
+
+<div class="grid2">
+<div class="card"><h4>Requirements</h4><ul>
+<li><strong>B-21</strong> Landscape page (<code>/woods/landscape</code>): L1 and L2 derived from the <code>BehavioralProfile</code> unit, model and table database facts, engines, mailer delivery, external consumers; each container links to its L3 view and lists its unit counts by type.</li>
+<li><strong>B-22</strong> L3 component view: the Cytoscape compound graph grouped by package, namespace or domain cluster, with C4-style labels and the parent container shown as a frame.</li>
+<li><strong>B-23</strong> Flow renderings: swimlane, flowchart, sequence and C4 dynamic from one document, with a copy-as-Mermaid action for each.</li>
+<li><strong>B-24</strong> Exports: Structurizr DSL workspace and LikeC4 model for L1 to L3; Mermaid C4 text for any view.</li>
+</ul></div>
+<div class="card"><h4>Extraction-side need</h4><ul>
+<li><strong>W-9</strong> Container attribution per unit: the queue adapter a job runs under (from <code>background_processing</code> and per-job <code>queue</code>), the database a model or table belongs to (already present), the delivery method per mailer (already present). Publish it as <code>metadata.container</code> so L2 and the dynamic view need no re-derivation.</li>
+<li>Users and roles for L1 come from the host (<code>config.landscape_actors</code>) with an optional Devise/Pundit-derived default; the index does not know who uses the app.</li>
+</ul></div>
+</div>
+
+<h3 id="mermaid">Mermaid diagram types mapped to Woods insights</h3>
+<div class="col">
+<p>Mermaid 11 and 12 ship far more than flowcharts. The table maps each insight the explorer produces to the diagram type that represents it best, with the Woods data it is generated from. Types marked 12 are new in Mermaid 12 (2026) and must be checked against the vendored version before the explorer offers them; the examples below render with the 11.4 build this page loads. Every diagram is generated text, so each one is also a copy-and-paste export for issues, pull requests and chat.</p>
+</div>
+
+<div class="tbl"><table>
+<thead><tr><th>Insight</th><th>Data</th><th>Diagram</th><th>Fit and notes</th></tr></thead>
+<tbody>
+<tr><td>Request or job lifecycle, in time order, with async hops</td><td>Flow document + job/mailer facts</td><td><code>sequenceDiagram</code> <span class="pick">pick</span></td><td>Participants are units, <code>-&gt;&gt;</code> synchronous calls, <code>-)</code> async enqueue and deliver, <code>loop</code> for <code>find_each</code>, <code>Note</code> for flags, <code>autonumber</code> matches the step table. Best single answer to "what happens when".</td></tr>
+<tr><td>Lifecycle across containers as lanes</td><td>Flow document + container attribution (W-9)</td><td><code>swimlanes</code> 12, else own HTML lanes</td><td>The Trail view natively; verify syntax and ELK layout once Mermaid 12 is vendored.</td></tr>
+<tr><td>Lifecycle as branches and conditions</td><td>Flow document (conditional, transaction, response)</td><td><code>flowchart TD</code></td><td>Subgraphs per step, diamonds for conditionals, dashed edges for async; the existing <code>MermaidRenderer</code> is the base.</td></tr>
+<tr><td>Table schema and relationships</td><td>Model columns, foreign keys, associations, <code>database_table</code> units</td><td><code>erDiagram</code> <span class="pick">pick</span></td><td>Cardinality from macro and <code>has_one</code>/<code>has_many</code>, keys as PK/FK/UK, chunked per namespace or database; polymorphic shown as a dashed relation to each candidate.</td></tr>
+<tr><td>Class structure: concerns, inheritance, STI, methods</td><td>Model/service metadata, <code>inlined_concerns</code>, method table (W-2), <code>include</code>/<code>inheritance</code> edges</td><td><code>classDiagram</code> <span class="pick">pick</span></td><td><code>&lt;&lt;concern&gt;&gt;</code> stereotype, <code>&lt;|--</code> for STI, labelled associations with cardinality, methods grouped by owner. Complements the Effective-class lens.</td></tr>
+<tr><td>State machines</td><td><code>state_machine</code> units (AASM, state_machines, Statesman) with events and callbacks</td><td><code>stateDiagram-v2</code> <span class="pick">pick</span></td><td>Transitions labelled with the event and the side effect (job enqueued); composite states for sub-machines.</td></tr>
+<tr><td>Hotspots: churn against dependents</td><td><code>change_frequency</code> / commit counts, PageRank or dependent counts</td><td><code>quadrantChart</code> <span class="pick">pick</span></td><td>"Review carefully" quadrant = hot and depended upon; feeds the impact risk flags and the review Markdown.</td></tr>
+<tr><td>Dependency volume between layers</td><td>Edges grouped by source type → target type and <code>via</code></td><td><code>sankey-beta</code></td><td>Shows where coupling concentrates (views → models reads, controllers → jobs); also per package.</td></tr>
+<tr><td>Commits over time for a neighbourhood</td><td>Commit table (W-3), <code>recent_commits</code></td><td><code>xychart-beta</code></td><td>Bars per week with a line overlay; the History tab's non-interactive export of the vis-timeline strip.</td></tr>
+<tr><td>Generation history and what changed</td><td>Snapshot store, impact reports</td><td><code>timeline</code></td><td>One entry per generation with the headline change; links out to impact reports in the HTML form.</td></tr>
+<tr><td>Branch illustration for a review</td><td>Commit table (branch from manifest provenance)</td><td><code>gitGraph</code></td><td>Small, illustrative only; the commit table is HEAD-reachable so unmerged branches are not available.</td></tr>
+<tr><td>Namespace, package and domain structure</td><td>Namespaces, <code>package</code> units, <code>domain_clusters</code></td><td><code>mindmap</code>; <code>treemap</code> 11.7+ sized by LOC or PageRank</td><td>Mindmap for orientation; treemap when size matters (which package carries the code).</td></tr>
+<tr><td>System landscape (C4 L1, L2)</td><td><code>BehavioralProfile</code>, engines, external consumers</td><td><code>flowchart</code> in C4 notation; <code>architecture-beta</code></td><td>Shown above. <code>block-beta</code> is a third option when a fixed grid is wanted.</td></tr>
+<tr><td>Change impact paths</td><td>Impact report</td><td><code>flowchart LR</code></td><td>Changed nodes on the left, affected to the right, <code>via</code> on edges, risk flags as notes; the Mermaid export in section 8.</td></tr>
+<tr><td>Unit health at a glance</td><td>LOC, callbacks, associations, dependents, churn, test coverage edges</td><td><code>radar</code> 11.6+</td><td>One polygon per unit, overlay two units to compare; verify availability.</td></tr>
+<tr><td>Unit type distribution, extraction counts</td><td><code>manifest.json</code> counts</td><td><code>pie</code></td><td>Status page only.</td></tr>
+<tr><td>File tree with unit ownership</td><td><code>file_map</code></td><td><code>treeview</code> 12</td><td>Export of the tree panel; verify.</td></tr>
+<tr><td>Events, commands and read models</td><td>Jobs, mailers, Active Support notifications (<code>event</code> units), <code>published_by</code>/<code>subscribed_by</code> edges</td><td><code>event modeling</code> 12</td><td>Promising for event-driven apps; verify syntax before committing.</td></tr>
+<tr><td>Not a fit</td><td></td><td><code>gantt</code>, <code>kanban</code>, <code>packet</code>, <code>venn</code>, <code>ishikawa</code>, <code>wardley</code>, <code>cynefin</code>, <code>requirement</code>, <code>journey</code>, <code>use case</code>, <code>zenuml</code></td><td>Planning and workshop formats, or duplicates of the sequence diagram; the explorer does not generate them.</td></tr>
+</tbody></table></div>
+
+<h4>Rendered examples from the blog scenario</h4>
+
+<div class="col"><p><strong>Sequence diagram</strong> of the same flow document as the dynamic view, with asynchronous hops as open arrows and the risk flag as a note. This is the form to offer first on every Lifecycle tab.</p></div>
+<pre class="mermaid">
+sequenceDiagram
+  autonumber
+  actor Author
+  participant C as PostsController#create
+  participant P as Post
+  participant DB as PostgreSQL
+  participant Q as Solid Queue
+  participant J as NotifySubscribersJob
+  participant M as MailingListMailer
+  Author->>C: POST /posts
+  C->>P: Post.new(post_params).save
+  activate P
+  P->>P: before_validation, validations, before_save
+  P->>DB: INSERT INTO posts
+  P-)Q: after_commit: NotifySubscribersJob.perform_later(id)
+  deactivate P
+  C-->>Author: 302 redirect_to post_path
+  Q-)J: perform(post_id)
+  J->>DB: SELECT users WHERE follower of author
+  loop each follower (find_each)
+    J-)M: new_post(user, post).deliver_later
+  end
+  Note over J,M: no retry_on or discard_on declared
+</pre>
+
+<div class="grid2">
+<div>
+<div class="col"><p><strong>Entity relationship</strong> from model columns, foreign keys and associations (Schema tab, chunked by namespace).</p></div>
+<pre class="mermaid">
+erDiagram
+  USERS ||--o{ POSTS : author_id
+  POSTS ||--o{ COMMENTS : post_id
+  POSTS }o--o{ TAGS : taggings
+  USERS ||--o| PREFERENCES : user_id
+  POSTS {
+    bigint id PK
+    bigint author_id FK
+    string title
+    string slug UK
+    text body
+    datetime published_at
+  }
+  USERS {
+    bigint id PK
+    string email UK
+    string name
+  }
+</pre>
+</div>
+<div>
+<div class="col"><p><strong>Class diagram</strong> with the concern as a stereotype, STI inheritance and labelled associations (the Effective-class lens as a picture).</p></div>
+<pre class="mermaid">
+classDiagram
+  class ApplicationRecord
+  class Post {
+    +String title
+    +String slug
+    +publish!()
+    -notify_subscribers()
+  }
+  class Taggable {
+    &lt;&lt;concern&gt;&gt;
+    +tag_list()
+    +tag_list=()
+  }
+  class Comment
+  class User
+  class NotifySubscribersJob
+  ApplicationRecord <|-- Post
+  Post ..|> Taggable : include
+  Post "1" --> "*" Comment : has_many
+  Post "*" --> "1" User : belongs_to author
+  Post ..> NotifySubscribersJob : after_commit enqueues
+</pre>
+</div>
+</div>
+
+<div class="grid2">
+<div>
+<div class="col"><p><strong>State diagram</strong> from a state machine unit; transitions carry the event and the side effect.</p></div>
+<pre class="mermaid">
+stateDiagram-v2
+  [*] --> draft
+  draft --> review : submit
+  review --> published : approve / NotifySubscribersJob
+  review --> draft : reject
+  published --> archived : archive
+  archived --> [*]
+</pre>
+</div>
+<div>
+<div class="col"><p><strong>Hotspot quadrant</strong>: change frequency against dependents. Top-right is where review attention goes.</p></div>
+<pre class="mermaid">
+quadrantChart
+  title Hotspots: churn vs dependents
+  x-axis Few dependents --> Many dependents
+  y-axis Stable --> Hot
+  quadrant-1 Review carefully
+  quadrant-2 Churning leaves
+  quadrant-3 Quiet
+  quadrant-4 Stable hubs
+  Post: [0.82, 0.78]
+  User: [0.9, 0.35]
+  NotifySubscribersJob: [0.3, 0.85]
+  MailingListMailer: [0.25, 0.7]
+  Comment: [0.4, 0.2]
+  ApplicationController: [0.95, 0.15]
+</pre>
+</div>
+</div>
+
+<div class="grid2">
+<div>
+<div class="col"><p><strong>Sankey</strong> of dependency edges between layers: where coupling concentrates.</p></div>
+<pre class="mermaid">
+sankey-beta
+
+controllers,models,38
+controllers,views,41
+controllers,jobs,5
+views,models,22
+views,helpers,17
+models,jobs,6
+jobs,mailers,4
+mailers,views,9
+</pre>
+</div>
+<div>
+<div class="col"><p><strong>Commits per week</strong> touching the Post neighbourhood, from the commit table.</p></div>
+<pre class="mermaid">
+xychart-beta
+  title "Commits touching the Post neighbourhood, 12 weeks"
+  x-axis [w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12]
+  y-axis "commits" 0 --> 12
+  bar [2, 1, 0, 3, 5, 2, 1, 0, 4, 9, 7, 3]
+  line [2, 1, 0, 3, 5, 2, 1, 0, 4, 9, 7, 3]
+</pre>
+</div>
+</div>
+
+<div class="col"><p><strong>Timeline</strong> of index generations with the headline change of each, the History tab's export.</p></div>
+<pre class="mermaid">
+timeline
+  title Index generations on main
+  gen 40 · a1b2c3d, 6 days ago : MailingListMailer and NotifySubscribersJob changed together ("digest refactor")
+  gen 41 · c4d5e6f, 3 days ago : Post callback moved from after_save to after_commit
+  gen 42 · 9f8e7d6, today : new_post.html.erb reads @user.preferences
+</pre>
+
+<div class="callout"><span class="eyebrow">Decisions for the explorer</span>
+<ul style="margin:.3rem 0 0">
+<li>Vendor Mermaid 12 (ELK default, swimlanes, treemap, radar) and verify each 12-only type against the vendored build in a spec that renders every generated diagram headlessly.</li>
+<li>Every Lifecycle tab offers sequence first, then flowchart, swimlane and C4-notation flowchart; every Schema tab offers ER and class; state machine units get a state diagram; the Landscape page renders the C4-notation flowchart; History offers timeline and XY; the overview offers quadrant, sankey and mindmap.</li>
+<li>One Ruby renderer per type extends <code>Woods::RubyAnalyzer::MermaidRenderer</code>; each has a "copy Mermaid" action and a size guard that chunks or refuses above the node budget.</li>
+</ul></div>
+
+<h2 id="impact">8 · Spike: change highlighting and blast radius</h2>
+<div class="col">
+<p>Two questions turn out to be the same report read in opposite directions. <em>What changed between A and B, and what does it affect?</em> (review, after the fact) and <em>what will changing this affect?</em> (planning, before the fact). Both produce a set of changed or focused units, a propagation through the dependency graph, the flows, tables, templates and tests that propagation reaches, and risk flags. The deliverable is a sharable URL that opens with the interesting part already highlighted, plus the same report as Markdown for a pull request and JSON for an agent.</p>
+</div>
+
+<h3>What the index can already answer</h3>
+<div class="tbl"><table>
+<thead><tr><th>Question</th><th>Source today</th><th>Limit</th></tr></thead>
+<tbody>
+<tr><td>Which units changed between two extractions?</td><td>Snapshot store: per unit and per generation, <code>source_hash</code>, <code>metadata_hash</code>, <code>dependencies_hash</code> keyed by git sha; <code>SnapshotStore#diff</code> returns added, modified and deleted. MCP already exposes <code>snapshot_diff</code>, <code>unit_history</code>, <code>snapshot_detail</code>.</td><td>Says <em>that</em> a unit changed, not which facet; needs a tiny change to report which of the three hashes moved (W-10).</td></tr>
+<tr><td>What exactly changed in a unit?</td><td>Retained payloads (three generations by default) hold full <code>source_code</code> and <code>metadata</code>, so a real diff of source, schema, callbacks, filters, routes and edges is a payload-to-payload comparison.</td><td>Only for retained generations; a review base older than that needs the base extracted again or a pinned payload (W-11).</td></tr>
+<tr><td>What depends on a changed unit?</td><td><code>reverse_via</code> gives inbound records with source type and <code>via</code>; transitive closure with depth from the graph; PageRank for weighting; <code>graph_analysis</code> for hubs, bridges, cycles.</td><td>Unit level. Method-level propagation needs reference spans with method targets (W-1, W-6).</td></tr>
+<tr><td>Which entry points run through it?</td><td>Flow documents (precomputed or assembled) list every unit a flow touches; invert to "flows per unit"; controller <code>routes</code> turn that into verbs and paths.</td><td>Flow assembly is static; receiverless and dynamic calls are gaps the report must label.</td></tr>
+<tr><td>Which tests cover it?</td><td><code>test_mapping</code> units and <code>test_coverage</code> edges link specs and tests to units.</td><td>Heuristic mapping; good enough for "tests to run first".</td></tr>
+<tr><td>Who changed it and when?</td><td><code>metadata.git</code> per unit; the commit table (W-3) for the full window.</td><td>W-3 is needed for "commits in this range touching these files".</td></tr>
+</tbody></table></div>
+
+<h3>Report pipeline</h3>
+<pre class="mermaid">
+flowchart LR
+  A["from: gen 40 / sha a1b2c3d\nto: gen 42 / sha 9f8e7d6\n(or: focus set, no range)"] --> D["1 · Diff units\nsnapshot facets + payload compare"]
+  D --> K["2 · Classify each change\nschema · behaviour · routing · template · edges · tests"]
+  K --> P["3 · Propagate\nreverse_via depth N · flows per unit\ntables · templates · tests · PageRank weight"]
+  P --> R["4 · Risk flags\nhub · bridge · cycle · cross-db\nside-effect change · filter chain change\nnew ivar mismatch · job without retry"]
+  R --> O["5 · Render\nHTML with focus URL · Markdown · JSON · Mermaid"]
+  O --> S["saved as impact JSON\nunder index/explorer/impacts"]
+</pre>
+
+<div class="wf">
+  <p class="caption">Wireframe E1: change impact for a pull request that changed <code>MailingListMailer</code>, its template and <code>NotifySubscribersJob</code>; opened from a focus URL.</p>
+  <div class="screen" style="grid-template-columns:230px 1fr 250px;grid-template-rows:auto 1fr auto auto;grid-template-areas:'top top top' 'changed graph focus' 'flows flows flows' 'share share share'">
+    <div class="box bar" style="grid-area:top"><span class="box solid" style="flex:0 0 250px">Impact · gen 40 (a1b2c3d) → gen 42 (9f8e7d6)</span><span class="box">3 changed · 11 directly affected · 27 in radius (depth 2) · 4 flows · 7 tests · 2 risk flags</span><span class="box solid" style="flex:0 0 90px">depth ◉2 ○3</span><span class="n">1</span></div>
+    <div class="box" style="grid-area:changed"><b>Changed (3)</b>
+      <b style="margin-top:6px">M MailingListMailer</b>source · templates<br>
+      <b style="margin-top:4px">M mailing_list_mailer/new_post.html.erb</b>source · reads @user.preferences (new)<br>
+      <b style="margin-top:4px">M NotifySubscribersJob</b>source · deps +User · callbacks<br><br>
+      <b>Directly affected (11)</b>Post ← job_enqueue<br>PostsController#create · #republish<br>User (new read)<br>spec/jobs/notify_subscribers_job_spec.rb …<br><br>Filters: types ▾ · via ▾ · hide tests ☐<span class="n">2</span></div>
+    <div class="box" style="grid-area:graph;min-height:180px"><b>Impact graph (Cytoscape, dagre, changed → affected)</b>
+      <div class="nodes">
+        <span class="node hub" style="border-style:double">NotifySubscribersJob ✎</span><span class="edge">◀ job_enqueue</span><span class="node">Post</span><span class="edge">◀ code_reference</span><span class="node ctl">PostsController</span><br>
+        <span class="node hub" style="border-style:double">MailingListMailer ✎</span><span class="edge">◀ code_reference</span><span class="node">NotifySubscribersJob</span><br>
+        <span class="node hub" style="border-style:double">new_post.html.erb ✎</span><span class="edge">◀ template</span><span class="node">MailingListMailer</span><span class="edge">reads ▶</span><span class="node">User ⚑</span><br>
+        <span class="node" style="opacity:.55">PostSerializer</span><span class="node" style="opacity:.55">posts/show.html.erb</span><span class="node" style="opacity:.55">Api::PostsController</span>
+      </div>
+      <span class="edge">✎ changed (filled) · ring = direct · faded = transitive · ⚑ risk flag · click a node: "why affected" path in the focus panel</span><span class="n">3</span></div>
+    <div class="box" style="grid-area:focus"><b>Focus · new_post.html.erb</b>
+      <div class="lines"><span>@@ -38,6 +38,8 @@</span><span>+ &lt;% if @user.preferences.digest? %&gt;</span><span>+ &nbsp;&nbsp;&lt;%= render "digest_note" %&gt;</span><span>+ &lt;% end %&gt;</span></div>
+      <b style="margin-top:6px">Why affected</b>MailingListMailer#new_post renders it ← NotifySubscribersJob#perform ← Post after_commit ← PostsController#create, #republish<br>
+      <b style="margin-top:6px">⚑ Risk</b>@user.preferences read in template; mailer assigns @user only; <code>preferences</code> is a has_one that can be nil (no <code>dependent</code>, no validation)<br>
+      <b style="margin-top:6px">Tests to run first</b>notify_subscribers_job_spec · mailing_list_mailer_spec · posts_controller_spec (create)<span class="n">4</span></div>
+    <div class="box" style="grid-area:flows"><b>Affected flows (4)</b>
+      <div class="lane"><span>POST /posts</span><div class="steps"><span class="step">PostsController#create</span><span class="step">Post after_commit</span><span class="step err">NotifySubscribersJob ✎</span><span class="step err">MailingListMailer ✎</span><span class="step err">new_post.html.erb ✎</span></div></div>
+      <div class="lane"><span>POST /posts/:id/republish</span><div class="steps"><span class="step">PostsController#republish</span><span class="step err">NotifySubscribersJob ✎</span><span class="step">…</span></div></div>
+      <span class="edge">two more: PublishPostJob (scheduled), Admin::PostsController#approve · unexpanded dynamic call in PublishPostJob marked</span><span class="n">5</span></div>
+    <div class="box bar" style="grid-area:share"><span class="box solid">Share: /woods/impact/9f8e7d6?from=a1b2c3d&amp;focus=new_post.html.erb&amp;depth=2</span><span class="box solid" style="flex:0 0 150px">Copy as Markdown (PR)</span><span class="box solid" style="flex:0 0 90px">JSON</span><span class="box solid" style="flex:0 0 100px">Mermaid</span><span class="box solid" style="flex:0 0 150px">Ask the guide: review this</span><span class="n">6</span></div>
+  </div>
+  <ol class="legend">
+    <li>Header carries the range (generation numbers and shas) and the counts; depth is a control, not a hidden default.</li>
+    <li>Changed units with the facets that moved (source, schema, callbacks, filters, routes, templates, dependencies, tests), then the direct dependents grouped by how they depend (<code>via</code>).</li>
+    <li>The impact graph is the Atlas component in a directed layout, changed on the left; node emphasis encodes changed, direct, transitive; the same tints apply in every other view when opened with <code>?since=</code>.</li>
+    <li>Focus panel: the diff for a changed unit (from retained payloads) or the "why affected" path for an affected one, the risk flags with their evidence, and the tests that cover the focused unit.</li>
+    <li>Affected flows are the entry points whose documents pass through a changed unit, as lanes with the changed steps outlined; routes come from controller metadata.</li>
+    <li>Share bar: the focus URL, and the same report as Markdown, JSON or Mermaid. The guide's "review this change" action takes the JSON as context.</li>
+  </ol>
+</div>
+
+<h3>Sharable URL grammar</h3>
+<pre>/woods/impact?from=gen:40&amp;to=gen:42                  # range by generation number
+/woods/impact?from=a1b2c3d&amp;to=9f8e7d6                 # range by git sha (resolved through the snapshot store)
+/woods/impact?from=a1b2c3d                            # to = current generation ("since")
+/woods/impact?focus=Post%23publish!&amp;depth=2            # no range: blast radius of a planned change
+/woods/impact/9f8e7d6?from=a1b2c3d&amp;focus=new_post.html.erb&amp;depth=2&amp;types=controller,view&amp;lens=flows
+/woods/impacts/7c1e…                                  # a saved report, stable after restarts and retention
+/woods/units/view_template/new_post.html.erb?since=gen:40#L38-L40   # any unit page lights changed lines and marginalia
+/woods/graph?centre=Post&amp;since=a1b2c3d                 # any graph view tints changed and affected nodes</pre>
+<div class="col"><p><code>focus</code> opens the page with those units selected and the paths to them highlighted; <code>lens</code> chooses which panel is expanded first (changed, graph, flows, tests, risks). The saved form writes <code>impact.json</code> under <code>&lt;index&gt;/explorer/impacts/</code> so a link in a pull request still resolves after the payloads it was computed from are retired.</p></div>
+
+<h3>Output formats</h3>
+<div class="tbl"><table>
+<thead><tr><th>Format</th><th>For</th><th>Contents</th></tr></thead>
+<tbody>
+<tr><td>HTML page</td><td>People, from a link</td><td>Wireframe E1; every element links into the explorer; the lens and focus come from the URL.</td></tr>
+<tr><td>Markdown</td><td>Pull request comment, issue, review thread</td><td>Summary line; table of changed units with facets; "directly affected" grouped by <code>via</code>; affected routes and jobs; risk flags with one-line evidence; "tests to run first"; focus links back to the explorer; a collapsed Mermaid flowchart of the paths. Sized to a PR comment (about 60 lines, longer lists collapsed).</td></tr>
+<tr><td>JSON (<code>impact.json</code>)</td><td>Agents, CI, the guide</td><td><code>range</code>, <code>changed[{identifier,type,facets,diff_stats}]</code>, <code>affected[{identifier,type,distance,paths[{via…}],weight}]</code>, <code>flows[{entry_point,route,changed_steps}]</code>, <code>tables</code>, <code>templates</code>, <code>tests</code>, <code>risks[{kind,unit,evidence}]</code>, <code>unknowns</code> (unexpanded calls, ambiguous names). Versioned schema.</td></tr>
+<tr><td>Mermaid</td><td>Docs and chat</td><td><code>flowchart LR</code> of changed → affected paths to the focus, with <code>via</code> edge labels; swimlane-free so it renders anywhere Mermaid does.</td></tr>
+<tr><td>MCP tool <code>change_impact</code></td><td>Editor agents during review</td><td><code>from</code>, <code>to</code>, <code>focus</code>, <code>depth</code>, <code>format</code> (markdown or json); wiring-conditional on the snapshot store like the existing snapshot tools; read-only.</td></tr>
+</tbody></table></div>
+
+<h3>Where it shows up in the rest of the explorer</h3>
+<div class="grid2">
+<div class="card"><h4>Highlighting with <code>?since=</code></h4><ul>
+<li>Unit tree and search results: A / M / D badges and a "changed since" filter.</li>
+<li>Code viewer: a diff gutter against the base generation in either lens; changed marginalia (a callback added, a filter condition changed) are marked, not only changed lines.</li>
+<li>Graph: changed nodes filled, direct dependents ringed, transitive faded; a "show only radius" toggle.</li>
+<li>Lifecycle and passage views: changed steps outlined; a newly unassigned instance variable is a flag with a link to the diff that introduced it.</li>
+<li>ERD: added and removed columns and associations coloured; a dropped foreign key is a risk flag.</li>
+<li>History timeline: the compared range shaded; commits inside it listed with the units they touched.</li>
+</ul></div>
+<div class="card"><h4>Agents and CI</h4><ul>
+<li><strong>Review recipe.</strong> CI restores the cached index for the base commit, runs <code>woods:incremental</code> with <code>CHANGED_FILES</code> from the pull request diff (both generations then live in one index), then <code>woods:impact[base_sha,head_sha]</code> writes <code>impact.json</code> and prints the Markdown for the PR comment. No second host boot.</li>
+<li><strong>Editor agents.</strong> The <code>change_impact</code> tool answers "what does my diff affect" before a commit, using the working tree generation the watch daemon keeps current against the last published one.</li>
+<li><strong>The guide.</strong> A "review this change" action takes <code>impact.json</code> as context and is restricted to the read-only tools; it drafts the review comment with links, never posts it.</li>
+<li><strong>Pre-change mode.</strong> From any unit or method, "blast radius" is the same report with an empty range; with reference spans it works at method level (<code>Post#publish!</code>).</li>
+</ul></div>
+</div>
+
+<div class="grid2">
+<div class="card"><h4>Requirements</h4><ul>
+<li><strong>E-1</strong> Range resolution by generation number, git sha or "now"; sha resolves through the snapshot store; unknown shas fail with a message naming the nearest snapshots.</li>
+<li><strong>E-2</strong> Facet classification per unit type (schema, behaviour, routing, template, edges, tests) from payload comparison, with diff stats.</li>
+<li><strong>E-3</strong> Propagation with depth, type and <code>via</code> filters, PageRank weighting, and path recording so every affected unit can explain itself.</li>
+<li><strong>E-4</strong> Flows per changed unit, inverted from flow documents, with routes; unexpanded calls reported as unknowns, never dropped.</li>
+<li><strong>E-5</strong> Risk flags with evidence links: hub, bridge, cycle, cross-database edge, callback side-effect change, filter chain change, new instance-variable mismatch, job without retry touched, dropped foreign key.</li>
+<li><strong>E-6</strong> Focus URL grammar above; saved reports immutable and addressable.</li>
+<li><strong>E-7</strong> Markdown, JSON and Mermaid renderers from one report object; the MCP tool uses the same renderers.</li>
+<li><strong>E-8</strong> <code>?since=</code> highlighting in tree, code, graph, lifecycle, passage, ERD and timeline views.</li>
+<li><strong>E-9</strong> Pre-change mode from any unit or method.</li>
+<li><strong>E-10</strong> A report never claims completeness: counts carry "of which unknown" and the page says which generations it was computed from.</li>
+</ul></div>
+<div class="card"><h4>Woods-side needs</h4><ul>
+<li><strong>W-10</strong> <code>SnapshotStore#diff</code> returns which facet hashes moved per modified unit (source, metadata, dependencies).</li>
+<li><strong>W-11</strong> Pin a generation against retention (<code>woods:pin[gen]</code>) so a review base survives until the report is saved; today the shared <code>flock</code> protects a payload only while a reader holds it.</li>
+<li><strong>W-12</strong> <code>woods:impact[from,to]</code> rake task and the <code>impact.json</code> schema in the woods gem, so CI and the explorer share one implementation; the explorer only renders.</li>
+<li><strong>W-13</strong> Flow index inverted per unit (<code>flows/by_unit.json</code>) written with precomputed flows, so "flows through this unit" is a lookup; assembled on demand otherwise.</li>
+<li>W-1, W-3 and W-6 from section 10 for method-level radius and commit lists in the range.</li>
+</ul></div>
+</div>
+
+<div class="callout"><span class="eyebrow">Spike verdict</span>The data for a credible first version exists in the index today: unit-level diffs, dependents with <code>via</code>, flows, tests and risk inputs. The missing pieces are small and extraction-side (facet reporting, generation pinning, an inverted flow index, the commit table). The thing to build first is the report object and its three renderers, because the HTML page, the PR comment and the agent tool are the same report. Method-level radius and "since you last looked" highlighting follow once reference spans land.</div>
+
+<h2 id="tooling">9 · Tooling and open-source landscape</h2>
+<div class="col">
+<p>Versions and dates were checked against the npm and RubyGems registries on 14 October 2026. "No build" means the package ships a self-contained ES module or a classic script that an importmap engine can vendor and pin without Node. Picks are marked.</p>
+</div>
+
+<h3>Graph rendering</h3>
+<div class="tbl"><table>
+<thead><tr><th>Library</th><th>Version · license · last release</th><th>No build?</th><th>Assessment</th></tr></thead>
+<tbody>
+<tr><td>Cytoscape.js <span class="pick">pick</span></td><td>3.34.3 · MIT · 2026-09</td><td>Yes (ESM file, ~1 MB)</td><td>Canvas renderer, compound nodes for namespaces/packages, selector-based styling by edge <code>via</code>. Comfortable to about 3 000 nodes, which the neighbourhood cap guarantees.</td></tr>
+<tr><td>cytoscape-fcose / @dagrejs/dagre <span class="pick">pick</span></td><td>2.2.0 · MIT · 2023 / 3.1.1 · MIT · 2026-08</td><td>fcose UMD (classic script); dagre ESM</td><td>fcose for organic overviews, dagre for butterfly and flow-overlay layouts. Never use the unscoped, abandoned <code>dagre</code>.</td></tr>
+<tr><td>sigma.js + graphology</td><td>4.0.2 · MIT · 2026-10 (3.0.2 is the safe pin)</td><td>ESM, about 8 pins</td><td>WebGL2; the escape hatch above 3 000 visible nodes. Not needed for v1.</td></tr>
+<tr><td>vis-network</td><td>10.1.2 · Apache-2.0/MIT · 2026-08</td><td>Yes (standalone ESM)</td><td>Easiest single pin with built-in clustering; slows past about 1 500 nodes and styles less precisely than Cytoscape.</td></tr>
+<tr><td>AntV G6, force-graph, elkjs</td><td>5.1.1 MIT · 1.52 MIT · 0.12 EPL-2.0/GPL-3.0</td><td>G6 UMD; force-graph UMD+ESM; elkjs bundled script</td><td>G6 is heavy; force-graph is pretty but weak for labelled edges; elkjs is useful for layered layouts but EPL licensing deserves a note if vendored.</td></tr>
+</tbody></table></div>
+
+<h3>Diagrams as text</h3>
+<div class="tbl"><table>
+<thead><tr><th>Library</th><th>Version · license · last release</th><th>No build?</th><th>Assessment</th></tr></thead>
+<tbody>
+<tr><td>Mermaid <span class="pick">pick</span></td><td>12.2.0 · MIT · 2026-10</td><td>Yes (ESM file; ELK loads as a lazy chunk)</td><td><code>erDiagram</code>, <code>flowchart</code>, <code>sequenceDiagram</code>, <code>gitGraph</code>, <code>timeline</code> client-side. v12 made ELK the default layout and requires ES2024 browsers. Raise <code>maxTextSize</code> and <code>maxEdges</code>; chunk ERDs by namespace. Woods already has a <code>RubyAnalyzer::MermaidRenderer</code> for call graphs and dependency maps to extend.</td></tr>
+<tr><td>@viz-js/viz (Graphviz WASM)</td><td>3.31.0 · MIT · 2026-09</td><td>Yes (ESM with inlined WASM, ~2 MB)</td><td>Fallback for large dot graphs where Mermaid chokes (1 000+ nodes). Optional.</td></tr>
+<tr><td>D2, PlantUML, Kroki</td><td>0.1.33 MPL · 1.2026.8 MIT · 0.33 MIT</td><td>D2/PlantUML huge; Kroki needs a server</td><td>Skip.</td></tr>
+</tbody></table></div>
+
+<h3>Code viewing and navigation</h3>
+<div class="tbl"><table>
+<thead><tr><th>Library</th><th>Version · license · last release</th><th>No build?</th><th>Assessment</th></tr></thead>
+<tbody>
+<tr><td>rouge (gem) <span class="pick">pick</span></td><td>5.1.0 · MIT · 2026-08</td><td>Server-side</td><td>Best Ruby/ERB lexers, line tables, zero JS. Reference spans are injected after highlighting by position.</td></tr>
+<tr><td>highlight.js</td><td>11.12 · BSD-3 · 2026-08</td><td>Yes (two ESM pins)</td><td>Only for client-side snippets inside LLM answers.</td></tr>
+<tr><td>Shiki / CodeMirror 6 / Monaco</td><td>4.5 MIT · 6.0.2 MIT · 0.57 MIT</td><td>Fiddly (many pins) / heavy</td><td>Shiki needs a rewriting CDN or many pins; CodeMirror only if in-page editing is wanted later; Monaco is far too large.</td></tr>
+<tr><td>Precise Ruby navigation (scip-ruby, ruby-lsp, Solargraph, stack-graphs)</td><td>0.5 Apache · 0.26 MIT · 0.61 MIT · archived 2025</td><td>Server/CLI only</td><td>No OSS does in-browser Ruby jump-to-definition. GitHub itself uses search-based navigation for Ruby. Woods' own runtime-verified reference pass is the better source: precompute spans at extraction time (section 8).</td></tr>
+</tbody></table></div>
+
+<h3>Git history visualisation</h3>
+<div class="tbl"><table>
+<thead><tr><th>Library</th><th>Version · license · last release</th><th>No build?</th><th>Assessment</th></tr></thead>
+<tbody>
+<tr><td>vis-timeline <span class="pick">pick</span></td><td>8.5.4 · Apache-2.0/MIT · 2026-08</td><td>Yes (standalone ESM)</td><td>Grouped, zoomable rows (units) with items (commits); maintained.</td></tr>
+<tr><td>Observable Plot</td><td>0.6.17 · ISC · 2025-02</td><td>Yes</td><td>Smaller alternative for dot timelines and <code>Plot.cell</code> change-frequency heatmaps.</td></tr>
+<tr><td>Mermaid gitGraph</td><td>12.2.0</td><td>Yes</td><td>Illustrative branch diagrams up to about 50 commits; not interactive.</td></tr>
+<tr><td>gitgraph.js, @gitgraph/js, cal-heatmap</td><td>2019 / 2021 / 2023</td><td>Yes</td><td>Unmaintained; skip.</td></tr>
+</tbody></table></div>
+
+<h3>Rails precedents and prior art</h3>
+<div class="tbl"><table>
+<thead><tr><th>Project</th><th>Status</th><th>What to take</th></tr></thead>
+<tbody>
+<tr><td>mission_control-jobs 1.3.1 <span class="pick">pattern</span></td><td>MIT · 2026-09</td><td>Engine with its own <code>Importmap::Map</code>, vendored Turbo/Stimulus, <code>pin_all_from</code>, assets path registration, Propshaft or Sprockets. Copy wholesale.</td></tr>
+<tr><td>web-console 4.3, letter_opener_web 3.0, rails_db 2.5</td><td>MIT</td><td>Dev-only mounting conventions and the "inert in production" posture.</td></tr>
+<tr><td>rails-mermaid_erd 0.8.2</td><td>MIT · 2026-10</td><td>The closest existing "ERD in the browser" for Rails; Woods' index already has richer facts (databases, polymorphic, through).</td></tr>
+<tr><td>Rubrowser 2.11, visualize_packs, railroady</td><td>Dead 2021 · CLI · GPL</td><td>Rubrowser was the only prior Ruby codebase-explorer UI (D3 force graph, static parse). Nothing current fills this gap.</td></tr>
+<tr><td>Avo, Motor Admin</td><td>LGPL/commercial, MIT</td><td>The "prebuilt bundle in the gem" alternative we decided against.</td></tr>
+</tbody></table></div>
+
+<h3>Interaction patterns worth borrowing</h3>
+<div class="grid2">
+<div class="card"><h4>From code hosts</h4><ul>
+<li><strong>GitHub blame</strong>: consecutive lines grouped into hunks with one gutter card (avatar, message, relative date), an age heat bar and "view prior to this change".</li>
+<li><strong>GitHub search-based navigation</strong>: a "N definitions" panel instead of a wrong jump for ambiguous names.</li>
+<li><strong>Sourcegraph</strong>: a precise versus search-based confidence badge on each reference.</li>
+</ul></div>
+<div class="card"><h4>From graph tools</h4><ul>
+<li><strong>Dependency Cruiser</strong>: <code>--focus</code>, <code>--reaches</code>, <code>--highlight</code> as query-driven focus+context instead of panning.</li>
+<li><strong>Understand</strong>: butterfly layout, callers left and callees right.</li>
+<li><strong>CodeSee</strong>: overlay "what this change touched" on the map (our snapshot diff).</li>
+<li><strong>CodeCharta</strong>: metric encodings (change frequency → colour, PageRank → size).</li>
+<li><strong>Aider repo-map</strong>: PageRank personalised by the identifiers in the question, for the guide's context selection.</li>
+</ul></div>
+</div>
+
+<h2 id="gaps">10 · What we must build ourselves</h2>
+<div class="col">
+<p>No open-source tool matches the whole need, and three pieces of data are missing from the index. The plan below keeps the explorer index-only by moving every computation that needs source or git into Woods extraction, and keeps the UI work in <code>woods-map</code>.</p>
+</div>
+
+<h3>Extraction-side additions (woods gem, through the normal review gate)</h3>
+<div class="tbl"><table>
+<thead><tr><th>Item</th><th>What</th><th>How</th><th>Unblocks</th></tr></thead>
+<tbody>
+<tr><td><strong>W-1</strong> Reference spans</td><td><code>metadata.references</code>: <code>[{line, column, length, target, target_type, kind, confidence}]</code> in annotated-source coordinates (map to file lines through <code>source_line_map</code>). Kinds: constant, association, route_helper, callback_method, job_class, mailer_action, partial, scope.</td><td>The source-reference pass already collects constant reads with lexical context during extraction and resolves them against the typed registry; retain positions and publish the admitted ones. Association, callback and route-helper spans come from the metadata the extractors already produce plus a position scan of the same source. Ambiguous short names publish all candidates with <code>confidence: "ambiguous"</code>.</td><td>FR-4, B-1, click-through in every direction</td></tr>
+<tr><td><strong>W-2</strong> Method table</td><td><code>metadata.methods</code>: <code>[{name, kind, line, end_line, visibility, owner}]</code> including methods inlined from concerns (owner = concern).</td><td>One Prism walk per unit source; the AST layer and <code>SourceNesting</code> already handle nesting. Flow operations already carry lines, so method excerpts in Trail become a slice.</td><td>Method anchors, method excerpts, "jump to def" within a class</td></tr>
+<tr><td><strong>W-3</strong> Commit table</td><td>Payload artifact <code>git_commits.json</code>: <code>commits[{sha, author, date, message}]</code> and <code>paths{path → [sha…]}</code> for the 365-day HEAD-reachable window, plus a config to raise <code>recent_commits</code> per unit.</td><td><code>GitHistory</code> already streams touched-path events for every indexed path; aggregate instead of truncating to five. Written by full runs; incremental runs refresh touched paths. Honour the same provenance rules (<code>GitProvenance</code>, <code>WOODS_GIT_DIR</code>).</td><td>FR-7, timelines, co-change detection</td></tr>
+<tr><td><strong>W-4</strong> Job resilience facts</td><td>Job <code>metadata</code>: <code>retry_on</code>, <code>discard_on</code>, <code>rescue_from</code>, <code>around_perform</code> callbacks.</td><td>Runtime introspection of <code>ActiveJob::Base</code> descendants (<code>rescue_handlers</code>, callback chains) with a regex fallback for Sidekiq workers.</td><td>Trail flags C-2</td></tr>
+<tr><td><strong>W-5</strong> Lifecycle entries for models</td><td>Allow <code>trace_flow</code>/<code>FlowAssembler</code> to start from <code>Model@after_commit(create)</code>, expanding the callback methods for that event in chain order.</td><td>Model units already carry resolved callbacks with filters; the assembler needs an entry-point grammar for events.</td><td>FR-6, scenario 1 step 2</td></tr>
+<tr><td><strong>W-6</strong> Method-level span targets</td><td>Add <code>method</code> to a reference span when the receiver resolves to a unit (<code>Job.perform_later</code>, <code>Mailer.new_post</code>, <code>Service.call</code>).</td><td>Same Prism walk as W-1; the call node's method name is adjacent to the constant read.</td><td>Callers panel, peek slicing (B-9, B-13)</td></tr>
+<tr><td><strong>W-7</strong> Per-action controller and mailer facts</td><td><code>metadata.actions[name]</code> gains <code>assigns</code>, <code>params</code>, <code>renders</code> (with locals), <code>redirects</code>, <code>formats</code>, each with lines.</td><td>Prism over the captured <code>action_sources</code>; filters' assigns attributed to the filter method. Views already carry <code>instance_variables</code>, <code>helpers_called</code>, <code>partials_rendered</code>.</td><td>Data passage and mismatch flags (B-17, B-18)</td></tr>
+<tr><td><strong>W-8</strong> Resolved filter applicability</td><td><code>metadata.filters[].applies_to</code>: the action list after only/except, with owner (class, superclass or concern).</td><td>The runtime filter chain already exposes the action set via ActionFilter duck-typing; publish it per filter.</td><td>Filter matrix (B-16)</td></tr>
+</tbody></table></div>
+
+<h3>Explorer-side components (woods-map)</h3>
+<div class="tbl"><table>
+<thead><tr><th>Component</th><th>Responsibility</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>Repository</code></td><td>One pinned generation per request over <code>PublishedIndex</code>/<code>IndexReader</code>; per-generation memoised caches (search index, neighbourhoods, rendered source, diagrams, ERD facts).</td><td>Keyed by <code>(number, token)</code>; drops caches when the pointer moves; exposes <code>freshness</code> for the status bar.</td></tr>
+<tr><td><code>SourceRenderer</code></td><td>rouge highlight + line table + span injection + concern block delimiting + original-line gutter.</td><td>Spans are inserted by character offset after highlighting, splitting tokens where needed so markup stays valid.</td></tr>
+<tr><td><code>Neighbourhood</code></td><td>Graph query (centre, depth, direction, type and <code>via</code> filters, package) → Cytoscape elements JSON with truncation metadata.</td><td>Uses <code>reverse_via</code> for inbound edges; marks hubs, cycles, cross-database and undeclared package edges from <code>graph_analysis</code>.</td></tr>
+<tr><td><code>LifecycleBuilder</code></td><td>Flow document (precomputed or assembled) → lanes; follows async edges into job/mailer flows; applies <code>FlagDetector</code>.</td><td>Depth budget; honest "unexpanded" markers for receiverless or dynamic calls.</td></tr>
+<tr><td><code>Diagrams::Erd</code>, <code>Diagrams::Flow</code>, <code>Diagrams::Sequence</code></td><td>Mermaid text from model facts and flow documents.</td><td>Extend <code>Woods::RubyAnalyzer::MermaidRenderer</code>; chunking rules; identifier sanitising already exists there.</td></tr>
+<tr><td><code>Timeline</code></td><td>Commit table + unit set → vis-timeline groups/items; co-change pairs; snapshot diff overlay.</td><td>Falls back to <code>recent_commits</code> when <code>git_commits.json</code> is absent (older indexes), with a visible "5 most recent only" note.</td></tr>
+<tr><td><code>Auth</code></td><td>Token → signed cookie exchange; wraps <code>Woods::MCP::BearerAuth</code> and <code>OriginGuard</code>; loopback rules.</td><td>Same env var conventions as <code>woods-mcp-http</code>.</td></tr>
+<tr><td><code>Standalone</code></td><td><code>woods-map serve DIR</code>: minimal <code>Rails::Application</code> with the Engine mounted, Puma via rackup.</td><td>Needs railties, importmap-rails and a Rack server in the environment; documents that it boots no host code.</td></tr>
+<tr><td><code>Guide</code></td><td>Section 11.</td><td></td></tr>
+</tbody></table></div>
+
+<h2 id="llm">11 · The RubyLLM guide</h2>
+<div class="col">
+<p>RubyLLM 2.1 (released 8 October 2026; 2.1.1 on 11 October) has a native MCP client, so the Woods Index MCP server that agents already use can be attached to a chat without adapters. The guide is one agent, one tool allow-list, one streaming channel, and a set of page-aware actions. It is off by default and needs two things from the host: <code>ruby_llm</code> in the bundle with a provider configured, and <code>config.guide_enabled = true</code>.</p>
+</div>
+
+<div class="wf">
+  <p class="caption">Wireframe D1: the guide panel docked beside a unit page, with an "explain this" action running.</p>
+  <div class="screen wf-chat">
+    <div class="box a-top bar"><span class="box">models › Post</span><span class="box solid" style="flex:0 0 160px">Guide · claude-sonnet-5-5 · 3.1k tok</span></div>
+    <div class="box a-page" style="min-height:200px"><b>Unit page (any direction)</b>… Code / Schema / Lifecycle / Graph / History …<br><br>Actions on this page:<br>[Explain this model] [Explain lifecycle: create] [Summarise blast radius] [Plan a feature rooted here] [Why might this fail?]</div>
+    <div class="box a-chat"><b>Guide</b>
+      <div class="lines">
+        <span>▸ context: Post (model), gen 42, main@361468d</span>
+        <span>you: Explain the lifecycle when a post is created.</span>
+        <span>⚙ trace_flow PostsController#create · 42 ms</span>
+        <span>⚙ lookup NotifySubscribersJob · 8 ms</span>
+        <span>guide: Creating a post runs 5 validations, then</span>
+        <span>  after_commit enqueues [NotifySubscribersJob],</span>
+        <span>  which calls [MailingListMailer#new_post] …</span>
+        <span>  Risk: the job declares no retry_on.</span>
+        <span>  ▸ Pin these 3 units  ▸ Open as investigation</span>
+        <span>┌──────────────────────────────┐</span>
+        <span>│ Ask about this page…         │</span>
+        <span>└──────────────────────────────┘</span>
+      </div></div>
+  </div>
+  <ol class="legend">
+    <li>Tool calls render as cards from <code>before_tool_call</code> / <code>after_tool_result</code> callbacks, with duration; answer tokens stream in as they arrive.</li>
+    <li>Unit identifiers in answers become links by matching against the generation's identifier set; unknown names are left plain, so the guide cannot invent a link.</li>
+    <li>Every answer offers "pin" and "open as investigation", which hands the units to Trail.</li>
+  </ol>
+</div>
+
+<h3>Wiring</h3>
+<pre>class WoodsMap::Guide &lt; RubyLLM::Agent
+  model { WoodsMap.config.guide_model }          # host chooses provider + model
+  instructions &lt;&lt;~TXT
+    You answer questions about one Rails application using only the Woods index
+    tools. Cite units by exact identifier. Say when a flow step is unexpanded.
+    Never claim runtime behaviour the index cannot prove.
+  TXT
+  mcp do
+    server WoodsMap::IndexMcp,                   # RubyLLM::MCP subclass
+           only: %w[woods_status search lookup structure dependencies dependents
+                    trace_flow recent_changes graph_analysis pagerank
+                    domain_clusters codebase_retrieve]
+  end
+end
+
+class WoodsMap::IndexMcp &lt; RubyLLM::MCP
+  command 'bundle', 'exec', 'woods-mcp', WoodsMap.config.index_dir   # dev, stdio
+  # or: url WoodsMap.config.mcp_url                                   # staging, woods-mcp-http
+end</pre>
+<div class="grid2">
+<div class="card"><h4>Transport and tools</h4><ul>
+<li>Development: stdio to <code>woods-mcp</code> over the same index directory. Staging: Streamable HTTP to a deployed <code>woods-mcp-http</code> with its bearer token. Both expose exactly the tools agents use, so answers in the UI and answers in an editor agree.</li>
+<li>Allow-list excludes every operator, feedback, snapshot-write and Notion tool; the explorer never lets the guide trigger extraction.</li>
+<li>A later optimisation wraps the same handlers in-process as <code>RubyLLM::Tool</code> classes so the chat shares the request's pinned generation; not needed for v1.</li>
+<li><code>ruby_llm-mcp</code> is not used: it pins RubyLLM 1.x and is superseded by the native client.</li>
+</ul></div>
+<div class="card"><h4>Streaming without Action Cable</h4><ul>
+<li>Chat POST returns a Turbo Frame with the message shell; the browser opens an SSE connection (<code>EventSource</code>) and hands it to <code>Turbo.connectStreamSource</code>, so the server streams Turbo Stream actions with no cable. Works identically in the Engine and in standalone mode.</li>
+<li>Server side: <code>ActionController::Live</code>; <code>chat.ask(question) { |chunk| }</code> appends content; <code>before_tool_call</code> and <code>after_tool_result</code> broadcast tool cards. Ordering is guaranteed by the single SSE stream.</li>
+<li>Cancel button calls <code>chat.cancel</code>; disconnects stop generation.</li>
+</ul></div>
+<div class="card"><h4>Context seeding</h4><ul>
+<li>Each page contributes a compact context block: generation, HEAD, the unit's identifier, type, path, summary metadata (not full source), and for Trail the board's pinned identifiers and notes. The guide reads full source through <code>lookup</code> only when it needs it.</li>
+<li>Selection-aware: a highlighted range in the code viewer or a selected set of graph nodes is passed as context.</li>
+<li>Personalised retrieval (Aider's idea): PageRank restricted to the identifiers in the question ranks which units to mention first.</li>
+</ul></div>
+<div class="card"><h4>"Explain this" actions</h4><ul>
+<li><strong>Explain this unit</strong>: role, relationships, callbacks and side effects, who maintains it.</li>
+<li><strong>Explain this method</strong> (from a selected range or outline entry): what it does, what calls it, what it writes or enqueues, using the method table slice as context.</li>
+<li><strong>Explain this passage</strong>: narrates how data moves from params through filters and the action into templates, naming every flagged mismatch.</li>
+<li><strong>Explain lifecycle</strong>: narrates a flow document step by step with the async boundaries called out.</li>
+<li><strong>Summarise blast radius</strong>: transitive dependents grouped by type with risk notes (hubs, cycles, cross-database).</li>
+<li><strong>Plan a feature rooted here</strong>: proposes attachment points, migrations, controller params, views and tests, each citing a unit; output is Markdown ready for an issue.</li>
+<li><strong>Why might this fail?</strong> (jobs, mailers, actions): walks conditionals, missing retry/rescue, nil-prone calls visible in source, recent co-changes.</li>
+<li>Actions are prompt templates stored in the gem and overridable by the host (<code>config/woods_explorer/prompts/*.md</code>).</li>
+</ul></div>
+<div class="card"><h4>Persistence</h4><ul>
+<li>Default: ephemeral conversations kept in memory for the browser session and written as JSON under <code>&lt;index&gt;/explorer/chats/</code> (same file-store pattern as the session tracer), never in the host database.</li>
+<li>Optional: hosts that already run <code>ruby_llm:install</code> can set <code>config.guide_persistence = :active_record</code> to use <code>acts_as_chat</code> tables.</li>
+</ul></div>
+<div class="card"><h4>Safety and cost</h4><ul>
+<li>Off unless enabled; staging additionally requires the auth token. Index-only tools mean the model sees application source but never live data.</li>
+<li>Per-session token budget and a per-answer tool-call cap (default 12) with a visible counter; model and provider are the host's choice through RubyLLM configuration, including Ollama for fully local use.</li>
+<li>Answers are rendered from Markdown with links rewritten only to known identifiers; raw HTML is stripped.</li>
+<li>Prompts and chat logs are excluded from extraction (they live outside the payload) and from the Obsidian/Notion exporters.</li>
+</ul></div>
+</div>
+
+<h2 id="roadmap">12 · Roadmap</h2>
+<div class="tbl"><table>
+<thead><tr><th>Milestone</th><th>Scope</th><th>Repository</th><th>Exit criterion</th></tr></thead>
+<tbody>
+<tr><td>M0 · Data</td><td>W-1 reference spans, W-2 method table, W-3 commit table, W-4 job facts, W-5 model lifecycle entries, W-6 method targets, W-7 per-action facts, W-8 filter applicability, W-9 container attribution, W-10 facet diff, W-11 generation pin, W-12 impact task, W-13 inverted flow index</td><td>woods</td><td>Published by full and incremental runs; incremental equivalence spec green; verified on testbed rails-8.0, 7.2 and 6.0</td></tr>
+<tr><td>M1 · Reading</td><td>Gem skeleton, Engine + standalone, self-served assets and import map, auth, Repository, search palette and full-text code search, unit pages for all types, two-lens code viewer with marginalia, outline, peek, confidence marks, reading trail, file view</td><td>woods-map</td><td>Both scenarios navigable by clicking only on a Rails 6.0 and an 8.0 host; works with JS disabled except peek and hover</td></tr>
+<tr><td>M2 · Passage</td><td>Filter matrix, data passage for actions and mailers, mismatch flags, callback ladder, passage export</td><td>woods-map</td><td>The unassigned-ivar flag reproduces on a seeded testbed bug</td></tr>
+<tr><td>M3 · Diagrams</td><td>Lifecycle tab (controllers, jobs, mailers, model events) with swimlane, flowchart, sequence and C4 dynamic renderings; Schema tab and <code>/woods/erd</code>; Landscape page (L1, L2); Mermaid, Structurizr DSL and LikeC4 exports</td><td>woods-map</td><td>Flowchart and ERD match the flow document and model facts on the testbed; chunking verified on a 300-model fixture</td></tr>
+<tr><td>M4 · History</td><td>History tab hunk cards, gutter heat, neighbourhood timeline, snapshot picker, unit diff across retained generations</td><td>woods-map</td><td>Co-change query answers scenario 2 step 3 from the commit table</td></tr>
+<tr><td>M4b · Impact</td><td>Report object with Markdown, JSON and Mermaid renderers; <code>woods:impact</code> task and <code>change_impact</code> MCP tool; impact page with focus URLs; <code>?since=</code> highlighting across views; pre-change blast radius</td><td>both</td><td>A PR in the testbed gets a Markdown impact comment from CI; the focus link opens the page with the changed template highlighted</td></tr>
+<tr><td>M5 · Graph</td><td>Neighbourhood endpoint, Cytoscape component, Graph tab, full-screen graph page, blast radius, butterfly layout</td><td>woods-map</td><td>300-node neighbourhood renders under 500 ms on the testbed; keyboard list equivalent</td></tr>
+<tr><td>M6 · Trail</td><td>LifecycleBuilder across async hops, lanes, flags, board state, export</td><td>woods-map</td><td>Scenario 2 reproducible end to end from one URL</td></tr>
+<tr><td>M7 · Guide</td><td>RubyLLM agent, MCP attachment, SSE streaming, seven actions, budgets</td><td>woods-map</td><td>All actions produce linked answers on the testbed with one provider; disabled by default verified; unavailable below Ruby 3.2 with a clear message</td></tr>
+<tr><td>M8 · Staging</td><td>Threat-model doc, CSP, rate limits, deployment guide beside <code>MCP_HTTP_TRANSPORT.md</code></td><td>both</td><td>Non-loopback boot refuses without token; origin guard tests</td></tr>
+</tbody></table></div>
+<div class="col">
+<p>M1 and M2 are the comprehension core and ship first. M3, M4 and M5 can proceed in parallel after M1; M6 depends on M3 and M4; M7 depends on M1 only but is most useful after M2. The testbed is the validation host for every milestone, with a seeded "blog" scenario (Post, Comment, Tag, NotifySubscribersJob, MailingListMailer and templates, plus one deliberate unassigned instance variable in a mailer template) added to <code>apps/rails-8.0</code> and mirrored in 6.0 so both walkthroughs and the floor are real.</p>
+</div>
+
+<h2 id="questions">13 · Open questions</h2>
+<div class="col"><ul>
+<li><strong>Floors (settled).</strong> railties 6.0 and Ruby 3.0, the same as Woods, by serving assets from the engine instead of depending on importmap-rails or turbo-rails. The guide alone needs Ruby 3.2 and says so in the status bar when absent.</li>
+<li><strong>Editor deep links.</strong> "Open in editor" needs the host checkout path and a URL scheme (<code>vscode://file</code>, <code>idea://open</code>, <code>txmt://</code>). Make both a per-browser setting; never guess paths from the index.</li>
+<li><strong>Streaming on old stacks.</strong> <code>ActionController::Live</code> over SSE behind some proxies buffers; document the Puma and nginx settings, and fall back to polling Turbo Frames when the stream cannot open.</li>
+<li><strong>Testbed realism.</strong> The rails-8.0 variant has users and microposts but no mailer-after-create chain. Add the blog scenario above before M1 so wireframes are tested against real extraction output.</li>
+<li><strong>Standalone rendering.</strong> Booting a minimal Rails application for <code>woods-map serve</code> is the lowest-risk way to share views with the Engine. The alternative (plain Rack + ERB with the Engine as a thin wrapper) halves the dependency surface but duplicates view helpers. Decide before M1.</li>
+<li><strong>Reference span cost.</strong> W-1 adds per-unit JSON size (roughly 40 to 120 bytes per reference). Measure on a 5 000-unit app; if large, publish spans as a sidecar per type directory rather than inside each unit.</li>
+<li><strong>Precompute flows by default?</strong> Trail and the Lifecycle tab are faster when <code>precompute_flows</code> is on. It fails closed on any assembly error, which is why it is off. Consider a <code>precompute_flows: :best_effort</code> mode that records failures in <code>skipped_files.json</code> instead of aborting.</li>
+</ul></div>
+
+<p class="foot">Sources: Woods source and docs at <code>lost-in-the/woods</code> main (361468d); gem floors from the RubyGems API on 15 October 2026 (importmap-rails 2.2.3 railties ≥ 6.0, turbo-rails 2.0.23 railties ≥ 7.1, stimulus-rails 1.3.4 railties ≥ 6.0), in particular <code>docs/INDEX_LAYOUT.md</code>, <code>docs/PUBLISHED_INDEX.md</code>, <code>docs/EXTRACTOR_REFERENCE.md</code>, <code>docs/MCP_SERVERS.md</code>, <code>docs/MCP_HTTP_TRANSPORT.md</code>, <code>docs/OBSIDIAN_INTEGRATION.md</code>, <code>lib/woods/mcp/server.rb</code>, <code>lib/woods/flow_assembler.rb</code>, <code>lib/woods/extractors/*</code>; npm and RubyGems registries, Mermaid, sigma.js and RubyLLM release notes, mission_control-jobs source, checked 14 October 2026.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>
+(function(){
+  function isDark(){
+    var t=document.documentElement.getAttribute('data-theme');
+    if(t==='dark')return true; if(t==='light')return false;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function render(){
+    if(!window.mermaid)return;
+    var nodes=Array.prototype.filter.call(document.querySelectorAll('pre.mermaid'),function(n){return !n.querySelector('svg');});
+    if(!nodes.length)return;
+    var dark=isDark();
+    try{
+      mermaid.initialize({startOnLoad:false, theme: dark?'dark':'neutral', securityLevel:'strict',
+        fontFamily:'"IBM Plex Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+        themeVariables: dark?{primaryColor:'#223229',primaryTextColor:'#e4e8e2',primaryBorderColor:'#7fbf95',lineColor:'#a4ada6',secondaryColor:'#1f2622',tertiaryColor:'#1b211e',background:'#1f2622',mainBkg:'#223229',nodeBorder:'#7fbf95',clusterBkg:'#1b211e',clusterBorder:'#34403a',titleColor:'#e4e8e2',edgeLabelBackground:'#1f2622'}
+                           :{primaryColor:'#dfeae1',primaryTextColor:'#1d221f',primaryBorderColor:'#2f6b45',lineColor:'#4f5a53',secondaryColor:'#f5f7f3',tertiaryColor:'#eceee8',background:'#ffffff',mainBkg:'#dfeae1',nodeBorder:'#2f6b45',clusterBkg:'#f5f7f3',clusterBorder:'#d4d9d1',titleColor:'#1d221f',edgeLabelBackground:'#ffffff'},
+        flowchart:{htmlLabels:true, curve:'basis'}, er:{useMaxWidth:true}, sequence:{useMaxWidth:true, mirrorActors:false}});
+      mermaid.run({nodes:nodes, suppressErrors:true});
+    }catch(e){ /* leave the diagram text readable */ }
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',render);}else{render();}
+})();
+</script>
