@@ -1,0 +1,6 @@
+{"nodes":{"Post":{"type":"model","file_path":"app/models/post.rb"},"Comment":{"type":"model","file_path":"app/models/comment.rb"}},
+ "edges":{"Comment":[{"type":"model","target":"Post","via":"belongs_to"}]},
+ "reverse":{"Post":["Comment"]},
+ "file_map":{"app/models/post.rb":["Post"],"app/models/comment.rb":["Comment"]},
+ "type_index":{"model":["Comment","Post"]},
+ "stats":{"node_count":2,"edge_count":1,"types":{"model":2}}}

@@ -1,0 +1,19 @@
+<% content_for :title, "Woods Map · generation #{@status['generation']}" %>
+<% content_for :status_bar, "generation #{@status['generation']} · #{@status['git_branch'] || 'unknown branch'} @ #{@status['git_sha'].to_s[0, 7].presence || 'unknown'}" %>
+<h1>Index status</h1>
+<table>
+  <tr><th>Generation</th><td><%= @status['generation'] %></td></tr>
+  <tr><th>Extracted at</th><td><%= @status['extracted_at'] %></td></tr>
+  <tr><th>Units</th><td><%= @status['total_units'] %></td></tr>
+  <tr><th>Branch</th><td><%= @status['git_branch'] %></td></tr>
+  <tr><th>Commit</th><td><%= @status['git_sha'] %></td></tr>
+  <tr><th>Rails</th><td><%= @status['rails_version'] %></td></tr>
+</table>
+<% if @status['counts'].any? %>
+<h2>Units by type</h2>
+<table>
+  <% @status['counts'].sort_by { |_, count| -count.to_i }.each do |type, count| %>
+    <tr><th><%= type %></th><td><%= count %></td></tr>
+  <% end %>
+</table>
+<% end %>
