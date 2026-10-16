@@ -30,6 +30,7 @@ testbed suite in `woods-testbed`.
 ## Dependencies
 
 - M1 depends on M0 (W-1, W-2, W-3 at least) and T.
+- The design-system epic (woods-map#23) implements D-10 to D-20 inside M1; M3 to M6 compose their views from its partials.
 - M2 depends on M1 and M0 (W-7, W-8).
 - M4b depends on M1 and M0 (W-10 to W-13); the woods side of M4b is W-12.
 - M3, M4 and M5 can proceed in parallel after M1.
@@ -43,7 +44,7 @@ evidence.
 
 | Milestone | Requirements |
 |---|---|
-| M1 | FR-1, FR-2, FR-3, FR-4, NFR-1 to NFR-4, B-1 to B-15 |
+| M1 | FR-1, FR-2, FR-3, FR-4, NFR-1 to NFR-4, B-1 to B-15, design decisions D-10 to D-20 |
 | M2 | B-16 to B-20 |
 | M4b | FR-7 (impact part), E-1 to E-10 |
 | M3 | FR-6, B-21 to B-24, Mermaid decisions R-4 |
@@ -84,6 +85,18 @@ Run this before a milestone issue is opened and again before it closes.
 | W-13 inverted flow index | [woods#763](https://github.com/lost-in-the/woods/issues/763) |
 | W-14 best-effort flows | [woods#764](https://github.com/lost-in-the/woods/issues/764) |
 | M1 to M8 | woods-map#2 to #10 as listed in the milestone table |
+| Design system epic (tokens, fonts, components, responsive tiers) | [woods-map#23](https://github.com/lost-in-the/woods-map/issues/23) |
+| D-10 Source of truth for visual tokens | [woods-map#12](https://github.com/lost-in-the/woods-map/issues/12) |
+| D-11 Colour meaning | [woods-map#13](https://github.com/lost-in-the/woods-map/issues/13) |
+| D-12 Typefaces | [woods-map#14](https://github.com/lost-in-the/woods-map/issues/14) |
+| D-13 Spacing, borders and radii | [woods-map#15](https://github.com/lost-in-the/woods-map/issues/15) |
+| D-14 Heading hierarchy | [woods-map#16](https://github.com/lost-in-the/woods-map/issues/16) |
+| D-15 Dates and shorthand | [woods-map#17](https://github.com/lost-in-the/woods-map/issues/17) |
+| D-16 Tooltip | [woods-map#18](https://github.com/lost-in-the/woods-map/issues/18) |
+| D-17 Tables | [woods-map#19](https://github.com/lost-in-the/woods-map/issues/19) |
+| D-18 Navigation chrome | [woods-map#20](https://github.com/lost-in-the/woods-map/issues/20) |
+| D-19 Responsiveness | [woods-map#21](https://github.com/lost-in-the/woods-map/issues/21) |
+| D-20 Glyphs over assets | [woods-map#22](https://github.com/lost-in-the/woods-map/issues/22) |
 | T testbed suite | [woods-testbed#38](https://github.com/lost-in-the/woods-testbed/issues/38) |
 
 The GitHub integration available to the session that created these issues
