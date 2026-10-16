@@ -13,6 +13,8 @@ Version facts come from the Mermaid changelog and the per-type syntax pages in t
 Decision D-5 vendors the newest Mermaid, so every type below is available to
 the map; availability is not the question, fit is.
 
+The connection inventory in [`connection-types.md`](connection-types.md) is the renderer-agnostic view of the same question and proposes one intermediate model per topology with Mermaid as the default backend; read it first when deciding whether a type is the right drawing at all.
+
 ## Verdicts at a glance
 
 | Verdict | Meaning |
