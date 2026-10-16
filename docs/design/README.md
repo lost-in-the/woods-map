@@ -6,6 +6,7 @@
 | [design-study.html](design-study.html) | The same study as a self-contained page with rendered wireframes, SVG figures and Mermaid diagrams. Open it locally; it loads Mermaid from a CDN. |
 | [decisions.md](decisions.md) | Every decision taken so far, with consequences. Wins over the study where they disagree. |
 | [plan.md](plan.md) | Milestones, dependencies, requirement map, audit checklist and issue links. |
+| [mermaid-diagram-types.md](mermaid-diagram-types.md) | Every Mermaid diagram type with a verdict (core, secondary, export, verify, no), the Woods data it is built from, where the map renders it, renderer constraints and the verifications M3 must run. |
 
 The full design is produced from these three documents, milestone by
 milestone, each as an issue on the Woods Development project.
