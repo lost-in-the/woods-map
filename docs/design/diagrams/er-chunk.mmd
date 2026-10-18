@@ -1,0 +1,33 @@
+erDiagram
+  direction LR
+  accTitle: blog namespace, 7 tables, keys only
+  classDef join stroke:#6E7987,stroke-dasharray:4
+  users { bigint id PK
+    string email UK }
+  posts { bigint id PK
+    bigint author_id FK
+    string slug UK }
+  comments { bigint id PK
+    bigint post_id FK
+    bigint user_id FK }
+  tags { bigint id PK
+    string name UK }
+  taggings { bigint id PK
+    bigint post_id FK
+    bigint tag_id FK }
+  attachments { bigint id PK
+    string attachable_type
+    bigint attachable_id }
+  subscriptions { bigint id PK
+    bigint user_id FK
+    bigint post_id FK }
+  users ||--o{ posts : "author"
+  users ||--o{ comments : ""
+  posts ||--o{ comments : ""
+  posts ||--o{ taggings : ""
+  tags ||--o{ taggings : ""
+  posts ||..o{ attachments : "attachable"
+  comments ||..o{ attachments : "attachable"
+  users ||--o{ subscriptions : ""
+  posts ||--o{ subscriptions : ""
+  class taggings join
