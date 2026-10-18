@@ -7,8 +7,10 @@ relationship graphs, schema and history, and get change-impact reports with
 sharable focus URLs. It reads the published index only: no live database, no
 runtime reflection, no git subprocess at request time.
 
-Status: design and scaffold. The design study, decision log and milestone plan
-live in `docs/design/` and are the source of truth for scope.
+Status: scaffold landed, design done. The design study, decision log, boards
+and milestone plan live in `docs/design/` and are the source of truth for
+scope; `docs/design/foundations/tokens.css` is the stylesheet the engine ships
+verbatim (a spec keeps the two copies identical).
 
 ## Commands
 
@@ -31,17 +33,22 @@ mount the engine in a variant, run `woods:extract`, open `/woods`.
 - **Read-only and gated**: loopback without a token boots with a warning; anything else refuses without `WOODS_MAP_TOKEN`; `config.authorize` lets the host add its own gate. Routes take identifiers and generation numbers, never file paths from the client.
 - **Mounting is explicit**: `mount WoodsMap::Engine => "/woods"`; the Railtie injects nothing.
 
-## Architecture (planned, see docs/design/plan.md)
+## Architecture (see docs/design/plan.md for what is still planned)
 
 ```
-lib/woods_map.rb                 # module, Configuration
-lib/woods_map/engine.rb          # Rails::Engine, isolate_namespace WoodsMap
-lib/woods_map/repository.rb      # one pinned generation per request, per-generation caches
-lib/woods_map/importmap.rb       # pins for vendored modules
-app/controllers/woods_map/       # status, sessions (token exchange), assets, units, search, ...
-app/views/woods_map/             # server-rendered ERB, Turbo Frames
+lib/woods_map.rb                 # module, Configuration (boot_warning)
+lib/woods_map/engine.rb          # Rails::Engine, isolate_namespace WoodsMap, after_initialize warning
+lib/woods_map/repository.rb      # one pinned generation per request, per-generation caches (planned)
+lib/woods_map/assets.rb          # engine-served files: roots, content digests, content types
+lib/woods_map/importmap.rb       # pins for vendored modules, the literal import map
+app/controllers/concerns/woods_map/authentication.rb  # token, cookie and loopback gate (D-4)
+app/controllers/woods_map/       # application (gate order, 403 panel), status, sessions, assets; units, search, ...
+app/helpers/woods_map/           # asset URLs, date shorthand (D-15), short SHA
+app/assets/stylesheets/woods_map/ # tokens.css (verbatim from docs/design/foundations), map.css (engine-only rules)
+app/views/woods_map/             # server-rendered ERB on the token classes; shared/ holds the frame partials
 vendor/javascript/               # turbo, stimulus, mermaid, cytoscape, vis-timeline, highlight.js
-docs/design/                     # design study, decisions, plan
+vendor/fonts/                    # Inter and Fira Code WOFF2 (D-12)
+docs/design/                     # design study, decisions, boards, foundations, plan
 ```
 
 ## Conventions

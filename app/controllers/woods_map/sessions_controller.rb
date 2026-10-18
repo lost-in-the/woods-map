@@ -2,15 +2,16 @@
 
 module WoodsMap
   # Exchanges the bearer token for a signed, HttpOnly, SameSite=Strict cookie
-  # so browser navigations can authenticate without a header.
+  # so browser navigations can authenticate without a header. The form is the
+  # fallback for `GET /woods?token=…`, which exchanges in one step.
   class SessionsController < ApplicationController
+    skip_before_action :exchange_query_token!
     skip_before_action :authenticate!, only: %i[new create]
+    layout 'woods_map/bare', only: %i[new create]
 
     def new
       head :not_found unless woods_map_config.token?
     end
-
-    REJECTED = 'That token was not accepted.'
 
     def create
       if token_matches?(params[:token].to_s)
@@ -25,18 +26,6 @@ module WoodsMap
     def destroy
       cookies.delete(woods_map_config.cookie_name)
       redirect_to woods_map.new_session_path
-    end
-
-    private
-
-    def token_matches?(presented)
-      woods_map_config.token? && Rack::Utils.secure_compare(woods_map_config.token, presented)
-    end
-
-    def store_session_cookie
-      cookies.signed[woods_map_config.cookie_name] = {
-        value: token_digest, httponly: true, same_site: :strict, secure: request.ssl?
-      }
     end
   end
 end

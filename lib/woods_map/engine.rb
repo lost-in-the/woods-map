@@ -18,5 +18,13 @@ module WoodsMap
       # initializer that runs after this one. Every setting is resolved at
       # request time through WoodsMap.configuration.
     end
+
+    # Logged once, after every host initializer has run, so a token set in
+    # config/initializers/woods_map.rb is seen: a loopback-only mount boots
+    # with a warning rather than silently (D-4, M8).
+    config.after_initialize do
+      message = WoodsMap.configuration.boot_warning
+      Rails.logger&.warn("[woods-map] #{message}") if message
+    end
   end
 end

@@ -84,6 +84,7 @@ Run this before a milestone issue is opened and again before it closes.
 | W-12 impact report | [woods#762](https://github.com/lost-in-the/woods/issues/762) |
 | W-13 inverted flow index | [woods#763](https://github.com/lost-in-the/woods/issues/763) |
 | W-14 best-effort flows | [woods#764](https://github.com/lost-in-the/woods/issues/764) |
+| Engine scaffold (the M1 skeleton: gem, Engine, Repository, authentication, states, token sheet served) | [woods-map#11](https://github.com/lost-in-the/woods-map/pull/11) |
 | M1 to M8 | woods-map#2 to #10 as listed in the milestone table |
 | Design system epic (tokens, fonts, components, responsive tiers) | [woods-map#23](https://github.com/lost-in-the/woods-map/issues/23) |
 | Pele as the diagram renderer (needs-decision, supersedes D-5 if accepted) | [woods-map#25](https://github.com/lost-in-the/woods-map/issues/25) |

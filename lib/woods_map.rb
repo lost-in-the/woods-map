@@ -2,6 +2,7 @@
 
 require 'woods_map/version'
 require 'woods_map/configuration'
+require 'woods_map/assets'
 require 'woods_map/importmap'
 require 'woods_map/repository'
 require 'woods_map/engine' if defined?(Rails::Engine)

@@ -5,25 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><%= content_for?(:title) ? yield(:title) : 'Woods Map' %></title>
   <%= csrf_meta_tags %>
-  <script type="importmap"><%= raw WoodsMap::Importmap.to_json(url_for: ->(digest, path) { woods_map.asset_path(digest: digest, path: path) }) %></script>
+  <%= woods_map_stylesheet_tags %>
+  <script type="importmap"><%= raw WoodsMap::Importmap.to_json(url_for: ->(digest, path) { woods_map.engine_asset_path(digest: digest, path: path) }) %></script>
   <script type="module">import "woods_map";</script>
-  <style>
-    :root { color-scheme: light dark; --fg: #1d221f; --bg: #f5f7f3; --line: #d4d9d1; --accent: #2f6b45; }
-    @media (prefers-color-scheme: dark) { :root { --fg: #e4e8e2; --bg: #141917; --line: #34403a; --accent: #7fbf95; } }
-    body { margin: 0; font: 15px/1.5 system-ui, sans-serif; color: var(--fg); background: var(--bg); }
-    header.woods-map { display: flex; gap: 1rem; align-items: baseline; padding: .6rem 1rem; border-bottom: 1px solid var(--line); }
-    header.woods-map a { color: var(--accent); text-decoration: none; font-weight: 600; }
-    main { padding: 1rem; max-width: 72rem; }
-    table { border-collapse: collapse; } td, th { text-align: left; padding: .25rem .6rem; border-bottom: 1px solid var(--line); }
-    .flash { padding: .5rem 1rem; border-left: 3px solid var(--accent); }
-  </style>
 </head>
 <body>
-  <header class="woods-map">
-    <a href="<%= woods_map.root_path %>">Woods Map</a>
-    <span><%= yield(:status_bar) %></span>
-  </header>
-  <% if flash[:alert] %><p class="flash"><%= flash[:alert] %></p><% end %>
-  <main><%= yield %></main>
+  <div class="wm page" data-theme="dark">
+    <%= render 'woods_map/shared/bar', generation: @generation %>
+    <% if flash[:alert] %><div class="banner risk" role="alert"><b>Refused.</b><span class="txt"><%= flash[:alert] %></span></div><% end %>
+    <%= yield %>
+  </div>
 </body>
 </html>

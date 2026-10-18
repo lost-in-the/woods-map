@@ -14,4 +14,25 @@ RSpec.describe WoodsMap::Configuration do
     config.token = '   '
     expect(config.token?).to be(false)
   end
+
+  describe '#boot_warning' do
+    it 'warns that only loopback is served while no token is configured' do
+      config = described_class.new
+      config.token = nil
+      expect(config.boot_warning).to include('loopback requests only').and include('WOODS_MAP_TOKEN')
+    end
+
+    it 'warns that every request is refused when require_token is set without a token' do
+      config = described_class.new
+      config.token = nil
+      config.require_token = true
+      expect(config.boot_warning).to include('refuses every request')
+    end
+
+    it 'is silent once a token is configured' do
+      config = described_class.new
+      config.token = 'secret'
+      expect(config.boot_warning).to be_nil
+    end
+  end
 end
