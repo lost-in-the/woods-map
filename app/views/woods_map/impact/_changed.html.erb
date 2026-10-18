@@ -1,0 +1,23 @@
+<%# The Changed tab in pre-change mode: the focus units, then the affected units with the path that explains each. %>
+<section class="sec" aria-labelledby="chg">
+  <header><h2 class="t2" id="chg">Focus units <%= count_tag("#{r.focus.size} of #{@repository.status['total_units']}") %><%= info_tip('Pre-change mode (E-9): the units a planned change would touch, picked by the focus URL. With a range, Woods\' report lists the units whose source, metadata or dependency hashes moved (W-12).') %></h2><button class="tool goto" type="button" data-controller="copy" data-copy-text-value="<%= r.mermaid %>" data-action="copy#copy" data-needs-js>⎘ copy Mermaid</button></header>
+  <%= render 'woods_map/components/table', label: 'Focus units', min_width: '760px',
+             columns: [{ label: 'unit', width: '260px', cell_class: 'id' }, { label: 'type', width: '110px', cell_class: 'nw mut' }, { label: 'dependents', width: '100px', cell_class: 'num' }, { label: 'weight', width: '90px', cell_class: 'num' }, { label: 'notes' }, { label: 'flags', width: '110px', cell_class: 'nw' }],
+             rows: r.focus.map { |id| flags = v.findings.count { |f| f.where == id }; { cells: [unit_link(id, r.type_of(id)), r.type_of(id).tr('_', ' '), r.dependent_count(id), format('%.3f', r.weight(id)), r.notes(id).join(', ').presence || empty_value, flags.positive? ? safe_join([tag.span('⚑', class: 'flag'), " #{flags}"]) : empty_value] } } %>
+</section>
+<section class="sec" aria-labelledby="aff" data-controller="rows">
+  <header><h2 class="t2" id="aff">Affected <%= count_tag("#{r.affected.size} within depth #{r.depth}, #{r.direct.size} direct") %><%= info_tip('Every unit the reverse edges reach from the focus, breadth first; open a row for the path that explains it (E-3). Weight is PageRank. The type and show controls filter; the status bar keeps the count before filtering.') %></h2><button class="tool goto" type="button" data-action="rows#expandAll" data-needs-js>expand all</button></header>
+  <% if r.affected.empty? %>
+    <%= render 'woods_map/components/empty_state', title: 'Nothing depends on the focus within this depth', text: 'No reverse edge reaches another unit, or the filters hid every one. Raise the depth or show every type.' %>
+  <% else %>
+    <% rows = r.affected.map do |a| %>
+      <% path = safe_join(a.path.map { |from, via, to| safe_join([unit_link(to, r.type_of(to)), ' ', tag.span(via, class: 'mut'), ' ', tag.span('←', class: 'ar'), ' ', unit_link(from, r.type_of(from))]) }, tag.br) %>
+      <% specs = v.tests.select { |t| t.covers.include?(a.identifier) } %>
+      <% detail = tag.dl(safe_join([tag.dt('why affected'), tag.dd(path, class: 'p'), tag.dt('weight'), tag.dd(format('%.3f, %s', r.weight(a.identifier), r.notes(a.identifier).join(', ').presence || 'no analysis note')), tag.dt('covered by'), tag.dd(specs.any? ? safe_join(specs.map { |t| unit_link(t.spec, 'test_mapping') }, ', ') : 'no mapped test', class: 'p')]), class: 'det') %>
+      <% { cells: [unit_link(a.identifier, a.type), a.type.tr('_', ' '), a.distance == 1 ? 'direct' : "#{a.distance} hops", a.via, unit_link(a.from, r.type_of(a.from)), format('%.3f', r.weight(a.identifier)), r.notes(a.identifier).join(', ').presence || empty_value], detail: detail } %>
+    <% end %>
+    <%= render 'woods_map/components/table', label: 'Affected units', min_width: '980px', grouped: true,
+               columns: [{ label: 'unit', width: '240px', cell_class: 'id' }, { label: 'type', width: '110px', cell_class: 'nw mut' }, { label: 'distance', width: '90px', cell_class: 'nw' }, { label: 'via', width: '130px', cell_class: 'nw' }, { label: 'from', width: '180px' }, { label: 'weight', width: '80px', cell_class: 'num' }, { label: 'notes' }],
+               rows: rows %>
+  <% end %>
+</section>

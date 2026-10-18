@@ -1,0 +1,17 @@
+<%# The Unknown tab: what the index reported it could not resolve, and what each layer proves (E-10). %>
+<section class="sec" aria-labelledby="un">
+  <header><h2 class="t2" id="un">Unknown <%= count_tag("#{v.unknowns.size}, reported, never dropped") %><%= info_tip('E-10: a report never claims completeness. Unresolved renders of the controllers in the radius, unresolvable routes and volatile dependencies from the graph analysis.') %></h2></header>
+  <% if v.unknowns.empty? %>
+    <%= render 'woods_map/components/empty_state', title: 'The index reported nothing unresolved around the focus', text: 'Dynamic dispatch and ambiguous names inside method bodies are not recorded until reference spans land (W-1), so this list is the index\'s own, not a proof.' %>
+  <% else %>
+    <%= render 'woods_map/components/table', label: 'Unknowns', min_width: '900px',
+               columns: [{ label: 'kind', width: '160px', cell_class: 'id' }, { label: 'where', width: '300px' }, { label: 'why the index stopped', cell_class: 'p' }, { label: 'resolves with', width: '260px', cell_class: 'p' }],
+               rows: v.unknowns.map { |u| { cells: [u.kind, u.where, u.why, u.resolves] } } %>
+  <% end %>
+</section>
+<section class="sec" aria-labelledby="lm">
+  <header><h2 class="t2" id="lm">What this page cannot prove <%= count_tag("#{v.layers.size} layers") %><%= info_tip('Each layer of the index is true within a stated boundary. Outside it the map says so instead of guessing.') %></h2></header>
+  <%= render 'woods_map/components/table', label: 'Layers', min_width: '900px',
+             columns: [{ label: 'layer', width: '180px', cell_class: 'id' }, { label: 'true within', width: '360px', cell_class: 'p' }, { label: 'not proven', cell_class: 'p' }],
+             rows: v.layers.map { |layer, within, not_proven| { cells: [layer, within == '—' ? empty_value(applicable: false) : within, not_proven] } } %>
+</section>

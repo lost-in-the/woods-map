@@ -1,0 +1,5 @@
+<%# The Flows tab (B6-Impact-Flows) needs flows per unit, inverted from flow documents (W-13). %>
+<section class="sec" aria-labelledby="fl">
+  <header><h2 class="t2" id="fl">Flows <%= count_tag('0, not inverted') %><%= info_tip('Affected flows are the entry points whose flow documents pass through a changed unit (E-4). The index has no inverted flow index yet (W-13) and no flow documents unless precompute_flows is on (W-14).') %></h2></header>
+  <%= render 'woods_map/components/empty_state', title: 'No flow runs through the focus, as far as this generation says', text: safe_join(['Entry points per unit come from the inverted flow index (W-13, ', link_to('woods#763', 'https://github.com/lost-in-the/woods/issues/763'), ') over precomputed flow documents (W-14, ', link_to('woods#764', 'https://github.com/lost-in-the/woods/issues/764'), '). Until they are published the routes among the affected units are the nearest fact: ', (r.affected.select { |a| a.type == 'route' }.any? ? safe_join(r.affected.select { |a| a.type == 'route' }.map { |a| unit_link(a.identifier, 'route') }, ', ') : 'none within this depth'), '.']) %>
+</section>
