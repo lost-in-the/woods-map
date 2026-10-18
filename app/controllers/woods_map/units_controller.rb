@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module WoodsMap
-  # A unit's pages: the Code tab (two lenses, D-6), Schema, Lifecycle, Graph
-  # and History, and the peek fragment the code view opens inline. Every
+  # A unit's pages: the Code tab (two lenses, D-6), Passage, Schema,
+  # Lifecycle, Graph and History, and the peek fragment the code view opens inline. Every
   # action reads one pinned generation and renders inside it, so the payload
   # lock covers the whole response; the identifier and the type come from the
   # URL, never a path.
@@ -24,6 +24,22 @@ module WoodsMap
       with_unit do
         @schema = WoodsMap::SchemaView.new(@unit, table: @page.table, graph_analysis: @repository.graph_analysis)
         render :schema
+      end
+    end
+
+    # The data passage of one action (B8-Passage): the first action unless
+    # ?action_name= picks one; a type without actions goes to its Code tab.
+    def passage
+      with_unit do
+        unless @page.tabs.include?('passage')
+          next redirect_to(woods_map.unit_path(type: @page.type, identifier: @page.identifier))
+        end
+
+        @passage = WoodsMap::Passage.new(@repository, @unit, action: params[:action_name])
+        @ladder_model = @passage.ladder_model
+        @ladder = @ladder_model && lifecycle_for(@ladder_model)
+        @ladder_event = ladder_event(@ladder)
+        render :passage
       end
     end
 
@@ -104,6 +120,14 @@ module WoodsMap
 
     def lifecycle_for(unit)
       WoodsMap::Lifecycle.new(unit, concern_methods: concern_methods(unit))
+    end
+
+    # The ladder's event: ?event= when valid, else the one the action implies, else the first chain.
+    def ladder_event(ladder)
+      return nil unless ladder
+
+      requested = params[:event] if WoodsMap::Lifecycle::EVENTS.include?(params[:event])
+      requested || @passage.ladder_event || ladder.chains.keys.first || 'create'
     end
 
     # concern name => the instance methods that concern defines, for the

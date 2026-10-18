@@ -7,7 +7,7 @@ lifecycles, relationship graphs, schema and history, and share change-impact
 reports with links that open on the interesting part.
 
 Status: M1 Reading (search, unit pages, the two-lens code view, Schema,
-Lifecycle, Graph and History tabs). See [`docs/design/`](docs/design/) for the
+Lifecycle, Graph and History tabs) and M2 Passage. See [`docs/design/`](docs/design/) for the
 design study, decision log, boards and milestone plan.
 
 ```ruby
@@ -54,6 +54,10 @@ end
 - `…/schema`, `…/lifecycle?event=`, `…/graph`, `…/history`: the tabs a type
   has (models: all four; tables: schema and graph; controllers, mailers and
   jobs: lifecycle, graph and history; everything else: graph and history).
+- `…/passage?action_name=`: a controller or mailer action's passage, request
+  → filters → action → templates → response, with the filter matrix and the
+  callback ladder of the model it saves. Declared facts only: what the index
+  does not publish yet (W-7, W-8) is named, never guessed.
 
 Every read goes through one generation pinned for the request; the page says
 which (`gen N`) and whether the working tree has drifted from it.
