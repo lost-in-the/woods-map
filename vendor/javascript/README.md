@@ -2,10 +2,9 @@
 
 Third-party modules served by the engine's own assets route and pinned in
 `lib/woods_map/importmap.rb`. Each file is an unmodified, self-contained ES
-module (or classic script for UMD-only layout plugins) copied from the
-package's published build, with the package name, version, license and
-source URL recorded here when added.
+module copied from the package's published build, with the package name,
+version, license and source recorded here when added.
 
-| Module | Version | License | Source |
-|---|---|---|---|
-| (none yet) | | | |
+| Module | File | Version | License | Source |
+|---|---|---|---|---|
+| `@hotwired/stimulus` | `stimulus.js` | 3.2.2 (`dist/stimulus.js`) | MIT (`stimulus.LICENSE.md`) | https://www.npmjs.com/package/@hotwired/stimulus |

@@ -78,4 +78,6 @@ it; the implementation is tracked by the design-system epic.
 - Reference span size (F-3) must be measured on `woods-testbed` `rails-8.0-large` before M0 closes.
 - Boundary-row labels in flow tables (`⇒ async hop, new process: …`) are placeholders; the real label comes from the job or mailer unit named by the flow.
 - The ☰ sheet and tree strip have token and layout rules but no interaction prototype yet; verify with keyboard and screen reader on the testbed before M1 closes.
+- Inline links: D-11's bare cobalt+ link fails WCAG 1.4.1 inside running text (axe `link-in-text-block`); the engine underlines inline links faintly in the link hue until [woods-map#26](https://github.com/lost-in-the/woods-map/issues/26) settles it.
+- Token contrast: `--dim`, dark `--risk` and light `--hot` fall short of AA at 11–12px and the `M` / blocking chips hard-coded their text colour; the engine's `tokens.css` carries corrected values ([woods-map#27](https://github.com/lost-in-the/woods-map/issues/27)) pending a D-11 amendment.
 - Light-mode diagram renders on the B6 boards still use the dark Mermaid theme; [woods-map#25](https://github.com/lost-in-the/woods-map/issues/25) (Pele as the renderer, themed by CSS variables from `tokens.css`) would close this and supersede D-5.

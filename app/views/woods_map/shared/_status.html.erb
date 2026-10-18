@@ -1,0 +1,8 @@
+<%# The status bar (C5-Chrome): provenance left, keys right. Locals: items
+    (Array of String/HTML), keys (Array of [[key, ...], label]). %>
+<div class="status">
+  <% items.each do |item| %><span><%= item %></span><% end %>
+  <% if local_assigns[:keys] %>
+    <span class="keys"><% keys.each do |key_names, label| %><span><% key_names.each do |key| %><span class="kbd"><%= key %></span><% end %> <%= label %></span><% end %></span>
+  <% end %>
+</div>

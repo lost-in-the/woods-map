@@ -1,0 +1,41 @@
+<%# A table (C2-Table, D-17): fixed layout, a visible cliff instead of word
+    breaks, the champion column bold, group-parity striping, detail blocks
+    behind a bare + / − with one expand-all control in the section header.
+
+    Locals:
+      columns: Array of Hash with :label, :width (CSS length or nil), :class
+               (th class or nil), :abbr (long form for an abbreviated head)
+      rows:    Array of Hash with :cells (Array of HTML), :detail (HTML or nil),
+               :checkbox (String label or nil), :classes (String or nil)
+      grouped: Boolean (the 34px toggle column), sticky: Boolean, cards: Boolean,
+      min_width: CSS length below which the wrap scrolls past the cliff,
+      caption: HTML or nil, label: accessible name %>
+<% grouped = local_assigns.fetch(:grouped) { rows.any? { |row| row[:detail] || row[:checkbox] } } %>
+<% classes = ['tbl', ('grouped' if grouped), ('sticky' if local_assigns[:sticky]), ('cards' if local_assigns[:cards])].compact.join(' ') %>
+<div class="tblwrap" data-controller="cliff">
+  <table class="<%= classes %>" style="table-layout:fixed<%= ";--tbl-min:#{local_assigns[:min_width]}" if local_assigns[:min_width] %>"<%= " aria-label=\"#{ERB::Util.html_escape(label)}\"".html_safe if local_assigns[:label] %>>
+    <thead><tr><% if grouped %><th class="tg"><span class="sr-only">select, details</span></th><% end %><% columns.each do |column| %><th<%= " style=\"width:#{column[:width]}\"".html_safe if column[:width] %><%= " class=\"#{column[:class]}\"".html_safe if column[:class] %>><% if column[:abbr] %><abbr title="<%= column[:abbr] %>"><%= column[:label] %></abbr><% else %><%= column[:label] %><% end %></th><% end %></tr></thead>
+    <tbody>
+      <% rows.each_with_index do |row, index| %>
+        <% parity = index.odd? ? 'odd' : '' %>
+        <% open = row[:open] %>
+        <tr class="<%= [parity, ('xr' if row[:checkbox]), ('grp' if open), ('chk' if row[:checked]), row[:classes]].compact.reject(&:empty?).join(' ') %>">
+          <% if grouped %>
+            <td class="tg"><div class="tgc<%= ' one' unless row[:checkbox] %>">
+              <% if row[:checkbox] %><input type="checkbox" aria-label="<%= row[:checkbox] %>" data-action="rows#check"<%= ' checked'.html_safe if row[:checked] %>><% end %>
+              <% if row[:detail] %><button class="tgl" type="button" aria-expanded="<%= open ? 'true' : 'false' %>" aria-label="<%= open ? 'Collapse' : 'Expand' %> details" data-action="rows#toggle">+</button><% end %>
+            </div></td>
+          <% end %>
+          <% row[:cells].each_with_index do |cell, cell_index| %>
+            <% column = columns[cell_index] || {} %>
+            <td<%= " class=\"#{column[:cell_class]}\"".html_safe if column[:cell_class] %> data-h="<%= column[:label] %>"><%= cell %></td>
+          <% end %>
+        </tr>
+        <% if row[:detail] %>
+          <tr class="sub <%= parity %><%= ' open' if open %><%= ' chk' if row[:checked] %>"><td class="tg"></td><td colspan="<%= columns.size %>"><%= row[:detail] %></td></tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+<% if local_assigns[:caption] %><div class="cap"><%= caption %></div><% end %>

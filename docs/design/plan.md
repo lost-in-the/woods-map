@@ -87,6 +87,8 @@ Run this before a milestone issue is opened and again before it closes.
 | Engine scaffold (the M1 skeleton: gem, Engine, Repository, authentication, states, token sheet served) | [woods-map#11](https://github.com/lost-in-the/woods-map/pull/11) |
 | M1 to M8 | woods-map#2 to #10 as listed in the milestone table |
 | Design system epic (tokens, fonts, components, responsive tiers) | [woods-map#23](https://github.com/lost-in-the/woods-map/issues/23) |
+| Inline links need a cue besides colour (needs-decision, amends D-11) | [woods-map#26](https://github.com/lost-in-the/woods-map/issues/26) |
+| Token contrast corrections for AA (needs-decision, amends D-11) | [woods-map#27](https://github.com/lost-in-the/woods-map/issues/27) |
 | Pele as the diagram renderer (needs-decision, supersedes D-5 if accepted) | [woods-map#25](https://github.com/lost-in-the/woods-map/issues/25) |
 | D-10 Source of truth for visual tokens | [woods-map#12](https://github.com/lost-in-the/woods-map/issues/12) |
 | D-11 Colour meaning | [woods-map#13](https://github.com/lost-in-the/woods-map/issues/13) |

@@ -16,8 +16,10 @@ RSpec.describe 'Status page', type: :request do
 
   it 'links the token sheet by content hash' do
     get '/woods'
-    digest = WoodsMap::Assets.digest(WoodsMap::Assets::TOKENS)
+    digest = WoodsMap::Assets.digest
     expect(response.body).to include("/woods/assets/#{digest}/woods_map/tokens.css")
+    expect(response.body).to include("/woods/assets/#{digest}/woods_map/fonts.css")
+    expect(response.body).to include('rel="preload" as="font"')
   end
 
   it 'explains a missing index with the first-run empty state instead of failing' do

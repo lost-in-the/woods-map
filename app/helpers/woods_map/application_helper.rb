@@ -15,19 +15,24 @@ module WoodsMap
     # @return [String] the content-hashed URL the assets route serves it at
     # @raise [ArgumentError] when the file is not part of the engine
     def woods_map_asset_path(logical_path)
-      digest = WoodsMap::Assets.digest(logical_path)
-      raise ArgumentError, "Not an engine asset: #{logical_path}" unless digest
+      raise ArgumentError, "Not an engine asset: #{logical_path}" unless WoodsMap::Assets.resolve(logical_path)
 
-      woods_map.engine_asset_path(digest: digest, path: logical_path)
+      woods_map.engine_asset_path(digest: WoodsMap::Assets.digest, path: logical_path)
     end
 
-    # The `<link>` tags for the token sheet and the engine sheet.
+    # The `<link>` tags for the fonts, the token sheet and the engine sheet,
+    # with the regular weight of each face preloaded (D-12).
     #
     # @return [ActiveSupport::SafeBuffer]
     def woods_map_stylesheet_tags
-      safe_join([WoodsMap::Assets::TOKENS, WoodsMap::Assets::MAP].map do |logical_path|
+      preloads = WoodsMap::Assets::PRELOADED_FONTS.map do |font|
+        tag.link(rel: 'preload', as: 'font', type: 'font/woff2', href: woods_map_asset_path(font),
+                 crossorigin: 'anonymous')
+      end
+      sheets = [WoodsMap::Assets::FONTS, WoodsMap::Assets::TOKENS, WoodsMap::Assets::MAP].map do |logical_path|
         tag.link(rel: 'stylesheet', href: woods_map_asset_path(logical_path))
-      end, "\n")
+      end
+      safe_join(preloads + sheets, "\n")
     end
 
     # A relative date in git's shorthand with the long form in the tooltip

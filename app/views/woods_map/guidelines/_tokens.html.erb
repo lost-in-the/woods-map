@@ -1,0 +1,66 @@
+<%# C1 · Tokens: palette in three themes, type, spacing, borders, glyphs, dates. %>
+<% meaning = [
+     ['--select', 'purple+', '#B580BC', '#7E4384', 'selected, active, focus, the one primary button'],
+     ['--link', 'cobalt+', '#7EB1D4', '#4D597A', 'links'],
+     ['--mod', 'sun', '#F1B73A', '#7A5200', 'modified (M), changed rows, changed-box tint: least severe'],
+     ['--hot', 'orange′', '#EF8A3C', '#B9561D', 'hot, warning: more severe'],
+     ['--risk', 'beak', '#E64D47', '#C0392B', 'risk, blocking, errors; bold + glyph'],
+     ['--fresh', 'forest+', '#7DAA9E', '#436961', 'fresh, passing, added']
+   ]
+   neutral = [
+     ['--bg', 'black', '#222126', '#FCFCFD', 'page'], ['--panel', '', '#1B1A1F', '#F4F5F7', 'bands, heads, bars'],
+     ['--ground2', '', '#28272D', '#EEF0F2', 'controls, gutters'], ['--rule', 'dusk', '#3B3942', '#E5E8EB', 'every divider'],
+     ['--rule2', '', '#4A4852', '#C9CDD3', 'things you press, frames'], ['--hover', 'dusk', '#3B3942', '#E5E8EB', 'hovered row'],
+     ['--text', 'smoke', '#E5E8EB', '#222126', 'body'], ['--bright', 'snow', '#FCFCFD', '#141317', 'titles, champion cells'],
+     ['--mut', 'slate', '#9BA5B0', '#5C6675', 'meta, heads, counts'], ['--dim', 'gray', '#6E7987', '#6E7987', 'de-emphasis only']
+   ]
+   swatch = ->(hex) { tag.i(class: 'sw', style: "background:#{hex}") + hex }
+   token_rows = ->(list) { list.map { |token, palette, dark, light, means| { cells: [tag.code(token), palette, swatch.call(dark), swatch.call(light), means] } } }
+   columns = [{ label: 'token', width: '110px', cell_class: 'nw' }, { label: 'palette', width: '90px', cell_class: 'nw' }, { label: 'dark on #222126', width: '150px', cell_class: 'nw' }, { label: 'light on #FCFCFD', width: '150px', cell_class: 'nw' }, { label: 'means' }]
+   now = Time.utc(2026, 10, 16, 14, 0, 0) %>
+<section class="sec" id="tokens"><header><h2 class="t2">C1 · Tokens</h2><span class="n">palette for dark, light and colour-vision, type, spacing, borders, glyphs, dates</span></header>
+  <h3 class="t3" id="tokens-meaning" style="margin-bottom:var(--s3)">Meaning tokens</h3>
+  <%= render 'woods_map/components/table', columns: columns, rows: token_rows.call(meaning), label: 'Meaning tokens' %>
+  <div class="spec-note"><b>Tints</b>: --select-tint 8% purple+ behind a checked row; --mod-tint 10% sun behind a changed box in diagrams; diff tints --diff-add / --diff-del / --diff-chg for hunk rows. <b>Colour-vision theme</b> (data-cvd="on"): --mod takes the link hue and links are always underlined; nothing else changes.</div>
+  <h3 class="t3" style="margin:var(--s5) 0 var(--s3)" id="tokens-neutral">Neutral tokens</h3>
+  <%= render 'woods_map/components/table', columns: columns.each_with_index.map { |c, i| i == 4 ? c.merge(label: 'used for') : c }, rows: token_rows.call(neutral), label: 'Neutral tokens' %>
+  <h3 class="t3" style="margin:var(--s5) 0 var(--s3)" id="tokens-type">Type</h3>
+  <div class="row">
+    <div class="box"><div class="lbl">scale</div>
+      <%= render 'woods_map/components/table', label: 'Type scale', columns: [{ label: 'size', width: '60px', cell_class: 'num' }, { label: 'face', width: '40%' }, { label: 'where' }], rows: [
+            { cells: ['24', tag.span('Post', class: 'ui', style: 'font-size:var(--fs-24);font-weight:700;color:var(--bright)'), 'h1 page title, 700 snow'] },
+            { cells: ['18', tag.span('Steps for create', class: 'ui', style: 'font-size:var(--fs-18);font-weight:700;color:var(--bright)'), 'h2 section, 700 snow, count in 13 mono slate'] },
+            { cells: ['15', tag.span('model, table posts', style: 'font-size:var(--fs-15);color:var(--mut)'), 'h1 subtitle, mono slate'] },
+            { cells: ['13', 'PostsController#create', 'body, cells, rail items; the phone floor for mono'] },
+            { cells: ['12', tag.span('Order is the resolved runtime chain.', class: 'ui', style: 'font-size:var(--fs-12);color:var(--mut)'), 'captions, legends, tooltips, tools, details'] },
+            { cells: ['11', tag.span('facets moved', class: 'eyebrow'), 'eyebrows, table heads, chips, layer; uppercase .1em'] }
+          ] %></div>
+    <div class="box"><div class="lbl">weights and faces</div>
+      <%= render 'woods_map/components/detail', rows: [
+            ['Inter 400', tag.span('prose, captions, tooltips', class: 'ui')], ['Inter 500', tag.span('heads, eyebrows, tabs', class: 'ui', style: 'font-weight:500')],
+            ['Inter 700', tag.span('headings, primary button, badge words', class: 'ui', style: 'font-weight:700')], ['Fira Code 400', 'every data cell'],
+            ['Fira Code 500', tag.span('the champion column', style: 'font-weight:500')], ['Fira Code 700', tag.span('M, counts that are verdicts', style: 'font-weight:700')],
+            ['ligatures', safe_join([tag.span('-> => !=', class: 'codeview'), ' in the code view only; elsewhere ', tag.span('-> => !=')])],
+            ['floors', '13px mono, 14px sans on phones; density comes from collapsing']
+          ] %></div>
+  </div>
+  <h3 class="t3" style="margin:var(--s5) 0 var(--s3)" id="tokens-spacing">Spacing, borders, radii</h3>
+  <div class="row">
+    <div class="box"><div class="lbl">φ scale, px</div>
+      <div style="display:flex;gap:var(--s5);align-items:flex-end"><% [3, 5, 8, 13, 21, 34, 55].each do |px| %><span style="display:inline-flex;flex-direction:column;align-items:center;gap:var(--s2)"><i style="display:block;width:<%= px %>px;height:<%= px %>px;background:var(--select);opacity:.75"></i><span class="mut" style="font-size:var(--fs-11)"><%= px %></span></span><% end %></div>
+      <div style="margin-top:var(--s4)"><%= render 'woods_map/components/detail', rows: [['3', 'chip padding, gaps inside a glyph pair'], ['5', 'inline gaps, tooltip padding'], ['8', 'cell padding (vertical), small gaps'], ['13', 'cell padding (horizontal), panel padding, grid gaps'], ['21', 'section header gap, rail padding, legend gaps'], ['34', 'page gutter'], ['55', 'between page regions']] %></div></div>
+    <div class="box"><div class="lbl">borders</div>
+      <%= render 'woods_map/components/detail', rows: [['1px rule', 'every divider, cell, column rule, panel edge'], ['1px rule2', 'buttons, inputs, kbd, the table frame; never the row toggle'], ['2px rule2', 'the process boundary in steps, the active tab underline'], ['3px select', 'the selection bar; the one exception'], ['coloured', safe_join([tag.span('purple+', style: 'color:var(--select)'), ' selected, ', tag.span('sun', style: 'color:var(--hot)'), ' attention, ', tag.span('beak', style: 'color:var(--risk);font-weight:700'), ' risk; nothing else'])], ['radius', '3px controls and panels, 2px chips, 0 tables and cells']] %></div>
+    <div class="box"><div class="lbl">controls</div>
+      <div style="display:flex;gap:var(--s3);flex-wrap:wrap;align-items:center"><button class="btn primary" type="button">Code at L18</button><button class="btn" type="button">Share ▾</button><button class="tool" type="button">⎘ copy Mermaid</button><span class="seg"><button type="button" aria-pressed="true">keys</button><button type="button">all</button></span><button class="tgl" type="button" aria-expanded="false" aria-label="Expand">+</button><input type="checkbox" checked aria-label="checked"> <span class="kbd">j</span><span class="kbd">k</span></div>
+      <div class="spec-note">A thing is one of: a box (button), cobalt+ text (link), slate underlined text (tool). Hover shifts a border or a colour, never a background.</div></div>
+  </div>
+  <h3 class="t3" style="margin:var(--s5) 0 var(--s3)" id="tokens-glyphs">Glyphs, dates, shorthand</h3>
+  <div class="row">
+    <div class="box"><div class="lbl">glyph vocabulary (WoodsMap::Glyphs)</div>
+      <%= render 'woods_map/components/table', label: 'Glyph vocabulary', columns: [{ label: 'glyph', width: '70px', cell_class: 'nw' }, { label: 'meaning' }, { label: 'where' }], rows: WoodsMap::Glyphs::VOCABULARY.map { |name, (mark, meaning, where)| { cells: [tag.span(mark, title: name.to_s), meaning, where] } } %></div>
+    <div class="box"><div class="lbl">relative dates, git's algorithm</div>
+      <%= render 'woods_map/components/table', label: 'Relative dates', columns: [{ label: 'git says' }, { label: 'map shows', width: '110px' }], rows: [45, 12 * 60, 3 * 3600, 3 * 86_400, 35 * 86_400, 210 * 86_400, 425 * 86_400].map { |ago| short, long = relative_date(now - ago, now); { cells: [long.split(', ').first, date_abbr(now - ago, now: now)] } } %>
+      <div class="spec-note">Glued to the integer; absolute timestamp in the tooltip and the accessible name. Shorthand: <abbr title="generation">gen</abbr> <abbr title="dependencies">deps</abbr> <abbr title="references">refs</abbr> <abbr title="test coverage">cov</abbr> carry a dotted underline and a tooltip; PK FK UK SHA LOC ERD are standard notation and carry none.</div></div>
+  </div>
+</section>

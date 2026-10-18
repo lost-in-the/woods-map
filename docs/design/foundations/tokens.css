@@ -7,7 +7,7 @@
   --bg:#222126; --panel:#1B1A1F; --ground2:#28272D; --sheet:#222126;
   --stripe:rgba(252,252,253,.035); --hover:#3B3942;
   /* text */
-  --bright:#FCFCFD; --text:#E5E8EB; --mut:#9BA5B0; --dim:#6E7987;
+  --bright:#FCFCFD; --text:#E5E8EB; --mut:#9BA5B0; --dim:#86919E; /* gray, lifted from #6E7987 so 12px de-emphasis text reaches AA on every surface (woods-map#27) */
   /* rules */
   --rule:#3B3942; --rule2:#4A4852;
   /* meaning */
@@ -17,11 +17,11 @@
   --mod:#F1B73A;               /* sun      modified (M), changed rows, changed-box tint: least severe */
   --mod-tint:rgba(241,183,58,.10);
   --hot:#EF8A3C;               /* orange', hot, warning: more severe; lifted from #E66747 for CVD separation from beak */
-  --risk:#E64D47;              /* beak     risk, blocking, errors; always bold + glyph */
+  --risk:#EE665F;              /* beak+    risk, blocking, errors; always bold + glyph; lifted from #E64D47 for AA at 12px bold (woods-map#27) */
   --fresh:#7DAA9E;             /* forest+  fresh, passing, added */
   --diff-add:#2A3A2A; --diff-del:#3A2A2A; --diff-chg:#3A3A2A;
   /* code view syntax (font-lock) */
-  --k:#B580BC; --fn:#7EB1D4; --var:#EF8A3C; --str:#7DAA9E; --const:#F1B73A; --op:#9BA5B0; --cm:#6E7987;
+  --k:#B580BC; --fn:#7EB1D4; --var:#EF8A3C; --str:#7DAA9E; --const:#F1B73A; --op:#9BA5B0; --cm:#86919E;
   /* type */
   --ff-ui:"Inter",system-ui,sans-serif;
   --ff-data:"Fira Code","Fira Mono",ui-monospace,monospace;
@@ -38,16 +38,16 @@
 .wm[data-theme=light]{
   --bg:#FCFCFD; --panel:#F4F5F7; --ground2:#EEF0F2; --sheet:#FFFFFF;
   --stripe:rgba(20,19,23,.035); --hover:#E5E8EB;
-  --bright:#141317; --text:#222126; --mut:#5C6675; --dim:#6E7987;
+  --bright:#141317; --text:#222126; --mut:#5C6675; --dim:#646E7B; /* darkened from #6E7987 for AA on ground2 (woods-map#27) */
   --rule:#E5E8EB; --rule2:#C9CDD3;
   --select:#7E4384; --select-tint:rgba(126,67,132,.08);
   --link:#4D597A;
   --mod:#7A5200; --mod-tint:rgba(122,82,0,.10);
-  --hot:#B9561D;
+  --hot:#A74D1A;               /* darkened from #B9561D so the 11px bold chip reaches AA on panel and ground2 (woods-map#27) */
   --risk:#C0392B;
   --fresh:#436961;
   --diff-add:#E3F1E3; --diff-del:#F6E3E1; --diff-chg:#F3EEDC;
-  --k:#7E4384; --fn:#4D597A; --var:#B9561D; --str:#436961; --const:#7A5200; --op:#5C6675; --cm:#6E7987;
+  --k:#7E4384; --fn:#4D597A; --var:#A74D1A; --str:#436961; --const:#7A5200; --op:#5C6675; --cm:#646E7B;
 }
 /* colour-vision theme: modified borrows the link hue, links are always underlined, hot stays sun, risk stays beak */
 .wm[data-cvd=on]{ --mod:#7EB1D4; --mod-tint:rgba(126,177,212,.10); }
@@ -85,11 +85,11 @@
 .wm abbr.date{text-decoration:none}
 
 /* chips */
-.wm .M{display:inline-block;padding:0 var(--s1);border-radius:var(--r-chip);background:var(--mod);color:#1B1A1F;font-size:var(--fs-11);line-height:15px;font-weight:700;margin-right:var(--s2)}
+.wm .M{display:inline-block;padding:0 var(--s1);border-radius:var(--r-chip);background:var(--mod);color:var(--bg);font-size:var(--fs-11);line-height:15px;font-weight:700;margin-right:var(--s2)}
 .wm .hot{color:var(--hot);font-size:var(--fs-11);font-weight:700}
 .wm .flag{color:var(--risk);font-weight:700}
 .wm .flag.note{color:var(--hot)}
-.wm .fl{display:inline-block;padding:0 var(--s2);border-radius:var(--r-chip);background:var(--risk);color:#fff;font-size:var(--fs-11);line-height:16px;font-weight:700;text-decoration:none;white-space:nowrap}
+.wm .fl{display:inline-block;padding:0 var(--s2);border-radius:var(--r-chip);background:var(--risk);color:var(--bg);font-size:var(--fs-11);line-height:16px;font-weight:700;text-decoration:none;white-space:nowrap}
 .wm .fl.note{background:none;border:1px solid var(--hot);color:var(--hot);line-height:14px}
 .wm .sev{color:var(--mut)}
 .wm .fresh{color:var(--fresh);font-weight:700}
@@ -468,3 +468,37 @@
 @container wm (max-width:1279px){ .wm .bar .bar-search{width:220px} .wm .bar .bar-fresh .w{display:none} }
 @container wm (max-width:959px){ .wm .crumbs > .path{display:none} .wm .bar nav{display:none} .wm .bar .bar-search{width:auto;flex:1;max-width:340px} .wm .ident .ctl{margin-left:0;width:100%} .wm .aside{display:none} }
 @container wm (max-width:639px){ .wm .strip-btn{display:none} .wm .c4 .grid{grid-template-columns:1fr} .wm .bar .bar-search .q,.wm .bar .bar-search .kbd{display:none} .wm .bar .bar-search{width:30px;flex:none;justify-content:center;padding:0} .wm .cv{grid-template-columns:28px 40px minmax(0,1fr)} .wm .cv .mg{display:none} .wm .c4{grid-template-columns:1fr} .wm .c4 .grid{grid-template-columns:1fr 1fr} .wm .ladder{grid-template-columns:1fr 1fr} .wm .psg{grid-template-columns:1fr} .wm .psg .stage{border-bottom:0} }
+
+/* ---- engine additions (woods-map#23): what the boards wrote inline, and what links and buttons need in the engine ---- */
+.wm.page{position:relative}
+.wm .bar .menu-toggle{font-size:16px;text-decoration:none}
+.wm a.tab{text-decoration:none}
+.wm .tab[aria-current]{color:var(--bright);border-bottom-color:var(--select)}
+.wm .tree button.d{display:flex;width:100%;border:0;background:none;font:inherit;text-align:left;cursor:pointer;color:var(--text)}
+.wm .tree a.f{text-decoration:none;color:var(--text)}
+.wm .tree .nm{flex:1;overflow:hidden;text-overflow:ellipsis}
+.wm .tree mark{background:none;box-shadow:none;color:var(--bright);font-weight:700;text-decoration:underline;text-decoration-color:var(--select);text-underline-offset:2px}
+.wm .tree .th .tool{margin-left:auto;text-decoration:none}
+.wm .tree.strip .th{cursor:pointer}
+.wm .tblwrap{position:relative}
+.wm .tblwrap.more::after{content:"";position:absolute;top:0;right:0;bottom:0;width:34px;pointer-events:none;background:linear-gradient(to right,transparent,var(--bg))}
+.wm .strip-btn button{writing-mode:vertical-rl;padding:var(--s4) var(--s2);text-decoration:none;font-family:var(--ff-ui);font-size:var(--fs-11);letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.wm .sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:5}
+.wm .sheet{position:absolute;top:0;left:0;bottom:0;width:300px;max-width:85vw;background:var(--panel);border-right:1px solid var(--rule2);overflow:auto;display:flex;flex-direction:column}
+.wm .sheet .sh{display:flex;gap:var(--s4);align-items:center;padding:0 var(--s4);height:44px;border-bottom:1px solid var(--rule);font-family:var(--ff-ui);flex-shrink:0}
+.wm .sheet .sh .tool{font-size:16px;text-decoration:none}
+.wm .sheet .rail{width:auto;flex:none;border:0}
+.wm .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wm .tool[data-copied]{color:var(--fresh)}
+.wm .seg a{display:inline-block;font-size:var(--fs-12);line-height:28px;padding:0 var(--s3);background:var(--ground2);color:var(--mut);border-right:1px solid var(--rule2);text-decoration:none}
+.wm .seg a:last-child{border-right:0}
+.wm .seg a[aria-current]{background:var(--hover);color:var(--bright);font-weight:500;box-shadow:inset 0 -2px 0 var(--select)}
+.wm .tab{white-space:nowrap}
+.wm .bar .bar-search{min-width:0}
+.wm .bar .bar-search input.q{flex:1;min-width:0;width:100%;border:0;background:none;color:var(--text);font:inherit;padding:0;outline:none}
+.wm .bar .bar-search input.q::placeholder{color:var(--dim)}
+.wm .bar .bar-search:focus-within{border-color:var(--select)}
+.wm .tbl{min-width:var(--tbl-min,0)}
+.wm .tbl.cards{min-width:0}
+@container wm (max-width:639px){ .wm .t1 .sub{display:block;margin-left:0;white-space:normal} }
+.wm .tree .d:hover .ct,.wm .tree .f:hover .ct,.wm .tree .d:hover .c,.wm .rail li:hover .k,.wm .rail li:hover .own{color:var(--mut)}
