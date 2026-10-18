@@ -13,7 +13,9 @@
   <div class="wm page" data-theme="dark">
     <%= render 'woods_map/shared/bar', generation: @generation %>
     <% if flash[:alert] %><div class="banner risk" role="alert"><b>Refused.</b><span class="txt"><%= flash[:alert] %></span></div><% end %>
-    <%= yield %>
+    <main class="page-main">
+      <%= yield %>
+    </main>
   </div>
 </body>
 </html>

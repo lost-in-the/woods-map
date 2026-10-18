@@ -10,7 +10,7 @@ module WoodsMap
     layout 'woods_map/bare', only: %i[new create]
 
     def new
-      head :not_found unless woods_map_config.token?
+      refuse(:token) unless woods_map_config.token?
     end
 
     def create

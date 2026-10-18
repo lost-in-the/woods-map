@@ -11,6 +11,11 @@ AllCops:
     - 'spec/dummy/tmp/**/*'
     - 'bin/*'
 
+# The Bundler entry file carries the gem's name.
+Naming/FileName:
+  Exclude:
+    - 'lib/woods-map.rb'
+
 Style/Documentation:
   Exclude:
     - 'spec/**/*'
