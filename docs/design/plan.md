@@ -98,6 +98,7 @@ Run this before a milestone issue is opened and again before it closes.
 | D-18 Navigation chrome | [woods-map#20](https://github.com/lost-in-the/woods-map/issues/20) |
 | D-19 Responsiveness | [woods-map#21](https://github.com/lost-in-the/woods-map/issues/21) |
 | D-20 Glyphs over assets | [woods-map#22](https://github.com/lost-in-the/woods-map/issues/22) |
+| D-21 Diagram renderer: Pele in the browser, supersedes D-5 (settled) | [woods-map#25](https://github.com/lost-in-the/woods-map/issues/25) |
 | T testbed suite | [woods-testbed#38](https://github.com/lost-in-the/woods-testbed/issues/38) |
 
 The GitHub integration available to the session that created these issues
