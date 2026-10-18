@@ -86,6 +86,7 @@ Run this before a milestone issue is opened and again before it closes.
 | W-14 best-effort flows | [woods#764](https://github.com/lost-in-the/woods/issues/764) |
 | M1 to M8 | woods-map#2 to #10 as listed in the milestone table |
 | Design system epic (tokens, fonts, components, responsive tiers) | [woods-map#23](https://github.com/lost-in-the/woods-map/issues/23) |
+| Pele as the diagram renderer (needs-decision, supersedes D-5 if accepted) | [woods-map#25](https://github.com/lost-in-the/woods-map/issues/25) |
 | D-10 Source of truth for visual tokens | [woods-map#12](https://github.com/lost-in-the/woods-map/issues/12) |
 | D-11 Colour meaning | [woods-map#13](https://github.com/lost-in-the/woods-map/issues/13) |
 | D-12 Typefaces | [woods-map#14](https://github.com/lost-in-the/woods-map/issues/14) |
