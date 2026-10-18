@@ -1,0 +1,8 @@
+<% content_for :title, 'Impact · Woods Map' %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<%= render 'woods_map/impact/frame', title: 'Impact', subtitle: "#{@range.first} → #{@range.last}", crumb: 'range' %>
+<div class="body" data-controller="trail">
+  <div class="main" style="margin-left:var(--s5)">
+    <%= render 'woods_map/components/empty_state', title: "No impact report for #{@range.first} → #{@range.last}", text: safe_join(['A range compares two generations: Woods publishes that report with ', tag.code('woods:impact'), ' (W-12, ', link_to('woods#762', 'https://github.com/lost-in-the/woods/issues/762'), '), which also needs the facet diff (W-10) and the generation pin (W-11). This generation is gen ', tag.b(@repository.generation_number.to_s), '. Without a range the map reads the blast radius of a focus set from the graph: ', link_to('open the pre-change mode', woods_map.impact_path), '.']) %>
+  </div>
+</div>
