@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module WoodsMap
-  # The home page until M1 lands the unit pages: generation, counts and
-  # provenance of the pinned index.
+  # The home page until M1 lands the unit pages: generation, HEAD, counts and
+  # host facts of the pinned index, as the States board draws the status page.
   class StatusController < ApplicationController
     def show
-      @status = WoodsMap::Repository.open(&:status)
+      @status = with_repository(&:status)
     end
   end
 end

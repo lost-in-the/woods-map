@@ -1,0 +1,15 @@
+<%# The top bar (C5-Chrome): wordmark, primary nav, freshness. Search and the
+    remaining sections arrive with their milestones. %>
+<header class="bar">
+  <button class="tool menu-toggle" type="button" aria-label="Files and sections" style="font-size:16px;text-decoration:none">☰</button>
+  <a href="<%= woods_map.root_path %>" class="brand"><%= render 'woods_map/shared/mark' %>woods</a>
+  <nav aria-label="Primary"><a href="<%= woods_map.root_path %>" aria-current="page">Units</a></nav>
+  <span class="bar-fresh">
+    <% if generation %>
+      <span><span class="fresh">●</span><span class="w"> gen <b class="bright"><%= generation['generation'] %></b></span></span>
+      <span class="w"><%= short_sha(generation['git_sha']) %></span>
+    <% else %>
+      <span><span class="dim">○</span><span class="w"> no index</span></span>
+    <% end %>
+  </span>
+</header>

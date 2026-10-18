@@ -1,8 +1,12 @@
 <% content_for :title, 'Woods Map · sign in' %>
-<h1>Enter the Woods Map token</h1>
-<p>This mount is not on loopback. Paste the value of <code>WOODS_MAP_TOKEN</code> to open a session in this browser.</p>
-<%= form_with url: woods_map.session_path, method: :post, local: true do |form| %>
-  <%= form.label :token, 'Token' %>
-  <%= form.password_field :token, autocomplete: 'off', required: true %>
-  <%= form.submit 'Open session' %>
-<% end %>
+<div class="empty-state" style="padding:var(--s6) var(--s5)">
+  <div class="eyebrow" style="margin-bottom:var(--s3)">Token required</div>
+  <h2 class="t2">Enter the Woods Map token</h2>
+  This mount is not on loopback. Paste the value of <code>WOODS_MAP_TOKEN</code> to open a session in this browser; it becomes an <code>HttpOnly</code> cookie and the token is not kept in the address bar.
+  <% if flash[:alert] %><div class="finding" style="margin-top:var(--s4)"><b>⚑ <%= flash[:alert] %></b></div><% end %>
+  <%= form_with url: woods_map.session_path, method: :post, local: true, html: { style: 'margin-top:var(--s4);display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap' } do |form| %>
+    <%= form.label :token, 'Token', class: 'eyebrow' %>
+    <%= form.password_field :token, autocomplete: 'off', required: true, class: 'tree filter', style: 'width:28ch;border:1px solid var(--rule2);border-radius:var(--r-ctl)' %>
+    <%= form.submit 'Open session', class: 'btn primary' %>
+  <% end %>
+</div>

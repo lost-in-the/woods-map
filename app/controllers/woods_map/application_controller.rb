@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-require 'rack/utils'
-require 'digest'
-require 'ipaddr'
-
 module WoodsMap
   # Base controller: authentication, origin check, and the one-generation
   # repository every page reads from.
@@ -11,14 +7,22 @@ module WoodsMap
   # Order of checks on every request:
   # 1. the host's `authorize` hook, when configured;
   # 2. the origin check for non-GET requests;
-  # 3. the token gate: a bearer header, the exchanged signed cookie, or a
-  #    loopback request while no token is configured.
+  # 3. a `?token=` on a GET, exchanged once for the signed cookie (D-4);
+  # 4. the token gate: a bearer header, the exchanged cookie, or a loopback
+  #    request while no token is configured.
+  #
+  # A refused request gets the 403 panel from the States board, rendered
+  # without the frame and before the repository opens anything, so nothing
+  # from the index reaches a client that is not allowed in.
   class ApplicationController < ActionController::Base
+    include WoodsMap::Authentication
+
     protect_from_forgery with: :exception
     layout 'woods_map/application'
 
     before_action :authorize_host!
     before_action :check_origin!
+    before_action :exchange_query_token!
     before_action :authenticate!
 
     helper_method :woods_map_config
@@ -32,11 +36,23 @@ module WoodsMap
       WoodsMap.configuration
     end
 
+    # Open the configured index pinned to one generation for this request.
+    # The generation facts are kept for the bar; the block gets the repository.
+    #
+    # @yieldparam repository [WoodsMap::Repository]
+    # @return [Object] the block's value
+    def with_repository
+      WoodsMap::Repository.open do |repository|
+        @generation = repository.generation_facts
+        yield repository
+      end
+    end
+
     def authorize_host!
       hook = woods_map_config.authorize
       return if hook.nil? || hook.call(request)
 
-      head :forbidden
+      refuse(:host)
     end
 
     # Cross-origin writes are refused outright. A missing Origin header is
@@ -48,48 +64,33 @@ module WoodsMap
       origin = request.headers['Origin']
       return if origin.nil? || origin == request.base_url
 
-      head :forbidden
+      refuse(:origin)
+    end
+
+    # `GET /woods?token=…` once: a matching token becomes the cookie and the
+    # browser is sent to the same URL without it, so the secret does not stay
+    # in the address bar or the history. Ignored while no token is configured.
+    def exchange_query_token!
+      presented = query_token
+      return if presented.nil?
+
+      if token_matches?(presented)
+        store_session_cookie
+        redirect_to url_without_token
+      else
+        flash[:alert] = REJECTED
+        respond_to_unauthenticated
+      end
     end
 
     def authenticate!
-      return if authenticated_by_token? || authenticated_by_cookie? || loopback_without_token?
+      return if authenticated?
 
       if woods_map_config.token?
         respond_to_unauthenticated
       else
-        render plain: 'Woods Map refuses non-loopback requests until config.token is set.', status: :forbidden
+        refuse(:token)
       end
-    end
-
-    def authenticated_by_token?
-      return false unless woods_map_config.token?
-
-      presented = request.authorization.to_s.sub(/\ABearer\s+/i, '')
-      !presented.empty? && Rack::Utils.secure_compare(woods_map_config.token, presented)
-    end
-
-    def authenticated_by_cookie?
-      return false unless woods_map_config.token?
-
-      stored = cookies.signed[woods_map_config.cookie_name].to_s
-      !stored.empty? && Rack::Utils.secure_compare(token_digest, stored)
-    end
-
-    def loopback_without_token?
-      return false if woods_map_config.token? || woods_map_config.require_token
-
-      loopback?(request.remote_ip)
-    end
-
-    def loopback?(address)
-      IPAddr.new(address.to_s).loopback?
-    rescue IPAddr::InvalidAddressError
-      false
-    end
-
-    # @return [String] SHA-256 of the configured token; what the cookie holds
-    def token_digest
-      Digest::SHA256.hexdigest(woods_map_config.token.to_s)
     end
 
     def respond_to_unauthenticated
@@ -99,6 +100,14 @@ module WoodsMap
         response.headers['WWW-Authenticate'] = 'Bearer realm="Woods Map"'
         head :unauthorized
       end
+    end
+
+    # The 403 panel: no frame and no index facts (States board, D-4).
+    #
+    # @param reason [Symbol] :token, :host or :origin
+    def refuse(reason)
+      @reason = reason
+      render 'woods_map/refusals/show', layout: 'woods_map/bare', status: :forbidden
     end
 
     def render_unavailable(error)

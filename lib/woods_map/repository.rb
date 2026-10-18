@@ -40,13 +40,30 @@ module WoodsMap
 
     # Facts the manifest records at the top level on current writers and under
     # `provenance` on some older ones.
-    PROVENANCE_KEYS = %w[git_branch git_sha rails_version].freeze
+    PROVENANCE_KEYS = %w[git_branch git_sha rails_version ruby_version woods_version].freeze
+
+    # Published generation numbers under the index root, ascending. A flat
+    # (pre-2.0) index reports `[0]`.
+    #
+    # @return [Array<Integer>]
+    def generations
+      numbers = Woods::PublishedIndex.available_generations(@index.index_dir)
+      numbers.empty? ? [generation_number] : numbers
+    end
+
+    # What the bar shows on every page: the generation and the HEAD it was
+    # extracted at.
+    #
+    # @return [Hash{String => Object}]
+    def generation_facts
+      { 'generation' => generation_number, 'extracted_at' => manifest['extracted_at'] }.merge(provenance_facts)
+    end
 
     # Status facts for the home page and the status bar.
     #
     # @return [Hash{String => Object}]
     def status
-      { 'generation' => generation_number }.merge(manifest_facts).merge(provenance_facts)
+      generation_facts.merge(manifest_facts).merge('generations' => generations)
     end
 
     # @param type [String, nil]
@@ -66,7 +83,6 @@ module WoodsMap
 
     def manifest_facts
       {
-        'extracted_at' => manifest['extracted_at'],
         'total_units' => manifest.fetch('total_units') { manifest['total'] },
         'counts' => manifest.fetch('counts', {})
       }

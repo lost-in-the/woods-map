@@ -1,0 +1,19 @@
+<% content_for :title, 'Woods Map · refused' %>
+<div class="empty-state" style="padding:var(--s6) var(--s5)">
+  <div class="eyebrow" style="margin-bottom:var(--s3)">HTTP 403</div>
+  <h2 class="t2">Woods Map refused the request</h2>
+  <% case @reason %>
+  <% when :host %>
+    The host's <code>config.authorize</code> hook did not allow this request. Sign in to the host application with an account the hook accepts, then open the map again.
+  <% when :origin %>
+    The request came from another origin. Writes to the map are accepted from its own origin only; open the map directly and try again.
+  <% else %>
+    This host is not loopback and no <code>WOODS_MAP_TOKEN</code> is configured, so the map does not boot its routes. Set the token and open <code>/woods?token=…</code> once; it becomes a cookie. Or let the host gate it with <code>config.authorize</code>.
+    <pre class="cmd">WOODS_MAP_TOKEN=$(openssl rand -hex 24)   # staging only
+# config/initializers/woods_map.rb
+WoodsMap.configure do |c|
+  c.authorize = ->(r) { r.env["warden"].user&.admin? }
+end</pre>
+  <% end %>
+  <div class="cap">No index data, no unit names and no paths appear on this page; it is served before the map opens anything.</div>
+</div>

@@ -49,6 +49,22 @@ module WoodsMap
       Pathname.new(index_dir.to_s)
     end
 
+    # The one-line warning the engine logs after the host has initialized, or
+    # nil when the mount is gated by a token.
+    #
+    # @return [String, nil]
+    def boot_warning
+      return nil if token?
+
+      if require_token
+        'Woods Map refuses every request: config.require_token is set and no token is configured ' \
+          '(config.token or WOODS_MAP_TOKEN).'
+      else
+        'Woods Map serves loopback requests only: no token is configured (config.token or ' \
+          'WOODS_MAP_TOKEN). Set one, or config.authorize, before exposing the mount beyond this machine.'
+      end
+    end
+
     private
 
     def default_index_dir
