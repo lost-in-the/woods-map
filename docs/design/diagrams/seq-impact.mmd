@@ -1,0 +1,45 @@
+---
+config:
+  sequence:
+    actorFontSize: 13
+    messageFontSize: 13
+    noteFontSize: 12
+    actorMargin: 18
+    messageMargin: 26
+    width: 120
+    height: 40
+    boxMargin: 6
+    mirrorActors: false
+---
+sequenceDiagram
+  accTitle: POST /posts through the changed units
+  autonumber
+  participant A as Author
+  participant C as PostsController#35;create
+  participant P as Post
+  participant Q as Solid Queue
+  box rgba(241,183,58,0.03) changed
+    participant J as NotifySubscribersJob
+    participant M as MailingListMailer
+    participant V as new_post.html.erb
+  end
+  participant U as User
+  A->>C: POST /posts
+  activate C
+  C->>P: save(post_params)
+  activate P
+  P->>P: INSERT INTO posts
+  P-)Q: after_commit · perform_later(id)
+  deactivate P
+  C-->>A: 302 → post_path
+  deactivate C
+  Q-)J: perform(post_id)
+  activate J
+  Note over J: no retry_on ⚑ blocking
+  loop find_each over followers
+    J-)M: new_post · deliver_later
+  end
+  deactivate J
+  M->>V: render
+  V->>U: preferences
+  Note over U: nil for 3 fixtures ⚑ note

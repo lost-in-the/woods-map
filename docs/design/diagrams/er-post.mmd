@@ -1,0 +1,55 @@
+erDiagram
+  direction LR
+  accTitle: Post schema, one hop
+  classDef focus stroke:#A78BFA,stroke-width:2px
+  classDef join stroke:#6E7987,stroke-dasharray:4
+  users {
+    bigint id PK
+    string email UK
+    string name
+  }
+  posts {
+    bigint id PK
+    bigint author_id FK
+    string title
+    string slug UK
+    string state
+    datetime published_at
+  }
+  comments {
+    bigint id PK
+    bigint post_id FK
+    bigint user_id FK
+    text body
+  }
+  tags {
+    bigint id PK
+    string name UK
+  }
+  taggings {
+    bigint id PK
+    bigint post_id FK
+    bigint tag_id FK
+  }
+  attachments {
+    bigint id PK
+    string attachable_type
+    bigint attachable_id
+    string blob_key
+  }
+  subscriptions {
+    bigint id PK
+    bigint user_id FK
+    bigint post_id FK
+  }
+  users ||--o{ posts : "belongs_to :author"
+  users ||--o{ comments : "has_many :comments"
+  posts ||--o{ comments : "has_many :comments"
+  posts ||--o{ taggings : "has_many :taggings"
+  tags ||--o{ taggings : "has_many :taggings"
+  posts ||..o{ attachments : "as: :attachable"
+  comments ||..o{ attachments : "as: :attachable"
+  users ||--o{ subscriptions : "has_many :subscriptions"
+  posts ||--o{ subscriptions : "has_many :subscriptions"
+  class posts focus
+  class taggings join

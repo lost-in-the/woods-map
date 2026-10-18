@@ -1,0 +1,30 @@
+%%{init: { "themeVariables": { "fontSize": "13px" }, "sequence": { "actorFontSize": 13, "noteFontSize": 12, "messageFontSize": 13 } }}%%
+sequenceDiagram
+  accTitle: Post create lifecycle
+  autonumber
+  participant B as Browser
+  participant C as PostsController#35;create
+  participant P as Post
+  participant U as User
+  participant J as NotifySubscribersJob
+  participant M as SubscriptionMailer
+  B->>C: POST /posts
+  activate C
+  C->>C: before_action :authenticate_user!
+  C->>P: Post.new(post_params).save
+  activate P
+  P->>P: before_validation :normalize_title
+  P->>P: validates title, slug, state
+  P->>P: before_save :set_slug
+  Note over P: transaction
+  P->>U: after_save :touch_user
+  P-)J: after_commit · perform_later(post.id)
+  deactivate P
+  P-->>C: true
+  C-->>B: 302 → /posts/:id
+  deactivate C
+  Note over J: queue default · no retry_on ⚑
+  J->>M: notify(post, subscriber)
+  loop find_each
+    M-)M: deliver_later
+  end
