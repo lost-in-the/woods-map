@@ -16,8 +16,8 @@ module WoodsMap
     TABS = {
       'model' => %w[code schema lifecycle graph history],
       'database_table' => %w[schema graph],
-      'controller' => %w[code lifecycle graph history],
-      'mailer' => %w[code lifecycle graph history],
+      'controller' => %w[code passage lifecycle graph history],
+      'mailer' => %w[code passage lifecycle graph history],
       'job' => %w[code lifecycle graph history]
     }.freeze
     DEFAULT_TABS = %w[code graph history].freeze
@@ -88,6 +88,7 @@ module WoodsMap
       case tab
       when 'code' then @metadata['loc'] && "#{@metadata['loc']} lines"
       when 'schema' then @metadata['column_count']
+      when 'passage' then Array(@metadata['actions']).size.nonzero?
       when 'lifecycle' then lifecycle_count
       when 'graph' then dependencies.size + dependents.size
       when 'history' then @metadata.dig('git', 'commit_count')

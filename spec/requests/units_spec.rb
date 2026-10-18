@@ -64,6 +64,27 @@ RSpec.describe 'Unit pages', type: :request do
     expect(response).to have_http_status(:ok)
   end
 
+  it 'renders the passage of a controller action with its stages, matrix and ladder' do
+    get '/woods/units/controller/UsersController/passage?action_name=edit'
+    title = '<h1 class="t1">UsersController#edit<span class="sub">GET /users/:id/edit</span></h1>'
+    expect(response.body).to include(title).and include('Filter matrix')
+    expect(response.body).to include('href="/woods/units/controller/UsersController#L2">logged_in_user</a>')
+    expect(response.body).to include('<th class="c cur" style="width:66px">edit</th>')
+    expect(response.body).to include('Callback ladder, <a href="/woods/units/model/User">User</a>')
+  end
+
+  it 'renders the passage of a mailer action from its templates' do
+    get '/woods/units/mailer/UserMailer/passage'
+    expect(response.body).to include('UserMailer#account_activation')
+    expect(response.body).to include('user_mailer/account_activation.html.erb')
+    expect(response.body).to include('not in the index')
+  end
+
+  it 'sends a type without actions from the passage route to its Code tab' do
+    get '/woods/units/model/User/passage'
+    expect(response).to redirect_to('/woods/units/model/User')
+  end
+
   it 'answers 404 with an empty state for an unknown unit' do
     get '/woods/units/model/Nope'
     expect(response).to have_http_status(:not_found)

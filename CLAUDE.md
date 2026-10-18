@@ -7,7 +7,7 @@ relationship graphs, schema and history, and get change-impact reports with
 sharable focus URLs. It reads the published index only: no live database, no
 runtime reflection, no git subprocess at request time.
 
-Status: scaffold, design system and M1 Reading landed. The design study, decision log, boards
+Status: scaffold, design system, M1 Reading and M2 Passage landed. The design study, decision log, boards
 and milestone plan live in `docs/design/` and are the source of truth for
 scope; `docs/design/foundations/tokens.css` is the stylesheet the engine ships
 verbatim (a spec keeps the two copies identical).
@@ -42,6 +42,7 @@ lib/woods_map/engine.rb          # Rails::Engine, isolate_namespace WoodsMap, af
 lib/woods_map/repository.rb      # one pinned generation per request: units, graph, analysis, search (string keys), freshness
 lib/woods_map/{unit_page,code_view,composite_source,highlighter,marginalia,references,outline}.rb  # the unit page and Code tab
 lib/woods_map/{schema_view,lifecycle,neighbourhood,history_view}.rb  # the Schema, Lifecycle, Graph and History tabs
+lib/woods_map/passage.rb         # the Passage tab: declared filters, templates by the view_render edge, the ladder's model and event
 lib/woods_map/{search_results,palette,file_tree}.rb  # search modes, the palette's groups, the per-generation file tree
 lib/woods_map/assets.rb          # engine-served files: roots, content digests, content types
 lib/woods_map/importmap.rb       # pins for vendored modules, the literal import map
@@ -54,7 +55,7 @@ app/javascript/woods_map/        # Stimulus controllers: cliff, tooltip, rows, t
 app/views/woods_map/shared/      # the frame: bar, crumbs, ident, tabs, status, sheet
 app/views/woods_map/components/  # table, steps, detail, rail, tree, facts, legend, diagram, banner, empty state
 app/views/woods_map/guidelines/  # the C1 to C5 boards rendered from the partials above
-app/views/woods_map/{units,search}/ # the unit page frame, Code tab, four tabs, peek, 404; the search page
+app/views/woods_map/{units,search}/ # the unit page frame, Code tab, Passage and four other tabs, the ladder, peek, 404; search
 vendor/javascript/               # stimulus (vendored); turbo, cytoscape, vis-timeline, highlight.js as milestones land them
 vendor/fonts/                    # Inter (latin subsets) and the complete Fira Code, WOFF2 (D-12)
 docs/design/                     # design study, decisions, boards, foundations, plan
@@ -66,6 +67,7 @@ docs/design/                     # design study, decisions, boards, foundations,
 - Freshness is `Woods::SourceInputs::Status` over the index root (`PublishedIndex#index_dir`), never the payload dir; a quick check that finds no changes can still say `unknown` when Woods could not verify the boot boundary, and the bar reports Woods' reasons rather than upgrading the verdict.
 - `Lifecycle` keeps only callbacks whose method the unit's source or an inlined concern defines; framework callbacks and procs are counted as a limit, not drawn as steps.
 - `Outline`, `SchemaView`, `Neighbourhood` and `HistoryView` read the generation at construction, so a view may use them after the repository block closes.
+- `Passage` shows filter scopes as declared (`only`/`except` lists) and never resolves the chain (W-8), reads no assigns from source (W-7) and ties templates to actions only through Woods' `view_render` edge or a mailer's template list. A fact the index lacks is named as a limit, not derived.
 - The code view is one scroll region (`.cvwrap`, woods-map#29): the source column grows to its longest line and the gutters are sticky. Do not reintroduce `overflow-x:auto` on `.src`.
 
 ## Conventions

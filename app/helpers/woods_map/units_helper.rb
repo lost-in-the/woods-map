@@ -4,8 +4,8 @@ module WoodsMap
   # Helpers for the unit pages: links to units, the facts tile values, the
   # freshness words, the tab table.
   module UnitsHelper
-    TAB_LABELS = { 'code' => 'Code', 'schema' => 'Schema', 'lifecycle' => 'Lifecycle', 'graph' => 'Graph',
-                   'history' => 'History' }.freeze
+    TAB_LABELS = { 'code' => 'Code', 'schema' => 'Schema', 'passage' => 'Passage', 'lifecycle' => 'Lifecycle',
+                   'graph' => 'Graph', 'history' => 'History' }.freeze
 
     # @param identifier [String]
     # @param type [String, nil]
@@ -16,6 +16,21 @@ module WoodsMap
       return ERB::Util.html_escape(label || identifier) unless type
 
       link_to(label || identifier, woods_map.unit_path(type: type, identifier: identifier))
+    end
+
+    # A link to a line of the unit that owns a file, through the graph's file map.
+    #
+    # @param file [String] a path relative to the application root
+    # @param line [Integer, nil]
+    # @param text [String, nil] the link text; "path:line" by default
+    # @return [ActiveSupport::SafeBuffer, String]
+    def code_line_link(file, line, text: nil)
+      text ||= [file, line].compact.join(':')
+      owner = Array(current_repository&.file_map&.dig(file)).first
+      type = owner && Array(current_repository.identifier_types(owner)).first
+      return ERB::Util.html_escape(text) unless type
+
+      link_to(text, "#{woods_map.unit_path(type: type, identifier: owner)}#{"#L#{line}" if line}")
     end
 
     # @param page [WoodsMap::UnitPage]

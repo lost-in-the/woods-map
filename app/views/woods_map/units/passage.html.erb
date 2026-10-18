@@ -1,0 +1,108 @@
+<% p = @passage %>
+<% content_for :title, "#{@page.identifier}##{p.action} · Passage · Woods Map" %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<% passage_path = ->(action) { woods_map.unit_passage_path(type: @page.type, identifier: @page.identifier, action_name: action) } %>
+<% controls = safe_join([tag.span('action', class: 'lbl'), tag.span(safe_join(p.actions.map { |a| link_to(a, passage_path.call(a), 'aria-current': (a == p.action ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'action')]) %>
+<% applying = p.filters_for %>
+<% before = applying.select { |f| f.kind == 'before' }; after = applying.select { |f| f.kind == 'after' }; around = applying.select { |f| f.kind == 'around' } %>
+<% skipped = p.filters - applying %>
+<% filter_text = ->(f) { safe_join([code_line_link(f.file, f.line, text: f.name), (f.scope == 'every action' ? nil : " #{f.scope}")].compact) } %>
+<% templates = p.action_templates; partials = p.templates - templates %>
+<% template_link = ->(t) { t.unit ? unit_link(t.identifier, 'view_template') : tag.span(t.identifier, class: 'dim', title: 'not in the index') } %>
+<% ivars = p.instance_variables_read %>
+<% tiles = [] %>
+<% if p.mailer? %>
+  <% tiles << { eyebrow: 'Delivery', rows: [['action', "#{@page.identifier}.#{p.action}"], ['method', p.unit.dig('metadata', 'delivery_method').to_s.presence || empty_value], ['from', p.unit.dig('metadata', 'defaults', 'from').to_s.presence || empty_value], ['source', layer_chip('mailer metadata')]] } %>
+<% else %>
+  <% tiles << { eyebrow: 'Route', rows: [['verb', p.routes.any? ? safe_join(p.routes.map { |r| "#{r['verb']} #{r['path']}" }, tag.br) : 'no route'], ['helper', p.routes.filter_map { |r| r['name'] && "#{r['name']}_path" }.join(', ').presence || empty_value], ['declared', p.declared ? code_line_link(p.declared['file'], p.declared['line'], text: "L#{p.declared['line']}") : 'inherited'], ['source', layer_chip('routes, action_sources')]] } %>
+<% end %>
+<% tiles << { eyebrow: "Filters, #{applying.size} of #{p.filters.size} declared", rows: [['before', before.any? ? safe_join(before.map { |f| code_line_link(f.file, f.line, text: f.name) }, ', ') : 'none'], ['after', after.any? ? safe_join(after.map { |f| code_line_link(f.file, f.line, text: f.name) }, ', ') : 'none'], ['not declared', skipped.any? ? skipped.map(&:name).join(', ') : 'none'], ['source', layer_chip('declared only/except; resolved chain is W-8')]] } %>
+<% tiles << { eyebrow: "Renders #{p.templates.size}", rows: [['template', templates.any? ? safe_join(templates.map(&template_link), ', ') : 'none in the index'], ['partials', partials.any? ? safe_join(partials.uniq(&:identifier).map(&template_link), ', ') : 'none'], ['layout', p.layout || 'not in the index (W-7)'], ['source', layer_chip(p.mailer? ? 'mailer templates' : 'view_render edges, per-action renders are W-7')]] } %>
+<% tiles << { eyebrow: 'Flags', rows: [['ivars read', ivars.any? ? safe_join(ivars.map { |v| tag.span(v, class: 'iv') }, ', ') : 'none'], ['rule', 'unassigned-ivar-read'], ['needs', 'assigns per action and filter, W-7'], ['source', layer_chip('template ivars')]] } %>
+<%= render 'woods_map/units/frame', page: @page, tab: 'passage', controls: controls, definition: p.declared&.dig('line') || @definition, title: "#{@page.identifier}##{p.action}", subtitle: p.request_label, tiles: tiles %>
+<div class="body" data-controller="trail keys" data-trail-title-value="<%= @page.identifier %>##<%= p.action %>">
+  <%= render 'woods_map/components/rail', heading: 'Passage', groups: [
+        { label: 'stages', count: 6, items: [
+          { key: '·', text: 'request', own: p.request_label },
+          { key: '·', text: 'filters', own: "#{applying.size} of #{p.filters.size} declared" },
+          { key: '·', text: 'action', own: p.declared ? "L#{p.declared['line']}" : (p.mailer? ? 'no line in the index' : 'inherited'), current: true },
+          { key: '·', text: 'renders', own: "#{p.templates.size} #{'template'.pluralize(p.templates.size)}" },
+          { key: '·', text: 'after', own: "#{after.size} #{'filter'.pluralize(after.size)}" },
+          { key: '·', text: 'responds', own: p.formats.join(', ').presence || 'unknown' }
+        ] },
+        { label: 'also here', count: @ladder ? 2 : 1, items: [{ key: '·', text: 'filter matrix' }, (@ladder ? { key: '·', text: 'callback ladder', own: "#{@ladder_model['identifier']}, #{@ladder_event}" } : nil)].compact },
+        { label: 'limits', count: 3, items: [
+          { key: '·', text: 'assigns, params read and renders per action', own: layer_chip('W-7, woods#757') },
+          { key: '·', text: 'resolved filter chain and owners', own: layer_chip('W-8, woods#758') },
+          { key: '·', text: 'nothing here proves a path ran', own: layer_chip('static') }
+        ] }
+      ] %>
+  <div class="main">
+    <section class="sec" aria-labelledby="ps">
+      <header><h2 class="t2" id="ps">Passage, <%= p.action %> <span class="n">request → filters → action → templates → response</span><%= info_tip('Every row links to its line. Filters are those whose declared only/except names this action; the resolved chain with inherited and concern-supplied filters lands with W-8, and assigns, params and renders per action with W-7.') %></h2><button class="tool goto" type="button" data-controller="copy" data-copy-text-value="<%= p.mermaid %>" data-action="copy#copy" data-needs-js>⎘ copy as Mermaid</button></header>
+      <div class="psg">
+        <div class="stage">request<b><%= p.request_label %></b></div>
+        <div class="rows">
+          <% p.path_params.each do |name| %><div><span>param</span><span><span class="iv"><%= name %></span> path <%= layer_chip('routes') %></span></div><% end %>
+          <% p.permitted.each do |pp| %><div><span>permits</span><span><code><%= pp['method'] %></code> → <%= unit_link(pp['model'].camelize, 'model') %>: <%= pp['permitted'].join(', ') %> <%= layer_chip('permitted_params') %></span></div><% end %>
+          <% if p.path_params.empty? && p.permitted.empty? %><div><span>params</span><span>none declared</span></div><% end %>
+          <div><span>format</span><span><%= p.formats.join(', ').presence || 'unknown' %></span></div>
+        </div>
+        <div class="stage">filters<b><%= before.size + around.size %> before, <%= after.size %> after</b></div>
+        <div class="rows">
+          <% (before + around).each do |f| %><div><span><%= f.kind %></span><span><%= filter_text.call(f) %> <%= layer_chip('declared') %></span></div><% end %>
+          <% skipped.each do |f| %><div><span>not declared</span><span><%= f.name %>, <%= f.scope %></span></div><% end %>
+          <% if p.framework_filter_count.positive? %><div><span>framework</span><span><%= p.framework_filter_count %> hidden (CSRF, origin, engine procs)</span></div><% end %>
+          <% if (before + around).empty? && skipped.empty? && p.framework_filter_count.zero? %><div><span>before</span><span>none declared</span></div><% end %>
+        </div>
+        <div class="stage" aria-current="true">action<b><%= p.action %><%= p.declared ? ", L#{p.declared['line']}" : '' %></b></div>
+        <div class="rows">
+          <div><span>defined in</span><span><%= p.declared ? code_line_link(p.declared['file'], p.declared['line']) : (p.mailer? ? 'the index records no action_sources for mailers (W-7)' : 'not in the controller source (inherited or a gem action)') %><% if p.declared && p.declared['owner'] != @page.identifier %> owner <%= unit_link(p.declared['owner'].to_s) %><% end %></span></div>
+          <div><span>assigns</span><span>per-action assigns and reads are not published yet <%= layer_chip('W-7, woods#757') %></span></div>
+        </div>
+        <div class="stage">renders<b><%= p.templates.size %> <%= 'template'.pluralize(p.templates.size) %></b></div>
+        <div class="rows">
+          <% p.templates.each do |t| %>
+            <div><span><%= t.role %></span><span><%= safe_join(['↳ '] * t.depth) %><%= template_link.call(t) %><% if t.unit %><% if t.instance_variables.any? %> reads <%= safe_join(t.instance_variables.map { |v| tag.span(v, class: 'iv') }, ', ') %><% end %><% if t.helpers.any? %>, <%= t.helpers.size %> <%= 'helper'.pluralize(t.helpers.size) %><% end %><% else %> <span class="dim">not in the index</span><% end %></span></div>
+          <% end %>
+          <% if p.templates.empty? %><div><span>template</span><span>none tied to this action in the index</span></div><% end %>
+          <div><span>layout</span><span><%= p.layout || 'not in the index (W-7)' %></span></div>
+        </div>
+        <div class="stage">after<b><%= after.size %> <%= 'filter'.pluralize(after.size) %></b></div>
+        <div class="rows">
+          <% after.each do |f| %><div><span>after</span><span><%= filter_text.call(f) %> <%= layer_chip('declared') %></span></div><% end %>
+          <% if after.empty? %><div><span>after</span><span>none declared</span></div><% end %>
+        </div>
+        <div class="stage last">responds<b><%= p.formats.join(', ').presence || 'unknown' %></b></div>
+        <div class="rows">
+          <% p.formats.each do |f| %><div><span><%= f %></span><span><%= p.mailer? ? "template #{templates.find { |t| t.identifier.include?(".#{f}.") }&.identifier || 'unknown'}" : 'rendered template or redirect; per-action facts are W-7' %></span></div><% end %>
+          <div class="finding note"><span class="flag note">⚑</span> <b>No flag can be raised yet.</b> The unassigned-ivar-read rule needs the assigns of this action and its filters (W-7); the templates read <%= ivars.any? ? safe_join(ivars.map { |v| tag.span(v, class: 'iv') }, ', ') : 'no instance variable' %>. <%= layer_chip("template ivars, gen #{@repository.generation_number}") %></div>
+        </div>
+      </div>
+    </section>
+    <% unless p.mailer? || p.filters.empty? %>
+      <section class="sec" aria-labelledby="fm">
+        <header><h2 class="t2" id="fm">Filter matrix <span class="n">declared scope</span><%= info_tip('A ✓ means the filter\'s declared only/except names the action; the resolved chain (skip_before_action, inherited and concern-supplied filters, conditions) lands with W-8. The current action\'s column is marked in the head.') %></h2></header>
+        <div class="tblwrap" data-controller="cliff">
+          <table class="tbl matrix" style="table-layout:fixed;min-width:<%= 200 + (66 * p.actions.size) %>px" aria-label="Filter matrix">
+            <thead><tr><th style="width:200px">filter, declared in</th><% p.actions.each do |a| %><th class="c<%= ' cur' if a == p.action %>" style="width:66px"><%= a %></th><% end %></tr></thead>
+            <tbody>
+              <% p.filters.each do |f| %>
+                <tr><td class="id"><%= f.kind %> <%= code_line_link(f.file, f.line, text: f.name) %><br><span class="mut" style="font-weight:400"><%= f.file ? f.file.sub('app/controllers/', '') : f.scope %><%= f.file && f.scope != 'every action' ? ", #{f.scope}" : '' %></span></td><% p.actions.each do |a| %><% on = f.declared_for?(a) %><td class="c <%= on ? 'on' : 'off' %><%= ' cur' if a == p.action %>"><%= on ? '✓' : '·' %></td><% end %></tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% end %>
+    <% if @ladder %>
+      <% ladder_steps = @ladder.steps(@ladder_event) %>
+      <section class="sec" aria-labelledby="cl">
+        <header><h2 class="t2" id="cl">Callback ladder, <%= unit_link(@ladder_model['identifier'], 'model') %> <span class="n">what a <%= @ladder_event %> runs</span><%= info_tip("Order is the resolved runtime chain, not file order. The model is the one #{p.permitted.any? ? 'the permitted params build' : 'the action references first'}; the event follows the action name, or pick one.") %></h2></header>
+        <div style="margin-bottom:var(--s3);display:flex;gap:var(--s3);align-items:center"><span class="lbl">event</span><span class="seg" role="group" aria-label="entry"><% WoodsMap::Lifecycle::EVENTS.each do |e| %><%= link_to(e, woods_map.unit_passage_path(type: @page.type, identifier: @page.identifier, action_name: p.action, event: e), 'aria-current': (e == @ladder_event ? 'true' : nil)) %><% end %></span></div>
+        <%= render 'woods_map/units/ladder', steps: ladder_steps, owner: @ladder_model['identifier'], label: "Callback ladder, #{@ladder_model['identifier']} #{@ladder_event}", event: @ladder_event %>
+      </section>
+    <% end %>
+    <%= render 'woods_map/shared/status', items: ['static: what the index declares, not what ran', 'declared filters, routes, template ivars', "gen #{@repository.generation_number}"], keys: [[%w[c u d], 'event'], [%w[y], 'copy Mermaid'], [%w[/], 'search']] %>
+  </div>
+</div>
