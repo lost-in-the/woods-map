@@ -1,0 +1,21 @@
+<%# The rail (C3-Navigation): an eyebrow heading, groups with a count, numbered
+    or bulleted items, the current item, filters. Locals: heading (String),
+    groups (Array of Hash with :label, :count, :items (Array of Hash with :key,
+    :text (HTML), :own (HTML), :current, :href), :filters (Array of Hash with
+    :label, :count, :checked, :name)). %>
+<nav class="rail" aria-label="<%= local_assigns.fetch(:label, 'On this page') %>">
+  <h3 class="t3 on"><%= heading %></h3>
+  <% groups.each do |group| %>
+    <div class="grp"><%= group[:label] %> <span class="cnt"><%= group[:count] %></span></div>
+    <% if group[:items] %>
+      <ol>
+        <% group[:items].each do |item| %>
+          <li<%= ' aria-current="true"'.html_safe if item[:current] %>><span class="k"><%= item[:key] || '·' %></span><span><% if item[:href] %><a href="<%= item[:href] %>"><%= item[:text] %></a><% else %><%= item[:text] %><% end %><% if item[:own] %> <span class="own"><%= item[:own] %></span><% end %></span></li>
+        <% end %>
+      </ol>
+    <% end %>
+    <% (group[:filters] || []).each do |filter| %>
+      <label class="f"><input type="checkbox" name="<%= filter[:name] %>"<%= ' checked'.html_safe if filter[:checked] %>> <%= filter[:label] %> <span class="cnt"><%= filter[:count] %></span></label>
+    <% end %>
+  <% end %>
+</nav>

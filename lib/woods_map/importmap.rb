@@ -7,32 +7,20 @@ module WoodsMap
   # The engine's own import map. Pins name the vendored modules under
   # `vendor/javascript/` and the engine's own code under `app/javascript/`;
   # the layout emits the map as a literal `<script type="importmap">` and
-  # {WoodsMap::Assets} serves each file under a content-hash prefix so caches
-  # are immutable and a gem upgrade changes every URL.
+  # {WoodsMap::Assets} serves each file under the set's content digest so
+  # caches are immutable and a gem upgrade changes every URL.
   #
   # No importmap-rails, no asset pipeline: this is what keeps the gem on the
   # Woods floors (railties 6.0) and free of a Node toolchain.
   module Importmap
     # Bare specifier => logical path under one of {WoodsMap::Assets::ROOTS}.
-    # Third-party pins are added as the milestones vendor them (turbo,
-    # stimulus, mermaid, cytoscape, vis-timeline, highlight.js).
+    # Third-party pins are added as the milestones vendor them.
     PINS = {
-      'woods_map' => 'woods_map/application.js'
+      'woods_map' => 'woods_map/application.js',
+      '@hotwired/stimulus' => 'stimulus.js'
     }.freeze
 
     module_function
-
-    # @param (see WoodsMap::Assets.resolve)
-    # @return (see WoodsMap::Assets.resolve)
-    def resolve(logical_path)
-      Assets.resolve(logical_path)
-    end
-
-    # @param (see WoodsMap::Assets.digest)
-    # @return (see WoodsMap::Assets.digest)
-    def digest(logical_path)
-      Assets.digest(logical_path)
-    end
 
     # Build the import map JSON for the layout.
     #
@@ -40,10 +28,9 @@ module WoodsMap
     # @return [String] JSON for the `importmap` script tag
     def to_json(url_for:)
       imports = PINS.each_with_object({}) do |(name, path), map|
-        digest = digest(path)
-        next unless digest
+        next unless Assets.resolve(path)
 
-        map[name] = url_for.call(digest, path)
+        map[name] = url_for.call(Assets.digest, path)
       end
       JSON.generate(imports: imports)
     end

@@ -1,0 +1,14 @@
+<%# Numbered steps (C2-Table): a sub-table whose numbers match the diagram's
+    autonumber; indent is call depth; a labelled rule marks an async hop.
+    Locals: steps (Array of Hash with :n, :depth, :arrow (:call, :async, :return
+    or nil), :text (HTML), :mech (String or nil), :boundary (String: a label row
+    instead of a step), :proc (Boolean: first step of a new process)). %>
+<table class="stpt">
+  <% steps.each do |step| %>
+    <% if step[:boundary] %>
+      <tr class="bnd"><td></td><td><%= step[:boundary] %></td></tr>
+    <% else %>
+      <tr<%= ' class="proc"'.html_safe if step[:proc] %>><td class="n"><%= step[:n] %></td><td><div class="st" style="--d:<%= step[:depth] || 0 %>"><span class="ar<%= ' async' if step[:arrow] == :async %>"><%= { call: '→', async: '⇒', return: '⇢' }[step[:arrow]] %></span><span><%= step[:text] %><% if step[:mech] %><span class="mech"><%= step[:mech] %></span><% end %></span></div></td></tr>
+    <% end %>
+  <% end %>
+</table>

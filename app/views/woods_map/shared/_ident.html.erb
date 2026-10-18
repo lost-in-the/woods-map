@@ -1,0 +1,7 @@
+<%# The title block (C5-Chrome): one h1, a data subtitle, controls right.
+    Locals: title (String), subtitle (String or nil), controls (HTML or nil),
+    level (:h1 by default; a specimen passes :div to keep one h1 per page). %>
+<div class="ident">
+  <%= content_tag(local_assigns.fetch(:level, :h1), class: 't1') do %><%= title %><% if local_assigns[:subtitle] %><span class="sub"><%= subtitle %></span><% end %><% end %>
+  <div class="ctl"><%= local_assigns[:controls] %></div>
+</div>

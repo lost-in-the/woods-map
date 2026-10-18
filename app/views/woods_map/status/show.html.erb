@@ -8,6 +8,7 @@
     <dt>extractors</dt><dd><%= @status['counts'].count { |_, n| n.to_i.positive? } %> types with units: <%= @status['counts'].select { |_, n| n.to_i.positive? }.sort_by { |_, n| -n.to_i }.map { |type, n| "#{type} #{n}" }.join(', ').presence || 'none' %></dd>
     <dt>payload</dt><dd><%= @status['total_units'] %> units, read through PublishedIndex, generation pinned per request</dd>
     <dt>extracted with</dt><dd>Woods <%= @status['woods_version'].presence || 'unknown' %>, Rails <%= @status['rails_version'].presence || 'unknown' %>, Ruby <%= @status['ruby_version'].presence || 'unknown' %></dd>
+    <dt>design</dt><dd><a href="<%= woods_map.guidelines_path %>">guidelines</a>, the component boards rendered from the engine's partials</dd>
     <dt>host</dt><dd>Rails <%= Rails.version %>, Ruby <%= RUBY_VERSION %>, mounted at <%= woods_map.root_path.chomp('/') %>, <%= loopback_request? ? 'loopback' : 'remote' %>, <%= woods_map_config.token? ? 'token configured' : 'no token' %></dd>
   </dl>
 </div>

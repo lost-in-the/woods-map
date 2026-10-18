@@ -12,10 +12,8 @@ module WoodsMap
     skip_forgery_protection
 
     def show
-      logical_path = params[:path].to_s
-      file = WoodsMap::Assets.resolve(logical_path)
-      digest = file && WoodsMap::Assets.digest(logical_path)
-      return head :not_found unless file && digest == params[:digest]
+      file = WoodsMap::Assets.resolve(params[:path].to_s)
+      return head :not_found unless file && params[:digest] == WoodsMap::Assets.digest
 
       response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
       send_file file.to_s, type: WoodsMap::Assets.content_type(file), disposition: 'inline'
