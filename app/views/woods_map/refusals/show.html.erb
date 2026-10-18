@@ -1,7 +1,7 @@
 <% content_for :title, 'Woods Map · refused' %>
 <div class="empty-state" style="padding:var(--s6) var(--s5)">
   <div class="eyebrow" style="margin-bottom:var(--s3)">HTTP 403</div>
-  <h2 class="t2">Woods Map refused the request</h2>
+  <h1 class="t2">Woods Map refused the request</h1>
   <% case @reason %>
   <% when :host %>
     The host's <code>config.authorize</code> hook did not allow this request. Sign in to the host application with an account the hook accepts, then open the map again.

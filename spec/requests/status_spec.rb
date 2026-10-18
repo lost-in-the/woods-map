@@ -9,6 +9,11 @@ RSpec.describe 'Status page', type: :request do
     expect(response.body).to include('type="importmap"')
   end
 
+  it 'puts the page in a main landmark under the bar' do
+    get '/woods'
+    expect(response.body).to include('<header class="bar">').and include('<main class="page-main">')
+  end
+
   it 'links the token sheet by content hash' do
     get '/woods'
     digest = WoodsMap::Assets.digest(WoodsMap::Assets::TOKENS)

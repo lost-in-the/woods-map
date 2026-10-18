@@ -8,7 +8,7 @@ RSpec.describe 'Authentication', type: :request do
 
     it 'is refused with the 403 panel, without the frame' do
       expect(response).to have_http_status(:forbidden)
-      expect(response.body).to include('Woods Map refused the request')
+      expect(response.body).to include('<h1 class="t2">Woods Map refused the request</h1>')
       expect(response.body).to include('WOODS_MAP_TOKEN').and include('config.authorize')
       expect(response.body).not_to include('class="bar"')
     end
@@ -24,6 +24,12 @@ RSpec.describe 'Authentication', type: :request do
     WoodsMap.configuration.require_token = true
     get '/woods'
     expect(response).to have_http_status(:forbidden)
+  end
+
+  it 'refuses the session form while no token is configured' do
+    get '/woods/session/new', env: remote
+    expect(response).to have_http_status(:forbidden)
+    expect(response.body).to include('Woods Map refused the request')
   end
 
   context 'with a token configured' do
