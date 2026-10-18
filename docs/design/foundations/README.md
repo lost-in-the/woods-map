@@ -2,9 +2,9 @@
 
 The visual system behind every design board, handed off for the engine
 (woods-map#23). Decisions D-10 to D-20 in [decisions.md](../decisions.md) are
-the rules; this folder holds what they produce. The boards themselves live on
-the Design canvas ([Woods Map pages](https://claude.ai/artifact/Vm2Sp2izRie5wyZ26Q6gWr),
-pages *Iterative Designs* and *Brand Guidelines & Components*);
+the rules; this folder holds what they produce. The boards themselves are in
+[../boards](../boards/README.md) (HTML and PNG) and on the Design canvas
+([Woods Map pages](https://claude.ai/artifact/Vm2Sp2izRie5wyZ26Q6gWr)) with the review comments;
 [coverage.md](../coverage.md) maps every page of the map to its board.
 
 | File | What it is |

@@ -2,8 +2,8 @@
 
 Every page and panel the map needs, the requirement it answers, the board that
 designs it and how far that board is from final. This is a map of the design
-artefacts, not a status board: issues own the work. Boards are on the Design
-canvas ([Woods Map pages](https://claude.ai/artifact/Vm2Sp2izRie5wyZ26Q6gWr)):
+artefacts, not a status board: issues own the work. Boards are in [boards/](boards/README.md) as HTML and PNG, and on the Design
+canvas ([Woods Map pages](https://claude.ai/artifact/Vm2Sp2izRie5wyZ26Q6gWr)) with the review comments:
 B6 and B8 boards are built on `foundations/tokens.css` (v7 and v8), C1 to C5
 are the component specimens, B5 and earlier are superseded iterations kept for
 the record.
@@ -20,48 +20,48 @@ opens the file tree.
 
 | Route | Page | Requirements | Board | State |
 |---|---|---|---|---|
-| `/woods` | Status page (generation, HEAD, freshness, extractors, host) | FR-1 | B8-States (stale panel) | final |
-| `/woods?token=` refused, no index, drifted, stale, degraded, empty results, guide unavailable | States and banners | FR-1, D-4, R-1, E-10 | B8-States | final |
+| `/woods` | Status page (generation, HEAD, freshness, extractors, host) | FR-1 | [B8-States](boards/B8-States.html) (stale panel) | final |
+| `/woods?token=` refused, no index, drifted, stale, degraded, empty results, guide unavailable | States and banners | FR-1, D-4, R-1, E-10 | [B8-States](boards/B8-States.html) | final |
 | `/woods/units` | Units index, grouped by type with counts | FR-3 | — | **none** |
-| search palette, `/woods/search` | Name, path and full-text code search, completeness | FR-2, B-12 | B8-Search | final |
-| `/woods/units/model/Post` Code | Two lenses, outline, marginalia, peek, confidence marks, folds, concerns inlined | FR-3, FR-4, B-1, B-2, B-7 to B-11, B-15 | B8-Code | final |
+| search palette, `/woods/search` | Name, path and full-text code search, completeness | FR-2, B-12 | [B8-Search](boards/B8-Search.html) | final |
+| `/woods/units/model/Post` Code | Two lenses, outline, marginalia, peek, confidence marks, folds, concerns inlined | FR-3, FR-4, B-1, B-2, B-7 to B-11, B-15 | [B8-Code](boards/B8-Code.html) | final |
 | hover card on a reference | Type, path, PageRank, last author, churn in 100 ms | B-3 | — | **none** (tooltip component exists, C5) |
 | disambiguation popover | Candidates with types and paths for an ambiguous name | FR-4, B-1 | — | **none** |
-| callers panel | Callers of the current method | B-13 | B8-Code (margin "called from") | partial |
-| unit diff across generations | Unified source diff with metadata changes | B-14, FR-7 | B8-Impact-Changed (diff component) | partial, no unit-page entry |
-| Schema tab | ER one hop, associations, columns, database facts | FR-6 | B6-Schema | final |
-| Lifecycle tab | Sequence / flowchart / lanes, numbered steps, state machine | FR-6, B-19, B-23 | B6-Lifecycle | final; C4-dynamic rendering (B-23) missing from the view control |
-| Graph tab | Neighbourhood, filters, depth, hubs | FR-5, A-1, A-2 | B6-Graph | final |
-| History tab | Commit strip, commits with description rows, co-change, people | FR-7, B-6, C-5 | B6-History | final; generation picker not drawn |
+| callers panel | Callers of the current method | B-13 | [B8-Code](boards/B8-Code.html) (margin "called from") | partial |
+| unit diff across generations | Unified source diff with metadata changes | B-14, FR-7 | [B8-Impact-Changed](boards/B8-Impact-Changed.html) (diff component) | partial, no unit-page entry |
+| Schema tab | ER one hop, associations, columns, database facts | FR-6 | [B6-Schema](boards/B6-Schema.html) | final |
+| Lifecycle tab | Sequence / flowchart / lanes, numbered steps, state machine | FR-6, B-19, B-23 | [B6-Lifecycle](boards/B6-Lifecycle.html) | final; C4-dynamic rendering (B-23) missing from the view control |
+| Graph tab | Neighbourhood, filters, depth, hubs | FR-5, A-1, A-2 | [B6-Graph](boards/B6-Graph.html) | final |
+| History tab | Commit strip, commits with description rows, co-change, people | FR-7, B-6, C-5 | [B6-History](boards/B6-History.html) | final; generation picker not drawn |
 | Controller: Routes tab | Routes, helpers, action sources | FR-3 | — | **none** |
-| Controller: Passage tab | Stages, filter matrix, callback ladder, mismatch flags, export | B-16 to B-20 | B8-Passage | final |
+| Controller: Passage tab | Stages, filter matrix, callback ladder, mismatch flags, export | B-16 to B-20 | [B8-Passage](boards/B8-Passage.html) | final |
 | Mailer: Passage and Templates | Mailer action passage, delivery, templates | B-17 | — | **none** (same component as the controller passage) |
 | Unit pages: job, mailer, view, concern, serializer, table | Type-specific facts tiles | B-4 | B6/B8 (model and controller only) | partial |
 | `/woods/files/*path` | File view: every unit a file defines | B-5 | — | **none** |
-| `/woods/landscape` Context L1 | People and external systems | B-21 | B8-Landscape (ladder only) | partial |
-| Landscape Containers L2 | C4 containers, relationships, structural risk | B-21, W-9 | B8-Landscape | final |
+| `/woods/landscape` Context L1 | People and external systems | B-21 | [B8-Landscape](boards/B8-Landscape.html) (ladder only) | partial |
+| Landscape Containers L2 | C4 containers, relationships, structural risk | B-21, W-9 | [B8-Landscape](boards/B8-Landscape.html) | final |
 | Landscape Components L3 | Compound graph by package with container frame | B-22 | — | **none** |
-| Landscape Hotspots | Quadrant, coupling matrix, sankey, treemap, structural risk | design study §7 | B6-Overview | final |
+| Landscape Hotspots | Quadrant, coupling matrix, sankey, treemap, structural risk | design study §7 | [B6-Overview](boards/B6-Overview.html) | final |
 | Landscape Domains | Domain clusters | design study §7 | — | **none** |
 | `/woods/graph` | Full-screen graph, domain clusters, list equivalent, flow overlay | FR-5, A-3 to A-6 | B5-Graph (tab only) | **none** for the page |
-| `/woods/erd` | Whole database by chunk, findings | FR-6 | B6-ERD | final |
+| `/woods/erd` | Whole database by chunk, findings | FR-6 | [B6-ERD](boards/B6-ERD.html) | final |
 | `/woods/history` | Cross-unit timeline for a selected set, commit → node | FR-7, A-6 | — | **none** |
 | `/woods/impact` Overview | The PR comment, rendered | E-7 | B5-Impact-Overview | v5 |
-| Impact Changed | Units as subdivided rows, focus detail, diff | E-2, E-6 | B8-Impact-Changed | final |
-| Impact Risks | Findings, rule registry | E-5 | B8-Impact-Risks | final |
-| Impact Flows | Entry points through changed units, numbered steps, async boundaries | E-4 | B6-Impact-Flows | final |
-| Impact Tests | Run first, gaps | E-5 | B8-Impact-Tests | final |
+| Impact Changed | Units as subdivided rows, focus detail, diff | E-2, E-6 | [B8-Impact-Changed](boards/B8-Impact-Changed.html) | final |
+| Impact Risks | Findings, rule registry | E-5 | [B8-Impact-Risks](boards/B8-Impact-Risks.html) | final |
+| Impact Flows | Entry points through changed units, numbered steps, async boundaries | E-4 | [B6-Impact-Flows](boards/B6-Impact-Flows.html) | final |
+| Impact Tests | Run first, gaps | E-5 | [B8-Impact-Tests](boards/B8-Impact-Tests.html) | final |
 | Impact Graph | Changed, direct, transitive emphasis | E-3, E-8 | — | **none** |
-| Impact Unknown | Unknowns and what each layer proves | E-4, E-10 | B8-Impact-Unknown | final |
-| `?since=` on any view | Changed lines, nodes, steps, columns highlighted | E-8 | B8-States (degraded), tree M badges | partial |
+| Impact Unknown | Unknowns and what each layer proves | E-4, E-10 | [B8-Impact-Unknown](boards/B8-Impact-Unknown.html) | final |
+| `?since=` on any view | Changed lines, nodes, steps, columns highlighted | E-8 | [B8-States](boards/B8-States.html) (degraded), tree M badges | partial |
 | pre-change mode | Blast radius from a unit or method, no range | E-9 | — | **none** (the impact frame with a focus title) |
 | Share menu | Focus URL, Markdown, JSON, Mermaid | E-6, E-7 | buttons only | partial |
 | Trail board | Pinned units, lanes, flags, board state, export | C-1 to C-5 | — | **none** (release 0.2, M6) |
-| Guide panel | Context chips, actions, tool cards, streamed answer, budget | FR-8 | B8-Guide | final; chat history list not drawn |
+| Guide panel | Context chips, actions, tool cards, streamed answer, budget | FR-8 | [B8-Guide](boards/B8-Guide.html) | final; chat history list not drawn |
 | settings | Editor URL scheme, lens, wrap and font size, per browser | B-15, D-6 | Code toolbar only | partial |
 | keyboard help | `?` overlay listing every page's keys | NFR-3 | status bars only | **none** |
-| four widths | 1280 / 960 / 640 / 390 | D-19 | C1 to C5, B8-Widths | final |
-| light and colour-vision themes | Same markup, `data-theme`, `data-cvd` | D-11 | C1, C2, B9-Pele | final for components; B6 diagrams still dark (woods-map#25) |
+| four widths | 1280 / 960 / 640 / 390 | D-19 | C1 to C5, [B8-Widths](boards/B8-Widths.html) | final |
+| light and colour-vision themes | Same markup, `data-theme`, `data-cvd` | D-11 | C1, C2, [B9-Pele](boards/B9-Pele.html) | final for components; B6 diagrams still dark (woods-map#25) |
 
 ## Gaps by milestone
 
