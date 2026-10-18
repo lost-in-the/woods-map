@@ -25,7 +25,7 @@ module WoodsMap
     before_action :exchange_query_token!
     before_action :authenticate!
 
-    helper_method :woods_map_config
+    helper_method :woods_map_config, :current_repository
 
     rescue_from WoodsMap::Repository::Unavailable, with: :render_unavailable
 
@@ -36,6 +36,11 @@ module WoodsMap
       WoodsMap.configuration
     end
 
+    # @return [WoodsMap::Repository, nil] the generation this request reads
+    def current_repository
+      @repository
+    end
+
     # Open the configured index pinned to one generation for this request.
     # The generation facts are kept for the bar; the block gets the repository.
     #
@@ -43,6 +48,7 @@ module WoodsMap
     # @return [Object] the block's value
     def with_repository
       WoodsMap::Repository.open do |repository|
+        @repository = repository
         @generation = repository.generation_facts
         yield repository
       end

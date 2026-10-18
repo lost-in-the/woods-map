@@ -5,7 +5,11 @@ module WoodsMap
   # host facts of the pinned index, as the States board draws the status page.
   class StatusController < ApplicationController
     def show
-      @status = with_repository(&:status)
+      with_repository do |repository|
+        @status = repository.status
+        @freshness = repository.freshness
+        @tree = WoodsMap::FileTree.for(repository)
+      end
     end
   end
 end
