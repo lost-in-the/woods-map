@@ -1,0 +1,2 @@
+<% content_for :title, 'Woods Map · no such unit' %>
+<%= render 'woods_map/components/empty_state', heading: :h1, title: "No #{@type.tr('_', ' ')} named #{@identifier}", text: safe_join(['Searched the ', tag.code(@type), ' units of gen ', @repository.generation_number.to_s, '. The name may belong to another type, or to a unit that was removed by a later extraction.']), cap: safe_join([link_to("search names for #{@identifier}", woods_map.search_path(q: @identifier, in: 'name')), ' · ', link_to('status', woods_map.root_path)]) %>

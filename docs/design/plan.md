@@ -90,6 +90,7 @@ Run this before a milestone issue is opened and again before it closes.
 | Inline links need a cue besides colour (needs-decision, amends D-11) | [woods-map#26](https://github.com/lost-in-the/woods-map/issues/26) |
 | Token contrast corrections for AA (needs-decision, amends D-11) | [woods-map#27](https://github.com/lost-in-the/woods-map/issues/27) |
 | Pele as the diagram renderer (needs-decision, supersedes D-5 if accepted) | [woods-map#25](https://github.com/lost-in-the/woods-map/issues/25) |
+| Code view scrolls as one region, not a line at a time (needs-decision, amends B8-Code) | [woods-map#29](https://github.com/lost-in-the/woods-map/issues/29) |
 | D-10 Source of truth for visual tokens | [woods-map#12](https://github.com/lost-in-the/woods-map/issues/12) |
 | D-11 Colour meaning | [woods-map#13](https://github.com/lost-in-the/woods-map/issues/13) |
 | D-12 Typefaces | [woods-map#14](https://github.com/lost-in-the/woods-map/issues/14) |

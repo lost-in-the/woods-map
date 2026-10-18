@@ -25,6 +25,28 @@ Metrics/BlockLength:
     - 'spec/**/*'
     - '*.gemspec'
 
+# The same posture as Woods: presenters shape index data into rows and tiles,
+# which reads better as one method than as ten.
+Metrics/MethodLength:
+  Max: 20
+
+Metrics/AbcSize:
+  Max: 25
+
+Metrics/ClassLength:
+  Max: 140
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Metrics/PerceivedComplexity:
+  Max: 10
+
+# Struct members named after the thing they hold (a filter, a count) read
+# better than renamed ones; nothing enumerates these structs.
+Lint/StructNewOverride:
+  Enabled: false
+
 Rails:
   Enabled: true
 

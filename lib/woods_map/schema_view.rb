@@ -1,0 +1,165 @@
+# frozen_string_literal: true
+
+module WoodsMap
+  # The Schema tab (B6-Schema): associations with their keys and whether the
+  # database enforces them, the columns with their indexes, and the database
+  # facts the schema and the graph analysis prove.
+  class SchemaView
+    Association = Struct.new(:macro, :name, :target, :options, :foreign_key, :enforced, :finding, keyword_init: true)
+    Column = Struct.new(:name, :type, :null, :default, :index, :written_by, keyword_init: true)
+
+    # @param unit [Hash] a model or database_table unit
+    # @param table [Hash, nil] the database_table unit behind a model
+    # @param graph_analysis [Hash]
+    def initialize(unit, table: nil, graph_analysis: {})
+      @unit = unit
+      @metadata = unit['metadata'] || {}
+      @table = table
+      @table_metadata = (table || (unit['type'] == 'database_table' ? unit : nil))&.dig('metadata') || {}
+      @analysis = graph_analysis
+    end
+
+    # @return [String, nil]
+    def table_name
+      @metadata['table_name'] || @table_metadata['table_name']
+    end
+
+    # @return [Array<Association>]
+    def associations
+      Array(@metadata['associations']).map do |a|
+        fk = a['through'] ? nil : a['foreign_key']
+        Association.new(macro: "#{a['type']} :#{a['name']}", name: a['name'], target: a['target'],
+                        options: options_text(a), foreign_key: fk && key_text(a, fk),
+                        enforced: enforcement(a, fk), finding: finding_for(a))
+      end
+    end
+
+    # @return [Array<Column>]
+    def columns
+      Array(@metadata['columns'].presence || @table_metadata['columns']).map do |c|
+        Column.new(name: c['name'], type: c['type'] || c['sql_type'], null: c['null'] == false ? 'no' : 'yes',
+                   default: if c.key?('default')
+                              c['default']
+                            else
+                              (c['has_default'] ? 'yes' : nil)
+                            end,
+                   index: index_for(c['name']), written_by: writers[c['name'].to_s])
+      end
+    end
+
+    # @return [Array<Hash>] the indexes of the table
+    def indexes
+      Array(@table_metadata['indexes'])
+    end
+
+    # @return [Array<Array(String, String, String)>] fact, value, source
+    def facts
+      [
+        ['association without FK', unenforced.presence&.join(', ') || 'none', 'associations ∖ foreign_keys'],
+        ['FK without association', orphan_keys.presence&.join(', ') || 'none', 'foreign_keys ∖ associations'],
+        ['cross-database', cross_database.presence&.join(', ') || "none, all on #{@metadata['database'] || 'primary'}",
+         'from_db / to_db'],
+        ['unmodelled tables', unmodelled.presence&.join(', ') || 'none', 'graph_analysis.unmodelled_tables']
+      ]
+    end
+
+    # Mermaid erDiagram text for this table and one hop of associations.
+    #
+    # @return [String]
+    def mermaid
+      lines = ['erDiagram']
+      Array(@metadata['associations']).each do |a|
+        next if a['through']
+
+        left, right = if a['type'].to_s.start_with?('belongs_to')
+                        ['}o--||',
+                         [table_name,
+                          a['target'].to_s.tableize]]
+                      else
+                        ['||--o{',
+                         [table_name,
+                          a['target'].to_s.tableize]]
+                      end
+        lines << "  #{right[0]} #{left} #{right[1]} : \"#{a['name']}\""
+      end
+      lines.join("\n")
+    end
+
+    private
+
+    def options_text(assoc)
+      opts = (assoc['options'] || {}).map { |k, v| "#{k}: #{v.inspect}" }
+      opts << "through: :#{assoc['through']}" if assoc['through']
+      opts << "as: :#{assoc['polymorphic']}" if assoc['polymorphic'].is_a?(String)
+      opts.join(', ')
+    end
+
+    def key_text(assoc, key)
+      assoc['type'].to_s == 'belongs_to' ? "#{table_name}.#{key}" : "#{assoc['target'].to_s.tableize}.#{key}"
+    end
+
+    def enforcement(assoc, key)
+      return 'via join' if assoc['through']
+      return 'none' if key.nil? || assoc['polymorphic']
+
+      if assoc['type'].to_s == 'belongs_to'
+        foreign_keys.find { |fkey| fkey['column'].to_s == key.to_s } ? '✓ enforced' : 'none'
+      else
+        '—'
+      end
+    end
+
+    def foreign_keys
+      Array(@table_metadata['foreign_keys'].presence || @metadata['foreign_keys'])
+    end
+
+    def finding_for(assoc)
+      return 'polymorphic, no FK' if assoc['polymorphic']
+      if assoc.dig('options', 'dependent').to_s.start_with?(
+        'destroy', 'delete'
+      )
+        return "delete radius: dependent #{assoc.dig('options',
+                                                     'dependent')}"
+      end
+
+      nil
+    end
+
+    def index_for(column)
+      hits = indexes.select { |i| Array(i['columns']).include?(column) }
+      return 'PK' if column.to_s == (@metadata['primary_key'] || @table_metadata['primary_key'] || 'id').to_s
+
+      hits.map { |i| i['unique'] ? "#{i['name']}, unique" : i['name'] }.join('; ').presence
+    end
+
+    def writers
+      @writers ||= Array(@metadata['callbacks']).each_with_object(Hash.new { |h, k| h[k] = [] }) do |cb, map|
+        Array(cb.dig('side_effects', 'columns_written')).each do |col|
+          map[col.to_s] << "#{cb['type']} :#{cb['filter']}"
+        end
+      end
+    end
+
+    def unenforced
+      missing = Array(@metadata['associations']).select do |a|
+        a['type'].to_s == 'belongs_to' && enforcement(a, a['foreign_key']) == 'none'
+      end
+      missing.map { |a| "#{table_name}.#{a['foreign_key']}#{' (polymorphic)' if a['polymorphic']}" }
+    end
+
+    def orphan_keys
+      columns_with_assoc = Array(@metadata['associations']).map { |a| a['foreign_key'].to_s }
+      orphans = foreign_keys.reject { |fkey| columns_with_assoc.include?(fkey['column'].to_s) }
+      orphans.map { |fkey| "#{fkey['column']} → #{fkey['to_table']}" }
+    end
+
+    def cross_database
+      Array(@metadata['associations']).select { |a| a['from_db'] && a['to_db'] && a['from_db'] != a['to_db'] }
+                                      .map { |a| "#{a['name']}: #{a['from_db']} → #{a['to_db']}" }
+    end
+
+    def unmodelled
+      Array(@analysis['unmodelled_tables']).map { |t| t.is_a?(Hash) ? t['table'] || t['name'] : t.to_s }
+    end
+  end
+end

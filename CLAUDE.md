@@ -7,7 +7,7 @@ relationship graphs, schema and history, and get change-impact reports with
 sharable focus URLs. It reads the published index only: no live database, no
 runtime reflection, no git subprocess at request time.
 
-Status: scaffold landed, design done. The design study, decision log, boards
+Status: scaffold, design system and M1 Reading landed. The design study, decision log, boards
 and milestone plan live in `docs/design/` and are the source of truth for
 scope; `docs/design/foundations/tokens.css` is the stylesheet the engine ships
 verbatim (a spec keeps the two copies identical).
@@ -39,22 +39,34 @@ mount the engine in a variant, run `woods:extract`, open `/woods`.
 ```
 lib/woods_map.rb                 # module, Configuration (boot_warning)
 lib/woods_map/engine.rb          # Rails::Engine, isolate_namespace WoodsMap, after_initialize warning
-lib/woods_map/repository.rb      # one pinned generation per request, per-generation caches (planned)
+lib/woods_map/repository.rb      # one pinned generation per request: units, graph, analysis, search (string keys), freshness
+lib/woods_map/{unit_page,code_view,composite_source,highlighter,marginalia,references,outline}.rb  # the unit page and Code tab
+lib/woods_map/{schema_view,lifecycle,neighbourhood,history_view}.rb  # the Schema, Lifecycle, Graph and History tabs
+lib/woods_map/{search_results,palette,file_tree}.rb  # search modes, the palette's groups, the per-generation file tree
 lib/woods_map/assets.rb          # engine-served files: roots, content digests, content types
 lib/woods_map/importmap.rb       # pins for vendored modules, the literal import map
 app/controllers/concerns/woods_map/authentication.rb  # token, cookie and loopback gate (D-4)
 lib/woods_map/glyphs.rb          # the glyph vocabulary (D-20)
-app/controllers/woods_map/       # application (gate order, 403 panel), status, sessions, assets, guidelines; units, search, ...
+app/controllers/woods_map/       # application (gate order, 403 panel), status, sessions, assets, guidelines, units, search
 app/helpers/woods_map/           # asset URLs, date shorthand (D-15), short SHA; components (glyphs, chips, ⓘ, people)
 app/assets/stylesheets/woods_map/ # tokens.css (verbatim from docs/design/foundations), fonts.css, map.css (engine-only rules)
-app/javascript/woods_map/        # Stimulus application and controllers: cliff, tooltip, rows, tree, sheet, copy
+app/javascript/woods_map/        # Stimulus controllers: cliff, tooltip, rows, tree, sheet, copy, palette, peek, trail, keys
 app/views/woods_map/shared/      # the frame: bar, crumbs, ident, tabs, status, sheet
 app/views/woods_map/components/  # table, steps, detail, rail, tree, facts, legend, diagram, banner, empty state
 app/views/woods_map/guidelines/  # the C1 to C5 boards rendered from the partials above
+app/views/woods_map/{units,search}/ # the unit page frame, Code tab, four tabs, peek, 404; the search page
 vendor/javascript/               # stimulus (vendored); turbo, cytoscape, vis-timeline, highlight.js as milestones land them
 vendor/fonts/                    # Inter (latin subsets) and the complete Fira Code, WOFF2 (D-12)
 docs/design/                     # design study, decisions, boards, foundations, plan
 ```
+
+## Gotchas
+
+- `Woods::MCP::IndexReader#search` answers with symbol keys and rows of identifier, type and match_field only; `Repository#search` stringifies the keys and adds `file_path` from the graph nodes. Read search results through the repository.
+- Freshness is `Woods::SourceInputs::Status` over the index root (`PublishedIndex#index_dir`), never the payload dir; a quick check that finds no changes can still say `unknown` when Woods could not verify the boot boundary, and the bar reports Woods' reasons rather than upgrading the verdict.
+- `Lifecycle` keeps only callbacks whose method the unit's source or an inlined concern defines; framework callbacks and procs are counted as a limit, not drawn as steps.
+- `Outline`, `SchemaView`, `Neighbourhood` and `HistoryView` read the generation at construction, so a view may use them after the repository block closes.
+- The code view is one scroll region (`.cvwrap`, woods-map#29): the source column grows to its longest line and the gutters are sticky. Do not reintroduce `overflow-x:auto` on `.src`.
 
 ## Conventions
 
