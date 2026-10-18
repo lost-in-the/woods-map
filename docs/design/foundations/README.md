@@ -24,9 +24,10 @@ beak stay apart for deuteranopia and protanopia. No other selector changes.
 
 Mermaid sources for every diagram the boards render are in
 [../diagrams](../diagrams/), with `pele-render.mjs`, the script used to verify
-Pele as a server-side renderer (woods-map#25). When Pele is adopted the eight
-`--pele-*` variables are set from this sheet and the Mermaid overrides at the
-end of `tokens.css` go away.
+Pele as a renderer (woods-map#25). D-21 adopts Pele in the browser, vendored
+like every other module, with the Mermaid text kept in the page as the
+fallback; when M3 lands the eight `--pele-*` variables are set from this sheet
+and the Mermaid overrides at the end of `tokens.css` go away.
 
 ## What the engine must add
 
