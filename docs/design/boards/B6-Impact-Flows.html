@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>v6 · Impact · Flows</title>
+</head>
+<body>
+
+<style>
+body{margin:0}
+/* design-system element resets: the DS styles p, small, code, kbd, h1-h4 globally */
+.wm code,.wm kbd{font-family:"Fira Code","Fira Mono",ui-monospace,monospace;font-size:inherit;font-weight:inherit;line-height:inherit;background:none;color:inherit;padding:0;border-radius:0}
+.wm small{font-size:inherit;color:inherit;font-family:inherit}
+.wm p,.wm li{font-family:inherit;font-weight:inherit;line-height:inherit}
+.wm li,.wm td,.wm th{font-size:inherit}
+.wm h1,.wm h2,.wm h3,.wm h4{font-family:inherit;color:inherit;text-wrap:initial}
+.wm .sec header h2{white-space:nowrap}
+.wm .mx td.cyc{box-shadow:none;outline:1px solid var(--amber);outline-offset:-1px}
+
+.wm{
+  --bg:#222126; --panel:#1B1A1F; --ground2:#28272D;
+  --stripe:rgba(252,252,253,0.035); --bright:#FCFCFD; --text:#E5E8EB; --mut:#9BA5B0; --dim:#6E7987; --rule:#3B3942; --rule2:#4A4852;
+  --accent:#A78BFA; --amber:#F1B73A; --red:#E64D47; --green:#7DAA9E; --add-bg:#2A3A2A; --risk-bg:#2E2426; --sel-bg:#2A2833;
+  background:var(--bg);color:var(--text);font-family:"Fira Mono",ui-monospace,monospace;font-size:13px;line-height:1.55;display:flex;flex-direction:column;min-height:100vh
+}
+.wm[data-theme=light]{
+  --bg:#FCFCFD; --panel:#F4F5F7; --ground2:#EEF0F2;
+  --stripe:rgba(20,19,23,0.035); --bright:#141317; --text:#222126; --mut:#5C6675; --dim:#6E7987; --rule:#E5E8EB; --rule2:#C9CDD3;
+  --accent:#7C3AED; --amber:#8A5A00; --red:#C0392B; --green:#047857; --add-bg:#E6F4EA; --risk-bg:#FBEDEB; --sel-bg:#F3EEFB
+}
+*:focus-visible{outline:3px solid #F1B73A;outline-offset:2px}
+/* links look like links: same color as text, a quiet underline; violet on hover */
+a{color:inherit;text-decoration:underline;text-decoration-color:var(--rule2);text-underline-offset:3px}
+a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+a.nav{text-decoration:none;color:var(--mut)}a.nav:hover{color:var(--accent)}
+/* buttons look like buttons */
+.btn{font:inherit;font-size:12.5px;height:32px;padding:0 14px;border:1px solid var(--rule2);color:var(--bright);background:var(--ground2);border-radius:3px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#1B1A1F;font-weight:700}
+.btn.sm{height:26px;font-size:12px;padding:0 10px}
+.btn.ghost{background:none;border-color:transparent;color:var(--mut)}.btn.ghost:hover{color:var(--accent);border-color:transparent}
+/* type scale: 24 / 15 / 13 · meta 12 · eyebrow 11 */
+.t1{font-size:24px;line-height:1.15;font-weight:700;color:var(--bright);margin:0}
+.t2{font-size:15px;line-height:1.3;font-weight:700;color:var(--bright);margin:0}
+.meta{font-size:12px;color:var(--mut)}
+.eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-weight:500}
+.dim{color:var(--dim)}.mut{color:var(--mut)}.bright{color:var(--bright)}
+/* the two data badges · the only non-violet color on the page */
+.m{display:inline-block;color:var(--amber);font-weight:700;width:14px}
+.fl{display:inline-block;padding:0 5px;border-radius:2px;background:var(--red);color:#fff;font-size:11px;line-height:16px;font-weight:700;text-decoration:none;white-space:nowrap}
+.fl:hover{color:#fff;background:var(--accent)}
+/* evidence layer tags · text, never color */
+.lyr{font-size:11px;color:var(--dim);letter-spacing:.02em;white-space:nowrap}
+.lyr::before{content:"· "}
+/* flag severity by shape: filled = blocking, outlined = note */
+.fl.note{background:none;border:1px solid var(--red);color:var(--red);line-height:14px}
+.fl.note:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+/* freshness */
+.fresh{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:var(--mut)}
+.fresh::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--green)}
+.fresh.drift::before{background:var(--amber)}
+.banner{display:flex;gap:14px;align-items:center;padding:8px 32px;background:var(--ground2);border-bottom:1px solid var(--rule);font-size:12.5px;color:var(--text)}
+.banner b{color:var(--amber)}
+.limits{margin-top:32px;padding-top:12px;border-top:1px solid var(--rule);font-size:12px;color:var(--mut);line-height:1.6}
+.unmod{color:var(--mut)}
+/* tables (bordered) */
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px;border:1px solid var(--rule2);border-radius:3px;overflow:hidden}
+.tbl th,.tbl td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+.tbl th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-weight:500;background:var(--panel)}
+.tbl tbody tr:nth-child(even) td{background:var(--stripe)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td.nw{white-space:nowrap}
+.ok{color:var(--mut)}.off{color:var(--dim)}
+.sel-chip{display:inline-flex;gap:8px;align-items:center;margin:0 0 0 auto;padding:4px 4px 4px 12px;border:1px solid var(--accent);border-radius:3px;font-size:12.5px;color:var(--bright)}
+.sel-chip .x{font:inherit;background:none;border:0;color:var(--mut);width:22px;height:22px;cursor:pointer}
+.onsel{box-shadow:inset 3px 0 0 var(--accent)}
+.diff{font-family:"Fira Code","Fira Mono",monospace;font-size:12.5px;line-height:20px;border:1px solid var(--rule);border-radius:3px;overflow:hidden;background:var(--bg);margin-top:8px}
+.diff div{padding:0 10px 0 0;white-space:pre;display:grid;grid-template-columns:26px minmax(0,1fr)}
+.diff div::before{content:"";text-align:center;color:var(--dim)}
+.diff .add::before{content:"+";color:var(--green);font-weight:700}.diff .del::before{content:"−";color:var(--red);font-weight:700}.diff .hunk::before{content:"@@"}
+.diff .hunk{color:var(--mut);background:var(--ground2)}.diff .add{background:var(--add-bg)}
+.eyebrow .id{text-transform:none;letter-spacing:0;color:var(--text);font-size:12.5px;font-weight:400}
+.sev{font-size:11px;color:var(--mut);display:block;margin-top:2px;white-space:nowrap}
+.when-guide{color:var(--mut)}
+/* sequence diagram (what Mermaid renders for the selected flow) */
+.seq{margin-top:8px;border:1px solid var(--rule2);border-radius:3px;background:var(--panel);padding:14px 16px 10px;overflow-x:auto}
+.seq .parts{display:grid;grid-template-columns:repeat(7,minmax(130px,1fr));gap:0 8px}
+.seq .part{text-align:center;font-size:12px;color:var(--bright);padding:5px 6px;border:1px solid var(--rule2);border-radius:3px;background:var(--bg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seq .part.chg{border-color:var(--amber)}
+.seq .part.chg::before{content:"M ";color:var(--amber);font-weight:700}
+.seq .lanes{position:relative;display:grid;grid-template-columns:repeat(7,minmax(130px,1fr));gap:0 8px;min-height:276px}
+.seq .lane{border-left:1px dashed var(--rule2);margin-left:50%;height:100%}
+.seq .msg{position:absolute;height:0;border-top:1px solid var(--mut);font-size:11.5px;color:var(--mut);white-space:nowrap}
+.seq .msg.async{border-top-style:dashed}
+.seq .msg::after{content:"";position:absolute;right:-1px;top:-5px;border:5px solid transparent;border-left:7px solid var(--mut)}
+.seq .msg.back::after{right:auto;left:-1px;border-left:5px solid transparent;border-right:7px solid var(--mut)}
+.seq .msg span{position:absolute;top:-18px;left:8px;color:var(--text)}
+.seq .msg .n{position:absolute;top:-18px;left:-22px;color:var(--dim)}
+.seq .note{position:absolute;font-size:11.5px;color:var(--mut);padding:3px 8px;border:1px solid var(--rule2);border-radius:3px;background:var(--bg)}
+.dg{display:flex;flex-direction:column;gap:2px;font-size:12px;white-space:nowrap;margin-top:8px}
+.stp{list-style:none;margin:0;padding:0}
+.stp li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:6px;line-height:1.5}
+.stp li .ar{color:var(--dim);text-align:center}
+.stp li .ar.async{color:var(--mut)}
+.dg svg{width:14px;height:14px;vertical-align:-2px;margin-right:4px;color:var(--dim)}
+
+.bar{display:flex;align-items:center;gap:18px;padding:0 24px;height:52px;border-bottom:1px solid var(--rule);background:var(--panel)}
+.search{flex:0 1 380px;display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border:1px solid var(--rule2);border-radius:3px;color:var(--mut);background:var(--bg)}
+.search input{flex:1;background:none;border:0;color:var(--text);font:inherit;outline:none;min-width:0}
+.kbd{display:inline-block;padding:0 5px;border:1px solid var(--rule2);border-radius:2px;font-size:11px;color:var(--mut);line-height:16px}
+/* page identity */
+.ident{padding:24px 32px 0;display:flex;gap:24px;align-items:flex-end;flex-wrap:wrap}
+.ident .ctl{display:flex;gap:10px;align-items:center;margin-left:auto}
+.seg{display:inline-flex;border:1px solid var(--rule2);border-radius:3px;overflow:hidden}
+.seg button{font:inherit;font-size:12px;height:26px;padding:0 10px;background:var(--ground2);border:0;color:var(--mut);cursor:pointer;border-right:1px solid var(--rule2)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed=true]{background:var(--bright);color:var(--bg);font-weight:700}
+.tabs{display:flex;padding:18px 32px 0;border-bottom:1px solid var(--rule);gap:4px}
+.tab{font:inherit;font-size:13px;padding:0 14px;height:36px;color:var(--mut);background:none;border:0;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-1px;display:inline-flex;gap:8px;align-items:center}
+.tab .n{color:var(--dim)}
+.tab[aria-selected=true]{color:var(--bright);font-weight:700;border-bottom-color:var(--accent)}
+.tab[aria-selected=true] .n{color:var(--mut)}
+/* sections */
+.page{padding:8px 32px 40px;max-width:1180px}
+.sec{margin-top:28px}
+.sec header{display:flex;align-items:baseline;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--rule);margin-bottom:6px}
+.sec header .n{color:var(--mut);font-weight:400}
+.sec header .goto{margin-left:auto;font-size:12px}
+.rows{margin:0 -12px}
+.row{display:grid;align-items:baseline;gap:16px;padding:9px 12px;border-bottom:1px solid var(--rule)}
+.rows .row:nth-child(even){background:var(--stripe)}
+.row:last-child{border-bottom:0}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:48px}
+.lead{font-size:15px;line-height:1.6;margin:22px 0 0;max-width:80ch}
+.lead b{color:var(--bright);font-weight:700}
+.risk{display:grid;grid-template-columns:52px 1fr auto;gap:16px;align-items:start;padding:10px 12px;border-bottom:1px solid var(--rule)}
+.rows .risk:nth-child(even){background:var(--stripe)}
+.risk:last-child{border-bottom:0}
+.risk .what{color:var(--bright);font-weight:700}
+.risk .where{display:block;font-size:12px;color:var(--mut);margin-top:2px}
+.steps{color:var(--mut);font-size:12px}
+.steps a{color:var(--text)}
+.steps .m{width:auto;margin-right:5px}
+
+/* flows v6 */
+.tbl.flows{table-layout:fixed;width:100%}
+.tbl.flows th,.tbl.flows td{border-right:1px solid var(--rule)}.tbl.flows th:last-child,.tbl.flows td:last-child{border-right:0}
+.tbl.flows th.tg,.tbl.flows td.tg{width:40px;padding:8px 6px;text-align:center;vertical-align:top}
+.tbl.flows tbody td.tg{height:1px}
+.tgc{height:100%;display:flex;flex-direction:column;justify-content:space-between;align-items:center;min-height:44px}
+.tgc input,.tbl.flows th.tg input{margin:0;width:14px;height:14px;accent-color:var(--accent)}
+.tgl{font:inherit;font-size:12px;width:20px;height:20px;line-height:18px;text-align:center;border:1px solid var(--rule2);border-radius:3px;background:var(--ground2);color:var(--mut);cursor:pointer;padding:0}
+.tgl:hover{border-color:var(--accent);color:var(--bright)}
+.tbl.flows tbody tr.chk td.tg{box-shadow:inset 3px 0 0 var(--accent)}
+.tbl.flows tbody tr.open td{border-bottom:1px solid var(--rule)}
+.tbl.flows tbody tr.xp td{border-bottom:1px solid var(--rule)}
+.tbl.flows tbody tr.xp td.xb{padding:0;border-right:0}
+.tbl.flows tbody tr.xp td.tg{padding-top:10px}
+.tbl.flows tbody tr.odd td{background:var(--stripe)}
+.irail{display:grid;gap:6px;justify-items:center;position:relative}
+.ib{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--rule2);border-radius:3px;background:var(--ground2);color:var(--mut);cursor:pointer;padding:0}
+.ib svg{width:14px;height:14px}
+.ib:hover{border-color:var(--accent);color:var(--bright)}
+.ib[aria-pressed=true]{background:var(--bright);border-color:var(--bright);color:var(--bg)}
+.ib:last-child{margin-top:6px}
+.irail .tip{position:absolute;left:34px;top:2px;font-size:11.5px;color:var(--bright);background:var(--ground2);border:1px solid var(--rule2);border-radius:3px;padding:1px 7px;white-space:nowrap}
+.xh{display:flex;gap:18px;align-items:center;padding:8px 14px 7px;background:var(--panel);font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden}
+.xh b{color:var(--bright);font-weight:700}
+.xh .tools{margin-left:auto;display:flex;gap:14px;align-items:center}
+.xd{overflow-x:auto;padding:12px 14px 6px}
+.xd svg{display:block}
+.xp .legend{border-top:1px solid var(--rule);padding:6px 14px 8px}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--mut)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend .ar{display:inline-block;width:18px;text-align:center;color:var(--dim)}
+.legend .m{display:inline-block;padding:0 4px;border-radius:2px;background:var(--amber);color:#1B1A1F;font-size:11px;line-height:15px;font-weight:700}
+.legend.tl{border:1px solid var(--rule2);border-top:0;border-radius:0 0 3px 3px;margin-top:-1px;background:var(--panel);padding:8px 14px}
+.tbl.flows td.steps{padding:0;vertical-align:top}
+.stpt{width:100%;border-collapse:collapse}
+.stpt td{padding:6px 12px 6px 0;border-bottom:1px solid var(--rule);border-right:0;vertical-align:top}
+.stpt tr:last-child td{border-bottom:0}
+.stpt tr.proc td{border-top:2px solid var(--rule2)}
+.stpt td.n{width:30px;padding:6px 0;text-align:center;color:var(--mut);background:var(--ground2);border-right:1px solid var(--rule);font-size:12px}
+.st{display:grid;grid-template-columns:18px minmax(0,1fr);gap:6px;line-height:1.5;padding:2px 0 2px calc(8px + var(--d,0) * 18px)}
+.st .ar{color:var(--dim);text-align:center}.st .ar.async{color:var(--mut)}.st .ar.ret{color:var(--dim)}
+.st .mech{display:block;color:var(--dim);font-size:12px}
+.lines span{display:block}
+.m{display:inline-block;width:auto;min-width:0;padding:0 3px;border-radius:2px;background:var(--amber);color:#1B1A1F;font-size:11px;line-height:15px;font-weight:700;margin-right:6px;vertical-align:1px}
+.sec header h2{white-space:nowrap}
+.sec header .seg{flex-shrink:0}.sec header .seg button{white-space:nowrap}
+.sec header .meta{min-width:0;overflow:hidden;text-overflow:ellipsis}
+
+.tbl.grouped tbody tr:nth-child(even) td{background:none}
+.tbl.grouped tbody tr.odd td{background:var(--stripe)}
+.tbl.grouped tbody tr.grp td,.tbl.grouped tbody tr.sub td{border-bottom:0}
+.tbl.grouped tbody tr.grp td{padding-bottom:4px}
+.tbl.grouped tbody tr.sub td{padding-top:2px;padding-bottom:4px}
+.tbl.grouped tbody tr.last td{border-bottom:1px solid var(--rule);padding-bottom:8px}
+.tbl .lyr::before{content:""}.tbl .lyr{margin-left:6px}
+.tbl.grouped tbody tr.sub td{padding:0 12px 10px 12px}
+.det{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:3px 16px;margin:2px 0 0 0;padding:4px 0 2px 14px;border-left:2px solid var(--rule2);font-size:12px;line-height:1.5}
+.det dt{color:var(--dim);white-space:nowrap}.det dd{margin:0;color:var(--text)}
+.dia svg .link{mix-blend-mode:normal!important;stroke:#9BA5B0!important;stroke-opacity:.4!important}
+.dia svg .link ~ .node text,.dia svg g.node text{paint-order:stroke;stroke:var(--panel);stroke-width:4px;stroke-linejoin:round}
+.dia svg .node small{font-size:10.5px;color:var(--mut);letter-spacing:.04em}
+.dia svg foreignObject p,.dia svg foreignObject span{line-height:1.45;margin:0;font-size:12.5px}
+.tbl th,.tbl td{border-right:1px solid var(--rule)}.tbl th:last-child,.tbl td:last-child{border-right:0}
+/* toggle column + divider between a row and its detail block (same as Flows) */
+.tbl.grouped:not(.flows) th.tg,.tbl.grouped:not(.flows) td.tg{width:28px;padding:0 4px;text-align:center}
+.tbl.grouped:not(.flows) tbody td.tg{vertical-align:bottom;padding-bottom:7px}
+.tbl.grouped tbody tr.sub td{border-top:1px solid var(--rule);padding-top:8px}
+.tbl.grouped tbody tr.sub td.tg{padding:0}
+.tgl{font:inherit;font-size:12px;width:20px;height:20px;line-height:18px;text-align:center;border:1px solid var(--rule2);border-radius:3px;background:var(--ground2);color:var(--mut);cursor:pointer;padding:0}
+.tgl:hover{border-color:var(--accent);color:var(--bright)}
+/* sweep: separators become spacing, panel bands */
+.sep{display:inline-block;width:14px}
+.dia{background:var(--bg)}
+.dia .dh{background:var(--panel);border-bottom:0;gap:18px;padding:8px 14px 7px}
+.dia .dh > span{white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.dia .dh > b{flex-shrink:0}.dia .dh .tools{flex-shrink:0}
+.lyr::before{content:""}.lyr{margin-left:8px}
+.big ~ .lyr{display:block;margin:2px 0 0}
+/* diagram edge/relationship labels sit on the diagram background, no tinted box */
+.dia svg .relationshipLabelBox,.dia svg .relationshipLabelBox rect{fill:var(--bg);opacity:1}
+.dia svg .edgeLabel,.dia svg .edgeLabel p,.dia svg .labelBkg{background-color:var(--bg)}
+.dia svg .edgeLabel rect{fill:var(--bg);opacity:1}
+.tbl.steps td.n{background:var(--ground2);color:var(--mut);text-align:right;padding-right:10px;font-variant-numeric:tabular-nums;width:36px}
+
+/* pass2: champion column and heading info */
+.wm .tbl tbody td.ch{font-weight:600;color:var(--bright)}
+.wm .tbl tbody td.ch a{font-weight:600}
+.wm .tbl tbody tr.ctx td.ch{font-weight:500;color:var(--text)}
+.wm h2 .info{font-size:14px;vertical-align:1px}
+
+/* ---- woods/tokens.css ---- */
+/* Woods Map foundations — tokens.css (draft 3)
+   One source for every board and, later, the engine's stylesheet.
+   Palette: CodePigeon "Coop at Night". Dark uses the lifted (+) accents; light uses the true pigeon colours. */
+
+.wm{
+  /* surfaces */
+  --bg:#222126; --panel:#1B1A1F; --ground2:#28272D; --sheet:#222126;
+  --stripe:rgba(252,252,253,.035); --hover:#3B3942;
+  /* text */
+  --bright:#FCFCFD; --text:#E5E8EB; --mut:#9BA5B0; --dim:#6E7987;
+  /* rules */
+  --rule:#3B3942; --rule2:#4A4852;
+  /* meaning */
+  --select:#B580BC;            /* purple+  selected, active, focus, the one primary button */
+  --select-tint:rgba(181,128,188,.08);
+  --link:#7EB1D4;              /* cobalt+  links */
+  --mod:#F1B73A;               /* sun      modified (M), changed rows, changed-box tint: least severe */
+  --mod-tint:rgba(241,183,58,.10);
+  --hot:#EF8A3C;               /* orange', hot, warning: more severe; lifted from #E66747 for CVD separation from beak */
+  --risk:#E64D47;              /* beak     risk, blocking, errors; always bold + glyph */
+  --fresh:#7DAA9E;             /* forest+  fresh, passing, added */
+  --diff-add:#2A3A2A; --diff-del:#3A2A2A; --diff-chg:#3A3A2A;
+  /* code view syntax (font-lock) */
+  --k:#B580BC; --fn:#7EB1D4; --var:#EF8A3C; --str:#7DAA9E; --const:#F1B73A; --op:#9BA5B0; --cm:#6E7987;
+  /* type */
+  --ff-ui:"Inter",system-ui,sans-serif;
+  --ff-data:"Fira Code","Fira Mono",ui-monospace,monospace;
+  --fs-11:11px; --fs-12:12px; --fs-13:13px; --fs-15:15px; --fs-18:18px; --fs-24:24px;
+  /* spacing (φ) */
+  --s1:3px; --s2:5px; --s3:8px; --s4:13px; --s5:21px; --s6:34px; --s7:55px;
+  /* radii */
+  --r-chip:2px; --r-ctl:3px;
+  background:var(--bg); color:var(--text);
+  font-family:var(--ff-data); font-size:var(--fs-13); line-height:1.55;
+  font-variant-ligatures:none; /* ligatures only inside .codeview */
+  container-type:inline-size; container-name:wm;
+}
+.wm[data-theme=light]{
+  --bg:#FCFCFD; --panel:#F4F5F7; --ground2:#EEF0F2; --sheet:#FFFFFF;
+  --stripe:rgba(20,19,23,.035); --hover:#E5E8EB;
+  --bright:#141317; --text:#222126; --mut:#5C6675; --dim:#6E7987;
+  --rule:#E5E8EB; --rule2:#C9CDD3;
+  --select:#7E4384; --select-tint:rgba(126,67,132,.08);
+  --link:#4D597A;
+  --mod:#7A5200; --mod-tint:rgba(122,82,0,.10);
+  --hot:#B9561D;
+  --risk:#C0392B;
+  --fresh:#436961;
+  --diff-add:#E3F1E3; --diff-del:#F6E3E1; --diff-chg:#F3EEDC;
+  --k:#7E4384; --fn:#4D597A; --var:#B9561D; --str:#436961; --const:#7A5200; --op:#5C6675; --cm:#6E7987;
+}
+/* colour-vision theme: modified borrows the link hue, links are always underlined, hot stays sun, risk stays beak */
+.wm[data-cvd=on]{ --mod:#7EB1D4; --mod-tint:rgba(126,177,212,.10); }
+.wm[data-cvd=on] a{ text-decoration:underline; }
+.wm[data-theme=light][data-cvd=on]{ --mod:#4D597A; --mod-tint:rgba(77,89,122,.10); }
+
+/* element resets against the CodePigeon stylesheet */
+.wm code,.wm kbd{font-family:var(--ff-data);font-size:inherit;font-weight:inherit;line-height:inherit;background:none;color:inherit;padding:0;border-radius:0}
+.wm p,.wm li,.wm td,.wm th,.wm small{font-family:inherit;font-size:inherit;font-weight:inherit;line-height:inherit;color:inherit;margin:0}
+.wm h1,.wm h2,.wm h3,.wm h4{font-family:var(--ff-ui);color:inherit;margin:0;text-wrap:initial}
+.wm a{color:var(--link);text-decoration:none}
+.wm a:hover{text-decoration:underline;text-underline-offset:3px}
+.wm a:focus-visible,.wm button:focus-visible,.wm input:focus-visible{outline:2px solid var(--select);outline-offset:1px}
+
+/* voice: ui = the map talking (sans), data = the index (mono) */
+.ui,.wm .t1,.wm .t2,.wm .t3,.wm .eyebrow,.wm .btn,.wm .tab,.wm .seg button,.wm .tbl th,.wm .legend,.wm .cap,.wm .tip,.wm .tool{font-family:var(--ff-ui)}
+.wm .codeview{font-family:var(--ff-data);font-variant-ligatures:contextual}
+
+/* headings */
+.wm .t1{font-size:var(--fs-24);line-height:1.15;font-weight:700;color:var(--bright)}
+.wm .t1 .sub{font-family:var(--ff-data);font-size:var(--fs-15);font-weight:400;color:var(--mut);margin-left:var(--s4);white-space:nowrap}
+.wm .t2{font-size:var(--fs-18);line-height:1.3;font-weight:700;color:var(--bright)}
+.wm .t2 .n{font-family:var(--ff-data);font-size:var(--fs-13);font-weight:400;color:var(--mut);margin-left:var(--s3)}
+.wm .eyebrow,.wm .t3{font-size:var(--fs-11);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:500}
+.wm .t3.on{color:var(--select)}
+.wm .sec header{display:flex;align-items:baseline;gap:var(--s4);padding-bottom:var(--s3);border-bottom:1px solid var(--rule);margin-bottom:var(--s4)}
+.wm .sec header .goto{margin-left:auto;font-family:var(--ff-ui);font-size:var(--fs-12)}
+.wm .info{display:inline-block;margin-left:var(--s2);color:var(--mut);font-family:var(--ff-ui);font-weight:400;cursor:help}
+
+/* text roles */
+.wm .bright{color:var(--bright)}.wm .mut{color:var(--mut)}.wm .dim{color:var(--dim)}
+.wm .cap{font-size:var(--fs-12);color:var(--mut);margin-top:var(--s3)}
+.wm .nw{white-space:nowrap}
+.wm abbr{text-decoration:underline dotted var(--dim);text-underline-offset:3px;cursor:help}
+.wm abbr.date{text-decoration:none}
+
+/* chips */
+.wm .M{display:inline-block;padding:0 var(--s1);border-radius:var(--r-chip);background:var(--mod);color:#1B1A1F;font-size:var(--fs-11);line-height:15px;font-weight:700;margin-right:var(--s2)}
+.wm .hot{color:var(--hot);font-size:var(--fs-11);font-weight:700}
+.wm .flag{color:var(--risk);font-weight:700}
+.wm .flag.note{color:var(--hot)}
+.wm .fl{display:inline-block;padding:0 var(--s2);border-radius:var(--r-chip);background:var(--risk);color:#fff;font-size:var(--fs-11);line-height:16px;font-weight:700;text-decoration:none;white-space:nowrap}
+.wm .fl.note{background:none;border:1px solid var(--hot);color:var(--hot);line-height:14px}
+.wm .sev{color:var(--mut)}
+.wm .fresh{color:var(--fresh);font-weight:700}
+.wm .lyr{font-size:var(--fs-11);color:var(--dim);white-space:nowrap;margin-left:var(--s3)}
+.wm .cnt{color:var(--mut)}
+.wm .kbd{display:inline-block;min-width:12px;text-align:center;padding:0 var(--s2);border:1px solid var(--rule2);border-radius:var(--r-chip);font-size:var(--fs-11);color:var(--mut);line-height:16px}
+
+/* controls */
+.wm .btn{font-size:var(--fs-12);height:30px;padding:0 var(--s4);border:1px solid var(--rule2);color:var(--bright);background:var(--ground2);border-radius:var(--r-ctl);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:var(--s3)}
+.wm .btn:hover{border-color:var(--select)}
+.wm .btn.primary{background:var(--select);border-color:var(--select);color:var(--bg);font-weight:700}
+.wm .btn.primary:hover{filter:brightness(1.08)}
+.wm .tool{font-size:var(--fs-12);color:var(--mut);background:none;border:0;padding:0;cursor:pointer;white-space:nowrap;text-decoration:underline;text-decoration-color:var(--rule2);text-underline-offset:3px}
+.wm .tool:hover{color:var(--select);text-decoration-color:var(--select)}
+.wm .seg{display:inline-flex;border:1px solid var(--rule2);border-radius:var(--r-ctl);overflow:hidden}
+.wm .seg button{font-size:var(--fs-12);height:28px;padding:0 var(--s3);background:var(--ground2);border:0;color:var(--mut);cursor:pointer;border-right:1px solid var(--rule2)}
+.wm .seg button:last-child{border-right:0}
+.wm .seg button[aria-pressed=true]{background:var(--hover);color:var(--bright);font-weight:500;box-shadow:inset 0 -2px 0 var(--select)}
+.wm .tabs{display:flex;gap:var(--s1);border-bottom:1px solid var(--rule)}
+.wm .tab{font-size:var(--fs-13);padding:0 var(--s4);height:36px;color:var(--mut);background:none;border:0;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-1px;display:inline-flex;gap:var(--s3);align-items:center}
+.wm .tab[aria-selected=true]{color:var(--bright);border-bottom-color:var(--select)}
+.wm .tab .cnt{font-family:var(--ff-data);font-size:var(--fs-12)}
+.wm input[type=checkbox]{margin:0;width:14px;height:14px;accent-color:var(--select)}
+/* expand toggle: a bare + or −, no box; the glyph in the markup is replaced by aria-expanded */
+.wm .tgl{font:inherit;font-size:0;width:14px;height:14px;line-height:14px;text-align:center;border:0;background:none;color:var(--mut);cursor:pointer;padding:0;position:relative}
+.wm .tgl::before{content:"+";font-family:var(--ff-data);font-size:15px;line-height:14px;font-weight:500;display:block}
+.wm .tgl[aria-expanded=true]::before{content:"−"}
+.wm .tgl:hover{color:var(--bright)}
+.wm .tgl:hover::before{color:var(--select)}
+.wm .tip{position:absolute;z-index:3;font-size:var(--fs-12);color:var(--text);background:var(--panel);border:1px solid var(--rule2);border-radius:var(--r-ctl);padding:var(--s2) var(--s3);max-width:320px;line-height:1.45;font-family:var(--ff-ui);box-shadow:0 2px 8px rgba(0,0,0,.35);pointer-events:auto}
+.wm .tip::before{content:"";position:absolute;top:-6px;left:var(--caret,13px);width:10px;height:10px;background:var(--panel);border-left:1px solid var(--rule2);border-top:1px solid var(--rule2);transform:rotate(45deg)}
+.wm .tip.above::before{top:auto;bottom:-6px;border:0;border-right:1px solid var(--rule2);border-bottom:1px solid var(--rule2)}
+.wm .tip a{text-decoration:underline}
+
+/* table */
+.wm .tblwrap{overflow-x:auto}
+.wm .tbl{width:100%;border-collapse:collapse;font-size:var(--fs-13);border:1px solid var(--rule2)}
+.wm .tbl th{font-size:var(--fs-11);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:500;background:var(--panel);white-space:nowrap;text-align:left;padding:var(--s3) var(--s4);border-bottom:1px solid var(--rule)}
+.wm .tbl td{text-align:left;padding:var(--s3) var(--s4);border-bottom:1px solid var(--rule);vertical-align:top}
+.wm .tbl th,.wm .tbl td{border-right:1px solid var(--rule);box-sizing:border-box}
+.wm .tbl th:last-child,.wm .tbl td:last-child{border-right:0}
+.wm .tbl tbody tr:nth-child(even) td{background:var(--stripe)}
+.wm .tbl tbody tr:hover td{background:var(--hover)}
+.wm .tbl td.id,.wm .tbl td.id a{font-weight:600}
+.wm .tbl td.id.p{font-weight:600;font-family:var(--ff-ui);font-size:var(--fs-13)}
+.wm .tbl td.id{color:var(--bright)}
+.wm .tbl td{overflow:hidden;text-overflow:ellipsis}
+.wm .tbl td.p{font-family:var(--ff-ui);font-size:var(--fs-13)}
+.wm .tbl td.p code{font-family:var(--ff-data);font-size:var(--fs-12)}
+.wm .tbl td.num{text-align:right;font-variant-numeric:tabular-nums}
+.wm .tbl td.empty{color:var(--dim)}
+.wm .tbl.sticky th:first-child,.wm .tbl.sticky td:first-child{position:sticky;left:0;background:var(--bg);z-index:1}
+/* grouped: an item's rows share one band */
+.wm .tbl.grouped tbody tr:nth-child(even) td{background:none}
+.wm .tbl.grouped tbody tr.odd td{background:var(--stripe)}
+.wm .tbl.grouped tbody tr.grp td{border-bottom:1px solid var(--rule)}
+.wm .tbl.grouped tbody tr.sub td{border-top:0;padding:0;background:var(--panel)}
+.wm .tbl.grouped tbody tr.sub td.tg{background:var(--panel)}
+.wm .tbl.grouped th.tg,.wm .tbl.grouped td.tg{width:34px;padding:0 var(--s3);text-align:center;vertical-align:top;height:1px}
+.wm .tbl.grouped tbody td.tg{padding:var(--s3) var(--s3)}
+.wm .tgc{height:100%;min-height:34px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;gap:var(--s2)}
+.wm .tgc.one{justify-content:flex-start;min-height:0}
+.wm .tbl.grouped tbody tr.sub td.tg{padding:0}
+.wm .tbl.grouped tbody tr.chk td.tg{box-shadow:inset 3px 0 0 var(--select);background:var(--select-tint)}
+.wm .tbl.grouped tbody tr.sub.chk td.tg{box-shadow:none;background:var(--panel)}
+/* expandable rows (.xr): hover and checked colour only the toggle and lead cells; nested steps highlight per step */
+.wm .tbl.grouped tbody tr.xr:hover td{background:none}
+.wm .tbl.grouped tbody tr.xr:hover td.tg{background:var(--hover)}
+.wm .tbl.grouped tbody tr.xr.chk:hover td.tg{background:var(--select-tint)}
+.wm .det{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:0;margin:0;padding:0;border:0;font-size:var(--fs-12);line-height:1.5}
+.wm .det dt{color:var(--mut);white-space:nowrap;padding:var(--s2) var(--s4);border-bottom:1px solid var(--rule);border-right:1px solid var(--rule)}.wm .det dd{margin:0;color:var(--text);padding:var(--s2) var(--s4);border-bottom:1px solid var(--rule)}
+.wm .det dd.p{font-family:var(--ff-ui);font-size:var(--fs-13)}
+.wm .det dd.p code,.wm .det dd.p .iv,.wm .det dd.p a{font-family:var(--ff-data);font-size:var(--fs-12)}
+.wm .det dt:last-of-type,.wm .det dd:last-of-type{border-bottom:0}
+.wm .det dd.desc{font-family:var(--ff-ui);padding-right:min(30%,340px);white-space:normal;color:var(--text)}
+/* steps: numbered sub-table */
+.wm .stpt{width:100%;border-collapse:collapse;font-size:var(--fs-12)}
+.wm .stpt td{padding:var(--s2) var(--s4);border-bottom:1px solid var(--rule);vertical-align:top}
+.wm .stpt td.n{width:28px;color:var(--mut);text-align:right;padding-right:var(--s3);border-right:1px solid var(--rule);font-variant-numeric:tabular-nums}
+.wm .stpt tr:hover td{background:var(--hover)}
+.wm .stpt tr.bnd td{padding:var(--s1) var(--s4);color:var(--dim);font-family:var(--ff-ui);font-size:var(--fs-11);letter-spacing:.06em;text-transform:uppercase;border-top:2px solid var(--rule2);border-bottom:0}
+.wm .stpt tr.bnd:hover td{background:none}
+.wm .stpt tr:last-child td{border-bottom:0}
+.wm .stpt tr.proc td{border-top:0}
+.wm .st{display:flex;gap:var(--s2);padding-left:calc(var(--d,0) * 18px)}
+.wm .st .ar{display:inline-block;width:14px;color:var(--dim);text-align:center}
+.wm .st .ar.async{color:var(--mut)}
+.wm .st .mech{display:block;color:var(--dim)}
+
+/* rail */
+.wm .rail{width:260px;flex:0 0 260px;border-right:1px solid var(--rule);background:var(--panel);padding:var(--s4) 0;font-size:var(--fs-12)}
+.wm .rail .t3{padding:var(--s2) var(--s5)}
+.wm .rail .grp{display:flex;gap:var(--s3);padding:var(--s4) var(--s5) var(--s1);margin-top:var(--s2);border-top:1px solid var(--rule);color:var(--mut)}
+.wm .rail .t3 + .grp{border-top:0;margin-top:0}
+.wm .rail .grp .cnt{margin-left:auto}
+.wm .rail ol{list-style:none;margin:0;padding:0}
+.wm .rail li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:0 var(--s3);padding:var(--s2) var(--s5);color:var(--text);line-height:1.45}
+.wm .rail li:hover{background:var(--hover)}
+.wm .rail li .k{color:var(--dim);text-align:right}
+.wm .rail li[aria-current=true]{box-shadow:inset 3px 0 0 var(--select);background:var(--select-tint);color:var(--bright)}
+.wm .rail li .own{color:var(--dim);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wm .rail label.f{display:flex;gap:var(--s3);align-items:center;padding:var(--s1) var(--s5);cursor:pointer}
+.wm .rail label.f .cnt{margin-left:auto}
+
+/* file tree */
+.wm .tree{width:260px;flex:0 0 260px;border-right:1px solid var(--rule);background:var(--panel);font-size:var(--fs-12)}
+.wm .tree .th{display:flex;gap:var(--s3);padding:var(--s3) var(--s4);border-bottom:1px solid var(--rule);font-family:var(--ff-ui);font-size:var(--fs-11);letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.wm .tree .filter{display:block;width:100%;box-sizing:border-box;margin:0;padding:var(--s2) var(--s4);border:0;border-bottom:1px solid var(--rule);background:var(--ground2);color:var(--text);font:inherit}
+.wm .tree .d,.wm .tree .f{display:flex;align-items:center;gap:var(--s2);padding:var(--s1) var(--s4) var(--s1) calc(var(--s4) + var(--l,0) * var(--s4));white-space:nowrap;color:var(--text)}
+.wm .tree .f{padding-left:calc(var(--s4) + 16px + var(--l,0) * var(--s4))}
+.wm .tree .c{width:11px;color:var(--dim);font-size:10px}
+.wm .tree .ct{margin-left:auto;color:var(--dim);font-size:var(--fs-11)}
+.wm .tree .f[aria-current=true]{background:var(--select-tint);box-shadow:inset 3px 0 0 var(--select);color:var(--bright)}
+.wm .tree .f.unindexed{color:var(--dim)}
+.wm .tree .f:hover,.wm .tree .d:hover{background:var(--hover)}
+.wm .tree.strip{width:28px;flex-basis:28px}
+.wm .tree.strip > *{display:none}
+.wm .tree.strip .th{display:flex;writing-mode:vertical-rl;border:0;padding:var(--s3) var(--s2)}
+
+/* diagram panel */
+.wm .dia{border:1px solid var(--rule2);border-radius:var(--r-ctl);background:var(--bg)}
+.wm .dia .dh{display:flex;gap:var(--s5);align-items:center;padding:var(--s3) var(--s4) 7px;background:var(--panel);font-size:var(--fs-12);color:var(--mut);white-space:nowrap;overflow:hidden}
+.wm .dia .dh > span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.wm .dia .dh > b{color:var(--bright);font-family:var(--ff-ui);flex-shrink:0}
+.wm .dia .dh .tools{margin-left:auto;display:flex;gap:var(--s4);flex-shrink:0}
+.wm .dia .dw{overflow-x:auto;padding:var(--s4) var(--s4) var(--s2)}
+.wm .dia .dw svg{display:block}
+.wm .legend{display:flex;column-gap:var(--s5);row-gap:var(--s2);flex-wrap:wrap;align-items:center;padding:var(--s2) var(--s4) var(--s3);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);font-size:var(--fs-12);color:var(--mut)}
+.wm .dia .legend{border-bottom:0}
+.wm .legend .prov{margin-left:auto;display:inline-flex;gap:var(--s4);color:var(--dim)}
+.wm .legend span{display:inline-flex;gap:var(--s2);align-items:center}
+.wm .legend .ar{display:inline-block;width:18px;text-align:center;color:var(--dim)}
+.wm .legend i.sw{display:inline-block;width:12px;height:12px;border-radius:var(--r-chip);border:1px solid var(--rule2)}
+/* mermaid overrides */
+.wm .dia svg{font-family:var(--ff-data)!important}
+.wm .dia svg .relationshipLabelBox,.wm .dia svg .relationshipLabelBox rect{fill:var(--bg)!important;opacity:1!important}
+.wm .dia svg .edgeLabel,.wm .dia svg .edgeLabel p,.wm .dia svg .labelBkg{background-color:var(--bg)!important}
+.wm .dia svg .edgeLabel rect{fill:var(--bg)!important;opacity:1!important}
+.wm .dia svg .changed > rect,.wm .dia svg .changed > polygon{stroke:var(--mod)!important;stroke-width:1.5px!important;fill:var(--mod-tint)!important}
+.wm .dia svg .risk > rect,.wm .dia svg .risk > polygon{stroke:var(--risk)!important;stroke-width:1.5px!important}
+.wm .dia svg .focus > rect,.wm .dia svg .focus > polygon{stroke:var(--select)!important;stroke-width:1.5px!important}
+.wm .dia svg .node small{font-size:10.5px;color:var(--mut);letter-spacing:.04em}
+.wm .dia svg foreignObject p,.wm .dia svg foreignObject span{line-height:1.45;margin:0;font-size:12.5px}
+
+/* status bar */
+.wm .status{display:flex;gap:var(--s5);align-items:center;padding:0 var(--s5);height:32px;border-top:1px solid var(--rule);background:var(--panel);color:var(--mut);font-size:var(--fs-12);white-space:nowrap;overflow:hidden;font-family:var(--ff-ui)}
+.wm .status code,.wm .status .d{font-family:var(--ff-data)}
+.wm .status .keys{flex-shrink:0}
+.wm .status .keys{display:flex;gap:var(--s4);margin-left:auto;align-items:center;font-family:var(--ff-ui)}
+
+/* facts tiles */
+.wm .facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--rule2);border-radius:var(--r-ctl);background:var(--panel)}
+.wm .facts > div{padding:var(--s3) var(--s4) var(--s4);border-right:1px solid var(--rule);font-size:var(--fs-12);line-height:1.5;min-width:0}
+.wm .facts > div:last-child{border-right:0}
+.wm .facts .eyebrow{display:block;padding:var(--s2) 0;margin-bottom:var(--s1);border-bottom:1px solid var(--rule)}
+.wm .facts dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--s1) var(--s4);margin:0}
+.wm .facts dt{color:var(--dim);white-space:nowrap}.wm .facts dd{margin:0;color:var(--text)}
+.wm .facts .big{display:block;font-size:var(--fs-24);line-height:1.1;color:var(--bright);font-weight:700;margin-bottom:var(--s1)}
+
+/* responsive */
+@container wm (max-width:1279px){ .wm .tree{width:28px;flex-basis:28px} .wm .tree > *{display:none} .wm .tree .th{display:flex;writing-mode:vertical-rl;border:0;padding:var(--s3) var(--s2)} .wm .bar-search{width:220px} .wm .bar-fresh .w{display:none} }
+@container wm (max-width:959px){ .wm .rail{display:none} .wm .facts{grid-template-columns:repeat(2,minmax(0,1fr))} .wm .status .keys{display:none} }
+@container wm (max-width:639px){ .wm .facts{grid-template-columns:1fr} .wm .tree{display:none} .wm .tbl th,.wm .tbl td{padding:var(--s3)} .wm{font-size:13px} .wm .t2{font-size:var(--fs-15)} }
+@media (pointer:coarse){ .wm .tgl{width:44px;height:44px;line-height:44px} .wm .tgl::before{line-height:44px} .wm input[type=checkbox]{width:22px;height:22px} .wm .tree .d,.wm .tree .f{min-height:44px} }
+
+/* phone: a small table becomes a card list */
+@container wm (max-width:639px){
+  .wm .tbl.cards{border:0}
+  .wm .tbl.cards thead{display:none}
+  .wm .tbl.cards tbody tr{display:flex;flex-direction:column;border:1px solid var(--rule2);border-radius:var(--r-ctl);margin-bottom:var(--s4);padding:0 0 var(--s2);background:var(--panel)}
+  .wm .tbl.cards tbody tr td.id{display:block;order:-1;padding:var(--s3) var(--s4);border-bottom:1px solid var(--rule);margin-bottom:var(--s1);font-size:var(--fs-13)}
+  .wm .tbl.cards tbody tr td.id::before{display:none}
+  .wm .tbl.cards tbody tr td{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 var(--s3);border:0;padding:var(--s1) var(--s4);background:none;text-align:left}
+  .wm .tbl.cards tbody tr td::before{flex:0 0 88px;content:attr(data-h);font-family:var(--ff-ui);font-size:var(--fs-11);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);padding-top:2px}
+  .wm .tbl.cards tbody tr td.id{font-size:var(--fs-15)}
+  .wm .tbl.cards tbody tr:nth-child(even) td{background:none}
+  .wm .acc{display:flex;gap:var(--s3);align-items:center;padding:var(--s3) var(--s4);border-bottom:1px solid var(--rule);font-family:var(--ff-ui);color:var(--bright);font-weight:700}
+  .wm .acc .cnt{margin-left:auto;font-family:var(--ff-data);font-weight:400}
+}
+/* specimen chrome used only on the component boards */
+.spec-grid{display:grid;gap:21px}
+.spec-note{font-family:var(--ff-ui);font-size:12px;color:var(--mut);margin-top:8px;max-width:980px}
+.note-it{font-family:var(--ff-ui);font-size:12px;color:var(--dim);font-style:italic;padding:8px 13px 0}
+.spec-note b{color:var(--text);font-weight:500}
+.callouts{font-family:var(--ff-ui);font-size:12px;color:var(--mut);columns:2;column-gap:34px;margin-top:13px}
+.callouts div{break-inside:avoid;margin-bottom:5px;padding-left:24px;position:relative}
+.callouts i{position:absolute;left:0;top:1px;display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--bright);color:var(--bg);font-style:normal;font-size:10px;line-height:16px;text-align:center;font-weight:700}
+.mark{display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--bright);color:var(--bg);font-size:10px;line-height:16px;text-align:center;font-weight:700;font-family:var(--ff-ui);vertical-align:1px;margin-left:5px}
+.frame{border:1px dashed var(--rule2);padding:13px;border-radius:3px}
+.frame .lbl{font-family:var(--ff-ui);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+
+/* breadcrumb band under the top bar */
+.wm .crumbs{display:flex;gap:var(--s4);align-items:center;height:32px;padding:0 var(--s5);border-bottom:1px solid var(--rule);background:var(--ground2);font-size:var(--fs-12);color:var(--mut);white-space:nowrap;overflow:hidden}
+.wm .crumbs .path{color:var(--dim)}
+.wm .crumbs .files{color:var(--mut);text-decoration:none;font-family:var(--ff-ui);display:inline-flex;gap:var(--s2);align-items:center;padding-right:var(--s3);border-right:1px solid var(--rule2)}
+.wm .crumbs .files:hover{color:var(--select)}
+/* horizontal scrollers: a cliff at the overflowing edge */
+.wm .hscroll{position:relative;overflow-x:auto;scrollbar-width:thin}
+.wm .hscroll.more::after{content:"";position:absolute;top:0;right:0;bottom:0;width:34px;pointer-events:none;background:linear-gradient(to right,transparent,var(--bg))}
+.wm .hscroll.more-left::before{content:"";position:absolute;top:0;left:0;bottom:0;width:34px;pointer-events:none;background:linear-gradient(to left,transparent,var(--bg));z-index:1}
+/* top-left menu toggle below 960 */
+.wm .menu-toggle{display:none}
+@container wm (max-width:959px){ .wm .menu-toggle{display:inline-flex} }
+/* sheets: the tree inside a phone sheet ignores the width folds */
+.wm .sheet .tree{display:block!important;width:auto!important;flex:none!important;border:0}
+.wm .sheet .tree > *{display:flex!important}
+.wm .sheet .tree .filter{display:block!important}
+.wm .strip-btn{width:28px;flex:0 0 28px;border-right:1px solid var(--rule);background:var(--panel)}
+.wm .sheet .tree .th{display:none!important}
+/* people: git author as recorded (name or handle), never wrapped; long names truncate with the full name + email on hover */
+.wm .who{display:inline-block;max-width:16ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;cursor:help}
+
+/* ---- page frame (B8 boards and the engine layout) ---- */
+.wm .bar{display:flex;align-items:center;gap:var(--s5);padding:0 var(--s5);height:52px;background:var(--panel);font-family:var(--ff-ui);font-size:var(--fs-13)}
+.wm .bar .brand{display:flex;gap:var(--s3);align-items:center;color:var(--bright);font-weight:700;text-decoration:none;font-size:var(--fs-15)}
+.wm .bar .bar-search{display:flex;gap:var(--s3);align-items:center;width:340px;height:30px;padding:0 var(--s3);border:1px solid var(--rule2);border-radius:var(--r-ctl);background:var(--ground2);color:var(--dim);font-family:var(--ff-data);font-size:var(--fs-12);box-sizing:border-box}
+.wm .bar .bar-search span.q{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wm .bar nav{display:flex;gap:var(--s5);font-weight:500}
+.wm .bar nav a{color:var(--mut)}.wm .bar nav a[aria-current]{color:var(--bright)}.wm .bar nav a:hover{color:var(--select);text-decoration:none}
+.wm .bar .bar-fresh{margin-left:auto;display:flex;gap:var(--s5);font-family:var(--ff-data);font-size:var(--fs-12);color:var(--mut);white-space:nowrap}
+.wm .ident{padding:var(--s4) var(--s5) 0;display:flex;gap:var(--s4);align-items:center;flex-wrap:wrap}
+.wm .ident .ctl{margin-left:auto;display:flex;gap:var(--s3);align-items:center;font-family:var(--ff-ui);font-size:var(--fs-12);color:var(--mut);flex-wrap:wrap}
+.wm .ident .ctl .lbl{margin-left:var(--s2)}
+.wm .ident .ctl .lbl:first-child{margin-left:0}
+.wm .tabs.page-tabs{margin:var(--s4) var(--s5) 0}
+.wm .body{display:flex;margin:var(--s4) var(--s5) var(--s5);border:1px solid var(--rule2);border-radius:var(--r-ctl);background:var(--sheet);overflow:hidden}
+.wm .main{flex:1 1 560px;min-width:0;display:flex;flex-direction:column}
+.wm .main .sec{margin:var(--s5) var(--s5) 0}
+.wm .main .sec:last-of-type{margin-bottom:var(--s5)}
+.wm .main .status{margin-top:auto}
+.wm .cols{display:flex;gap:0}
+.wm .cols > *{min-width:0}
+.wm .aside{flex:0 0 420px;border-left:1px solid var(--rule);background:var(--panel)}
+.wm .lead{font-family:var(--ff-ui);font-size:var(--fs-13);color:var(--text);line-height:1.55;max-width:72ch}
+.wm .lead b{color:var(--bright);font-weight:500}
+.wm .banner{display:flex;gap:var(--s4);align-items:center;padding:var(--s3) var(--s5);border-bottom:1px solid var(--rule);font-family:var(--ff-ui);font-size:var(--fs-12);color:var(--text);background:var(--ground2)}
+.wm .banner b{font-weight:700;white-space:nowrap}
+.wm .banner .txt{flex:1;min-width:0}
+.wm .banner.warn{box-shadow:inset 3px 0 0 var(--hot)}.wm .banner.warn b{color:var(--hot)}
+.wm .banner.risk{box-shadow:inset 3px 0 0 var(--risk)}.wm .banner.risk b{color:var(--risk)}
+.wm .banner.mod{box-shadow:inset 3px 0 0 var(--mod)}.wm .banner.mod b{color:var(--mod)}
+.wm .banner .tools{margin-left:auto;display:flex;gap:var(--s4)}
+.wm .finding{border:1px solid var(--rule2);border-left:3px solid var(--risk);border-radius:var(--r-ctl);padding:var(--s3) var(--s4);font-size:var(--fs-12);line-height:1.5;background:var(--panel);font-family:var(--ff-ui);color:var(--text)}
+.wm .finding code,.wm .finding .iv{font-family:var(--ff-data)}
+.wm .finding .lyr{display:block;margin:var(--s1) 0 0}
+.wm .finding.note{border-left-color:var(--hot)}
+.wm .finding b{color:var(--bright)}
+.wm .iv{display:inline;padding:0 2px;border-radius:var(--r-chip);background:var(--stripe);color:var(--bright);font-family:var(--ff-data);white-space:nowrap}
+.wm .iv.bad{outline:1px solid var(--risk);color:var(--risk);font-weight:700}
+.wm .iv.bad::before{content:"⚑ ";font-weight:700}
+.wm .sel-chip{display:inline-flex;gap:var(--s3);align-items:center;padding:0 var(--s3);height:26px;border:1px solid var(--select);border-radius:var(--r-ctl);background:var(--select-tint);font-size:var(--fs-12);color:var(--text)}
+.wm .sel-chip b{color:var(--bright);font-weight:500}
+.wm .empty-state{padding:var(--s6) var(--s5);text-align:left;font-family:var(--ff-ui);color:var(--mut);font-size:var(--fs-13);line-height:1.6;max-width:62ch}
+.wm .empty-state .t2{margin-bottom:var(--s2)}
+.wm .empty-state code{font-family:var(--ff-data);color:var(--text)}
+.wm pre.cmd{margin:var(--s3) 0 0;padding:var(--s3) var(--s4);background:var(--panel);border:1px solid var(--rule2);border-radius:var(--r-ctl);font-family:var(--ff-data);font-size:var(--fs-12);color:var(--text);overflow-x:auto;white-space:pre}
+
+/* ---- code view ---- */
+.wm .cv{display:grid;grid-template-columns:8px 44px minmax(0,1fr) 440px;font-family:var(--ff-data);font-size:var(--fs-13);line-height:1.6;border-top:1px solid var(--rule)}
+.wm .cv.nomargin{grid-template-columns:8px 44px minmax(0,1fr)}
+.wm .cv.nomargin .mg{display:none}
+.wm .cv.nomargin .peek{grid-column:3 / 4}
+.wm .cv > div{min-width:0;padding:1px var(--s3);border-bottom:1px solid transparent}
+.wm .cv .heat{padding:0;position:relative;background:var(--panel)}
+.wm .cv .heat i{position:absolute;inset:0 2px;background:var(--rule2)}
+.wm .cv .heat i.h2{background:var(--mod)}.wm .cv .heat i.h3{background:var(--hot)}
+.wm .cv .ln{color:var(--dim);text-align:right;padding-right:var(--s3);border-right:1px solid var(--rule);font-variant-numeric:tabular-nums;user-select:none}
+.wm .cv .src{white-space:pre;overflow-x:auto;font-variant-ligatures:contextual;color:var(--text)}
+.wm .cv .mg{font-family:var(--ff-ui);font-size:var(--fs-11);line-height:1.6;color:var(--mut);border-left:1px solid var(--rule);padding:2px var(--s4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:help}
+.wm .cv .row-foc .mg,.wm .cv .row-hl .mg{white-space:normal;line-height:1.45;padding:3px var(--s4)}
+.wm .cv .mg a{color:var(--link);border:0;font-family:var(--ff-data)}
+.wm .cv .hdr .tools .tool{border:1px solid var(--rule2);border-radius:var(--r-ctl);padding:1px var(--s2);text-decoration:none;color:var(--mut);background:var(--ground2)}
+.wm .cv .hdr .tools .tool:hover{border-color:var(--select);color:var(--bright)}
+.wm .cv .mg b{color:var(--text);font-weight:500;font-family:var(--ff-data);font-size:var(--fs-11)}
+.wm .cv .mg .lyr{margin-left:var(--s2)}
+.wm .cv .row-hl > div{background:var(--select-tint)}
+.wm .cv .ln{padding-left:0}
+.wm .cv .row-chg .ln{box-shadow:inset 3px 0 0 var(--mod)}
+.wm .cv .row-foc .ln{box-shadow:inset 3px 0 0 var(--select)}
+.wm .cv .hdr{grid-column:1 / -1;padding:var(--s2) var(--s4) var(--s2) 60px;background:var(--panel);border-bottom:1px solid var(--rule);color:var(--mut);font-family:var(--ff-ui);font-size:var(--fs-11);display:flex;gap:var(--s4);align-items:center}
+.wm .cv .hdr b{color:var(--text);font-weight:500;white-space:nowrap}
+.wm .cv .hdr .tools{margin-left:auto;display:flex;gap:var(--s4)}
+.wm .cv .fold{grid-column:1 / -1;padding:var(--s1) var(--s4) var(--s1) 60px;color:var(--mut);font-family:var(--ff-data);font-size:var(--fs-11);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:var(--panel)}
+.wm .cv .fold .tool,.wm .cv .fold a{font-family:var(--ff-ui)}
+.wm .cv .peek{grid-column:3 / -1;margin:var(--s2) var(--s4) var(--s3) 0;border:1px solid var(--select);border-radius:var(--r-ctl);background:var(--panel);font-size:var(--fs-12)}
+.wm .cv .peek .ph{display:flex;gap:var(--s4);align-items:center;padding:var(--s2) var(--s4);border-bottom:1px solid var(--rule);font-family:var(--ff-ui);color:var(--mut);flex-wrap:wrap;row-gap:var(--s1)}
+.wm .cv .peek .ph .eyebrow{color:var(--select)}
+.wm .cv .peek .ph b{color:var(--bright);font-family:var(--ff-data)}
+.wm .cv .peek .ph .tools{margin-left:auto;display:flex;gap:var(--s4)}
+.wm .cv .peek .pl{display:grid;grid-template-columns:40px minmax(0,1fr);line-height:1.6}
+.wm .cv .peek .pl > span{padding:0 var(--s3);white-space:pre}
+.wm .cv .peek .pl > span:nth-child(odd){color:var(--dim);text-align:right;border-right:1px solid var(--rule)}
+.wm .cv .src a{color:inherit;text-decoration:none;border-bottom:1px dotted transparent}
+.wm .cv .src a:hover{border-bottom-color:var(--select);color:var(--select)}
+.wm .cv a.const{color:var(--const)}
+.wm .cv a.s::after{content:"○";font-size:9px;color:var(--mut);margin-left:2px;vertical-align:super}
+.wm .cv a.a::after{content:"?";font-size:9px;color:var(--hot);margin-left:2px;vertical-align:super}
+.wm .k{color:var(--k)}.wm .fn{color:var(--fn)}.wm .var{color:var(--var)}.wm .str{color:var(--str)}.wm .const{color:var(--const)}.wm .op{color:var(--op)}.wm .cm{color:var(--cm);font-style:italic}
+.wm .difft{font-family:var(--ff-data);font-size:var(--fs-12);line-height:1.6;border:1px solid var(--rule2);border-radius:var(--r-ctl);overflow:hidden}
+.wm .difft .dl{display:grid;grid-template-columns:36px 36px 18px minmax(0,1fr);white-space:pre}
+.wm .difft .dl span{padding:0 var(--s2)}
+.wm .difft .dl span:nth-child(-n+2){color:var(--dim);text-align:right;border-right:1px solid var(--rule)}
+.wm .difft .dl.add{background:var(--diff-add)}.wm .difft .dl.del{background:var(--diff-del)}.wm .difft .dl.hunk{background:var(--panel);color:var(--mut)}
+
+/* ---- search palette and results ---- */
+.wm .palette{width:720px;max-width:100%;border:1px solid var(--rule2);border-radius:var(--r-ctl);background:var(--panel);box-shadow:0 8px 34px rgba(0,0,0,.5);overflow:hidden;font-family:var(--ff-data);font-size:var(--fs-13)}
+.wm .palette .q{display:flex;gap:var(--s3);align-items:center;padding:var(--s3) var(--s4);border-bottom:1px solid var(--rule);font-size:var(--fs-15);color:var(--bright)}
+.wm .palette .q .caret{display:inline-block;width:1px;height:18px;background:var(--select)}
+.wm .palette .q .kbd{margin-left:auto}
+.wm .palette .grp{display:flex;gap:var(--s3);padding:var(--s3) var(--s4) var(--s1);font-family:var(--ff-ui);font-size:var(--fs-11);letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.wm .palette .grp .cnt{margin-left:auto;letter-spacing:0;text-transform:none;font-family:var(--ff-data)}
+.wm .palette .hit{display:grid;grid-template-columns:minmax(0,1fr) max-content;gap:var(--s4);padding:var(--s2) var(--s4);color:var(--text)}
+.wm .palette .hit .path{color:var(--dim);font-size:var(--fs-12)}
+.wm .palette .hit[aria-selected=true]{background:var(--select-tint);box-shadow:inset 3px 0 0 var(--select);color:var(--bright)}
+.wm .palette .hit mark{background:none;color:var(--bright);font-weight:700;text-decoration:underline;text-decoration-color:var(--select);text-underline-offset:3px}
+.wm .palette .foot{display:flex;gap:var(--s4);padding:var(--s2) var(--s4);border-top:1px solid var(--rule);font-family:var(--ff-ui);font-size:var(--fs-11);color:var(--mut)}
+.wm .palette .foot .right{margin-left:auto}
+.wm .snip{margin:var(--s2) 0 0;padding:var(--s2) var(--s3);background:var(--panel);border:1px solid var(--rule);border-radius:var(--r-ctl);font-family:var(--ff-data);font-size:var(--fs-12);white-space:pre;overflow-x:auto;color:var(--text)}
+.wm mark{background:var(--select-tint);color:var(--bright);border-radius:1px;box-shadow:inset 0 -2px 0 var(--select)}
+.wm .snip mark{background:var(--select-tint);color:var(--bright);box-shadow:inset 0 -2px 0 var(--select)}
+
+/* ---- guide panel ---- */
+.wm .guide{display:flex;flex-direction:column;font-family:var(--ff-ui);font-size:var(--fs-13)}
+.wm .guide .gh{display:flex;gap:var(--s4);align-items:center;padding:0 var(--s4);height:40px;border-bottom:1px solid var(--rule);color:var(--mut)}
+.wm .guide .gh b{color:var(--bright)}
+.wm .guide .gh .tools{margin-left:auto;display:flex;gap:var(--s4)}
+.wm .guide .ctx{display:flex;gap:var(--s3);flex-wrap:wrap;padding:var(--s3) var(--s4);border-bottom:1px solid var(--rule);font-size:var(--fs-12);color:var(--mut)}
+.wm .guide .msg{padding:var(--s4);border-bottom:1px solid var(--rule);line-height:1.55;color:var(--text)}
+.wm .guide .msg.me{background:var(--ground2)}
+.wm .guide .msg .who{display:block;max-width:none;font-size:var(--fs-11);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:var(--s2);cursor:default}
+.wm .guide .msg p{margin:0 0 var(--s3)}
+.wm .guide .msg p:last-child{margin:0}
+.wm .guide .msg li{margin:0 0 var(--s1)}
+.wm .guide .call{display:grid;grid-template-columns:18px minmax(0,1fr) max-content;gap:var(--s3);align-items:baseline;margin:var(--s2) 0;padding:var(--s2) var(--s3);border:1px solid var(--rule2);border-radius:var(--r-ctl);background:var(--panel);font-family:var(--ff-data);font-size:var(--fs-12);color:var(--text)}
+.wm .call .g{color:var(--fresh)}.wm .call .g.run{color:var(--mod)}
+.wm .call .t{color:var(--dim);font-variant-numeric:tabular-nums}
+.wm .guide .acts{display:flex;gap:var(--s3);flex-wrap:wrap;padding:var(--s3) var(--s4);border-bottom:1px solid var(--rule)}
+.wm .guide .acts .btn{height:26px;font-size:var(--fs-11)}
+.wm .guide .ask{margin-top:auto;display:flex;gap:var(--s3);align-items:flex-end;padding:var(--s3) var(--s4);border-top:1px solid var(--rule);background:var(--panel)}
+.wm .guide .ask .in{flex:1;min-height:44px;padding:var(--s2) var(--s3);border:1px solid var(--rule2);border-radius:var(--r-ctl);background:var(--ground2);color:var(--dim);font-size:var(--fs-13)}
+.wm .guide .budget{display:flex;gap:var(--s4);padding:var(--s2) var(--s4);font-size:var(--fs-11);color:var(--dim);border-top:1px solid var(--rule);white-space:nowrap;overflow:hidden}
+.wm .guide .budget b{color:var(--mut);font-weight:500}
+.wm .cursor::after{content:"▍";color:var(--select);animation:none}
+
+/* ---- landscape (C4 notation) ---- */
+.wm .c4{display:grid;grid-template-columns:220px minmax(0,1fr) 220px;gap:var(--s4);align-items:start}
+.wm .c4 .sys{border:1px solid var(--rule2);border-radius:var(--r-ctl);padding:var(--s4);background:var(--panel)}
+.wm .c4 .sys > .eyebrow{display:block;margin-bottom:var(--s3)}
+.wm .c4 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s3)}
+.wm .c4 .box{border:1px solid var(--rule2);border-radius:var(--r-ctl);padding:var(--s3) var(--s4);background:var(--bg);font-size:var(--fs-12);line-height:1.5;min-width:0}
+.wm .c4 .box.db{border-style:double;border-width:3px}
+.wm .c4 .box.ext{border-color:var(--rule);background:var(--panel)}
+.wm .c4 .box .st{display:block;color:var(--dim);font-family:var(--ff-ui);font-size:var(--fs-11);padding:0}
+.wm .c4 .box .nm{display:block;color:var(--bright);font-weight:700;font-family:var(--ff-ui);font-size:var(--fs-13);margin:1px 0 var(--s1)}
+.wm .c4 .box .tech{display:block;color:var(--mut);margin-bottom:var(--s2)}
+.wm .c4 .box .rel{display:block;color:var(--text);padding-left:16px;text-indent:-16px}
+.wm .c4 .box .rel .ar{color:var(--dim);display:inline-block;width:16px;text-indent:0}
+.wm .c4 .box.focus{border-color:var(--select)}
+.wm .c4 .box.changed{border-color:var(--mod)}
+.wm .c4 .col{display:grid;gap:var(--s3)}
+.wm .ladder{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--rule2);border-radius:var(--r-ctl);overflow:hidden;font-size:var(--fs-12)}
+.wm .ladder > div{padding:var(--s3) var(--s4);border-right:1px solid var(--rule);color:var(--mut);line-height:1.5}
+.wm .ladder > div:last-child{border-right:0}
+.wm .ladder > div b{display:block;color:var(--bright);font-family:var(--ff-ui)}
+.wm .ladder > div[aria-current]{background:var(--select-tint);box-shadow:inset 0 -2px 0 var(--select);color:var(--text)}
+
+/* ---- passage ---- */
+.wm .psg{display:grid;grid-template-columns:150px minmax(0,1fr);font-size:var(--fs-12);border:1px solid var(--rule2);border-radius:var(--r-ctl)}
+.wm .psg .stage{position:relative;padding:var(--s3) var(--s4) var(--s3) 26px;border-bottom:1px solid var(--rule);color:var(--bright);font-family:var(--ff-ui);font-size:var(--fs-13);font-weight:500;line-height:1.5}
+.wm .psg .stage::before{content:"";position:absolute;left:10px;top:0;bottom:0;border-left:1px solid var(--rule2)}
+.wm .psg .stage::after{content:"";position:absolute;left:6px;top:14px;width:7px;height:7px;border-radius:50%;background:var(--dim);border:1px solid var(--panel)}
+.wm .psg .stage[aria-current]::after{background:var(--select)}
+.wm .psg .stage b{display:block;font-family:var(--ff-data);font-size:var(--fs-12);color:var(--mut);font-weight:400}
+.wm .psg .rows{border-bottom:1px solid var(--rule)}
+.wm .psg .rows > div{display:grid;grid-template-columns:120px minmax(0,1fr);gap:var(--s4);padding:var(--s2) var(--s4);border-bottom:1px solid var(--rule);line-height:1.5}
+.wm .psg .rows > div:last-child{border-bottom:0}
+.wm .psg .rows > div > span:first-child{color:var(--mut)}
+.wm .psg .rows .sub{padding-left:calc(110px + var(--s4) + var(--s5))}
+.wm .matrix td.c{text-align:center;padding:var(--s2) 0}
+.wm .matrix th.c{padding:var(--s3) 0;text-align:center}
+.wm .matrix th.c abbr{text-decoration:none}
+.wm .matrix th.cur{color:var(--bright);box-shadow:inset 0 3px 0 var(--select)}
+.wm .matrix td.cur{background:none}
+.wm .matrix td.on{color:var(--bright)}.wm .matrix td.off{color:var(--dim)}
+
+
+/* ---- narrow bar and frame (after the page-frame rules so they win) ---- */
+@container wm (max-width:1279px){ .wm .bar .bar-search{width:220px} .wm .bar .bar-fresh .w{display:none} }
+@container wm (max-width:959px){ .wm .crumbs > .path{display:none} .wm .bar nav{display:none} .wm .bar .bar-search{width:auto;flex:1;max-width:340px} .wm .ident .ctl{margin-left:0;width:100%} .wm .aside{display:none} }
+@container wm (max-width:639px){ .wm .strip-btn{display:none} .wm .c4 .grid{grid-template-columns:1fr} .wm .bar .bar-search .q,.wm .bar .bar-search .kbd{display:none} .wm .bar .bar-search{width:30px;flex:none;justify-content:center;padding:0} .wm .cv{grid-template-columns:28px 40px minmax(0,1fr)} .wm .cv .mg{display:none} .wm .c4{grid-template-columns:1fr} .wm .c4 .grid{grid-template-columns:1fr 1fr} .wm .ladder{grid-template-columns:1fr 1fr} .wm .psg{grid-template-columns:1fr} .wm .psg .stage{border-bottom:0} }
+
+/* retoken: old variable names → tokens; board-level corrections */
+.wm{--accent:var(--select);--amber:var(--mod);--red:var(--risk);--green:var(--fresh);--heat-hot:var(--hot);--heat-warm:var(--mod);--hi:var(--select-tint);--sel-bg:var(--select-tint);--k:var(--k);--c:var(--fn);--s:var(--str);--y:var(--const)}
+.wm .bar{border-bottom:0}
+.wm .ident,.wm .hero{padding-top:var(--s4)}
+.wm .rail li:nth-child(even){background:none}
+.wm .rail label.f:nth-child(even),.wm .rail label.f:nth-child(odd){background:none}.wm .rail label.f:hover{background:var(--hover)}
+.wm .rail h3{font-family:var(--ff-ui);font-size:var(--fs-11);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:500}
+.wm .rail h3.on{color:var(--select)}
+.wm .rail li .dim{text-align:right}
+.wm .tab .n{font-family:var(--ff-data);font-size:var(--fs-12)}
+.wm .tbl.steps td.n{background:none;border-right:1px solid var(--rule)}
+.wm .tbl.flows tbody tr.chk td{background:none}
+.wm .tbl.flows tbody tr.chk td.tg{background:var(--select-tint)}
+.wm .tbl.flows tbody tr.xp td.xb{background:none}
+.wm .xh{font-family:var(--ff-data)}.wm .xh b{font-family:var(--ff-ui)}
+.wm .tiles .eyebrow{display:block;padding:var(--s2) 0;margin-bottom:var(--s1);border-bottom:1px solid var(--rule)}
+.wm .meta,.wm .cap,.wm .legend,.wm .status{font-family:var(--ff-ui)}
+.wm .status span.keys{font-family:var(--ff-ui)}
+.wm .fresh{font-family:var(--ff-data)}
+.wm .search input{font-family:var(--ff-data)}
+.wm .sel-chip{font-family:var(--ff-ui)}
+.wm .lead,.wm p{font-family:var(--ff-ui)}
+.wm .tbl td,.wm .tbl td *{font-family:var(--ff-data)}
+.wm .tbl td .fl,.wm .tbl td .tool{font-family:var(--ff-ui)}
+.wm .tbl td .M{font-family:var(--ff-data)}
+.wm .det dt{font-family:var(--ff-ui)}
+.wm .irail .tip{font-family:var(--ff-ui)}
+.wm .bar .nav{color:var(--mut)}.wm .bar .nav[aria-current]{color:var(--bright)}.wm .bar a.nav:hover{color:var(--select);text-decoration:none}
+.wm .crumbs a{color:var(--link)}
+.wm .dia .dh{flex-wrap:wrap;row-gap:var(--s1)}.wm .dia .dh > span{overflow:visible;text-overflow:clip}
+.wm .ib{font-size:14px;line-height:1}.wm .ib[aria-pressed=true]{background:var(--hover);border-color:var(--select);color:var(--bright)}
+.wm .sel-chip b{font-family:var(--ff-data)}
+.wm abbr.date{text-decoration:none;cursor:help;border-bottom:1px dotted transparent}.wm abbr.date:hover,.wm abbr.date:focus{border-bottom-color:var(--mut)}
+.wm .dia svg foreignObject *{font-family:var(--ff-data)!important}
+</style>
+
+<div class="wm" data-theme="dark">
+  <header class="bar">
+    <a href="#" class="nav" style="display:flex;align-items:center;gap:10px;color:var(--bright);font-weight:700;font-size:15px">
+      <svg viewBox="0 0 120 120" width="24" height="24" fill="none" role="img" aria-label="woods"><g stroke="currentColor" stroke-width="3.4"><circle cx="62" cy="58" r="49"/><circle cx="59" cy="61" r="38"/><circle cx="63" cy="57" r="27"/><circle cx="60" cy="60" r="16"/></g><circle cx="61" cy="59" r="4.4" fill="currentColor"/><path d="M61 59 L18 34" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+      woods
+    </a>
+    <label class="search"><span aria-hidden="true">⌕</span><input type="search" placeholder="Search units, files, routes, tables, code…" aria-label="Search"><span class="kbd">/</span></label>
+    <nav aria-label="Primary" style="display:flex;gap:18px;font-size:13px"><a href="#" class="nav">Units</a><a href="#" class="nav">Landscape</a><a href="#" class="nav">Graph</a><a href="#" class="nav">ERD</a><a href="#" class="nav" aria-current="page" style="color:var(--bright);font-weight:700">Impact</a><a href="#" class="nav">History</a></nav>
+    <span style="flex:1"></span>
+    <span class="fresh" title="source_freshness: current">index current<i class="sep"></i>gen <b class="bright">42</b><i class="sep"></i>9f8e7d6</span>
+    <button class="btn" type="button">Guide ▸</button>
+  </header>
+  <div class="crumbs"><span><a href="#" >impact</a> › report 7c1e9a2</span><span class="path">from the PR comment, computed by <code>woods:impact</code> in CI</span></div>
+
+  <div class="ident">
+    <div>
+      <h1 class="t1">gen 40 → gen 42 <span class="sub">a1b2c3d → 9f8e7d6</span></h1>
+      <div class="meta" style="margin:6px 0 0">base <a href="#">deploy 2026-10-09<i class="sep"></i>gen 40</a><i class="sep"></i>head <b class="bright">this deploy<i class="sep"></i>gen 42</b><i class="sep"></i>both payloads retained<i class="sep"></i><a href="#">change range ▾</a></div>
+    </div>
+    <div class="ctl">
+      <span class="meta">depth</span><span class="seg" role="group" aria-label="Depth"><button type="button" aria-pressed="false">1</button><button type="button" aria-pressed="true">2</button><button type="button" aria-pressed="false">3</button></span>
+      <span class="meta" style="margin-left:6px">show</span><span class="seg" role="group" aria-label="Show"><button type="button" aria-pressed="true">all</button><button type="button" aria-pressed="false">no tests</button><button type="button" aria-pressed="false">no views</button></span>
+      <button class="btn" type="button" style="margin-left:10px">Share ▾</button>
+      <button class="btn primary" type="button">Markdown for PR</button>
+    </div>
+  </div>
+  <div class="tabs" role="tablist" aria-label="Impact views">
+    <button class="tab" role="tab" aria-selected="false" tabindex="-1">Overview</button>
+    <button class="tab" role="tab" aria-selected="false" tabindex="-1">Changed <span class="n">3</span></button>
+    <button class="tab" role="tab" aria-selected="false" tabindex="-1">Risks <span class="n">2</span></button>
+    <button class="tab" role="tab" aria-selected="true" tabindex="0">Flows <span class="n">4</span></button>
+    <button class="tab" role="tab" aria-selected="false" tabindex="-1">Tests <span class="n">7</span></button>
+    <button class="tab" role="tab" aria-selected="false" tabindex="-1">Graph <span class="n">8</span></button>
+    <button class="tab" role="tab" aria-selected="false" tabindex="-1">Unknown <span class="n">3</span></button>
+  </div>
+
+  <main class="page" style="max-width:none">
+    <div style="display:flex;align-items:center;margin-top:18px"><span class="meta">selection carries across tabs<i class="sep"></i>filters this list, does not mark rows</span><span class="sel-chip" role="status"><span class="meta">selected</span><b>new_post.html.erb → User</b><button class="x" type="button" aria-label="Clear selection">✕</button></span></div>
+    <section class="sec" aria-labelledby="h-f1">
+      <header><h2 class="t2" id="h-f1">Flows <span class="n">· 4, 2 through the selection</span></h2><span class="meta" style="white-space:nowrap">entry points through a changed unit; checked rows follow you to Tests, Graph and the PR Markdown</span><span class="seg" role="group" aria-label="Filter" style="margin-left:auto"><button type="button" aria-pressed="true">all 4</button><button type="button" aria-pressed="false">through selection 2</button><button type="button" aria-pressed="false">checked 2</button></span><span style="display:flex;gap:14px;font-size:12px;margin-left:14px;white-space:nowrap"><a href="#">expand all</a><a href="#">collapse all</a></span></header>
+      <table class="tbl grouped flows"><thead><tr><th class="tg"></th><th style="width:220px">entry point</th><th>steps, numbered like the diagram; indent = call depth</th><th style="width:78px">changed</th><th style="width:104px">unexpanded</th><th style="width:150px">layer</th></tr></thead><tbody><tr class="xr chk open"><td class="tg"><div class="tgc"><input type="checkbox" aria-label="Include in review set" checked><button class="tgl" type="button" aria-expanded="true" aria-label="Collapse">▾</button></div></td><td class="lead ch"><a href="#">POST /posts</a><br><span class="meta">PostsController#create</span></td><td class="steps"><table class="stpt"><tr><td class="n">1</td><td class="g"><div class="st" style="--d:0"><span class="ar"></span><span>POST /posts → <a href="#">PostsController#create</a></span></div></td></tr><tr><td class="n">2</td><td class="g"><div class="st" style="--d:1"><span class="ar">→</span><span><a href="#">Post</a>.save(post_params)</span></div></td></tr><tr><td class="n">3</td><td class="g"><div class="st" style="--d:2"><span class="ar">→</span><span>INSERT INTO posts<span class="mech">transaction</span></span></div></td></tr><tr><td class="n">4</td><td class="g"><div class="st" style="--d:2"><span class="ar">→</span><span>after_commit<span class="mech">perform_later(id) to the default queue</span></span></div></td></tr><tr><td class="n">5</td><td class="g"><div class="st" style="--d:1"><span class="ar ret">⇢</span><span>302 → post_path<span class="mech">response</span></span></div></td></tr><tr class="bnd"><td></td><td>⇒ async hop, new process: queue worker</td></tr><tr class="proc"><td class="n">6</td><td class="g"><div class="st" style="--d:0"><span class="ar async">⇒</span><span><span class="M">M</span><a href="#">NotifySubscribersJob#perform</a><span class="mech">from the queue, no retry_on</span></span></div></td></tr><tr class="bnd"><td></td><td>⇒ async hop, new process: mail delivery job</td></tr><tr class="proc"><td class="n">7</td><td class="g"><div class="st" style="--d:0"><span class="ar async">⇒</span><span><span class="M">M</span><a href="#">MailingListMailer#new_post</a><span class="mech">deliver_later, per follower</span></span></div></td></tr><tr><td class="n">8</td><td class="g"><div class="st" style="--d:1"><span class="ar">→</span><span><span class="M">M</span><a href="#">new_post.html.erb</a><span class="mech">render</span></span></div></td></tr><tr><td class="n">9</td><td class="g"><div class="st" style="--d:2"><span class="ar">→</span><span><a href="#">User#preferences</a><span class="mech">nil for 3 fixtures</span></span></div></td></tr></table></td><td class="nw">3 of 6</td><td class="nw"><span class="meta">0</span></td><td class="meta"><span class="lines"><span>precomputed</span><span>gen 42</span></span></td></tr><tr class="xr xp chk"><td class="tg"><div class="irail" role="group" aria-label="Diagram"><button class="ib" type="button" title="sequence" aria-label="sequence" aria-pressed="true">↕</button><button class="ib" type="button" title="flowchart" aria-label="flowchart" aria-pressed="false">⤵</button><button class="ib" type="button" title="lanes" aria-label="lanes" aria-pressed="false">≡</button><button class="ib" type="button" title="copy Mermaid" aria-label="copy Mermaid">⎘</button></div></td><td colspan="5" class="xb"><div class="xh"><b>POST /posts, sequence</b><span>numbers match the step list</span><span>rendered on expand</span><span class="lyr">static flow, precomputed, gen 42</span><span class="tools"><a href="#">share</a><button class="tool" type="button" aria-label="Collapse">✕</button></span></div><div class="xd"><svg role="img" aria-label="Sequence diagram of POST /posts through the changed units" id="m1" xmlns="http://www.w3.org/2000/svg" viewBox="-50 -10 1446 576" role="graphics-document document" aria-roledescription="sequence" aria-labelledby="chart-title-m1" style="width:1446px;max-width:none;height:auto"><title id="chart-title-m1">POST /posts through the changed units</title><g><rect x="703" y="-3" fill="rgba(241,183,58,0.03)" stroke="rgb(0,0,0, 0.5)" width="492.5" height="559" class="rect"></rect><text x="949.25" y="12.5" dominant-baseline="central" alignment-baseline="central" class="text" style="text-anchor: middle; font-size: 12.5px; font-weight: 400;"><tspan x="949.25" dy="0">changed</tspan></text></g><g><line id="actor7" x1="1267.5" y1="61" x2="1267.5" y2="2000" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="U" data-et="life-line" data-id="U"></line><g id="root-7" data-et="participant" data-type="participant" data-id="U"><rect x="1207.5" y="21" fill="#eaeaea" stroke="#666" width="120" height="40" name="U" rx="3" ry="3" class="actor actor-top"></rect><text x="1267.5" y="41" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 12.5px; font-weight: 400;"><tspan x="1267.5" dy="0">User</tspan></text></g></g><g><line id="actor6" x1="1114" y1="61" x2="1114" y2="2000" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="V" data-et="life-line" data-id="V"></line><g id="root-6" data-et="participant" data-type="participant" data-id="V"><rect x="1049.5" y="21" fill="#eaeaea" stroke="#666" width="129" height="40" name="V" rx="3" ry="3" class="actor actor-top"></rect><text x="1114" y="41" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 12.5px; font-weight: 400;"><tspan x="1114" dy="0">new_post.html.erb</tspan></text></g></g><g><line id="actor5" x1="971.5" y1="61" x2="971.5" y2="2000" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="M" data-et="life-line" data-id="M"></line><g id="root-5" data-et="participant" data-type="participant" data-id="M"><rect x="911.5" y="21" fill="#eaeaea" stroke="#666" width="120" height="40" name="M" rx="3" ry="3" class="actor actor-top"></rect><text x="971.5" y="41" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 12.5px; font-weight: 400;"><tspan x="971.5" dy="0">MailingListMailer</tspan></text></g></g><g><line id="actor4" x1="794.5" y1="61" x2="794.5" y2="2000" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="J" data-et="life-line" data-id="J"></line><g id="root-4" data-et="participant" data-type="participant" data-id="J"><rect x="720" y="21" fill="#eaeaea" stroke="#666" width="149" height="40" name="J" rx="3" ry="3" class="actor actor-top"></rect><text x="794.5" y="41" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 12.5px; font-weight: 400;"><tspan x="794.5" dy="0">NotifySubscribersJob</tspan></text></g></g><g><line id="actor3" x1="637" y1="61" x2="637" y2="2000" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="Q" data-et="life-line" data-id="Q"></line><g id="root-3" data-et="participant" data-type="participant" data-id="Q"><rect x="577" y="21" fill="#eaeaea" stroke="#666" width="120" height="40" name="Q" rx="3" ry="3" class="actor actor-top"></rect><text x="637" y="41" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 12.5px; font-weight: 400;"><tspan x="637" dy="0">Solid Queue</tspan></text></g></g><g><line id="actor2" x1="412" y1="61" x2="412" y2="2000" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="P" data-et="life-line" data-id="P"></line><g id="root-2" data-et="participant" data-type="participant" data-id="P"><rect x="352" y="21" fill="#eaeaea" stroke="#666" width="120" height="40" name="P" rx="3" ry="3" class="actor actor-top"></rect><text x="412" y="41" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 12.5px; font-weight: 400;"><tspan x="412" dy="0">Post</tspan></text></g></g><g><line id="actor1" x1="236" y1="61" x2="236" y2="2000" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="C" data-et="life-line" data-id="C"></line><g id="root-1" data-et="participant" data-type="participant" data-id="C"><rect x="138" y="21" fill="#eaeaea" stroke="#666" width="196" height="40" name="C" rx="3" ry="3" class="actor actor-top"></rect><text x="236" y="41" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 12.5px; font-weight: 400;"><tspan x="236" dy="0">PostsController&#35;create</tspan></text></g></g><g><line id="actor0" x1="60" y1="61" x2="60" y2="2000" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="A" data-et="life-line" data-id="A"></line><g id="root-0" data-et="participant" data-type="participant" data-id="A"><rect x="0" y="21" fill="#eaeaea" stroke="#666" width="120" height="40" name="A" rx="3" ry="3" class="actor actor-top"></rect><text x="60" y="41" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 12.5px; font-weight: 400;"><tspan x="60" dy="0">Author</tspan></text></g></g><style>#m1{font-family:"Fira Mono",ui-monospace,monospace;font-size:12.5px;fill:#E5E8EB;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#m1 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#m1 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#m1 .error-icon{fill:#2A2833;}#m1 .error-text{fill:#E5E8EB;stroke:#E5E8EB;}#m1 .edge-thickness-normal{stroke-width:1px;}#m1 .edge-thickness-thick{stroke-width:3.5px;}#m1 .edge-pattern-solid{stroke-dasharray:0;}#m1 .edge-thickness-invisible{stroke-width:0;fill:none;}#m1 .edge-pattern-dashed{stroke-dasharray:3;}#m1 .edge-pattern-dotted{stroke-dasharray:2;}#m1 .marker{fill:#9BA5B0;stroke:#9BA5B0;}#m1 .marker.cross{stroke:#9BA5B0;}#m1 svg{font-family:"Fira Mono",ui-monospace,monospace;font-size:12.5px;}#m1 p{margin:0;}#m1 .actor{stroke:#4A4852;fill:#28272D;stroke-width:1;}#m1 rect.actor.outer-path[data-look="neo"]{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m1 rect.note[data-look="neo"]{stroke:#3B3942;fill:#2A2833;filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m1 text.actor>tspan{fill:#E5E8EB;stroke:none;}#m1 .actor-line{stroke:#3B3942;}#m1 .innerArc{stroke-width:1.5;stroke-dasharray:none;}#m1 .messageLine0{stroke-width:1.5;stroke-dasharray:none;stroke:#9BA5B0;}#m1 .messageLine1{stroke-width:1.5;stroke-dasharray:2,2;stroke:#9BA5B0;}#m1 [id$="-arrowhead"] path{fill:#9BA5B0;stroke:#9BA5B0;}#m1 .sequenceNumber{fill:#222126;}#m1 [id$="-sequencenumber"]{fill:#9BA5B0;}#m1 [id$="-crosshead"] path{fill:#9BA5B0;stroke:#9BA5B0;}#m1 .messageText{fill:#E5E8EB;stroke:none;}#m1 .labelBox{stroke:#3B3942;fill:#1B1A1F;filter:none;}#m1 .labelText,#m1 .labelText>tspan{fill:#E5E8EB;stroke:none;}#m1 .loopText,#m1 .loopText>tspan{fill:#9BA5B0;stroke:none;}#m1 .sectionTitle,#m1 .sectionTitle>tspan{fill:#9BA5B0;stroke:none;}#m1 .loopLine{stroke-width:2px;stroke-dasharray:2,2;stroke:#3B3942;fill:#3B3942;}#m1 .note{stroke:#3B3942;fill:#2A2833;}#m1 .noteText,#m1 .noteText>tspan{fill:#E5E8EB;stroke:none;}#m1 .activation0{fill:#2A2833;stroke:#4A4852;}#m1 .activation1{fill:#2A2833;stroke:#4A4852;}#m1 .activation2{fill:#2A2833;stroke:#4A4852;}#m1 .actorPopupMenu{position:absolute;}#m1 .actorPopupMenuPanel{position:absolute;fill:#28272D;box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);filter:drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4));}#m1 .actor-man circle,#m1 line{fill:#28272D;stroke-width:2px;}#m1 g rect.rect{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));stroke:#4A4852;}#m1 .node .neo-node{stroke:#4A4852;}#m1 [data-look="neo"].node rect,#m1 [data-look="neo"].cluster rect,#m1 [data-look="neo"].node polygon{stroke:#4A4852;filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m1 [data-look="neo"].swimlane.cluster rect{filter:none;}#m1 [data-look="neo"].node path{stroke:#4A4852;stroke-width:1px;}#m1 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m1 [data-look="neo"].node .neo-line path{stroke:#4A4852;filter:none;}#m1 [data-look="neo"].node circle{stroke:#4A4852;filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m1 [data-look="neo"].node circle .state-start{fill:#000000;}#m1 [data-look="neo"].icon-shape .icon{fill:#4A4852;filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m1 [data-look="neo"].icon-shape .icon-neo path{stroke:#4A4852;filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m1 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g></g><defs><symbol id="m1-computer" width="24" height="24"><path transform="scale(.5)" d="M2 2v13h20v-13h-20zm18 11h-16v-9h16v9zm-10.228 6l.466-1h3.524l.467 1h-4.457zm14.228 3h-24l2-6h2.104l-1.33 4h18.45l-1.297-4h2.073l2 6zm-5-10h-14v-7h14v7z"></path></symbol></defs><defs><symbol id="m1-database" fill-rule="evenodd" clip-rule="evenodd"><path transform="scale(.5)" d="M12.258.001l.256.004.255.005.253.008.251.01.249.012.247.015.246.016.242.019.241.02.239.023.236.024.233.027.231.028.229.031.225.032.223.034.22.036.217.038.214.04.211.041.208.043.205.045.201.046.198.048.194.05.191.051.187.053.183.054.18.056.175.057.172.059.168.06.163.061.16.063.155.064.15.066.074.033.073.033.071.034.07.034.069.035.068.035.067.035.066.035.064.036.064.036.062.036.06.036.06.037.058.037.058.037.055.038.055.038.053.038.052.038.051.039.05.039.048.039.047.039.045.04.044.04.043.04.041.04.04.041.039.041.037.041.036.041.034.041.033.042.032.042.03.042.029.042.027.042.026.043.024.043.023.043.021.043.02.043.018.044.017.043.015.044.013.044.012.044.011.045.009.044.007.045.006.045.004.045.002.045.001.045v17l-.001.045-.002.045-.004.045-.006.045-.007.045-.009.044-.011.045-.012.044-.013.044-.015.044-.017.043-.018.044-.02.043-.021.043-.023.043-.024.043-.026.043-.027.042-.029.042-.03.042-.032.042-.033.042-.034.041-.036.041-.037.041-.039.041-.04.041-.041.04-.043.04-.044.04-.045.04-.047.039-.048.039-.05.039-.051.039-.052.038-.053.038-.055.038-.055.038-.058.037-.058.037-.06.037-.06.036-.062.036-.064.036-.064.036-.066.035-.067.035-.068.035-.069.035-.07.034-.071.034-.073.033-.074.033-.15.066-.155.064-.16.063-.163.061-.168.06-.172.059-.175.057-.18.056-.183.054-.187.053-.191.051-.194.05-.198.048-.201.046-.205.045-.208.043-.211.041-.214.04-.217.038-.22.036-.223.034-.225.032-.229.031-.231.028-.233.027-.236.024-.239.023-.241.02-.242.019-.246.016-.247.015-.249.012-.251.01-.253.008-.255.005-.256.004-.258.001-.258-.001-.256-.004-.255-.005-.253-.008-.251-.01-.249-.012-.247-.015-.245-.016-.243-.019-.241-.02-.238-.023-.236-.024-.234-.027-.231-.028-.228-.031-.226-.032-.223-.034-.22-.036-.217-.038-.214-.04-.211-.041-.208-.043-.204-.045-.201-.046-.198-.048-.195-.05-.19-.051-.187-.053-.184-.054-.179-.056-.176-.057-.172-.059-.167-.06-.164-.061-.159-.063-.155-.064-.151-.066-.074-.033-.072-.033-.072-.034-.07-.034-.069-.035-.068-.035-.067-.035-.066-.035-.064-.036-.063-.036-.062-.036-.061-.036-.06-.037-.058-.037-.057-.037-.056-.038-.055-.038-.053-.038-.052-.038-.051-.039-.049-.039-.049-.039-.046-.039-.046-.04-.044-.04-.043-.04-.041-.04-.04-.041-.039-.041-.037-.041-.036-.041-.034-.041-.033-.042-.032-.042-.03-.042-.029-.042-.027-.042-.026-.043-.024-.043-.023-.043-.021-.043-.02-.043-.018-.044-.017-.043-.015-.044-.013-.044-.012-.044-.011-.045-.009-.044-.007-.045-.006-.045-.004-.045-.002-.045-.001-.045v-17l.001-.045.002-.045.004-.045.006-.045.007-.045.009-.044.011-.045.012-.044.013-.044.015-.044.017-.043.018-.044.02-.043.021-.043.023-.043.024-.043.026-.043.027-.042.029-.042.03-.042.032-.042.033-.042.034-.041.036-.041.037-.041.039-.041.04-.041.041-.04.043-.04.044-.04.046-.04.046-.039.049-.039.049-.039.051-.039.052-.038.053-.038.055-.038.056-.038.057-.037.058-.037.06-.037.061-.036.062-.036.063-.036.064-.036.066-.035.067-.035.068-.035.069-.035.07-.034.072-.034.072-.033.074-.033.151-.066.155-.064.159-.063.164-.061.167-.06.172-.059.176-.057.179-.056.184-.054.187-.053.19-.051.195-.05.198-.048.201-.046.204-.045.208-.043.211-.041.214-.04.217-.038.22-.036.223-.034.226-.032.228-.031.231-.028.234-.027.236-.024.238-.023.241-.02.243-.019.245-.016.247-.015.249-.012.251-.01.253-.008.255-.005.256-.004.258-.001.258.001zm-9.258 20.499v.01l.001.021.003.021.004.022.005.021.006.022.007.022.009.023.01.022.011.023.012.023.013.023.015.023.016.024.017.023.018.024.019.024.021.024.022.025.023.024.024.025.052.049.056.05.061.051.066.051.07.051.075.051.079.052.084.052.088.052.092.052.097.052.102.051.105.052.11.052.114.051.119.051.123.051.127.05.131.05.135.05.139.048.144.049.147.047.152.047.155.047.16.045.163.045.167.043.171.043.176.041.178.041.183.039.187.039.19.037.194.035.197.035.202.033.204.031.209.03.212.029.216.027.219.025.222.024.226.021.23.02.233.018.236.016.24.015.243.012.246.01.249.008.253.005.256.004.259.001.26-.001.257-.004.254-.005.25-.008.247-.011.244-.012.241-.014.237-.016.233-.018.231-.021.226-.021.224-.024.22-.026.216-.027.212-.028.21-.031.205-.031.202-.034.198-.034.194-.036.191-.037.187-.039.183-.04.179-.04.175-.042.172-.043.168-.044.163-.045.16-.046.155-.046.152-.047.148-.048.143-.049.139-.049.136-.05.131-.05.126-.05.123-.051.118-.052.114-.051.11-.052.106-.052.101-.052.096-.052.092-.052.088-.053.083-.051.079-.052.074-.052.07-.051.065-.051.06-.051.056-.05.051-.05.023-.024.023-.025.021-.024.02-.024.019-.024.018-.024.017-.024.015-.023.014-.024.013-.023.012-.023.01-.023.01-.022.008-.022.006-.022.006-.022.004-.022.004-.021.001-.021.001-.021v-4.127l-.077.055-.08.053-.083.054-.085.053-.087.052-.09.052-.093.051-.095.05-.097.05-.1.049-.102.049-.105.048-.106.047-.109.047-.111.046-.114.045-.115.045-.118.044-.12.043-.122.042-.124.042-.126.041-.128.04-.13.04-.132.038-.134.038-.135.037-.138.037-.139.035-.142.035-.143.034-.144.033-.147.032-.148.031-.15.03-.151.03-.153.029-.154.027-.156.027-.158.026-.159.025-.161.024-.162.023-.163.022-.165.021-.166.02-.167.019-.169.018-.169.017-.171.016-.173.015-.173.014-.175.013-.175.012-.177.011-.178.01-.179.008-.179.008-.181.006-.182.005-.182.004-.184.003-.184.002h-.37l-.184-.002-.184-.003-.182-.004-.182-.005-.181-.006-.179-.008-.179-.008-.178-.01-.176-.011-.176-.012-.175-.013-.173-.014-.172-.015-.171-.016-.17-.017-.169-.018-.167-.019-.166-.02-.165-.021-.163-.022-.162-.023-.161-.024-.159-.025-.157-.026-.156-.027-.155-.027-.153-.029-.151-.03-.15-.03-.148-.031-.146-.032-.145-.033-.143-.034-.141-.035-.14-.035-.137-.037-.136-.037-.134-.038-.132-.038-.13-.04-.128-.04-.126-.041-.124-.042-.122-.042-.12-.044-.117-.043-.116-.045-.113-.045-.112-.046-.109-.047-.106-.047-.105-.048-.102-.049-.1-.049-.097-.05-.095-.05-.093-.052-.09-.051-.087-.052-.085-.053-.083-.054-.08-.054-.077-.054v4.127zm0-5.654v.011l.001.021.003.021.004.021.005.022.006.022.007.022.009.022.01.022.011.023.012.023.013.023.015.024.016.023.017.024.018.024.019.024.021.024.022.024.023.025.024.024.052.05.056.05.061.05.066.051.07.051.075.052.079.051.084.052.088.052.092.052.097.052.102.052.105.052.11.051.114.051.119.052.123.05.127.051.131.05.135.049.139.049.144.048.147.048.152.047.155.046.16.045.163.045.167.044.171.042.176.042.178.04.183.04.187.038.19.037.194.036.197.034.202.033.204.032.209.03.212.028.216.027.219.025.222.024.226.022.23.02.233.018.236.016.24.014.243.012.246.01.249.008.253.006.256.003.259.001.26-.001.257-.003.254-.006.25-.008.247-.01.244-.012.241-.015.237-.016.233-.018.231-.02.226-.022.224-.024.22-.025.216-.027.212-.029.21-.03.205-.032.202-.033.198-.035.194-.036.191-.037.187-.039.183-.039.179-.041.175-.042.172-.043.168-.044.163-.045.16-.045.155-.047.152-.047.148-.048.143-.048.139-.05.136-.049.131-.05.126-.051.123-.051.118-.051.114-.052.11-.052.106-.052.101-.052.096-.052.092-.052.088-.052.083-.052.079-.052.074-.051.07-.052.065-.051.06-.05.056-.051.051-.049.023-.025.023-.024.021-.025.02-.024.019-.024.018-.024.017-.024.015-.023.014-.023.013-.024.012-.022.01-.023.01-.023.008-.022.006-.022.006-.022.004-.021.004-.022.001-.021.001-.021v-4.139l-.077.054-.08.054-.083.054-.085.052-.087.053-.09.051-.093.051-.095.051-.097.05-.1.049-.102.049-.105.048-.106.047-.109.047-.111.046-.114.045-.115.044-.118.044-.12.044-.122.042-.124.042-.126.041-.128.04-.13.039-.132.039-.134.038-.135.037-.138.036-.139.036-.142.035-.143.033-.144.033-.147.033-.148.031-.15.03-.151.03-.153.028-.154.028-.156.027-.158.026-.159.025-.161.024-.162.023-.163.022-.165.021-.166.02-.167.019-.169.018-.169.017-.171.016-.173.015-.173.014-.175.013-.175.012-.177.011-.178.009-.179.009-.179.007-.181.007-.182.005-.182.004-.184.003-.184.002h-.37l-.184-.002-.184-.003-.182-.004-.182-.005-.181-.007-.179-.007-.179-.009-.178-.009-.176-.011-.176-.012-.175-.013-.173-.014-.172-.015-.171-.016-.17-.017-.169-.018-.167-.019-.166-.02-.165-.021-.163-.022-.162-.023-.161-.024-.159-.025-.157-.026-.156-.027-.155-.028-.153-.028-.151-.03-.15-.03-.148-.031-.146-.033-.145-.033-.143-.033-.141-.035-.14-.036-.137-.036-.136-.037-.134-.038-.132-.039-.13-.039-.128-.04-.126-.041-.124-.042-.122-.043-.12-.043-.117-.044-.116-.044-.113-.046-.112-.046-.109-.046-.106-.047-.105-.048-.102-.049-.1-.049-.097-.05-.095-.051-.093-.051-.09-.051-.087-.053-.085-.052-.083-.054-.08-.054-.077-.054v4.139zm0-5.666v.011l.001.02.003.022.004.021.005.022.006.021.007.022.009.023.01.022.011.023.012.023.013.023.015.023.016.024.017.024.018.023.019.024.021.025.022.024.023.024.024.025.052.05.056.05.061.05.066.051.07.051.075.052.079.051.084.052.088.052.092.052.097.052.102.052.105.051.11.052.114.051.119.051.123.051.127.05.131.05.135.05.139.049.144.048.147.048.152.047.155.046.16.045.163.045.167.043.171.043.176.042.178.04.183.04.187.038.19.037.194.036.197.034.202.033.204.032.209.03.212.028.216.027.219.025.222.024.226.021.23.02.233.018.236.017.24.014.243.012.246.01.249.008.253.006.256.003.259.001.26-.001.257-.003.254-.006.25-.008.247-.01.244-.013.241-.014.237-.016.233-.018.231-.02.226-.022.224-.024.22-.025.216-.027.212-.029.21-.03.205-.032.202-.033.198-.035.194-.036.191-.037.187-.039.183-.039.179-.041.175-.042.172-.043.168-.044.163-.045.16-.045.155-.047.152-.047.148-.048.143-.049.139-.049.136-.049.131-.051.126-.05.123-.051.118-.052.114-.051.11-.052.106-.052.101-.052.096-.052.092-.052.088-.052.083-.052.079-.052.074-.052.07-.051.065-.051.06-.051.056-.05.051-.049.023-.025.023-.025.021-.024.02-.024.019-.024.018-.024.017-.024.015-.023.014-.024.013-.023.012-.023.01-.022.01-.023.008-.022.006-.022.006-.022.004-.022.004-.021.001-.021.001-.021v-4.153l-.077.054-.08.054-.083.053-.085.053-.087.053-.09.051-.093.051-.095.051-.097.05-.1.049-.102.048-.105.048-.106.048-.109.046-.111.046-.114.046-.115.044-.118.044-.12.043-.122.043-.124.042-.126.041-.128.04-.13.039-.132.039-.134.038-.135.037-.138.036-.139.036-.142.034-.143.034-.144.033-.147.032-.148.032-.15.03-.151.03-.153.028-.154.028-.156.027-.158.026-.159.024-.161.024-.162.023-.163.023-.165.021-.166.02-.167.019-.169.018-.169.017-.171.016-.173.015-.173.014-.175.013-.175.012-.177.01-.178.01-.179.009-.179.007-.181.006-.182.006-.182.004-.184.003-.184.001-.185.001-.185-.001-.184-.001-.184-.003-.182-.004-.182-.006-.181-.006-.179-.007-.179-.009-.178-.01-.176-.01-.176-.012-.175-.013-.173-.014-.172-.015-.171-.016-.17-.017-.169-.018-.167-.019-.166-.02-.165-.021-.163-.023-.162-.023-.161-.024-.159-.024-.157-.026-.156-.027-.155-.028-.153-.028-.151-.03-.15-.03-.148-.032-.146-.032-.145-.033-.143-.034-.141-.034-.14-.036-.137-.036-.136-.037-.134-.038-.132-.039-.13-.039-.128-.041-.126-.041-.124-.041-.122-.043-.12-.043-.117-.044-.116-.044-.113-.046-.112-.046-.109-.046-.106-.048-.105-.048-.102-.048-.1-.05-.097-.049-.095-.051-.093-.051-.09-.052-.087-.052-.085-.053-.083-.053-.08-.054-.077-.054v4.153zm8.74-8.179l-.257.004-.254.005-.25.008-.247.011-.244.012-.241.014-.237.016-.233.018-.231.021-.226.022-.224.023-.22.026-.216.027-.212.028-.21.031-.205.032-.202.033-.198.034-.194.036-.191.038-.187.038-.183.04-.179.041-.175.042-.172.043-.168.043-.163.045-.16.046-.155.046-.152.048-.148.048-.143.048-.139.049-.136.05-.131.05-.126.051-.123.051-.118.051-.114.052-.11.052-.106.052-.101.052-.096.052-.092.052-.088.052-.083.052-.079.052-.074.051-.07.052-.065.051-.06.05-.056.05-.051.05-.023.025-.023.024-.021.024-.02.025-.019.024-.018.024-.017.023-.015.024-.014.023-.013.023-.012.023-.01.023-.01.022-.008.022-.006.023-.006.021-.004.022-.004.021-.001.021-.001.021.001.021.001.021.004.021.004.022.006.021.006.023.008.022.01.022.01.023.012.023.013.023.014.023.015.024.017.023.018.024.019.024.02.025.021.024.023.024.023.025.051.05.056.05.06.05.065.051.07.052.074.051.079.052.083.052.088.052.092.052.096.052.101.052.106.052.11.052.114.052.118.051.123.051.126.051.131.05.136.05.139.049.143.048.148.048.152.048.155.046.16.046.163.045.168.043.172.043.175.042.179.041.183.04.187.038.191.038.194.036.198.034.202.033.205.032.21.031.212.028.216.027.22.026.224.023.226.022.231.021.233.018.237.016.241.014.244.012.247.011.25.008.254.005.257.004.26.001.26-.001.257-.004.254-.005.25-.008.247-.011.244-.012.241-.014.237-.016.233-.018.231-.021.226-.022.224-.023.22-.026.216-.027.212-.028.21-.031.205-.032.202-.033.198-.034.194-.036.191-.038.187-.038.183-.04.179-.041.175-.042.172-.043.168-.043.163-.045.16-.046.155-.046.152-.048.148-.048.143-.048.139-.049.136-.05.131-.05.126-.051.123-.051.118-.051.114-.052.11-.052.106-.052.101-.052.096-.052.092-.052.088-.052.083-.052.079-.052.074-.051.07-.052.065-.051.06-.05.056-.05.051-.05.023-.025.023-.024.021-.024.02-.025.019-.024.018-.024.017-.023.015-.024.014-.023.013-.023.012-.023.01-.023.01-.022.008-.022.006-.023.006-.021.004-.022.004-.021.001-.021.001-.021-.001-.021-.001-.021-.004-.021-.004-.022-.006-.021-.006-.023-.008-.022-.01-.022-.01-.023-.012-.023-.013-.023-.014-.023-.015-.024-.017-.023-.018-.024-.019-.024-.02-.025-.021-.024-.023-.024-.023-.025-.051-.05-.056-.05-.06-.05-.065-.051-.07-.052-.074-.051-.079-.052-.083-.052-.088-.052-.092-.052-.096-.052-.101-.052-.106-.052-.11-.052-.114-.052-.118-.051-.123-.051-.126-.051-.131-.05-.136-.05-.139-.049-.143-.048-.148-.048-.152-.048-.155-.046-.16-.046-.163-.045-.168-.043-.172-.043-.175-.042-.179-.041-.183-.04-.187-.038-.191-.038-.194-.036-.198-.034-.202-.033-.205-.032-.21-.031-.212-.028-.216-.027-.22-.026-.224-.023-.226-.022-.231-.021-.233-.018-.237-.016-.241-.014-.244-.012-.247-.011-.25-.008-.254-.005-.257-.004-.26-.001-.26.001z"></path></symbol></defs><defs><symbol id="m1-clock" width="24" height="24"><path transform="scale(.5)" d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.848 12.459c.202.038.202.333.001.372-1.907.361-6.045 1.111-6.547 1.111-.719 0-1.301-.582-1.301-1.301 0-.512.77-5.447 1.125-7.445.034-.192.312-.181.343.014l.985 6.238 5.394 1.011z"></path></symbol></defs><defs><marker id="m1-arrowhead" refX="7.9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M -1 0 L 10 5 L 0 10 z"></path></marker></defs><defs><marker id="m1-crosshead" markerWidth="15" markerHeight="8" orient="auto" refX="4" refY="4.5"><path fill="none" stroke="#000000" stroke-width="1pt" d="M 1,2 L 6,7 M 6,2 L 1,7" style="stroke-dasharray: 0, 0;"></path></marker></defs><defs><marker id="m1-filled-head" refX="15.5" refY="7" markerWidth="20" markerHeight="28" orient="auto"><path d="M 18,7 L9,13 L14,7 L9,1 Z"></path></marker></defs><defs><marker id="m1-sequencenumber" refX="15" refY="15" markerWidth="60" markerHeight="40" orient="auto"><circle cx="15" cy="15" r="6"></circle></marker></defs><defs><marker id="m1-solidTopArrowHead" refX="7.9" refY="7.25" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M 0 0 L 10 8 L 0 8 z"></path></marker></defs><defs><marker id="m1-solidBottomArrowHead" refX="7.9" refY="0.75" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M 0 0 L 10 0 L 0 8 z"></path></marker></defs><defs><marker id="m1-stickTopArrowHead" refX="7.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M 0 0 L 7 7" stroke="black" stroke-width="1.5" fill="none"></path></marker></defs><defs><marker id="m1-stickBottomArrowHead" refX="7.5" refY="0" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M 0 7 L 7 0" stroke="black" stroke-width="1.5" fill="none"></path></marker></defs><g><rect x="231" y="97" fill="#EDF2AE" stroke="#666" width="10" height="174" class="activation0"></rect></g><g><rect x="407" y="135" fill="#EDF2AE" stroke="#666" width="10" height="100" class="activation0"></rect></g><g><rect x="789.5" y="309" fill="#EDF2AE" stroke="#666" width="10" height="128" class="activation0"></rect></g><g data-et="note" data-id="i12"><rect x="717.5" y="313" fill="#EDF2AE" stroke="#666" width="154" height="35" class="note"></rect><text x="795" y="318" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="noteText" dy="1em" style="font-size: 12.5px; font-weight: 400;"><tspan x="795">no retry_on ⚑ blocking</tspan></text></g><g data-et="control-structure" data-id="i15"><line x1="783.5" y1="354" x2="978.5" y2="354" class="loopLine"></line><line x1="978.5" y1="354" x2="978.5" y2="437" class="loopLine"></line><line x1="783.5" y1="437" x2="978.5" y2="437" class="loopLine"></line><line x1="783.5" y1="354" x2="783.5" y2="437" class="loopLine"></line><polygon points="783.5,354 833.5,354 833.5,367 825.1,374 783.5,374" class="labelBox"></polygon><text x="809" y="367" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="labelText" style="font-size: 12.5px; font-weight: 400;">loop</text><text x="906" y="368" text-anchor="middle" class="loopText" style="font-size: 12.5px; font-weight: 400;"><tspan x="906">[find_each over</tspan></text><text x="906" y="383" text-anchor="middle" class="loopText" style="font-size: 12.5px; font-weight: 400;"><tspan x="906">followers]</tspan></text></g><g data-et="note" data-id="i19"><rect x="1189" y="515" fill="#EDF2AE" stroke="#666" width="157" height="35" class="note"></rect><text x="1268" y="520" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="noteText" dy="1em" style="font-size: 12.5px; font-weight: 400;"><tspan x="1268">nil for 3 fixtures ⚑ note</tspan></text></g><text x="71" y="76" text-anchor="start" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 12.5px; font-weight: 400;">POST /posts</text><line x1="67" y1="97" x2="232" y2="97" class="messageLine0" data-et="message" data-id="i1" data-from="A" data-to="C" stroke-width="2" stroke="none" marker-end="url(#m1-arrowhead)" style="fill: none;"></line><line x1="60" y1="97" x2="60" y2="97" stroke-width="0" marker-start="url(#m1-sequencenumber)"></line><text x="60" y="101" font-family="sans-serif" font-size="12px" text-anchor="middle" class="sequenceNumber">1</text><text x="251" y="112" text-anchor="start" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 12.5px; font-weight: 400;">save(post_params)</text><line x1="247" y1="133" x2="408" y2="133" class="messageLine0" data-et="message" data-id="i3" data-from="C" data-to="P" stroke-width="2" stroke="none" marker-end="url(#m1-arrowhead)" style="fill: none;"></line><line x1="232" y1="133" x2="232" y2="133" stroke-width="0" marker-start="url(#m1-sequencenumber)"></line><text x="232" y="137" font-family="sans-serif" font-size="12px" text-anchor="middle" class="sequenceNumber">2</text><text x="427" y="148" text-anchor="start" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 12.5px; font-weight: 400;">INSERT INTO posts</text><path d="M 417,169 C 477,159 477,199 417,189" class="messageLine0" data-et="message" data-id="i5" data-from="P" data-to="P" stroke-width="2" stroke="none" marker-end="url(#m1-arrowhead)" x1="423" style="fill: none;"></path><line x1="408" y1="169" x2="408" y2="169" stroke-width="0" marker-start="url(#m1-sequencenumber)"></line><text x="408" y="173" font-family="sans-serif" font-size="12px" text-anchor="middle" class="sequenceNumber">3</text><text x="427" y="214" text-anchor="start" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 12.5px; font-weight: 400;">after_commit, perform_later(id)</text><line x1="423" y1="235" x2="633" y2="235" class="messageLine0" data-et="message" data-id="i6" data-from="P" data-to="Q" stroke-width="2" stroke="none" marker-end="url(#m1-filled-head)" style="fill: none;"></line><line x1="408" y1="235" x2="408" y2="235" stroke-width="0" marker-start="url(#m1-sequencenumber)"></line><text x="408" y="239" font-family="sans-serif" font-size="12px" text-anchor="middle" class="sequenceNumber">4</text><text x="74" y="250" text-anchor="start" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 12.5px; font-weight: 400;">302 → post_path</text><line x1="237" y1="271" x2="64" y2="271" class="messageLine1" data-et="message" data-id="i8" data-from="C" data-to="A" stroke-width="2" stroke="none" marker-end="url(#m1-arrowhead)" style="stroke-dasharray: 3, 3; fill: none;"></line><line x1="240" y1="271" x2="240" y2="271" stroke-width="0" marker-start="url(#m1-sequencenumber)"></line><text x="240" y="275" font-family="sans-serif" font-size="12px" text-anchor="middle" class="sequenceNumber">5</text><text x="648" y="286" text-anchor="start" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 12.5px; font-weight: 400;">perform(post_id)</text><line x1="644" y1="307" x2="790.5" y2="307" class="messageLine0" data-et="message" data-id="i10" data-from="Q" data-to="J" stroke-width="2" stroke="none" marker-end="url(#m1-filled-head)" style="fill: none;"></line><line x1="637" y1="307" x2="637" y2="307" stroke-width="0" marker-start="url(#m1-sequencenumber)"></line><text x="637" y="311" font-family="sans-serif" font-size="12px" text-anchor="middle" class="sequenceNumber">6</text><text x="810" y="410" text-anchor="start" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 12.5px; font-weight: 400;">new_post, deliver_later</text><line x1="805.5" y1="431" x2="967.5" y2="431" class="messageLine0" data-et="message" data-id="i14" data-from="J" data-to="M" stroke-width="2" stroke="none" marker-end="url(#m1-filled-head)" style="fill: none;"></line><line x1="790.5" y1="431" x2="790.5" y2="431" stroke-width="0" marker-start="url(#m1-sequencenumber)"></line><text x="790.5" y="435" font-family="sans-serif" font-size="12px" text-anchor="middle" class="sequenceNumber">7</text><text x="983" y="452" text-anchor="start" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 12.5px; font-weight: 400;">render</text><line x1="978.5" y1="473" x2="1110" y2="473" class="messageLine0" data-et="message" data-id="i17" data-from="M" data-to="V" stroke-width="2" stroke="none" marker-end="url(#m1-arrowhead)" style="fill: none;"></line><line x1="971.5" y1="473" x2="971.5" y2="473" stroke-width="0" marker-start="url(#m1-sequencenumber)"></line><text x="971.5" y="477" font-family="sans-serif" font-size="12px" text-anchor="middle" class="sequenceNumber">8</text><text x="1125" y="488" text-anchor="start" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 12.5px; font-weight: 400;">preferences</text><line x1="1121" y1="509" x2="1263.5" y2="509" class="messageLine0" data-et="message" data-id="i18" data-from="V" data-to="U" stroke-width="2" stroke="none" marker-end="url(#m1-arrowhead)" style="fill: none;"></line><line x1="1114" y1="509" x2="1114" y2="509" stroke-width="0" marker-start="url(#m1-sequencenumber)"></line><text x="1114" y="513" font-family="sans-serif" font-size="12px" text-anchor="middle" class="sequenceNumber">9</text></svg></div><div class="legend"><span><span class="ar">→</span> call (filled head)</span><span><span class="ar">⇒</span> async hop (open head), new process</span><span><span class="ar">⇢</span> return (dashed)</span><span>tinted box = changed in this range</span><span>⚑ blocking</span><span>fix before merge</span><span>⚑ note</span><span>mention in review</span></div></td></tr><tr class="xr chk odd"><td class="tg"><div class="tgc"><input type="checkbox" aria-label="Include in review set" checked><button class="tgl" type="button" aria-expanded="false" aria-label="Expand">▸</button></div></td><td class="lead ch"><a href="#">POST /posts/:id/republish</a><br><span class="meta">PostsController#republish</span></td><td class="steps"><table class="stpt"><tr><td class="n">1</td><td class="g"><div class="st" style="--d:0"><span class="ar"></span><span>POST /posts/:id/republish → <a href="#">PostsController#republish</a></span></div></td></tr><tr><td class="n">2</td><td class="g"><div class="st" style="--d:1"><span class="ar">→</span><span><a href="#">Post#republish!</a><span class="mech">perform_later(id)</span></span></div></td></tr><tr><td class="n">3</td><td class="g"><div class="st" style="--d:1"><span class="ar ret">⇢</span><span>302 → post_path<span class="mech">response</span></span></div></td></tr><tr class="bnd"><td></td><td>⇒ async hop, new process: another job</td></tr><tr class="proc"><td class="n">4</td><td class="g"><div class="st" style="--d:0"><span class="ar async">⇒</span><span><span class="M">M</span><a href="#">NotifySubscribersJob#perform</a><span class="mech">from the queue, no retry_on</span></span></div></td></tr><tr class="bnd"><td></td><td>⇒ async hop, new process: queue worker</td></tr><tr class="proc"><td class="n">5</td><td class="g"><div class="st" style="--d:0"><span class="ar async">⇒</span><span><span class="M">M</span><a href="#">MailingListMailer#new_post</a><span class="mech">deliver_later, per follower</span></span></div></td></tr><tr><td class="n">6</td><td class="g"><div class="st" style="--d:1"><span class="ar">→</span><span><span class="M">M</span><a href="#">new_post.html.erb</a><span class="mech">render</span></span></div></td></tr><tr><td class="n">7</td><td class="g"><div class="st" style="--d:2"><span class="ar">→</span><span><a href="#">User#preferences</a><span class="mech">nil for 3 fixtures</span></span></div></td></tr></table></td><td class="nw">3 of 5</td><td class="nw"><span class="meta">0</span></td><td class="meta"><span class="lines"><span>precomputed</span><span>gen 42</span></span></td></tr><tr class="xr open"><td class="tg"><div class="tgc"><input type="checkbox" aria-label="Include in review set"><button class="tgl" type="button" aria-expanded="true" aria-label="Collapse">▾</button></div></td><td class="lead ch"><a href="#">PublishPostJob</a><br><span class="meta">scheduled<i class="sep"></i>solid_queue recurring</span></td><td class="steps"><table class="stpt"><tr><td class="n">1</td><td class="g"><div class="st" style="--d:0"><span class="ar"></span><span><a href="#">PublishPostJob#perform</a><span class="mech">recurring, from the queue</span></span></div></td></tr><tr><td class="n">2</td><td class="g"><div class="st" style="--d:1"><span class="ar">→</span><span><span class="dim">send(:"#{kind}_notify")</span><span class="mech">unexpanded, 1 dynamic step</span></span></div></td></tr><tr class="bnd"><td></td><td>⇒ async hop, new process: mail delivery job</td></tr><tr class="proc"><td class="n">3</td><td class="g"><div class="st" style="--d:0"><span class="ar async">⇒</span><span><span class="M">M</span><a href="#">NotifySubscribersJob#perform</a><span class="mech">perform_later(post.id), no retry_on</span></span></div></td></tr></table></td><td class="nw">1 of 3+</td><td class="nw"><a href="#">1 dynamic</a></td><td class="meta"><span class="lines"><span>assembled on demand</span><span>gen 42</span></span></td></tr><tr class="xr xp"><td class="tg"><div class="irail" role="group" aria-label="Diagram"><button class="ib" type="button" title="sequence" aria-label="sequence" aria-pressed="true">↕</button><button class="ib" type="button" title="flowchart" aria-label="flowchart" aria-pressed="false">⤵</button><button class="ib" type="button" title="lanes" aria-label="lanes" aria-pressed="false">≡</button><button class="ib" type="button" title="copy Mermaid" aria-label="copy Mermaid">⎘</button></div></td><td colspan="5" class="xb"><div class="xh"><b>PublishPostJob</span><span>sequence</b><span>1 dynamic step unexpanded</span><span class="lyr">assembled on demand, gen 42</span><span class="tools"><a href="#">share</a><button class="tool" type="button" aria-label="Collapse">✕</button></span></div><div class="xd"><svg role="img" aria-label="Sequence diagram of PublishPostJob" id="m1" xmlns="http://www.w3.org/2000/svg" viewBox="-50 -10 833.5 281" role="graphics-document document" aria-roledescription="sequence" aria-labelledby="chart-title-m1" style="width:834px;max-width:none;height:auto"><title id="chart-title-m1">PublishPostJob through the changed units</title><g><rect x="562.5" y="-3" fill="rgba(241,183,58,0.03)" stroke="rgb(0,0,0, 0.5)" width="183" height="264" class="rect"></rect><text x="654" y="12.5" dominant-baseline="central" alignment-baseline="central" class="text" style="text-anchor: middle; font-size: 12.5px; font-weight: 400;"><tspan x="654" dy="0">changed</tspan></text></g><g><line id="actor3" x1="654" y1="65" x2="654" y2="2000" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="N" data-et="life-line" data-id="N"></line><g id="root-3" data-et="participant" data-type="participant" data-id="N"><rect x="579.5" y="21" fill="#eaeaea" stroke="#666" width="149" height="44" name="N" rx="3" ry="3" class="actor actor-top"></rect><text x="654" y="43" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 12.5px; font-weight: 400;"><tspan x="654" dy="0">NotifySubscribersJob</tspan></text></g></g><g><line id="actor2" x1="482" y1="65" x2="482" y2="2000" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="D" data-et="life-line" data-id="D"></line><g id="root-2" data-et="participant" data-type="participant" data-id="D"><rect x="417" y="21" fill="#eaeaea" stroke="#666" width="130" height="44" name="D" rx="3" ry="3" class="actor actor-top"></rect><text x="482" y="43" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 12.5px; font-weight: 400;"><tspan x="482" dy="0">dynamic dispatch</tspan></text></g></g><g><line id="actor1" x1="267" y1="65" x2="267" y2="2000" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="J" data-et="life-line" data-id="J"></line><g id="root-1" data-et="participant" data-type="participant" data-id="J"><rect x="202" y="21" fill="#eaeaea" stroke="#666" width="130" height="44" name="J" rx="3" ry="3" class="actor actor-top"></rect><text x="267" y="43" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 12.5px; font-weight: 400;"><tspan x="267" dy="0">PublishPostJob</tspan></text></g></g><g><line id="actor0" x1="65" y1="65" x2="65" y2="2000" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="S" data-et="life-line" data-id="S"></line><g id="root-0" data-et="participant" data-type="participant" data-id="S"><rect x="0" y="21" fill="#eaeaea" stroke="#666" width="130" height="44" name="S" rx="3" ry="3" class="actor actor-top"></rect><text x="65" y="43" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 12.5px; font-weight: 400;"><tspan x="65" dy="0">Solid Queue</tspan></text></g></g><style>#m1{font-family:"Fira Mono",ui-monospace,monospace;font-size:12.5px;fill:#E5E8EB;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#m1 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#m1 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#m1 .error-icon{fill:#2A2833;}#m1 .error-text{fill:#E5E8EB;stroke:#E5E8EB;}#m1 .edge-thickness-normal{stroke-width:1px;}#m1 .edge-thickness-thick{stroke-width:3.5px;}#m1 .edge-pattern-solid{stroke-dasharray:0;}#m1 .edge-thickness-invisible{stroke-width:0;fill:none;}#m1 .edge-pattern-dashed{stroke-dasharray:3;}#m1 .edge-pattern-dotted{stroke-dasharray:2;}#m1 .marker{fill:#9BA5B0;stroke:#9BA5B0;}#m1 .marker.cross{stroke:#9BA5B0;}#m1 svg{font-family:"Fira Mono",ui-monospace,monospace;font-size:12.5px;}#m1 p{margin:0;}#m1 .actor{stroke:#4A4852;fill:#28272D;stroke-width:1;}#m1 rect.actor.outer-path[data-look="neo"]{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m1 rect.note[data-look="neo"]{stroke:#3B3942;fill:#2A2833;filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m1 text.actor>tspan{fill:#E5E8EB;stroke:none;}#m1 .actor-line{stroke:#3B3942;}#m1 .innerArc{stroke-width:1.5;stroke-dasharray:none;}#m1 .messageLine0{stroke-width:1.5;stroke-dasharray:none;stroke:#9BA5B0;}#m1 .messageLine1{stroke-width:1.5;stroke-dasharray:2,2;stroke:#9BA5B0;}#m1 [id$="-arrowhead"] path{fill:#9BA5B0;stroke:#9BA5B0;}#m1 .sequenceNumber{fill:#222126;}#m1 [id$="-sequencenumber"]{fill:#9BA5B0;}#m1 [id$="-crosshead"] path{fill:#9BA5B0;stroke:#9BA5B0;}#m1 .messageText{fill:#E5E8EB;stroke:none;}#m1 .labelBox{stroke:#3B3942;fill:#1B1A1F;filter:none;}#m1 .labelText,#m1 .labelText>tspan{fill:#E5E8EB;stroke:none;}#m1 .loopText,#m1 .loopText>tspan{fill:#9BA5B0;stroke:none;}#m1 .sectionTitle,#m1 .sectionTitle>tspan{fill:#9BA5B0;stroke:none;}#m1 .loopLine{stroke-width:2px;stroke-dasharray:2,2;stroke:#3B3942;fill:#3B3942;}#m1 .note{stroke:#3B3942;fill:#2A2833;}#m1 .noteText,#m1 .noteText>tspan{fill:#E5E8EB;stroke:none;}#m1 .activation0{fill:#2A2833;stroke:#4A4852;}#m1 .activation1{fill:#2A2833;stroke:#4A4852;}#m1 .activation2{fill:#2A2833;stroke:#4A4852;}#m1 .actorPopupMenu{position:absolute;}#m1 .actorPopupMenuPanel{position:absolute;fill:#28272D;box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);filter:drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4));}#m1 .actor-man circle,#m1 line{fill:#28272D;stroke-width:2px;}#m1 g rect.rect{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));stroke:#4A4852;}#m1 .node .neo-node{stroke:#4A4852;}#m1 [data-look="neo"].node rect,#m1 [data-look="neo"].cluster rect,#m1 [data-look="neo"].node polygon{stroke:#4A4852;filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m1 [data-look="neo"].swimlane.cluster rect{filter:none;}#m1 [data-look="neo"].node path{stroke:#4A4852;stroke-width:1px;}#m1 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m1 [data-look="neo"].node .neo-line path{stroke:#4A4852;filter:none;}#m1 [data-look="neo"].node circle{stroke:#4A4852;filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m1 [data-look="neo"].node circle .state-start{fill:#000000;}#m1 [data-look="neo"].icon-shape .icon{fill:#4A4852;filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m1 [data-look="neo"].icon-shape .icon-neo path{stroke:#4A4852;filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m1 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g></g><defs><symbol id="m1-computer" width="24" height="24"><path transform="scale(.5)" d="M2 2v13h20v-13h-20zm18 11h-16v-9h16v9zm-10.228 6l.466-1h3.524l.467 1h-4.457zm14.228 3h-24l2-6h2.104l-1.33 4h18.45l-1.297-4h2.073l2 6zm-5-10h-14v-7h14v7z"></path></symbol></defs><defs><symbol id="m1-database" fill-rule="evenodd" clip-rule="evenodd"><path transform="scale(.5)" d="M12.258.001l.256.004.255.005.253.008.251.01.249.012.247.015.246.016.242.019.241.02.239.023.236.024.233.027.231.028.229.031.225.032.223.034.22.036.217.038.214.04.211.041.208.043.205.045.201.046.198.048.194.05.191.051.187.053.183.054.18.056.175.057.172.059.168.06.163.061.16.063.155.064.15.066.074.033.073.033.071.034.07.034.069.035.068.035.067.035.066.035.064.036.064.036.062.036.06.036.06.037.058.037.058.037.055.038.055.038.053.038.052.038.051.039.05.039.048.039.047.039.045.04.044.04.043.04.041.04.04.041.039.041.037.041.036.041.034.041.033.042.032.042.03.042.029.042.027.042.026.043.024.043.023.043.021.043.02.043.018.044.017.043.015.044.013.044.012.044.011.045.009.044.007.045.006.045.004.045.002.045.001.045v17l-.001.045-.002.045-.004.045-.006.045-.007.045-.009.044-.011.045-.012.044-.013.044-.015.044-.017.043-.018.044-.02.043-.021.043-.023.043-.024.043-.026.043-.027.042-.029.042-.03.042-.032.042-.033.042-.034.041-.036.041-.037.041-.039.041-.04.041-.041.04-.043.04-.044.04-.045.04-.047.039-.048.039-.05.039-.051.039-.052.038-.053.038-.055.038-.055.038-.058.037-.058.037-.06.037-.06.036-.062.036-.064.036-.064.036-.066.035-.067.035-.068.035-.069.035-.07.034-.071.034-.073.033-.074.033-.15.066-.155.064-.16.063-.163.061-.168.06-.172.059-.175.057-.18.056-.183.054-.187.053-.191.051-.194.05-.198.048-.201.046-.205.045-.208.043-.211.041-.214.04-.217.038-.22.036-.223.034-.225.032-.229.031-.231.028-.233.027-.236.024-.239.023-.241.02-.242.019-.246.016-.247.015-.249.012-.251.01-.253.008-.255.005-.256.004-.258.001-.258-.001-.256-.004-.255-.005-.253-.008-.251-.01-.249-.012-.247-.015-.245-.016-.243-.019-.241-.02-.238-.023-.236-.024-.234-.027-.231-.028-.228-.031-.226-.032-.223-.034-.22-.036-.217-.038-.214-.04-.211-.041-.208-.043-.204-.045-.201-.046-.198-.048-.195-.05-.19-.051-.187-.053-.184-.054-.179-.056-.176-.057-.172-.059-.167-.06-.164-.061-.159-.063-.155-.064-.151-.066-.074-.033-.072-.033-.072-.034-.07-.034-.069-.035-.068-.035-.067-.035-.066-.035-.064-.036-.063-.036-.062-.036-.061-.036-.06-.037-.058-.037-.057-.037-.056-.038-.055-.038-.053-.038-.052-.038-.051-.039-.049-.039-.049-.039-.046-.039-.046-.04-.044-.04-.043-.04-.041-.04-.04-.041-.039-.041-.037-.041-.036-.041-.034-.041-.033-.042-.032-.042-.03-.042-.029-.042-.027-.042-.026-.043-.024-.043-.023-.043-.021-.043-.02-.043-.018-.044-.017-.043-.015-.044-.013-.044-.012-.044-.011-.045-.009-.044-.007-.045-.006-.045-.004-.045-.002-.045-.001-.045v-17l.001-.045.002-.045.004-.045.006-.045.007-.045.009-.044.011-.045.012-.044.013-.044.015-.044.017-.043.018-.044.02-.043.021-.043.023-.043.024-.043.026-.043.027-.042.029-.042.03-.042.032-.042.033-.042.034-.041.036-.041.037-.041.039-.041.04-.041.041-.04.043-.04.044-.04.046-.04.046-.039.049-.039.049-.039.051-.039.052-.038.053-.038.055-.038.056-.038.057-.037.058-.037.06-.037.061-.036.062-.036.063-.036.064-.036.066-.035.067-.035.068-.035.069-.035.07-.034.072-.034.072-.033.074-.033.151-.066.155-.064.159-.063.164-.061.167-.06.172-.059.176-.057.179-.056.184-.054.187-.053.19-.051.195-.05.198-.048.201-.046.204-.045.208-.043.211-.041.214-.04.217-.038.22-.036.223-.034.226-.032.228-.031.231-.028.234-.027.236-.024.238-.023.241-.02.243-.019.245-.016.247-.015.249-.012.251-.01.253-.008.255-.005.256-.004.258-.001.258.001zm-9.258 20.499v.01l.001.021.003.021.004.022.005.021.006.022.007.022.009.023.01.022.011.023.012.023.013.023.015.023.016.024.017.023.018.024.019.024.021.024.022.025.023.024.024.025.052.049.056.05.061.051.066.051.07.051.075.051.079.052.084.052.088.052.092.052.097.052.102.051.105.052.11.052.114.051.119.051.123.051.127.05.131.05.135.05.139.048.144.049.147.047.152.047.155.047.16.045.163.045.167.043.171.043.176.041.178.041.183.039.187.039.19.037.194.035.197.035.202.033.204.031.209.03.212.029.216.027.219.025.222.024.226.021.23.02.233.018.236.016.24.015.243.012.246.01.249.008.253.005.256.004.259.001.26-.001.257-.004.254-.005.25-.008.247-.011.244-.012.241-.014.237-.016.233-.018.231-.021.226-.021.224-.024.22-.026.216-.027.212-.028.21-.031.205-.031.202-.034.198-.034.194-.036.191-.037.187-.039.183-.04.179-.04.175-.042.172-.043.168-.044.163-.045.16-.046.155-.046.152-.047.148-.048.143-.049.139-.049.136-.05.131-.05.126-.05.123-.051.118-.052.114-.051.11-.052.106-.052.101-.052.096-.052.092-.052.088-.053.083-.051.079-.052.074-.052.07-.051.065-.051.06-.051.056-.05.051-.05.023-.024.023-.025.021-.024.02-.024.019-.024.018-.024.017-.024.015-.023.014-.024.013-.023.012-.023.01-.023.01-.022.008-.022.006-.022.006-.022.004-.022.004-.021.001-.021.001-.021v-4.127l-.077.055-.08.053-.083.054-.085.053-.087.052-.09.052-.093.051-.095.05-.097.05-.1.049-.102.049-.105.048-.106.047-.109.047-.111.046-.114.045-.115.045-.118.044-.12.043-.122.042-.124.042-.126.041-.128.04-.13.04-.132.038-.134.038-.135.037-.138.037-.139.035-.142.035-.143.034-.144.033-.147.032-.148.031-.15.03-.151.03-.153.029-.154.027-.156.027-.158.026-.159.025-.161.024-.162.023-.163.022-.165.021-.166.02-.167.019-.169.018-.169.017-.171.016-.173.015-.173.014-.175.013-.175.012-.177.011-.178.01-.179.008-.179.008-.181.006-.182.005-.182.004-.184.003-.184.002h-.37l-.184-.002-.184-.003-.182-.004-.182-.005-.181-.006-.179-.008-.179-.008-.178-.01-.176-.011-.176-.012-.175-.013-.173-.014-.172-.015-.171-.016-.17-.017-.169-.018-.167-.019-.166-.02-.165-.021-.163-.022-.162-.023-.161-.024-.159-.025-.157-.026-.156-.027-.155-.027-.153-.029-.151-.03-.15-.03-.148-.031-.146-.032-.145-.033-.143-.034-.141-.035-.14-.035-.137-.037-.136-.037-.134-.038-.132-.038-.13-.04-.128-.04-.126-.041-.124-.042-.122-.042-.12-.044-.117-.043-.116-.045-.113-.045-.112-.046-.109-.047-.106-.047-.105-.048-.102-.049-.1-.049-.097-.05-.095-.05-.093-.052-.09-.051-.087-.052-.085-.053-.083-.054-.08-.054-.077-.054v4.127zm0-5.654v.011l.001.021.003.021.004.021.005.022.006.022.007.022.009.022.01.022.011.023.012.023.013.023.015.024.016.023.017.024.018.024.019.024.021.024.022.024.023.025.024.024.052.05.056.05.061.05.066.051.07.051.075.052.079.051.084.052.088.052.092.052.097.052.102.052.105.052.11.051.114.051.119.052.123.05.127.051.131.05.135.049.139.049.144.048.147.048.152.047.155.046.16.045.163.045.167.044.171.042.176.042.178.04.183.04.187.038.19.037.194.036.197.034.202.033.204.032.209.03.212.028.216.027.219.025.222.024.226.022.23.02.233.018.236.016.24.014.243.012.246.01.249.008.253.006.256.003.259.001.26-.001.257-.003.254-.006.25-.008.247-.01.244-.012.241-.015.237-.016.233-.018.231-.02.226-.022.224-.024.22-.025.216-.027.212-.029.21-.03.205-.032.202-.033.198-.035.194-.036.191-.037.187-.039.183-.039.179-.041.175-.042.172-.043.168-.044.163-.045.16-.045.155-.047.152-.047.148-.048.143-.048.139-.05.136-.049.131-.05.126-.051.123-.051.118-.051.114-.052.11-.052.106-.052.101-.052.096-.052.092-.052.088-.052.083-.052.079-.052.074-.051.07-.052.065-.051.06-.05.056-.051.051-.049.023-.025.023-.024.021-.025.02-.024.019-.024.018-.024.017-.024.015-.023.014-.023.013-.024.012-.022.01-.023.01-.023.008-.022.006-.022.006-.022.004-.021.004-.022.001-.021.001-.021v-4.139l-.077.054-.08.054-.083.054-.085.052-.087.053-.09.051-.093.051-.095.051-.097.05-.1.049-.102.049-.105.048-.106.047-.109.047-.111.046-.114.045-.115.044-.118.044-.12.044-.122.042-.124.042-.126.041-.128.04-.13.039-.132.039-.134.038-.135.037-.138.036-.139.036-.142.035-.143.033-.144.033-.147.033-.148.031-.15.03-.151.03-.153.028-.154.028-.156.027-.158.026-.159.025-.161.024-.162.023-.163.022-.165.021-.166.02-.167.019-.169.018-.169.017-.171.016-.173.015-.173.014-.175.013-.175.012-.177.011-.178.009-.179.009-.179.007-.181.007-.182.005-.182.004-.184.003-.184.002h-.37l-.184-.002-.184-.003-.182-.004-.182-.005-.181-.007-.179-.007-.179-.009-.178-.009-.176-.011-.176-.012-.175-.013-.173-.014-.172-.015-.171-.016-.17-.017-.169-.018-.167-.019-.166-.02-.165-.021-.163-.022-.162-.023-.161-.024-.159-.025-.157-.026-.156-.027-.155-.028-.153-.028-.151-.03-.15-.03-.148-.031-.146-.033-.145-.033-.143-.033-.141-.035-.14-.036-.137-.036-.136-.037-.134-.038-.132-.039-.13-.039-.128-.04-.126-.041-.124-.042-.122-.043-.12-.043-.117-.044-.116-.044-.113-.046-.112-.046-.109-.046-.106-.047-.105-.048-.102-.049-.1-.049-.097-.05-.095-.051-.093-.051-.09-.051-.087-.053-.085-.052-.083-.054-.08-.054-.077-.054v4.139zm0-5.666v.011l.001.02.003.022.004.021.005.022.006.021.007.022.009.023.01.022.011.023.012.023.013.023.015.023.016.024.017.024.018.023.019.024.021.025.022.024.023.024.024.025.052.05.056.05.061.05.066.051.07.051.075.052.079.051.084.052.088.052.092.052.097.052.102.052.105.051.11.052.114.051.119.051.123.051.127.05.131.05.135.05.139.049.144.048.147.048.152.047.155.046.16.045.163.045.167.043.171.043.176.042.178.04.183.04.187.038.19.037.194.036.197.034.202.033.204.032.209.03.212.028.216.027.219.025.222.024.226.021.23.02.233.018.236.017.24.014.243.012.246.01.249.008.253.006.256.003.259.001.26-.001.257-.003.254-.006.25-.008.247-.01.244-.013.241-.014.237-.016.233-.018.231-.02.226-.022.224-.024.22-.025.216-.027.212-.029.21-.03.205-.032.202-.033.198-.035.194-.036.191-.037.187-.039.183-.039.179-.041.175-.042.172-.043.168-.044.163-.045.16-.045.155-.047.152-.047.148-.048.143-.049.139-.049.136-.049.131-.051.126-.05.123-.051.118-.052.114-.051.11-.052.106-.052.101-.052.096-.052.092-.052.088-.052.083-.052.079-.052.074-.052.07-.051.065-.051.06-.051.056-.05.051-.049.023-.025.023-.025.021-.024.02-.024.019-.024.018-.024.017-.024.015-.023.014-.024.013-.023.012-.023.01-.022.01-.023.008-.022.006-.022.006-.022.004-.022.004-.021.001-.021.001-.021v-4.153l-.077.054-.08.054-.083.053-.085.053-.087.053-.09.051-.093.051-.095.051-.097.05-.1.049-.102.048-.105.048-.106.048-.109.046-.111.046-.114.046-.115.044-.118.044-.12.043-.122.043-.124.042-.126.041-.128.04-.13.039-.132.039-.134.038-.135.037-.138.036-.139.036-.142.034-.143.034-.144.033-.147.032-.148.032-.15.03-.151.03-.153.028-.154.028-.156.027-.158.026-.159.024-.161.024-.162.023-.163.023-.165.021-.166.02-.167.019-.169.018-.169.017-.171.016-.173.015-.173.014-.175.013-.175.012-.177.01-.178.01-.179.009-.179.007-.181.006-.182.006-.182.004-.184.003-.184.001-.185.001-.185-.001-.184-.001-.184-.003-.182-.004-.182-.006-.181-.006-.179-.007-.179-.009-.178-.01-.176-.01-.176-.012-.175-.013-.173-.014-.172-.015-.171-.016-.17-.017-.169-.018-.167-.019-.166-.02-.165-.021-.163-.023-.162-.023-.161-.024-.159-.024-.157-.026-.156-.027-.155-.028-.153-.028-.151-.03-.15-.03-.148-.032-.146-.032-.145-.033-.143-.034-.141-.034-.14-.036-.137-.036-.136-.037-.134-.038-.132-.039-.13-.039-.128-.041-.126-.041-.124-.041-.122-.043-.12-.043-.117-.044-.116-.044-.113-.046-.112-.046-.109-.046-.106-.048-.105-.048-.102-.048-.1-.05-.097-.049-.095-.051-.093-.051-.09-.052-.087-.052-.085-.053-.083-.053-.08-.054-.077-.054v4.153zm8.74-8.179l-.257.004-.254.005-.25.008-.247.011-.244.012-.241.014-.237.016-.233.018-.231.021-.226.022-.224.023-.22.026-.216.027-.212.028-.21.031-.205.032-.202.033-.198.034-.194.036-.191.038-.187.038-.183.04-.179.041-.175.042-.172.043-.168.043-.163.045-.16.046-.155.046-.152.048-.148.048-.143.048-.139.049-.136.05-.131.05-.126.051-.123.051-.118.051-.114.052-.11.052-.106.052-.101.052-.096.052-.092.052-.088.052-.083.052-.079.052-.074.051-.07.052-.065.051-.06.05-.056.05-.051.05-.023.025-.023.024-.021.024-.02.025-.019.024-.018.024-.017.023-.015.024-.014.023-.013.023-.012.023-.01.023-.01.022-.008.022-.006.023-.006.021-.004.022-.004.021-.001.021-.001.021.001.021.001.021.004.021.004.022.006.021.006.023.008.022.01.022.01.023.012.023.013.023.014.023.015.024.017.023.018.024.019.024.02.025.021.024.023.024.023.025.051.05.056.05.06.05.065.051.07.052.074.051.079.052.083.052.088.052.092.052.096.052.101.052.106.052.11.052.114.052.118.051.123.051.126.051.131.05.136.05.139.049.143.048.148.048.152.048.155.046.16.046.163.045.168.043.172.043.175.042.179.041.183.04.187.038.191.038.194.036.198.034.202.033.205.032.21.031.212.028.216.027.22.026.224.023.226.022.231.021.233.018.237.016.241.014.244.012.247.011.25.008.254.005.257.004.26.001.26-.001.257-.004.254-.005.25-.008.247-.011.244-.012.241-.014.237-.016.233-.018.231-.021.226-.022.224-.023.22-.026.216-.027.212-.028.21-.031.205-.032.202-.033.198-.034.194-.036.191-.038.187-.038.183-.04.179-.041.175-.042.172-.043.168-.043.163-.045.16-.046.155-.046.152-.048.148-.048.143-.048.139-.049.136-.05.131-.05.126-.051.123-.051.118-.051.114-.052.11-.052.106-.052.101-.052.096-.052.092-.052.088-.052.083-.052.079-.052.074-.051.07-.052.065-.051.06-.05.056-.05.051-.05.023-.025.023-.024.021-.024.02-.025.019-.024.018-.024.017-.023.015-.024.014-.023.013-.023.012-.023.01-.023.01-.022.008-.022.006-.023.006-.021.004-.022.004-.021.001-.021.001-.021-.001-.021-.001-.021-.004-.021-.004-.022-.006-.021-.006-.023-.008-.022-.01-.022-.01-.023-.012-.023-.013-.023-.014-.023-.015-.024-.017-.023-.018-.024-.019-.024-.02-.025-.021-.024-.023-.024-.023-.025-.051-.05-.056-.05-.06-.05-.065-.051-.07-.052-.074-.051-.079-.052-.083-.052-.088-.052-.092-.052-.096-.052-.101-.052-.106-.052-.11-.052-.114-.052-.118-.051-.123-.051-.126-.051-.131-.05-.136-.05-.139-.049-.143-.048-.148-.048-.152-.048-.155-.046-.16-.046-.163-.045-.168-.043-.172-.043-.175-.042-.179-.041-.183-.04-.187-.038-.191-.038-.194-.036-.198-.034-.202-.033-.205-.032-.21-.031-.212-.028-.216-.027-.22-.026-.224-.023-.226-.022-.231-.021-.233-.018-.237-.016-.241-.014-.244-.012-.247-.011-.25-.008-.254-.005-.257-.004-.26-.001-.26.001z"></path></symbol></defs><defs><symbol id="m1-clock" width="24" height="24"><path transform="scale(.5)" d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.848 12.459c.202.038.202.333.001.372-1.907.361-6.045 1.111-6.547 1.111-.719 0-1.301-.582-1.301-1.301 0-.512.77-5.447 1.125-7.445.034-.192.312-.181.343.014l.985 6.238 5.394 1.011z"></path></symbol></defs><defs><marker id="m1-arrowhead" refX="7.9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M -1 0 L 10 5 L 0 10 z"></path></marker></defs><defs><marker id="m1-crosshead" markerWidth="15" markerHeight="8" orient="auto" refX="4" refY="4.5"><path fill="none" stroke="#000000" stroke-width="1pt" d="M 1,2 L 6,7 M 6,2 L 1,7" style="stroke-dasharray: 0, 0;"></path></marker></defs><defs><marker id="m1-filled-head" refX="15.5" refY="7" markerWidth="20" markerHeight="28" orient="auto"><path d="M 18,7 L9,13 L14,7 L9,1 Z"></path></marker></defs><defs><marker id="m1-sequencenumber" refX="15" refY="15" markerWidth="60" markerHeight="40" orient="auto"><circle cx="15" cy="15" r="6"></circle></marker></defs><defs><marker id="m1-solidTopArrowHead" refX="7.9" refY="7.25" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M 0 0 L 10 8 L 0 8 z"></path></marker></defs><defs><marker id="m1-solidBottomArrowHead" refX="7.9" refY="0.75" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M 0 0 L 10 0 L 0 8 z"></path></marker></defs><defs><marker id="m1-stickTopArrowHead" refX="7.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M 0 0 L 7 7" stroke="black" stroke-width="1.5" fill="none"></path></marker></defs><defs><marker id="m1-stickBottomArrowHead" refX="7.5" refY="0" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M 0 7 L 7 0" stroke="black" stroke-width="1.5" fill="none"></path></marker></defs><g><rect x="262" y="101" fill="#EDF2AE" stroke="#666" width="10" height="113" class="activation0"></rect></g><g data-et="note" data-id="i4"><rect x="386" y="143" fill="#EDF2AE" stroke="#666" width="192" height="35" class="note"></rect><text x="482" y="148" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="noteText" dy="1em" style="font-size: 12.5px; font-weight: 400;"><tspan x="482">unexpanded</span><span>1 dynamic step</tspan></text></g><g data-et="note" data-id="i7"><rect x="577" y="220" fill="#EDF2AE" stroke="#666" width="154" height="35" class="note"></rect><text x="654" y="225" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="noteText" dy="1em" style="font-size: 12.5px; font-weight: 400;"><tspan x="654">no retry_on ⚑ blocking</tspan></text></g><text x="76" y="80" text-anchor="start" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 12.5px; font-weight: 400;">perform(post_id)</span><span>recurring</text><line x1="72" y1="101" x2="263" y2="101" class="messageLine0" data-et="message" data-id="i1" data-from="S" data-to="J" stroke-width="2" stroke="none" marker-end="url(#m1-filled-head)" style="fill: none;"></line><line x1="65" y1="101" x2="65" y2="101" stroke-width="0" marker-start="url(#m1-sequencenumber)"></line><text x="65" y="105" font-family="sans-serif" font-size="12px" text-anchor="middle" class="sequenceNumber">1</text><text x="282" y="116" text-anchor="start" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 12.5px; font-weight: 400;">send(:"&#35;{kind}_notify")</text><line x1="278" y1="137" x2="478" y2="137" class="messageLine0" data-et="message" data-id="i3" data-from="J" data-to="D" stroke-width="2" stroke="none" marker-end="url(#m1-arrowhead)" style="fill: none;"></line><line x1="263" y1="137" x2="263" y2="137" stroke-width="0" marker-start="url(#m1-sequencenumber)"></line><text x="263" y="141" font-family="sans-serif" font-size="12px" text-anchor="middle" class="sequenceNumber">2</text><text x="493" y="193" text-anchor="start" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 12.5px; font-weight: 400;">perform_later(post.id)</text><line x1="489" y1="214" x2="650" y2="214" class="messageLine0" data-et="message" data-id="i5" data-from="D" data-to="N" stroke-width="2" stroke="none" marker-end="url(#m1-filled-head)" style="fill: none;"></line><line x1="482" y1="214" x2="482" y2="214" stroke-width="0" marker-start="url(#m1-sequencenumber)"></line><text x="482" y="218" font-family="sans-serif" font-size="12px" text-anchor="middle" class="sequenceNumber">3</text></svg></div><div class="legend"><span><span class="ar">→</span> call (filled head)</span><span><span class="ar">⇒</span> async hop (open head), new process</span><span><span class="ar">⇢</span> return (dashed)</span><span>tinted box = changed in this range</span><span>⚑ blocking</span><span>fix before merge</span><span>⚑ note</span><span>mention in review</span></div></td></tr><tr class="xr odd"><td class="tg"><div class="tgc"><input type="checkbox" aria-label="Include in review set"><button class="tgl" type="button" aria-expanded="false" aria-label="Expand">▸</button></div></td><td class="lead ch"><a href="#">POST /admin/posts/:id/approve</a><br><span class="meta">Admin::PostsController#approve</span></td><td class="steps"><table class="stpt"><tr><td class="n">1</td><td class="g"><div class="st" style="--d:0"><span class="ar"></span><span>POST /admin/posts/:id/approve → <a href="#">Admin::PostsController#approve</a></span></div></td></tr><tr><td class="n">2</td><td class="g"><div class="st" style="--d:1"><span class="ar">→</span><span><a href="#">Post#publish!</a><span class="mech">state machine, publish</span></span></div></td></tr><tr class="bnd"><td></td><td>⇒ async hop, new process: another job</td></tr><tr class="proc"><td class="n">3</td><td class="g"><div class="st" style="--d:0"><span class="ar async">⇒</span><span><span class="M">M</span><a href="#">NotifySubscribersJob#perform</a><span class="mech">perform_later, queue default</span></span></div></td></tr><tr><td class="n">4</td><td class="g"><div class="st" style="--d:1"><span class="ar">→</span><span><span class="dim">Notifier</span><span class="mech">ambiguous, 2 candidates</span></span></div></td></tr></table></td><td class="nw">1 of 4</td><td class="nw"><a href="#">1 ambiguous</a></td><td class="meta"><span class="lines"><span>precomputed</span><span>gen 42</span></span></td></tr></tbody></table><div class="legend tl"><span><span class="ar">→</span> call, same process</span><span><span class="ar">⇢</span> return</span><span><span class="ar">⇒</span> async hop, <code>perform_later</code> or <code>deliver_later</code>: a new process; the transaction has ended and retries begin here</span><span><span class="M">M</span> changed in gen 40 → 42</span><span class="dim">unexpanded</span><span>ambiguous steps are shown as such, never dropped</span></div>
+      <div class="meta" style="margin:10px 0 0">Click a row or its chevron to open it in place; several can stay open to compare. The checkbox adds the flow to your review set; "through selection" ticks the rows that pass through the selected edge. Diagrams render when a row opens, from the same flow document. <span class="kbd">enter</span> toggles<i class="sep"></i><span class="kbd">x</span> checks<i class="sep"></i><span class="kbd">j</span><span class="kbd">k</span> rows.</div>
+    </section>
+  </main>
+</div>
+
+</body>
+</html>

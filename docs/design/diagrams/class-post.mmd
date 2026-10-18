@@ -1,0 +1,32 @@
+classDiagram
+  accTitle: Post structure
+  class Post {
+    +title : string
+    +state : string
+    +publish()
+    +normalize_title() «Sluggable»
+    +touch_user()
+  }
+  class ApplicationRecord
+  class Sluggable {
+    <<concern>>
+    +to_param()
+    +normalize_title()
+  }
+  class Publishable {
+    <<concern>>
+    +publish()
+    +published?()
+  }
+  class Comment
+  class Tagging
+  class Tag
+  class Attachment
+  ApplicationRecord <|-- Post
+  Post ..|> Sluggable : include
+  Post ..|> Publishable : include
+  Post "1" --> "*" Comment : has_many, dependent destroy
+  Post "1" --> "*" Tagging : has_many
+  Tagging "*" --> "1" Tag : belongs_to
+  Post "*" ..> "*" Tag : has_many through Tagging
+  Post "1" ..> "*" Attachment : has_many as attachable

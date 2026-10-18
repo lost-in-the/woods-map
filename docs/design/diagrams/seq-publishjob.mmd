@@ -1,0 +1,16 @@
+sequenceDiagram
+  accTitle: PublishPostJob through the changed units
+  autonumber
+  participant S as Solid Queue
+  participant J as PublishPostJob
+  participant D as dynamic dispatch
+  box rgba(241,183,58,0.03) changed
+    participant N as NotifySubscribersJob
+  end
+  S-)J: perform(post_id) · recurring
+  activate J
+  J->>D: send(:"#35;{kind}_notify")
+  Note over D: unexpanded · 1 dynamic step
+  D-)N: perform_later(post.id)
+  deactivate J
+  Note over N: no retry_on ⚑ blocking

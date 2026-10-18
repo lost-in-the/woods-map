@@ -1,0 +1,37 @@
+flowchart LR
+  accTitle: Impact of changes to Post
+  classDef changed stroke:#F1B73A,stroke-width:1.5px
+  classDef direct stroke:#9BA5B0
+  classDef trans stroke:#4A4852,color:#9BA5B0
+  classDef risk stroke:#E64D47,stroke-width:1.5px
+  subgraph changed [changed]
+    P[Post]:::changed
+    N[NotifySubscribersJob]:::changed
+  end
+  subgraph d1 [direct · 6]
+    PC[PostsController]:::direct
+    CM[Comment]:::direct
+    TG[Tagging]:::direct
+    PS[PostSerializer]:::direct
+    SV[posts/show.html.erb]:::direct
+    SM[SubscriptionMailer]:::risk
+  end
+  subgraph d2 [transitive · 4]
+    API[Api::PostsController]:::trans
+    CC[CommentsController]:::trans
+    IDX[posts/index.html.erb]:::trans
+    FD[feeds/show.rss.builder]:::trans
+  end
+  P -- render --> SV
+  P -- belongs_to --> CM
+  P -- has_many --> TG
+  P -- serialization --> PS
+  PC -- code_reference --> P
+  N -. job_enqueue .-> SM
+  P -. job_enqueue .-> N
+  PS -- serialization --> API
+  CM -- code_reference --> CC
+  SV -- render --> IDX
+  PS -- render --> FD
+  click P "/woods/units/Post" "Post"
+  click SM "/woods/units/SubscriptionMailer" "SubscriptionMailer"
