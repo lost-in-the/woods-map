@@ -1,0 +1,17 @@
+swimlane-beta TB
+  subgraph web [web]
+    A[POST /posts] --> B[PostsController#create]
+    B --> C[Post.save]
+    C --> D[302 /posts/:id]
+  end
+  subgraph jobs [job runner]
+    E[NotifySubscribersJob#perform]
+    E --> F[Subscription.find_each]
+  end
+  subgraph mail [mailer delivery]
+    G[SubscriptionMailer#notify]
+    H[SMTP]
+  end
+  C -. after_commit · perform_later .-> E
+  F -. deliver_later .-> G
+  G --> H

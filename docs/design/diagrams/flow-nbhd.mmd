@@ -1,0 +1,45 @@
+flowchart LR
+  accTitle: Neighbourhood of Post, depth 1
+  classDef model fill:#2B2A38,stroke:#4A4852,color:#E5E8EB
+  classDef controller fill:#27303A,stroke:#4A4852,color:#E5E8EB
+  classDef view fill:#283431,stroke:#4A4852,color:#E5E8EB
+  classDef job fill:#3A3328,stroke:#4A4852,color:#E5E8EB
+  classDef concern fill:#2C2C30,stroke:#4A4852,color:#E5E8EB
+  classDef serializer fill:#2C2C30,stroke:#4A4852,color:#E5E8EB
+  classDef focus stroke:#A78BFA,stroke-width:2px
+  classDef join stroke-dasharray:4,stroke:#6E7987
+  classDef risk stroke:#E64D47
+  PC["<small>controller · hot</small><br>PostsController"]:::controller
+  APC["<small>controller</small><br>Api::PostsController"]:::controller
+  SV["<small>view</small><br>posts/show.html.erb"]:::view
+  CV["<small>view</small><br>posts/_card.html.erb"]:::view
+  PS["<small>serializer</small><br>PostSerializer"]:::serializer
+  PJ["<small>job · ? ambiguous</small><br>PublishPostJob"]:::job
+  P["<small>model · hub · hot</small><br>Post"]:::model
+  U["<small>model · hub</small><br>User"]:::model
+  C["<small>model</small><br>Comment"]:::model
+  TG["<small>model · join</small><br>Tagging"]:::model
+  T["<small>model · 2 hops</small><br>Tag"]:::model
+  TB["<small>concern</small><br>Taggable"]:::concern
+  CT["<small>concern</small><br>Countable"]:::concern
+  NJ["<small>job · ⚑</small><br>NotifySubscribersJob"]:::job
+  AT["<small>model · polymorphic</small><br>Attachment"]:::model
+  PC -. code_reference .-> P
+  APC -. code_reference .-> P
+  SV -. render · @post .-> P
+  CV -. render · local post .-> P
+  PS -. serialization .-> P
+  PJ -. code_reference ? .-> P
+  P -- "belongs_to author · * → 1" --> U
+  P -- "has_many · 1 → *" --> C
+  P -- "has_many · 1 → *" --> TG
+  TG -- "belongs_to · * → 1" --> T
+  P -. "as attachable · 1 → *" .-> AT
+  C -. "as attachable · 1 → *" .-> AT
+  P -. include .-> TB
+  P -. include .-> CT
+  P -. "job_enqueue · after_commit" .-> NJ
+  TB -. "code_reference · cycle" .-> T
+  class P focus
+  class TG join
+  class NJ risk

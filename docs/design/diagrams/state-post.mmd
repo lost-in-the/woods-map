@@ -1,0 +1,12 @@
+stateDiagram-v2
+  accTitle: Post state machine
+  [*] --> draft
+  draft --> published : publish / after_transition → NotifySubscribersJob
+  published --> archived : archive
+  archived --> published : restore / guard: user.admin?
+  published --> draft : unpublish
+  archived --> [*]
+  note right of published
+    after_transition enqueues
+    NotifySubscribersJob (no retry_on ⚑)
+  end note

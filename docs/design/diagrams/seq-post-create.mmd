@@ -1,0 +1,27 @@
+sequenceDiagram
+  accTitle: POST /posts lifecycle
+  autonumber
+  participant B as Browser
+  participant C as PostsController#create
+  participant P as Post
+  participant J as NotifySubscribersJob
+  participant M as SubscriptionMailer
+  B->>C: POST /posts
+  activate C
+  C->>C: before_action :authenticate_user!
+  C->>P: Post.new(post_params).save
+  activate P
+  P->>P: before_validation :normalize_title
+  P->>P: validates :title, presence
+  Note over P: transaction
+  P->>P: after_save :touch_user
+  P-)J: after_commit → perform_later(post.id)
+  deactivate P
+  P-->>C: true
+  C-->>B: 302 → /posts/:id
+  deactivate C
+  Note over J: queue: default · no retry_on ⚑
+  J->>M: notify(post, subscriber)
+  loop each subscription (find_each)
+    M-)M: deliver_later
+  end

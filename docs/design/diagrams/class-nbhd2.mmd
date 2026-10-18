@@ -1,0 +1,50 @@
+classDiagram
+  direction LR
+  accTitle: Neighbourhood of Post, depth 1
+  classDef focus stroke:#A78BFA,stroke-width:2px
+  classDef join stroke:#6E7987,stroke-dasharray:4
+  classDef risk stroke:#E64D47
+  classDef model fill:#2B2A38
+  classDef controller fill:#27303A
+  classDef view fill:#283431
+  classDef job fill:#3A3328
+  classDef concern fill:#2C2C30
+  class PostsController { <<controller>> }
+  class Api_PostsController["Api::PostsController"] { <<controller>> }
+  class posts_show["posts/show.html.erb"] { <<view>> }
+  class posts_card["posts/_card.html.erb"] { <<view>> }
+  class PostSerializer { <<serializer>> }
+  class PublishPostJob { <<job>> }
+  class Post { <<model · hub · hot>> }
+  class User { <<model · hub>> }
+  class Comment { <<model>> }
+  class Tagging { <<model · join>> }
+  class Tag { <<model · 2 hops>> }
+  class Taggable { <<concern>> }
+  class Countable { <<concern>> }
+  class NotifySubscribersJob { <<job ⚑>> }
+  class Attachment { <<model · polymorphic>> }
+  PostsController ..> Post : code_reference
+  Api_PostsController ..> Post : code_reference
+  posts_show ..> Post : render · @post
+  posts_card ..> Post : render · local post
+  PostSerializer ..> Post : serialization
+  PublishPostJob ..> Post : code_reference ?
+  Post "*" --> "1" User : belongs_to author
+  Post "1" --> "*" Comment : has_many
+  Post "1" --> "*" Tagging : has_many
+  Tagging "*" --> "1" Tag : belongs_to
+  Post "1" ..> "*" Attachment : as attachable
+  Comment "1" ..> "*" Attachment : as attachable
+  Post ..|> Taggable : include
+  Post ..|> Countable : include
+  Post ..> NotifySubscribersJob : job_enqueue · after_commit
+  Taggable ..> Tag : code_reference · cycle
+  cssClass "Post" focus
+  cssClass "Tagging" join
+  cssClass "NotifySubscribersJob" risk
+  cssClass "PostsController,Api_PostsController" controller
+  cssClass "posts_show,posts_card" view
+  cssClass "User,Comment,Tag,Attachment" model
+  cssClass "PublishPostJob" job
+  cssClass "Taggable,Countable" concern

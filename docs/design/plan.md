@@ -1,7 +1,7 @@
 # Woods Map plan
 
 The milestone plan derived from the [design study](design-study.md) and the
-[decision log](decisions.md). GitHub issues own the live status of every item
+[decision log](decisions.md); [coverage.md](coverage.md) maps each page to its design board. GitHub issues own the live status of every item
 below; this file is the map of the plan, not a second status board. When an
 issue is created, closed or re-scoped, update the matching row here in the
 same pull request. Every issue is tracked in the
