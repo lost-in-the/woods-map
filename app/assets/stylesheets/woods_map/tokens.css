@@ -533,3 +533,9 @@
 /* A long unbreakable link in a facts tile wraps inside its column. */
 .wm .facts dd{overflow-wrap:anywhere}
 @container wm (max-width:639px){ .wm .cv .hdr > span:not(.tools){display:none} }
+/* The passage grid (B8-Passage): the closing stage keeps no rule, a finding sits in the rows as a block. */
+.wm .psg .stage.last{border-bottom:0}
+.wm .psg .rows > div.finding{display:block;margin:var(--s3) var(--s4)}
+/* A segmented control with many entries (nine actions) wraps instead of overflowing; a source chip in a tile wraps. */
+.wm .seg{flex-wrap:wrap}
+.wm .facts dd .lyr{white-space:normal}
