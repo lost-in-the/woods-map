@@ -1,0 +1,38 @@
+require:
+  - rubocop-rails
+  - rubocop-rspec
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.0
+  Exclude:
+    - 'vendor/**/*'
+    - 'tmp/**/*'
+    - 'spec/dummy/tmp/**/*'
+    - 'bin/*'
+
+# The Bundler entry file carries the gem's name.
+Naming/FileName:
+  Exclude:
+    - 'lib/woods-map.rb'
+
+Style/Documentation:
+  Exclude:
+    - 'spec/**/*'
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+    - '*.gemspec'
+
+Rails:
+  Enabled: true
+
+Rails/ApplicationController:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 4
+
+RSpec/ExampleLength:
+  Max: 12

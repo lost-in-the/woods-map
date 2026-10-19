@@ -1,0 +1,1 @@
+{"type":"model","identifier":"Comment","file_path":"app/models/comment.rb","namespace":null,"source_code":"class Comment < ApplicationRecord\n  belongs_to :post\nend\n","metadata":{"table_name":"comments"},"dependencies":[{"type":"model","target":"Post","via":"belongs_to"}],"dependents":[],"chunks":[],"extracted_at":"2026-10-15T00:00:00Z","source_hash":"b"}

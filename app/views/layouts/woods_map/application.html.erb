@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= content_for?(:title) ? yield(:title) : 'Woods Map' %></title>
+  <%= csrf_meta_tags %>
+  <%= woods_map_stylesheet_tags %>
+  <script type="importmap"><%= raw WoodsMap::Importmap.to_json(url_for: ->(digest, path) { woods_map.engine_asset_path(digest: digest, path: path) }) %></script>
+  <script type="module">import "woods_map";</script>
+</head>
+<body>
+  <div class="wm page" data-theme="dark">
+    <%= render 'woods_map/shared/bar', generation: @generation %>
+    <% if flash[:alert] %><div class="banner risk" role="alert"><b>Refused.</b><span class="txt"><%= flash[:alert] %></span></div><% end %>
+    <main class="page-main">
+      <%= yield %>
+    </main>
+  </div>
+</body>
+</html>
