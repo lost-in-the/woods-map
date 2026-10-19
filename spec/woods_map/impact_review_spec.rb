@@ -12,13 +12,23 @@ RSpec.describe WoodsMap::ImpactReview do
     expect(v.findings.map { |f| [f.rule, f.severity, f.where] })
       .to contain_exactly(['hub touched', 'blocking', 'User'], ['cycle entered', 'note', 'User'])
     expect(v.rules.size).to eq(9)
-    expect(v.rules.count { |x| x.result.is_a?(Integer) }).to eq(4)
+    expect(v.rules.count { |x| x.result.is_a?(Integer) }).to eq(5)
   end
 
   it 'names what the other rules need' do
     v = review('User')
     expect(v.rules.find { |x| x.name == 'foreign key dropped' }.result).to eq('needs a range')
-    expect(v.rules.find { |x| x.name == 'template reads unassigned ivar' }.result).to eq('needs W-7')
+    expect(v.rules.find { |x| x.name == 'filter chain changed' }.result).to eq('needs W-8 and a range')
+  end
+
+  it 'runs the unassigned-ivar rule on the per-action facts, from the mailer or from its template' do
+    [review('MailingListMailer', depth: 1), review('mailing_list_mailer/new_post.html.erb', depth: 1)].each do |v|
+      finding = v.findings.find { |f| f.rule == 'template reads unassigned ivar' }
+      expect(finding.where).to eq('mailing_list_mailer/new_post.html.erb')
+      expect(finding.evidence).to start_with('@preferences is read in mailing_list_mailer/new_post.html.erb')
+    end
+    expect(review('UsersController', depth: 1).rules.find { |x| x.name == 'template reads unassigned ivar' }.result)
+      .to eq(0)
   end
 
   it 'lists the gaps where no test reaches the focus or a direct dependent' do

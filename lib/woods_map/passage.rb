@@ -4,8 +4,9 @@ module WoodsMap
   # The data passage of one controller or mailer action (B8-Passage): what the
   # index publishes of request → filters → action → templates → response.
   # Filter scopes are shown as declared; the resolved chain and owner (W-8)
-  # and the per-action assigns, params and renders (W-7) are named as limits,
-  # never derived here.
+  # is named as a limit, never derived here. With W-7's per-action facts the
+  # passage knows what the action and its filters assign and render, and
+  # flags an instance variable a template reads that nothing assigns.
   class Passage
     # One application filter with its declared scope.
     Filter = Struct.new(:kind, :name, :only, :except, :file, :line, keyword_init: true) do
@@ -28,23 +29,13 @@ module WoodsMap
     end
 
     # A template of the action, or a partial beneath it.
-    Template = Struct.new(:identifier, :unit, :role, :depth, keyword_init: true) do
-      # @return [Array<String>] the instance variables the template reads
-      def instance_variables
-        Array(unit&.dig('metadata', 'instance_variables')).map(&:to_s)
-      end
-
-      # @return [Array<String>] the helpers the template calls
-      def helpers
-        Array(unit&.dig('metadata', 'helpers_called')).map(&:to_s)
-      end
-    end
+    # An instance variable a template reads that neither the action nor its filters assign.
+    Flag = Struct.new(:ivar, :template, keyword_init: true)
 
     # Framework filters: procs from engines, the CSRF and origin checks.
     FRAMEWORK = /\A(#<|verify_authenticity_token\z|verify_same_origin_request\z)/
     # The model event an action name implies, for the callback ladder.
     EVENT_BY_ACTION = { 'create' => 'create', 'update' => 'update', 'destroy' => 'destroy' }.freeze
-    PARTIAL_DEPTH = 3
 
     # @param repository [WoodsMap::Repository]
     # @param unit [Hash] a controller or mailer unit
@@ -85,9 +76,10 @@ module WoodsMap
       routes.map { |r| "#{r['verb']} #{r['path']}" }.first || 'no route'
     end
 
-    # @return [Hash, nil] owner, defined_in, file and line of the action's method
+    # @return [Hash, nil] owner, file and line of the action's method: action_sources, else the W-7 facts
     def declared
-      @metadata.dig('action_sources', action)
+      @metadata.dig('action_sources', action) ||
+        (facts&.line && { 'owner' => identifier, 'file' => facts.file, 'line' => facts.line })
     end
 
     # @return [Array<Filter>] the application's filters in declared order; framework ones are counted, not listed
@@ -122,24 +114,37 @@ module WoodsMap
       end
     end
 
-    # @return [Array<Template>] the action's templates (depth 0) followed by their partial chain
+    # @return [Array<PassageTemplates::Template>] the action's templates (depth 0) and their partial chain
     def templates
-      @templates ||= action_templates.flat_map { |t| [t] + partials_of(t, 1, [t.identifier]) }
+      template_resolver.all
     end
 
-    # @return [Array<Template>] the templates the index ties to this action
+    # @return [WoodsMap::ActionFacts, nil] the action's W-7 facts, nil on an index without them
+    def facts
+      return @facts if defined?(@facts)
+
+      @facts = ActionFacts.for(@unit, action)
+    end
+
+    # @return [Array<PassageTemplates::Template>] the templates the action renders
     def action_templates
-      identifiers = if mailer?
-                      mailer_templates
-                    else
-                      owned_templates.select { |id| File.basename(id).split('.').first == action }
-                    end
-      identifiers.map { |id| template(id, 'template', 0) }
+      template_resolver.rendered
+    end
+
+    # @return [Array<Flag>, nil] instance variables a template reads that nothing assigns;
+    #   nil when the index has no facts to decide with
+    def flags
+      return nil unless facts
+
+      templates.flat_map do |t|
+        (t.instance_variables - facts.assigned.to_a).map { |ivar| Flag.new(ivar: ivar, template: t.identifier) }
+      end.uniq
     end
 
     # @return [Array<String>] response formats: responds_to, or a mailer's template formats
     def formats
       return action_templates.filter_map { |t| t.identifier[/\.(\w+)\.\w+\z/, 1] }.uniq if mailer?
+      return facts.formats if facts&.formats&.any?
 
       Array(@metadata['responds_to']).map(&:to_s)
     end
@@ -181,8 +186,8 @@ module WoodsMap
 
     private
 
-    def mailer_templates
-      Array(@metadata.dig('templates', action)).map { |path| path.to_s.delete_prefix('app/views/') }
+    def template_resolver
+      @template_resolver ||= PassageTemplates.new(@repository, @unit, action, facts: facts)
     end
 
     def filter_calls(kind)
@@ -195,29 +200,6 @@ module WoodsMap
 
     def framework?(filter)
       filter['filter'].to_s.match?(FRAMEWORK)
-    end
-
-    # Templates the graph ties to this controller: Woods' view_render edge.
-    def owned_templates
-      edges = Array(@repository.graph.dig('reverse_via', identifier)).select { |e| e['via'] == 'view_render' }
-      edges.map { |e| e['source'].to_s }.sort
-    end
-
-    def template(identifier, role, depth)
-      Template.new(identifier: identifier, unit: @repository.unit(identifier, type: 'view_template'), role: role,
-                   depth: depth)
-    end
-
-    # The partials a template renders, from its own dependency list, to PARTIAL_DEPTH.
-    def partials_of(template, depth, seen)
-      return [] if depth > PARTIAL_DEPTH || template.unit.nil?
-
-      Array(template.unit['dependencies']).select { |d| d['via'] == 'render' }.flat_map do |d|
-        next [] if seen.include?(d['target'])
-
-        child = template(d['target'].to_s, 'partial', depth)
-        [child] + partials_of(child, depth + 1, seen + [d['target']])
-      end
     end
   end
 end
