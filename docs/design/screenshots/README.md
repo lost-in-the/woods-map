@@ -30,6 +30,9 @@ widths are the tiers of D-19.
 | Search palette | [B8-Search](../boards/B8-Search.html), *the palette* panel | [1440](search-palette-1440.png) |
 | Freshness words with Woods' reasons | [C5-Chrome](../boards/C5-Chrome.html), the bar | [tooltip open](freshness-tip-1440.png) |
 | Passage tab, controller action (`…/UsersController/passage?action_name=show`) | [B8-Passage](../boards/B8-Passage.html) | [1440](passage-1440.png), [create, with the callback ladder](passage-create-1440.png), [390](passage-390.png) |
+| Passage flag: the seeded `@preferences` read in `MailingListMailer#new_post`'s template (W-7 facts) | [B8-Passage](../boards/B8-Passage.html), *Flags* tile and finding | [1440](passage-flag-1440.png), [390](passage-flag-390.png) |
+| Passage, filter-made assigns at their lines (`PostsController#edit`) | [B8-Passage](../boards/B8-Passage.html), filters stage | [1440](passage-filter-assigns-1440.png) |
+| Impact, the unassigned-ivar rule running | [B8-Impact-Risks](../boards/B8-Impact-Risks.html) | [1440](impact-ivar-rule-1440.png) |
 | Passage tab, mailer action | [B8-Passage](../boards/B8-Passage.html) (the mailer passage is undesigned; the controller passage is reused) | [1440](passage-mailer-1440.png) |
 | Impact, pre-change mode (`/woods/impact?focus=User&depth=2`): Changed with a path opened | [B8-Impact-Changed](../boards/B8-Impact-Changed.html), the frame with a focus title | [1440](impact-changed-open-1440.png), [390](impact-390.png) |
 | Impact, Risks | [B8-Impact-Risks](../boards/B8-Impact-Risks.html) | [1440](impact-risks-1440.png) |

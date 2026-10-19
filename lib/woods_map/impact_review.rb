@@ -55,16 +55,18 @@ module WoodsMap
       @radius = radius
       @graph = repository.graph
       @analysis = repository.graph_analysis
+      @ivar_rule = UnassignedIvarRule.new(repository, radius)
     end
 
     # @return [Array<Finding>] the findings of the rules that ran
     def findings
-      @findings ||= hub_findings + bridge_findings + cycle_findings + job_findings
+      @findings ||= @ivar_rule.findings + hub_findings + bridge_findings + cycle_findings + job_findings
     end
 
     # @return [Array<Rule>] every rule with its result, or what it needs to run
     def rules
       RULES.map do |name, severity, needs, layer, blocker|
+        blocker = nil if name == UnassignedIvarRule::NAME && @ivar_rule.runnable?
         Rule.new(name: name, severity: severity, needs: needs, layer: layer,
                  result: blocker ? "needs #{blocker}" : findings.count { |f| f.rule == name })
       end
@@ -92,9 +94,8 @@ module WoodsMap
       ids = (@radius.focus + @radius.direct.map(&:identifier)).uniq
       ids.select { |id| TESTABLE.include?(@radius.type_of(id)) && coverage_of(id).empty? }.map do |id|
         blocking = findings.any? { |f| f.where == id && f.severity == 'blocking' }
-        why = blocking ? 'a blocking finding names it and no spec reaches it' : 'no test_coverage edge reaches it'
         Gap.new(severity: blocking ? 'blocking' : 'note', text: "#{id} has no mapped test", layer: 'test_mapping',
-                why: why)
+                why: blocking ? 'a blocking finding names it; no spec reaches it' : 'no test_coverage edge reaches it')
       end
     end
 
