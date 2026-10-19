@@ -16,16 +16,7 @@
     </section>
     <section class="sec" aria-labelledby="ladder">
       <header><h2 class="t2" id="ladder">Steps for <%= @event %> <%= count_tag("#{steps.size} steps, in the order Rails runs them") %><%= info_tip('Order is the resolved runtime chain, not file order. Side effects come from a regex analysis of the callback body; a proc callback is skipped.') %></h2></header>
-      <% if steps.empty? %>
-        <%= render 'woods_map/components/empty_state', title: "No callbacks on #{@event}", text: "#{@page.identifier} declares nothing that runs on #{@event}; validations and framework callbacks are not listed." %>
-      <% else %>
-        <% rows = [] %>
-        <% steps.each do |s| %>
-          <% rows << { cells: [s.n, s.type, s.filter, s.owner == @page.identifier ? @page.identifier : unit_link(s.owner, 'concern'), s.condition == '—' ? empty_value(applicable: false) : s.condition, s.effects.any? ? s.effects.join(', ') : empty_value, layer_chip(s.commit? ? 'after commit' : 'resolved chain')], classes: (s.commit? ? 'proc' : nil) } %>
-          <% if s.async? %><% rows << { cells: ['', 'async hop', safe_join([tag.span('⇒', class: 'ar async'), ' ', Array(s.side_effects['jobs_enqueued']).map { |j| unit_link(j, 'job') }.then { |l| safe_join(l, ', ') }, ' runs in a new process, the transaction has ended']), '', '', '', layer_chip('job metadata')], classes: 'bnd' } %><% end %>
-        <% end %>
-        <%= render 'woods_map/components/table', label: "Steps for #{@event}", min_width: '900px', columns: [{ label: '#', width: '40px', cell_class: 'num' }, { label: 'kind', width: '140px', cell_class: 'nw' }, { label: 'step', cell_class: 'id' }, { label: 'defined in', width: '150px' }, { label: 'condition', width: '150px' }, { label: 'side effects', width: '220px' }, { label: 'layer', width: '130px' }], rows: rows %>
-      <% end %>
+      <%= render 'woods_map/units/ladder', steps: steps, owner: @page.identifier, label: "Steps for #{@event}", event: @event %>
     </section>
     <%= render 'woods_map/shared/status', items: ['sequence', 'numbers match the steps', "gen #{@repository.generation_number}"], keys: [[%w[c u d], 'event'], [%w[y], 'copy'], [%w[/], 'search']] %>
   </div>
