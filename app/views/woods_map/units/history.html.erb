@@ -1,0 +1,22 @@
+<% content_for :title, "#{@page.identifier} · History · Woods Map" %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<% h = @history %>
+<%= render 'woods_map/units/frame', page: @page, tab: 'history', definition: @definition %>
+<div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
+  <%= render 'woods_map/components/rail', heading: 'History, HEAD-reachable', groups: [
+        { label: 'people', count: h.people.size, items: h.people.map { |p| { key: p.commits, text: who(p.name) } } },
+        { label: 'limits', count: h.limits.size, items: h.limits.map { |l| { key: '·', text: l } } }
+      ] %>
+  <div class="main">
+    <section class="sec" aria-labelledby="commits">
+      <header><h2 class="t2" id="commits">Commits <%= count_tag("latest #{h.commits.size} of #{h.commit_count}") %><%= info_tip('The last commits touching this unit\'s file, as the extractor recorded them; the full commit table, hunks and co-changes arrive with W-3.') %></h2></header>
+      <% if h.any? %>
+        <%= render 'woods_map/components/table', label: 'Commits', min_width: '640px', columns: [{ label: 'when', width: '70px', cell_class: 'nw' }, { label: 'sha', width: '100px', cell_class: 'nw mut' }, { label: 'author', width: '160px' }, { label: 'message', cell_class: 'id' }],
+              rows: h.commits.map { |c| { cells: [date_abbr(c.date), c.sha.to_s[0, 7], who(c.author), c.message] } }, caption: safe_join(["#{h.frequency} churn, last change ", date_abbr(h.last_modified)]) %>
+      <% else %>
+        <%= render 'woods_map/components/empty_state', title: 'No git facts for this unit', text: 'The extraction ran without git history for this file (a container without .git, or a file outside the repository).' %>
+      <% end %>
+    </section>
+    <%= render 'woods_map/shared/status', items: ['history', 'HEAD-reachable', "gen #{@repository.generation_number}"], keys: [[%w[/], 'search']] %>
+  </div>
+</div>

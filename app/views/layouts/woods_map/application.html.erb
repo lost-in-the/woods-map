@@ -10,13 +10,13 @@
   <script type="importmap" nonce="<%= content_security_policy_nonce %>"><%= raw WoodsMap::Importmap.to_json(url_for: ->(digest, path) { woods_map.engine_asset_path(digest: digest, path: path) }) %></script>
   <script type="module" nonce="<%= content_security_policy_nonce %>">import "woods_map";</script>
 </head>
-<body class="wm page" data-theme="dark" data-controller="tooltip sheet">
-  <%= render 'woods_map/shared/bar', generation: @generation, nav: @nav %>
+<body class="wm page" data-theme="dark" data-controller="tooltip sheet keys">
+  <%= render 'woods_map/shared/bar', generation: @generation, nav: @nav, freshness: @freshness, query: params[:q] %>
   <% if flash[:alert] %><%= render 'woods_map/components/banner', severity: :risk, lead: 'Refused.', text: flash[:alert] %><% end %>
   <%= yield :banner %>
   <main class="page-main">
     <%= yield %>
   </main>
-  <%= render 'woods_map/shared/sheet' %>
+  <%= render 'woods_map/shared/sheet', tree: @tree, current_path: @page&.path %>
 </body>
 </html>

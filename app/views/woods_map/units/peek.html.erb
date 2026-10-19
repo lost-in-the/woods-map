@@ -1,0 +1,9 @@
+<%# The peek drawer (B8-Code): the first lines around a unit's definition. %>
+<% rows = @code.rows.select { |r| r.kind == :line } %>
+<% start = [((@code.definition_line || 1) - 1), 0].max %>
+<% shown = rows.drop(start).first(8) %>
+<div class="peek">
+  <div class="ph"><span class="eyebrow">peek</span><b><%= @page.identifier %></b><span><%= @page.path %>:<%= @code.definition_line || 1 %></span><span class="tools"><%= link_to('open', woods_map.unit_path(type: @page.type, identifier: @page.identifier)) %><button class="tool" type="button" aria-label="Close" data-action="peek#close" style="text-decoration:none">✕</button></span></div>
+  <div class="ph" style="font-family:var(--ff-data);font-size:var(--fs-11)"><span><%= @page.subtitle %></span><span class="lyr" style="margin:0">gen <%= @repository.generation_number %></span></div>
+  <div class="pl codeview"><% shown.each do |row| %><span><%= row.label %></span><span><%= row.html.html_safe %></span><% end %></div>
+</div>

@@ -15,7 +15,7 @@
   <h3 class="t3" id="chrome-frame" style="margin-bottom:var(--s3)">Page frame</h3>
   <div class="wm narrow">
     <%= render 'woods_map/shared/bar', generation: sample, nav: nav, search_path: '#', label: 'Primary, frame at full width' %>
-    <%= render 'woods_map/shared/crumbs', crumbs: [['units', '#'], ['models', '#'], ['Post', nil]], path: 'app/models/post.rb', trail: safe_join([link_to('posts/show', '#'), ' ‹ ', link_to('PostsController', '#'), ' ‹ Post']) %>
+    <%= render 'woods_map/shared/crumbs', crumbs: [['units', '#'], ['models', '#'], ['Post', nil]], path: 'app/models/post.rb', trail: safe_join(['trail: ', link_to('posts/show', '#'), ' ‹ ', link_to('PostsController', '#'), ' ‹ Post']) %>
     <%= render 'woods_map/shared/ident', title: 'Post', subtitle: 'model, table posts', controls: controls, level: :div %>
     <%= render 'woods_map/shared/tabs', tabs: tabs, label: 'Sections, frame at full width' %>
     <div style="margin:var(--s5)"><%= render 'woods_map/components/facts', tiles: tiles %></div>

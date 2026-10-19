@@ -2,7 +2,11 @@
 
 require 'active_support/core_ext/enumerable'
 require 'active_support/core_ext/module/delegation'
+require 'json'
 require 'woods/published_index'
+require 'woods/atomic_file'
+require 'woods/mcp/index_reader'
+require 'woods/source_inputs/status'
 
 module WoodsMap
   # One pinned generation per request.
@@ -10,7 +14,8 @@ module WoodsMap
   # Wraps {Woods::PublishedIndex} so controllers never touch payload paths. The
   # block form holds the shared manifest lock for the duration of the request's
   # reads and releases it on the way out, which is what keeps retention from
-  # deleting a payload mid-render.
+  # deleting a payload mid-render. Every read below goes through the index
+  # reader of that one generation; nothing is resolved from a path.
   class Repository
     # Raised when no published generation can be opened at the configured root.
     class Unavailable < StandardError; end
@@ -30,6 +35,10 @@ module WoodsMap
     # @param index [Woods::PublishedIndex]
     def initialize(index)
       @index = index
+      # The queries the published-index API does not expose (search, the raw
+      # graph, freshness) come from a reader pinned to the same payload.
+      @reader = Woods::MCP::IndexReader.new(index.payload_dir.to_s, auto_refresh: false)
+      @units = {}
     end
 
     # @!method generation_number
@@ -72,14 +81,96 @@ module WoodsMap
       @index.units(type: type)
     end
 
+    # One unit, read once per request.
+    #
     # @param identifier [String]
     # @param type [String, nil]
     # @return [Hash, nil]
     def unit(identifier, type: nil)
-      @index.unit(identifier, type: type)
+      @units.fetch([identifier, type]) { @units[[identifier, type]] = @index.unit(identifier, type: type) }
+    end
+
+    # Resolve a constant or identifier to the unit types that own it, from
+    # the graph's node table (one lookup, every unit of the generation).
+    #
+    # @param identifier [String]
+    # @return [Array<String>] unit types; empty when unknown
+    def identifier_types(identifier)
+      node = graph.dig('nodes', identifier)
+      return [node['type'].to_s] if node
+
+      variants = Array(graph.dig('variants', identifier)).filter_map { |v| v['type'] }
+      variants.empty? ? [] : variants.map(&:to_s)
+    end
+
+    # @return [Hash] the raw dependency graph (nodes, edges, reverse, reverse_via, pagerank, file_map)
+    def graph
+      @graph ||= @reader.raw_graph_data
+    end
+
+    # @return [Hash] graph_analysis.json, or an empty hash when absent
+    def graph_analysis
+      @graph_analysis ||= @reader.graph_analysis || {}
+    rescue StandardError
+      @graph_analysis = {}
+    end
+
+    # The per-file constant references the extractor recorded (an internal,
+    # versioned artifact; absent on older indexes).
+    #
+    # @param file_path [String]
+    # @return [Hash, nil] `analysis` with declarations and references
+    def source_references(file_path)
+      references = payload_json('source_references.json')
+      references&.dig('files', file_path, 'analysis')
+    end
+
+    # Drift of the working tree against this generation, within a quarter
+    # second budget; compares file identities, never runs git.
+    #
+    # @return [Hash] with 'state' (current, drifted, unknown, unavailable)
+    def freshness
+      @freshness ||= Woods::SourceInputs::Status.new(output_dir: @index.index_dir, payload_dir: @index.payload_dir,
+                                                     generation: generation_number, mode: 'quick').call
+    rescue StandardError => e
+      @freshness = { 'state' => 'unknown', 'reasons' => [e.class.name] }
+    end
+
+    # Search the pinned generation. The reader answers with symbol keys and
+    # rows of identifier, type and match_field; the map reads string keys
+    # everywhere and wants the file path beside each row.
+    #
+    # @see Woods::MCP::IndexReader#search
+    # @return [Hash] 'results' rows with 'identifier', 'type', 'match_field' and 'file_path';
+    #   'completeness', 'partial', 'note' and 'hint' as the reader reports them
+    def search(query, **options)
+      response = @reader.search(query, **options).deep_stringify_keys
+      response['results'] = Array(response['results']).map do |row|
+        row.merge('file_path' => graph.dig('nodes', row['identifier'], 'file_path'))
+      end
+      response
+    end
+
+    # The dependency-graph file map restricted to application paths.
+    #
+    # @return [Hash{String => Array<String>}] relative path => identifiers
+    def file_map
+      @file_map ||= (graph['file_map'] || {}).reject { |path, _| path.start_with?('/') }
     end
 
     private
+
+    # A JSON artifact of the pinned payload (the directory PublishedIndex
+    # pinned, never resolved here); nil when the artifact is absent.
+    def payload_json(filename)
+      @payload_json ||= {}
+      @payload_json.fetch(filename) do
+        path = @index.payload_dir.join(filename)
+        @payload_json[filename] = path.file? ? JSON.parse(Woods::AtomicFile.read(path)) : nil
+      end
+    rescue StandardError
+      @payload_json[filename] = nil
+    end
 
     def manifest_facts
       {

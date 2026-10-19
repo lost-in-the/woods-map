@@ -1,0 +1,1 @@
+[{"identifier":"GET /users","file_path":"config/routes.rb","namespace":null,"estimated_tokens":148,"chunk_count":0},{"identifier":"POST /users","file_path":"config/routes.rb","namespace":null,"estimated_tokens":145,"chunk_count":0},{"identifier":"GET /users/:id","file_path":"config/routes.rb","namespace":null,"estimated_tokens":151,"chunk_count":0}]

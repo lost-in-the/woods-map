@@ -1,0 +1,29 @@
+<% content_for :title, "#{@page.identifier} · Graph · Woods Map" %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<% n = @neighbourhood %>
+<%= render 'woods_map/units/frame', page: @page, tab: 'graph', definition: @definition %>
+<div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
+  <nav class="rail" aria-label="Graph filters">
+    <form method="get" action="<%= woods_map.unit_graph_path(type: @page.type, identifier: @page.identifier) %>">
+      <h2 class="t3 on">Neighbourhood</h2>
+      <div class="grp">direction</div>
+      <div style="padding:var(--s1) var(--s5)"><span class="seg" role="group" aria-label="Direction"><% %w[both dependents dependencies].each do |d| %><a href="<%= woods_map.unit_graph_path(type: @page.type, identifier: @page.identifier, direction: d, depth: n.depth) %>"<%= ' aria-current="true"'.html_safe if n.direction == d %>><%= d %></a><% end %></span></div>
+      <div class="grp">depth</div>
+      <div style="padding:var(--s1) var(--s5)"><span class="seg" role="group" aria-label="Depth"><% [1, 2].each do |d| %><a href="<%= woods_map.unit_graph_path(type: @page.type, identifier: @page.identifier, direction: n.direction, depth: d) %>"<%= ' aria-current="true"'.html_safe if n.depth == d %>><%= d %></a><% end %></span></div>
+      <input type="hidden" name="direction" value="<%= n.direction %>"><input type="hidden" name="depth" value="<%= n.depth %>">
+      <div class="grp">types <span class="cnt"><%= n.type_counts.size %></span></div>
+      <% n.type_counts.each do |type, count| %><label class="f"><input type="checkbox" name="types[]" value="<%= type %>"<%= ' checked'.html_safe if params[:types].nil? || Array(params[:types]).include?(type) %>> <%= type.to_s.tr('_', ' ') %> <span class="cnt"><%= count %></span></label><% end %>
+      <div class="grp">via <span class="cnt"><%= n.via_counts.values.sum(&:size) %></span></div>
+      <% n.via_counts.each do |family, vias| %><div class="grp" style="border:0;padding-top:var(--s2)"><%= family %></div><% vias.each do |via, count| %><label class="f"><input type="checkbox" name="via[]" value="<%= via %>"<%= ' checked'.html_safe if params[:via].nil? || Array(params[:via]).include?(via) %>> <%= via %> <span class="cnt"><%= count %></span></label><% end %><% end %>
+      <div style="padding:var(--s3) var(--s5)"><button class="btn" type="submit">apply filters</button></div>
+    </form>
+  </nav>
+  <div class="main">
+    <section class="sec" data-controller="rows">
+      <header><h2 class="t2">List equivalent <%= count_tag("#{n.edges.size} of #{n.all_edges.size} edges") %><%= info_tip('The same edges a graph canvas would draw (M5); dependents point at this unit, dependencies away from it. Notes come from graph_analysis.json.') %></h2><button class="tool goto" type="button" data-controller="copy" data-copy-text-value="<%= n.mermaid %>" data-action="copy#copy" data-needs-js>⎘ copy Mermaid</button></header>
+      <%= render 'woods_map/components/table', label: 'Edges', min_width: '720px', columns: [{ label: 'from', width: '30%' }, { label: 'via', width: '160px', cell_class: 'nw' }, { label: 'to', width: '30%', cell_class: 'id' }, { label: 'notes' }],
+            rows: n.edges.map { |e| { cells: [e.from == @page.identifier ? e.from : unit_link(e.from, e.from_type), e.via, e.to == @page.identifier ? e.to : unit_link(e.to, e.to_type), (n.notes(e.from == @page.identifier ? e.to : e.from) + (e.depth > 1 ? ['2 hops'] : [])).join(', ').presence || empty_value(applicable: false)] } } %>
+    </section>
+    <%= render 'woods_map/shared/status', items: ['typed edges', 'graph_analysis', "gen #{@repository.generation_number}"], keys: [[%w[1 2], 'depth'], [%w[/], 'search']] %>
+  </div>
+</div>

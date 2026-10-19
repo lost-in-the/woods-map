@@ -36,7 +36,9 @@ end for what the boards wrote inline; `map.css` holds the document reset and
 the no-JavaScript rules; `fonts.css` declares the vendored faces. The
 components below live in `app/views/woods_map/shared/` and `components/`,
 the behaviours in `app/javascript/woods_map/controllers/`, and
-`/woods/guidelines` renders C1 to C5 from them.
+`/woods/guidelines` renders C1 to C5 from them. The engine additions also make
+the code view one scroll region with sticky gutters (woods-map#29), where the
+board scrolled each line on its own.
 
 ## What the engine must add
 

@@ -502,3 +502,34 @@
 .wm .tbl.cards{min-width:0}
 @container wm (max-width:639px){ .wm .t1 .sub{display:block;margin-left:0;white-space:normal} }
 .wm .tree .d:hover .ct,.wm .tree .f:hover .ct,.wm .tree .d:hover .c,.wm .rail li:hover .k,.wm .rail li:hover .own{color:var(--mut)}
+.wm .bar .bar-search{position:relative}
+.wm .palette-wrap{position:fixed;inset:0;z-index:6;display:flex;justify-content:center;align-items:flex-start;padding:10vh var(--s4) 0;background:rgba(0,0,0,.45)}
+.wm .palette-wrap[hidden]{display:none}
+.wm .palette a.hit{text-decoration:none}
+.wm .palette a.hit:hover{background:var(--hover);text-decoration:none}
+.wm .cv .row:target .ln{box-shadow:inset 3px 0 0 var(--select)}
+.wm .cv .row:target > div{background:var(--select-tint)}
+.wm .cv .src a{border-bottom-color:var(--rule2)}
+.wm .rail li > span:last-child{min-width:0;overflow-wrap:anywhere}
+.wm .rail li code,.wm .rail li b{overflow-wrap:normal;word-break:keep-all}
+/* The code view scrolls as one region (axe scrollable-region-focusable, every width): long lines widen the
+   source column, the heat strip, line numbers and marginalia stay put, the header and folds keep to the viewport. */
+.wm .cvwrap{overflow-x:auto;scrollbar-width:thin;container-type:inline-size}
+.wm .cvwrap .cv{grid-template-columns:8px 44px minmax(max-content,1fr) 440px}
+.wm .cvwrap .cv.nomargin{grid-template-columns:8px 44px minmax(max-content,1fr)}
+.wm .cv .src{overflow:visible}
+.wm .cv .heat,.wm .cv .ln,.wm .cv .mg{position:sticky;z-index:1}
+.wm .cv .heat{left:0}
+.wm .cv .ln{left:8px;background:var(--bg)}
+.wm .cv .mg{right:0;background:var(--bg)}
+.wm .cvwrap .cv .hdr,.wm .cvwrap .cv .fold,.wm .cvwrap .cv .peek{position:sticky;left:0;max-width:100cqw;box-sizing:border-box}
+@container wm (max-width:639px){ .wm .cvwrap .cv{grid-template-columns:28px 40px minmax(max-content,1fr)} .wm .cv .ln{left:28px} }
+/* Palette rows: the label keeps at least half the row, both halves clip with an ellipsis instead of overlapping. */
+.wm .palette .hit{grid-template-columns:minmax(0,1fr) minmax(0,50%)}
+.wm .palette .hit > span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wm .palette .hit .path{text-align:right}
+/* The rail's query field on the search page, styled like the tree filter but boxed. */
+.wm .rail .filter{display:block;width:100%;box-sizing:border-box;margin:0;padding:var(--s2) var(--s3);border:1px solid var(--rule2);border-radius:var(--r-ctl);background:var(--ground2);color:var(--text);font:inherit}
+/* A long unbreakable link in a facts tile wraps inside its column. */
+.wm .facts dd{overflow-wrap:anywhere}
+@container wm (max-width:639px){ .wm .cv .hdr > span:not(.tools){display:none} }
