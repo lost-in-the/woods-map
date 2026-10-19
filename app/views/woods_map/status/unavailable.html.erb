@@ -1,0 +1,9 @@
+<% content_for :title, 'Woods Map · no index' %>
+<div class="empty-state">
+  <h1 class="t2">No published index yet</h1>
+  The map reads a published Woods generation and nothing else. Extract one, then reload; the status bar shows the generation and HEAD once it exists.
+  <pre class="cmd">bin/rails woods:extract        # full run, publishes gen 1
+bin/rails woods:incremental    # after that, changed files only</pre>
+  <div class="cap">Looking in <code><%= woods_map_config.index_path %></code> (config.index_dir). <%= woods_map_config.token? ? 'Token configured.' : 'Loopback host, no token required.' %> <a href="https://github.com/lost-in-the/woods#readme">Woods README ↗</a></div>
+  <div class="cap"><%= @error.message %></div>
+</div>

@@ -1,0 +1,1 @@
+{"type":"model","identifier":"Post","file_path":"app/models/post.rb","namespace":null,"source_code":"class Post < ApplicationRecord\n  has_many :comments\nend\n","metadata":{"table_name":"posts"},"dependencies":[],"dependents":[{"type":"model","identifier":"Comment"}],"chunks":[],"extracted_at":"2026-10-15T00:00:00Z","source_hash":"a"}

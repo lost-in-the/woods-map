@@ -1,0 +1,14 @@
+/* Woods Map engine sheet.
+   tokens.css is the design's file (D-10) and ships verbatim: a spec keeps it byte-identical to
+   docs/design/foundations/tokens.css. The few rules the engine needs beyond it live here: the
+   document reset the boards carry at board level, the colour-scheme hint for native controls,
+   and the vendored fonts once they land (woods-map#23). No colours or sizes: tokens only. */
+html,body{margin:0;min-height:100%}
+.wm.page{min-height:100vh;display:flex;flex-direction:column}
+.wm{color-scheme:dark}
+.wm[data-theme=light]{color-scheme:light}
+/* Inline links: a cue besides colour (WCAG 1.4.1, axe link-in-text-block). D-11 keeps standalone
+   links bare; a link sitting among other text gets a faint underline in its own hue. The choice is
+   open in woods-map#26; until it is settled the accessible reading wins. */
+.wm .crumbs a,.wm .empty-state a,.wm .cap a,.wm .lead a,.wm .det dd a,.wm .facts dd a,.wm .banner .txt a,.wm .legend a,.wm .st a,.wm .mg a,.wm .rail li a,.wm .tip a,.wm .finding a{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--link) 55%,transparent);text-underline-offset:3px}
+.wm .crumbs a:hover,.wm .empty-state a:hover,.wm .cap a:hover,.wm .lead a:hover,.wm .det dd a:hover,.wm .facts dd a:hover,.wm .banner .txt a:hover,.wm .legend a:hover,.wm .st a:hover,.wm .mg a:hover,.wm .rail li a:hover,.wm .tip a:hover,.wm .finding a:hover{text-decoration-color:var(--link)}

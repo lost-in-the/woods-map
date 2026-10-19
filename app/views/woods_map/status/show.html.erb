@@ -1,0 +1,13 @@
+<% content_for :title, "Woods Map · gen #{@status['generation']}" %>
+<div class="crumbs"><span><a href="<%= woods_map.root_path %>">woods</a> › <span class="bright">status</span></span></div>
+<div class="ident"><h1 class="t1">Status<span class="sub">gen <%= @status['generation'] %>, <%= short_sha(@status['git_sha']) %>, extracted <%= date_abbr(@status['extracted_at']) %></span></h1><div class="ctl"></div></div>
+<div style="padding:var(--s4) var(--s5)">
+  <dl class="det" style="border:1px solid var(--rule2);border-radius:var(--r-ctl);max-width:720px">
+    <dt>generation</dt><dd><%= @status['generation'] %> of <%= @status['generations'].max %>, <%= @status['generations'].size %> retained (<%= @status['generations'].join(', ') %>)</dd>
+    <dt>HEAD at extraction</dt><dd><%= short_sha(@status['git_sha']) %>, <%= @status['git_branch'].presence || 'unknown branch' %>, <%= date_abbr(@status['extracted_at']) %></dd>
+    <dt>extractors</dt><dd><%= @status['counts'].count { |_, n| n.to_i.positive? } %> types with units: <%= @status['counts'].select { |_, n| n.to_i.positive? }.sort_by { |_, n| -n.to_i }.map { |type, n| "#{type} #{n}" }.join(', ').presence || 'none' %></dd>
+    <dt>payload</dt><dd><%= @status['total_units'] %> units, read through PublishedIndex, generation pinned per request</dd>
+    <dt>extracted with</dt><dd>Woods <%= @status['woods_version'].presence || 'unknown' %>, Rails <%= @status['rails_version'].presence || 'unknown' %>, Ruby <%= @status['ruby_version'].presence || 'unknown' %></dd>
+    <dt>host</dt><dd>Rails <%= Rails.version %>, Ruby <%= RUBY_VERSION %>, mounted at <%= woods_map.root_path.chomp('/') %>, <%= loopback_request? ? 'loopback' : 'remote' %>, <%= woods_map_config.token? ? 'token configured' : 'no token' %></dd>
+  </dl>
+</div>
