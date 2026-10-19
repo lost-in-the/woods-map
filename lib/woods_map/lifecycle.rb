@@ -45,6 +45,13 @@ module WoodsMap
         (side_effects || {}).fetch('jobs_enqueued', []).any? || (side_effects || {}).fetch('mailers_triggered', []).any?
       end
 
+      # @return [String, nil] where an async step's work runs: the first job, else the first mailer
+      def async_target
+        return nil unless async?
+
+        Array(side_effects['jobs_enqueued']).first || Array(side_effects['mailers_triggered']).first || 'Mailer'
+      end
+
       # @return [String] the condition column, "—" when unconditional
       def condition
         return '—' if conditions.blank?
@@ -82,6 +89,24 @@ module WoodsMap
     # @return [Hash{String => Array<Step>}] event => steps, events with none left out
     def chains
       EVENTS.index_with { |event| steps(event) }.reject { |_, steps| steps.empty? }
+    end
+
+    # Mermaid sequence text for one event: the app calls each step on the
+    # model; an async step hands off to its job or mailer. The numbers match
+    # the steps table (`autonumber`). Participants are aliased so namespaced
+    # names (`Admin::User`) stay valid Mermaid.
+    #
+    # @param event [String] create, update or destroy
+    # @return [String]
+    def mermaid(event)
+      list = steps(event)
+      targets = list.filter_map(&:async_target).uniq
+      lines = ['sequenceDiagram', '  autonumber', '  participant App', "  participant M as #{@owner}"]
+      targets.each_with_index { |target, i| lines << "  participant A#{i} as #{target}" }
+      list.each do |s|
+        lines << (s.async? ? "  M-)A#{targets.index(s.async_target)}: #{s.filter}" : "  App->>M: #{s.type} #{s.filter}")
+      end
+      lines.join("\n")
     end
 
     private

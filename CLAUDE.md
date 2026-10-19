@@ -52,12 +52,12 @@ lib/woods_map/glyphs.rb          # the glyph vocabulary (D-20)
 app/controllers/woods_map/       # application (gate order, 403 panel), status, sessions, assets, guidelines, units, search, impact
 app/helpers/woods_map/           # asset URLs, date shorthand (D-15), short SHA; components (glyphs, chips, ⓘ, people)
 app/assets/stylesheets/woods_map/ # tokens.css (verbatim from docs/design/foundations), fonts.css, map.css (engine-only rules)
-app/javascript/woods_map/        # Stimulus controllers: cliff, tooltip, rows, tree, sheet, copy, palette, peek, trail, keys
+app/javascript/woods_map/        # Stimulus controllers: cliff, tooltip, rows, tree, sheet, copy, palette, peek, trail, keys, diagram (Pele, D-21)
 app/views/woods_map/shared/      # the frame: bar, crumbs, ident, tabs, status, sheet
 app/views/woods_map/components/  # table, steps, detail, rail, tree, facts, legend, diagram, banner, empty state
 app/views/woods_map/guidelines/  # the C1 to C5 boards rendered from the partials above
 app/views/woods_map/{units,search,impact}/ # unit pages (Code, Passage, Schema, Lifecycle, Graph, History, peek, 404), search, impact lenses
-vendor/javascript/               # stimulus (vendored); turbo, cytoscape, vis-timeline, highlight.js as milestones land them
+vendor/javascript/               # stimulus, pele (vendored); turbo, cytoscape, vis-timeline, highlight.js as milestones land them
 vendor/fonts/                    # Inter (latin subsets) and the complete Fira Code, WOFF2 (D-12)
 docs/design/                     # design study, decisions, boards, foundations, plan
 ```
@@ -70,6 +70,7 @@ docs/design/                     # design study, decisions, boards, foundations,
 - `Outline`, `SchemaView`, `Neighbourhood` and `HistoryView` read the generation at construction, so a view may use them after the repository block closes.
 - `Passage` shows filter scopes as declared (`only`/`except` lists) and never resolves the chain (W-8), reads no assigns from source (W-7) and ties templates to actions only through Woods' `view_render` edge or a mailer's template list. A fact the index lacks is named as a limit, not derived.
 - The impact page computes nothing a range needs: `BlastRadius` propagates over `reverse_via` of one generation and `ImpactReview` runs only the rules that generation can answer, listing the rest with what they need (W-7, W-8, a range). The report itself is Woods' (`woods:impact`, W-12, decision D-1); never render Markdown or JSON for it here.
+- Diagrams are drawn in the browser by Pele (D-21) from the Mermaid text the page carries; Ruby builds the text (`#mermaid` on the view objects, never inline in a view) and the panel keeps it as the fallback. Pass `mermaid:` and `label:` to the diagram partial, and `refusal:` when a node budget (R-4) is exceeded. `spec/diagrams/pele_render_spec.rb` draws every generated text with the vendored build in Node: a text Pele refuses fails there, not on a page.
 - The code view is one scroll region (`.cvwrap`, woods-map#29): the source column grows to its longest line and the gutters are sticky. Do not reintroduce `overflow-x:auto` on `.src`.
 
 ## Conventions

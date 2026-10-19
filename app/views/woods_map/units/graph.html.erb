@@ -21,8 +21,15 @@
     </form>
   </nav>
   <div class="main">
+    <section class="sec">
+      <%= render 'woods_map/components/diagram', title: 'Neighbourhood', facts: ["#{@page.identifier}, depth #{n.depth}, #{n.direction}", "#{n.node_count} #{'unit'.pluralize(n.node_count)}", "#{n.edges.size} #{'edge'.pluralize(n.edges.size)}"],
+            tools: tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: n.mermaid, action: 'copy#copy', needs_js: true }),
+            mermaid: n.mermaid, label: "Neighbourhood of #{@page.identifier} at depth #{n.depth}: #{n.edges.size} edges, each labelled with its mechanism; the list below has the same edges",
+            refusal: (n.over_budget? ? "#{n.node_count} units is over the flowchart budget of #{WoodsMap::Neighbourhood::NODE_BUDGET}; narrow the types or mechanisms to draw it. The list below has every edge." : nil),
+            legend: [[tag.i(class: 'sw', style: 'border-color:var(--select)'), 'this unit'], [tag.span('→', class: 'ar'), 'edge, labelled with its mechanism']], provenance: ['typed edges', "gen #{@repository.generation_number}"] %>
+    </section>
     <section class="sec" data-controller="rows">
-      <header><h2 class="t2">List equivalent <%= count_tag("#{n.edges.size} of #{n.all_edges.size} edges") %><%= info_tip('The same edges a graph canvas would draw (M5); dependents point at this unit, dependencies away from it. Notes come from graph_analysis.json.') %></h2><button class="tool goto" type="button" data-controller="copy" data-copy-text-value="<%= n.mermaid %>" data-action="copy#copy" data-needs-js>⎘ copy Mermaid</button></header>
+      <header><h2 class="t2">List equivalent <%= count_tag("#{n.edges.size} of #{n.all_edges.size} edges") %><%= info_tip('The same edges the diagram draws, and the canvas will (M5); dependents point at this unit, dependencies away from it. Notes come from graph_analysis.json.') %></h2></header>
       <%= render 'woods_map/components/table', label: 'Edges', min_width: '720px', columns: [{ label: 'from', width: '30%' }, { label: 'via', width: '160px', cell_class: 'nw' }, { label: 'to', width: '30%', cell_class: 'id' }, { label: 'notes' }],
             rows: n.edges.map { |e| { cells: [e.from == @page.identifier ? e.from : unit_link(e.from, e.from_type), e.via, e.to == @page.identifier ? e.to : unit_link(e.to, e.to_type), (n.notes(e.from == @page.identifier ? e.to : e.from) + (e.depth > 1 ? ['2 hops'] : [])).join(', ').presence || empty_value(applicable: false)] } } %>
     </section>
