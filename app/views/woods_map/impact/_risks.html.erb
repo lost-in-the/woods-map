@@ -1,0 +1,17 @@
+<%# The Risks tab: findings of the rules that ran, then the registry with what each rule needs. %>
+<section class="sec" aria-labelledby="fd">
+  <header><h2 class="t2" id="fd">Findings <%= count_tag("#{v.findings.count { |f| f.severity == 'blocking' }} blocking, #{v.findings.count { |f| f.severity == 'note' }} #{'note'.pluralize(v.findings.count { |f| f.severity == 'note' })}") %><%= info_tip('blocking: fix before merge. note: mention in review. Only the rules that run on one generation fired; the registry below names what the others need.') %></h2></header>
+  <% if v.findings.empty? %>
+    <%= render 'woods_map/components/empty_state', title: 'No finding from the rules that ran', text: "#{v.rules.count { |x| x.result.is_a?(Integer) }} of #{v.rules.size} rules ran on gen #{@repository.generation_number}; the rest need a range or data the index does not publish yet." %>
+  <% else %>
+    <%= render 'woods_map/components/table', label: 'Findings', min_width: '900px',
+               columns: [{ label: 'severity', width: '96px', cell_class: 'nw' }, { label: 'finding', width: '300px', cell_class: 'id p' }, { label: 'where', width: '220px' }, { label: 'evidence', cell_class: 'p' }, { label: 'layer', width: '150px', cell_class: 'nw' }],
+               rows: v.findings.map { |f| { cells: [tag.span(f.severity, class: "fl#{' note' if f.severity == 'note'}"), f.text, unit_link(f.where, r.type_of(f.where)), f.evidence, layer_chip(f.layer)] } } %>
+  <% end %>
+</section>
+<section class="sec" aria-labelledby="rl">
+  <header><h2 class="t2" id="rl">Rules that ran <%= count_tag("#{v.rules.count { |x| x.result.is_a?(Integer) }} of #{v.rules.size}") %><%= info_tip('The risk-rule registry of the report (W-12). A rule that cannot run for lack of data is listed with what it needs, never silently dropped.') %></h2></header>
+  <%= render 'woods_map/components/table', label: 'Rules', min_width: '900px',
+             columns: [{ label: 'rule', width: '300px', cell_class: 'id' }, { label: 'severity', width: '90px', cell_class: 'sev' }, { label: 'needs' }, { label: 'layer', width: '150px', cell_class: 'nw' }, { label: 'result', width: '140px', cell_class: 'nw' }],
+             rows: v.rules.map { |x| { cells: [x.name, x.severity, x.needs, layer_chip(x.layer), x.result.is_a?(Integer) ? (x.result.positive? ? safe_join([tag.span(x.severity, class: "fl#{' note' if x.severity == 'note'}"), " #{x.result}"]) : tag.span('0', class: 'dim')) : tag.span(x.result, class: 'dim')] } } %>
+</section>

@@ -54,7 +54,7 @@ opens the file tree.
 | Impact Graph | Changed, direct, transitive emphasis | E-3, E-8 | — | **none** |
 | Impact Unknown | Unknowns and what each layer proves | E-4, E-10 | [B8-Impact-Unknown](boards/B8-Impact-Unknown.html) | final |
 | `?since=` on any view | Changed lines, nodes, steps, columns highlighted | E-8 | [B8-States](boards/B8-States.html) (degraded), tree M badges | partial |
-| pre-change mode | Blast radius from a unit or method, no range | E-9 | — | **none** (the impact frame with a focus title) |
+| pre-change mode | Blast radius from a unit or method, no range | E-9 | — | **none** (the impact frame with a focus title; the engine renders it that way from the Changed, Risks, Tests and Unknown boards) |
 | Share menu | Focus URL, Markdown, JSON, Mermaid | E-6, E-7 | buttons only | partial |
 | Trail board | Pinned units, lanes, flags, board state, export | C-1 to C-5 | — | **none** (release 0.2, M6) |
 | Guide panel | Context chips, actions, tool cards, streamed answer, budget | FR-8 | [B8-Guide](boards/B8-Guide.html) | final; chat history list not drawn |

@@ -1,0 +1,21 @@
+<%# The Tests tab: specs mapped to the focus and its direct dependents, then the gaps. %>
+<section class="sec" aria-labelledby="tr">
+  <header><h2 class="t2" id="tr">Tests to run first <%= count_tag(v.tests.size) %><%= info_tip('test_coverage edges from the focus and its direct dependents, the focus first. The mapping is heuristic; fixture facts are not in the index, so what a spec seeds is not known here.') %></h2></header>
+  <% if v.tests.empty? %>
+    <%= render 'woods_map/components/empty_state', title: 'No mapped test reaches the focus or its direct dependents', text: 'No test_coverage edge points at them in this generation; see the gaps below.' %>
+  <% else %>
+    <%= render 'woods_map/components/table', label: 'Tests to run first', min_width: '900px',
+               columns: [{ label: 'spec', width: '330px', cell_class: 'id' }, { label: 'covers' }, { label: 'reaches', width: '170px' }, { label: 'layer', width: '150px', cell_class: 'nw' }],
+               rows: v.tests.map { |t| { cells: [unit_link(t.spec, 'test_mapping'), safe_join(t.covers.map { |id| unit_link(id, r.type_of(id)) }, ', '), t.reaches, layer_chip(t.layer)] } } %>
+  <% end %>
+</section>
+<section class="sec" aria-labelledby="gp">
+  <header><h2 class="t2" id="gp">Gaps <%= count_tag(v.gaps.size) %><%= info_tip('A gap is a focus unit or a direct dependent with no mapped test; blocking when a blocking finding names it.') %></h2></header>
+  <% if v.gaps.empty? %>
+    <%= render 'woods_map/components/empty_state', title: 'Every focus unit and direct dependent has a mapped test', text: 'Heuristic mapping: a mapped test does not prove the changed lines run.' %>
+  <% else %>
+    <%= render 'woods_map/components/table', label: 'Gaps', min_width: '900px',
+               columns: [{ label: 'severity', width: '96px', cell_class: 'nw' }, { label: 'gap', width: '320px', cell_class: 'id p' }, { label: 'why it matters', cell_class: 'p' }, { label: 'layer', width: '150px', cell_class: 'nw' }],
+               rows: v.gaps.map { |g| { cells: [tag.span(g.severity, class: "fl#{' note' if g.severity == 'note'}"), g.text, g.why, layer_chip(g.layer)] } } %>
+  <% end %>
+</section>

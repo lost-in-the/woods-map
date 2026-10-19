@@ -7,7 +7,7 @@ relationship graphs, schema and history, and get change-impact reports with
 sharable focus URLs. It reads the published index only: no live database, no
 runtime reflection, no git subprocess at request time.
 
-Status: scaffold, design system, M1 Reading and M2 Passage landed. The design study, decision log, boards
+Status: scaffold, design system, M1 Reading, M2 Passage and the pre-change mode of M4b Impact landed. The design study, decision log, boards
 and milestone plan live in `docs/design/` and are the source of truth for
 scope; `docs/design/foundations/tokens.css` is the stylesheet the engine ships
 verbatim (a spec keeps the two copies identical).
@@ -43,19 +43,20 @@ lib/woods_map/repository.rb      # one pinned generation per request: units, gra
 lib/woods_map/{unit_page,code_view,composite_source,highlighter,marginalia,references,outline}.rb  # the unit page and Code tab
 lib/woods_map/{schema_view,lifecycle,neighbourhood,history_view}.rb  # the Schema, Lifecycle, Graph and History tabs
 lib/woods_map/passage.rb         # the Passage tab: declared filters, templates by the view_render edge, the ladder's model and event
+lib/woods_map/{blast_radius,impact_review}.rb  # the impact page's pre-change mode: reverse-edge propagation with paths; rules, tests, gaps, unknowns
 lib/woods_map/{search_results,palette,file_tree}.rb  # search modes, the palette's groups, the per-generation file tree
 lib/woods_map/assets.rb          # engine-served files: roots, content digests, content types
 lib/woods_map/importmap.rb       # pins for vendored modules, the literal import map
 app/controllers/concerns/woods_map/authentication.rb  # token, cookie and loopback gate (D-4)
 lib/woods_map/glyphs.rb          # the glyph vocabulary (D-20)
-app/controllers/woods_map/       # application (gate order, 403 panel), status, sessions, assets, guidelines, units, search
+app/controllers/woods_map/       # application (gate order, 403 panel), status, sessions, assets, guidelines, units, search, impact
 app/helpers/woods_map/           # asset URLs, date shorthand (D-15), short SHA; components (glyphs, chips, ⓘ, people)
 app/assets/stylesheets/woods_map/ # tokens.css (verbatim from docs/design/foundations), fonts.css, map.css (engine-only rules)
 app/javascript/woods_map/        # Stimulus controllers: cliff, tooltip, rows, tree, sheet, copy, palette, peek, trail, keys
 app/views/woods_map/shared/      # the frame: bar, crumbs, ident, tabs, status, sheet
 app/views/woods_map/components/  # table, steps, detail, rail, tree, facts, legend, diagram, banner, empty state
 app/views/woods_map/guidelines/  # the C1 to C5 boards rendered from the partials above
-app/views/woods_map/{units,search}/ # the unit page frame, Code tab, Passage and four other tabs, the ladder, peek, 404; search
+app/views/woods_map/{units,search,impact}/ # unit pages (Code, Passage, Schema, Lifecycle, Graph, History, peek, 404), search, impact lenses
 vendor/javascript/               # stimulus (vendored); turbo, cytoscape, vis-timeline, highlight.js as milestones land them
 vendor/fonts/                    # Inter (latin subsets) and the complete Fira Code, WOFF2 (D-12)
 docs/design/                     # design study, decisions, boards, foundations, plan
@@ -68,6 +69,7 @@ docs/design/                     # design study, decisions, boards, foundations,
 - `Lifecycle` keeps only callbacks whose method the unit's source or an inlined concern defines; framework callbacks and procs are counted as a limit, not drawn as steps.
 - `Outline`, `SchemaView`, `Neighbourhood` and `HistoryView` read the generation at construction, so a view may use them after the repository block closes.
 - `Passage` shows filter scopes as declared (`only`/`except` lists) and never resolves the chain (W-8), reads no assigns from source (W-7) and ties templates to actions only through Woods' `view_render` edge or a mailer's template list. A fact the index lacks is named as a limit, not derived.
+- The impact page computes nothing a range needs: `BlastRadius` propagates over `reverse_via` of one generation and `ImpactReview` runs only the rules that generation can answer, listing the rest with what they need (W-7, W-8, a range). The report itself is Woods' (`woods:impact`, W-12, decision D-1); never render Markdown or JSON for it here.
 - The code view is one scroll region (`.cvwrap`, woods-map#29): the source column grows to its longest line and the gutters are sticky. Do not reintroduce `overflow-x:auto` on `.src`.
 
 ## Conventions

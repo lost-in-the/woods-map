@@ -8,6 +8,8 @@
       <h2 class="t3 on">Neighbourhood</h2>
       <div class="grp">direction</div>
       <div style="padding:var(--s1) var(--s5)"><span class="seg" role="group" aria-label="Direction"><% %w[both dependents dependencies].each do |d| %><a href="<%= woods_map.unit_graph_path(type: @page.type, identifier: @page.identifier, direction: d, depth: n.depth) %>"<%= ' aria-current="true"'.html_safe if n.direction == d %>><%= d %></a><% end %></span></div>
+      <div class="grp">blast radius</div>
+      <ol><li><span class="k">·</span><span><a href="<%= woods_map.impact_path(focus: @page.identifier, depth: 2) %>">what a change here reaches</a> <span class="own">impact, pre-change mode</span></span></li></ol>
       <div class="grp">depth</div>
       <div style="padding:var(--s1) var(--s5)"><span class="seg" role="group" aria-label="Depth"><% [1, 2].each do |d| %><a href="<%= woods_map.unit_graph_path(type: @page.type, identifier: @page.identifier, direction: n.direction, depth: d) %>"<%= ' aria-current="true"'.html_safe if n.depth == d %>><%= d %></a><% end %></span></div>
       <input type="hidden" name="direction" value="<%= n.direction %>"><input type="hidden" name="depth" value="<%= n.depth %>">

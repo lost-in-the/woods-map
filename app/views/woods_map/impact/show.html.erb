@@ -1,0 +1,30 @@
+<% r = @radius; v = @review %>
+<% content_for :title, "Blast radius of #{r.focus.join(', ')} · Impact · Woods Map" %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<% impact_url = ->(**changes) { woods_map.impact_path({ focus: r.focus.join(','), depth: r.depth, show: (r.show == 'all' ? nil : r.show), types: params[:types].presence, via: params[:via].presence, lens: (@lens == 'changed' ? nil : @lens) }.merge(changes).compact) } %>
+<% controls = safe_join([
+     tag.span('depth', class: 'lbl'), tag.span(safe_join((1..WoodsMap::BlastRadius::MAX_DEPTH).map { |d| link_to(d, impact_url.call(depth: d), 'aria-current': (d == r.depth ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'Depth'),
+     tag.span('show', class: 'lbl'), tag.span(safe_join([['all', nil], ['no tests', 'no_tests'], ['no views', 'no_views']].map { |label, value| link_to(label, impact_url.call(show: value), 'aria-current': ((value || 'all') == r.show ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'Show'),
+     tag.button('⎘ copy focus URL', class: 'btn primary', type: 'button', data: { controller: 'copy', copy_text_value: request.original_url, action: 'copy#copy' }, 'data-needs-js': '')
+   ], ' ') %>
+<% counts = { 'changed' => r.focus.size, 'risks' => v.findings.size, 'flows' => 0, 'tests' => v.tests.size, 'unknown' => v.unknowns.size } %>
+<% tabs = WoodsMap::ImpactController::LENSES.map { |lens| { label: lens.capitalize, count: counts[lens], href: impact_url.call(lens: lens), current: lens == @lens } } %>
+<%= render 'woods_map/impact/frame', title: 'Blast radius', subtitle: "#{r.focus.join(', ')}, depth #{r.depth}, gen #{@repository.generation_number}", controls: controls, tabs: tabs %>
+<div class="body" data-controller="trail keys" data-trail-title-value="Blast radius of <%= r.focus.join(', ') %>">
+  <%= render 'woods_map/components/rail', heading: @lens.capitalize, groups: [
+        { label: 'focus', count: r.focus.size, items: r.focus.map { |id| { key: '·', text: unit_link(id, r.type_of(id)), own: safe_join([r.type_of(id).tr('_', ' '), (v.findings.count { |f| f.where == id }.positive? ? safe_join([', ', tag.span('⚑', class: 'flag'), " #{v.findings.count { |f| f.where == id }}"]) : nil)].compact) } } },
+        { label: 'affected', count: r.direct.size, items: r.direct.first(8).map { |a| { key: '·', text: unit_link(a.identifier, a.type), own: a.via } } + (r.direct.size > 8 ? [{ key: '·', text: "+#{r.direct.size - 8} more" }] : []) },
+        { label: 'limits', count: 3, items: [
+          { key: '·', text: 'no range: one generation', own: layer_chip('woods:impact is W-12, woods#762') },
+          { key: '·', text: 'flows not inverted', own: layer_chip('W-13, woods#763') },
+          { key: '·', text: 'nothing here proves a path ran', own: layer_chip('static') }
+        ] }
+      ] %>
+  <div class="main">
+    <% if r.unknown.any? %>
+      <%= render 'woods_map/components/banner', severity: :mod, lead: "Not in gen #{@repository.generation_number}: #{r.unknown.join(', ')}.", text: "The radius starts from #{r.focus.join(', ')}." %>
+    <% end %>
+    <%= render "woods_map/impact/#{@lens}", r: r, v: v, impact_url: impact_url %>
+    <%= render 'woods_map/shared/status', items: ['static: one generation, no range', "reverse edges to depth #{r.depth}, #{r.reached.size} reached, #{r.affected.size} shown", "gen #{@repository.generation_number}"], keys: [[%w[1 2 3], 'depth'], [%w[y], 'copy Mermaid'], [%w[/], 'search']] %>
+  </div>
+</div>
