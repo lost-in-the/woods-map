@@ -71,6 +71,16 @@ it; the implementation is tracked by the design-system epic.
 | D-19 | Responsiveness | Four tiers, driven by container queries on `.wm` so the map works in split windows as well as phones: ≥1280 full; 1279 to 960 tree strip and shorter bar; 959 to 640 rail hidden behind ☰, facts in two columns; ≤639 one column, tree in a sheet, smaller type; `pointer: coarse` grows every target to 44px | Decided before components were built, not after. Every C board shows all four widths; no tier hides data, only navigation. [woods-map#21](https://github.com/lost-in-the/woods-map/issues/21) |
 | D-20 | Glyphs over assets | Unicode glyphs for every status and control mark (ⓘ ⎘ ↕ ⤵ ≡ ☰ ✓ ⚠ ●) with a fixed vocabulary table in the guidelines; no icon font, no SVG sprite | One fewer vendored asset; glyphs inherit colour and size from text. A glyph is replaced by inline SVG only if it renders inconsistently across the three supported platforms. [woods-map#22](https://github.com/lost-in-the/woods-map/issues/22) |
 
+## Diagram renderer (18 October 2026)
+
+Settled from the verification recorded in [woods-map#25](https://github.com/lost-in-the/woods-map/issues/25)
+(Pele 1.6.0, every diagram type the boards use, themed from `tokens.css`),
+under the engine's constraint that no request may need Node.
+
+| # | Question | Decision | Consequence |
+|---|---|---|---|
+| D-21 | Diagram renderer | Pele, vendored and run in the browser; supersedes D-5 (Mermaid 12) | One ESM file under `vendor/javascript/` renders the Mermaid text the page already carries into SVG on the client. The text stays in the page as the fallback without JavaScript and as the *copy Mermaid* source, so the engine needs no Node at request time and no diagram is lost when scripts are off. Themes come from the eight `--pele-*` custom properties set in `tokens.css` (dark, light, colour-vision), so the Mermaid overrides at the end of the sheet go away and `classDef` colours leave the diagram text. Server-side and extraction-time rendering are not adopted: Pele renders in Node only. The ES2024 requirement of Mermaid 12 falls away; the node budget per diagram (R-4) stays the control. Lands with M3 ([woods-map#5](https://github.com/lost-in-the/woods-map/issues/5)); until then the diagram panels show the Mermaid text. [woods-map#25](https://github.com/lost-in-the/woods-map/issues/25) |
+
 ## Open
 
 - Editor deep links: scheme and checkout path are per-browser settings; never guessed from the index.
