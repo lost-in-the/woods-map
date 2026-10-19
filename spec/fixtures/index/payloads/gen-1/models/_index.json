@@ -1,1 +1,1 @@
-[{"type":"model","identifier":"Post","file_path":"app/models/post.rb"},{"type":"model","identifier":"Comment","file_path":"app/models/comment.rb"}]
+[{"identifier":"User","file_path":"app/models/user.rb","namespace":null,"estimated_tokens":3778,"chunk_count":5},{"identifier":"Relationship","file_path":"app/models/relationship.rb","namespace":null,"estimated_tokens":931,"chunk_count":4},{"identifier":"Micropost","file_path":"app/models/micropost.rb","namespace":null,"estimated_tokens":1804,"chunk_count":4}]

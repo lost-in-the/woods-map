@@ -1,0 +1,31 @@
+<% content_for :title, "#{@page.identifier} · Schema · Woods Map" %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<%= render 'woods_map/units/frame', page: @page, tab: 'schema', definition: @definition %>
+<% assocs = @schema.associations %>
+<div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
+  <%= render 'woods_map/components/rail', heading: 'Schema, as the database has it', groups: [
+        { label: 'table', count: @schema.table_name, items: [{ key: '·', text: "#{@schema.columns.size} #{'column'.pluralize(@schema.columns.size)}, #{@schema.indexes.size} #{'index'.pluralize(@schema.indexes.size)}" }] },
+        { label: 'associations', count: assocs.size, items: assocs.each_with_index.map { |a, i| { key: i + 1, text: unit_link(a.target), own: a.macro } } }
+      ].reject { |g| g[:items].empty? } %>
+  <div class="main">
+    <section class="sec" aria-labelledby="er">
+      <%= render 'woods_map/components/diagram', title: 'Entity relationship', facts: ["#{@schema.table_name} + 1 hop", "#{assocs.size + 1} tables"], tools: tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: @schema.mermaid, action: 'copy#copy' }), body: tag.pre(@schema.mermaid, class: 'cmd', style: 'margin:0;border:0;background:none', 'aria-label': 'Mermaid source', data: { controller: 'cliff' }), legend: [['|', 'one'], ['○', 'zero or more'], ['crow\'s foot', 'many'], [tag.span('', class: 'lyr'), 'rendered diagrams land with M3 (woods-map#25); the text is the same']], provenance: ['model metadata', "gen #{@repository.generation_number}"] %>
+    </section>
+    <section class="sec" aria-labelledby="assoc" data-controller="rows">
+      <header><h2 class="t2" id="assoc">Associations <%= count_tag(assocs.size) %></h2></header>
+      <%= render 'woods_map/components/table', label: 'Associations', min_width: '860px', columns: [{ label: 'macro', width: '200px', cell_class: 'nw id' }, { label: 'target', width: '140px' }, { label: 'options' }, { label: 'foreign key', width: '190px', cell_class: 'nw' }, { label: 'db enforced', width: '110px', cell_class: 'nw' }, { label: 'finding', width: '220px' }],
+            rows: assocs.map { |a| { cells: [a.macro, unit_link(a.target), a.options.presence || empty_value(applicable: false), a.foreign_key || tag.span('derived', class: 'dim'), a.enforced, a.finding ? safe_join([chip(:note), ' ', a.finding]) : empty_value(applicable: false)] } } %>
+    </section>
+    <section class="sec" aria-labelledby="colsh">
+      <header><h2 class="t2" id="colsh">Columns <%= count_tag(@schema.columns.size) %></h2></header>
+      <%= render 'woods_map/components/table', label: 'Columns', min_width: '760px', columns: [{ label: 'column', width: '180px', cell_class: 'nw id' }, { label: 'type', width: '110px' }, { label: 'null', width: '60px' }, { label: 'default', width: '110px' }, { label: 'index' }, { label: 'written by' }],
+            rows: @schema.columns.map { |c| { cells: [c.name, c.type, c.null, c.default.nil? ? empty_value(applicable: false) : c.default.to_s, c.index || empty_value(applicable: false), Array(c.written_by).any? ? c.written_by.join(', ') : empty_value(applicable: false)] } } %>
+    </section>
+    <section class="sec" aria-labelledby="dbh">
+      <header><h2 class="t2" id="dbh">Database facts <%= count_tag('what the schema enforces') %></h2></header>
+      <%= render 'woods_map/components/table', label: 'Database facts', columns: [{ label: 'fact', width: '240px', cell_class: 'nw id' }, { label: 'value' }, { label: 'source', width: '260px' }],
+            rows: @schema.facts.map { |fact, value, source| { cells: [fact, value == 'none' || value.start_with?('none') ? tag.span(value, class: 'dim') : value, layer_chip(source)] } } %>
+    </section>
+    <%= render 'woods_map/shared/status', items: ['ER', 'model metadata', "gen #{@repository.generation_number}"], keys: [[%w[y], 'copy Mermaid'], [%w[/], 'search']] %>
+  </div>
+</div>

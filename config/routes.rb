@@ -8,6 +8,21 @@ WoodsMap::Engine.routes.draw do
   # The component boards rendered from the engine's own partials (woods-map#23).
   get 'guidelines', to: 'guidelines#show', as: :guidelines
 
+  # Search (M1): the results page and the palette's hits.
+  get 'search', to: 'search#show', as: :search
+  get 'search/palette', to: 'search#palette', as: :palette, defaults: { format: :json }
+
+  # Unit pages (M1): one route per tab, taking a unit type and an identifier
+  # from the pinned generation; never a file path.
+  scope 'units/:type', constraints: { type: /[a-z0-9_]+/ }, format: false do
+    get '*identifier/schema', to: 'units#schema', as: :unit_schema
+    get '*identifier/lifecycle', to: 'units#lifecycle', as: :unit_lifecycle
+    get '*identifier/graph', to: 'units#graph', as: :unit_graph
+    get '*identifier/history', to: 'units#history', as: :unit_history
+    get '*identifier/peek', to: 'units#peek', as: :unit_peek
+    get '*identifier', to: 'units#show', as: :unit
+  end
+
   # Engine-served files: /assets/<digest>/<logical path>. The digest is the
   # file's content hash, so responses are cached as immutable. Named
   # engine_asset so it never shadows Action View's asset_path in views.

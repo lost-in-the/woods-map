@@ -8,7 +8,7 @@ import { Controller } from "@hotwired/stimulus"
 // Lives on the .wm root. Triggers are abbr, .info and .who elements with a
 // title (moved to data-tip so the native tooltip stays quiet) and anything
 // with data-tip; data-tip-html carries server-rendered markup with links.
-const TRIGGERS = "abbr[title], .info[title], .who[title]"
+const TRIGGERS = "abbr[title], .info[title], .who[title], .mg[title], .bar-fresh .why[title]"
 
 export default class extends Controller {
   static values = { delay: { type: Number, default: 300 } }

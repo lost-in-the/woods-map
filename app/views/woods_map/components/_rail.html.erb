@@ -4,7 +4,7 @@
     :text (HTML), :own (HTML), :current, :href), :filters (Array of Hash with
     :label, :count, :checked, :name)). %>
 <nav class="rail" aria-label="<%= local_assigns.fetch(:label, 'On this page') %>">
-  <h3 class="t3 on"><%= heading %></h3>
+  <h2 class="t3 on"><%= heading %></h2>
   <% groups.each do |group| %>
     <div class="grp"><%= group[:label] %> <span class="cnt"><%= group[:count] %></span></div>
     <% if group[:items] %>

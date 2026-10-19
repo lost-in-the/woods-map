@@ -6,8 +6,9 @@ read each unit as Rails runs it, follow references and data passages, see
 lifecycles, relationship graphs, schema and history, and share change-impact
 reports with links that open on the interesting part.
 
-Status: scaffold. See [`docs/design/`](docs/design/) for the design study,
-decision log, boards and milestone plan.
+Status: M1 Reading (search, unit pages, the two-lens code view, Schema,
+Lifecycle, Graph and History tabs). See [`docs/design/`](docs/design/) for the
+design study, decision log, boards and milestone plan.
 
 ```ruby
 # Gemfile
@@ -41,6 +42,21 @@ end
   `Authorization: Bearer …`.
 - `config.authorize` runs before any token check and can refuse on its own.
 - `config.require_token = true` refuses loopback too.
+
+## Pages
+
+- `/woods`: the status page (generation, HEAD, freshness, extractors, host).
+- `/woods/search?q=…&in=name|code|path`: name, full-text and path search over
+  the pinned generation, with type filters; `/` on any page opens the palette.
+- `/woods/units/:type/*identifier`: a unit's Code tab, the file as written or
+  the effective class (schema header and inlined concerns folded in), with
+  marginalia, outline, peek (`p`) and references linked with their confidence.
+- `…/schema`, `…/lifecycle?event=`, `…/graph`, `…/history`: the tabs a type
+  has (models: all four; tables: schema and graph; controllers, mailers and
+  jobs: lifecycle, graph and history; everything else: graph and history).
+
+Every read goes through one generation pinned for the request; the page says
+which (`gen N`) and whether the working tree has drifted from it.
 
 ## Guidelines page
 

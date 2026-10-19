@@ -1,0 +1,8 @@
+<%# The drifted / stale / unknown banner (B8-States). Locals: freshness (Hash). %>
+<% state = freshness.to_h['state'].to_s %>
+<% if state == 'drifted' %>
+  <% changed = %w[added changed removed].sum { |k| Array(freshness.dig('changes', k)).size } %>
+  <%= render 'woods_map/components/banner', severity: :warn, lead: 'Index drifted.', text: safe_join(["#{changed} #{'file'.pluralize(changed)} changed since gen #{freshness['generation']} was extracted; everything below is gen #{freshness['generation']}. Run ", tag.code('bin/rails woods:incremental'), ' to catch up.']) %>
+<% elsif state == 'stale' %>
+  <%= render 'woods_map/components/banner', severity: :mod, lead: 'Index stale.', text: "gen #{freshness['generation']} is behind HEAD; the map is still exact for the commit it was extracted at." %>
+<% end %>

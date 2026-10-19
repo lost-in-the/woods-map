@@ -1,0 +1,1 @@
+[{"identifier":"UsersController","file_path":"app/controllers/users_controller.rb","namespace":null,"estimated_tokens":1881,"chunk_count":9},{"identifier":"MicropostsController","file_path":"app/controllers/microposts_controller.rb","namespace":null,"estimated_tokens":1005,"chunk_count":2}]
