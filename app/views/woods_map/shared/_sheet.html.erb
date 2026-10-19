@@ -1,0 +1,8 @@
+<%# The sheet behind ☰ below 960 (C3-Navigation): files first, this page's
+    sections below. It borrows the page's nav.tree and nav.rail while open. %>
+<div class="sheet-overlay" hidden data-sheet-target="overlay" data-action="click->sheet#outside">
+  <div class="sheet" role="dialog" aria-modal="true" aria-label="Files and sections">
+    <div class="sh"><button class="tool" type="button" aria-label="Close" data-action="sheet#close" data-sheet-target="close">✕</button><span class="eyebrow">files</span><span class="eyebrow" style="margin-left:var(--s5);color:var(--dim)">on this page</span></div>
+    <div data-sheet-target="body"></div>
+  </div>
+</div>

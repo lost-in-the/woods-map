@@ -1,0 +1,9 @@
+<%# An empty state (B8-States): keeps the frame, names what was searched and
+    where, offers the next action; never a spinner. Locals: title (String),
+    text (HTML), command (String or nil), cap (HTML or nil), heading (:h1 or :h2). %>
+<div class="empty-state">
+  <%= content_tag(local_assigns.fetch(:heading, :h2), title, class: 't2') %>
+  <%= text %>
+  <% if local_assigns[:command] %><pre class="cmd"><%= command %></pre><% end %>
+  <% if local_assigns[:cap] %><div class="cap"><%= cap %></div><% end %>
+</div>

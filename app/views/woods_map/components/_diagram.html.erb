@@ -1,0 +1,9 @@
+<%# A diagram panel (C4-Diagrams): header band, body that scrolls sideways,
+    legend under a rule. Locals: title (String), facts (Array of String),
+    tools (HTML or nil), body (HTML), legend (Array of [mark, text] or nil),
+    provenance (Array of String or nil). %>
+<div class="dia">
+  <div class="dh"><b><%= title %></b><% facts.each do |fact| %><span><%= fact %></span><% end %><% if local_assigns[:tools] %><span class="tools"><%= tools %></span><% end %></div>
+  <div class="dw hscroll" data-controller="cliff"><%= body %></div>
+  <% if local_assigns[:legend] %><%= render 'woods_map/components/legend', entries: legend, provenance: local_assigns[:provenance] %><% end %>
+</div>

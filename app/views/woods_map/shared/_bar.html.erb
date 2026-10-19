@@ -1,9 +1,15 @@
-<%# The top bar (C5-Chrome): wordmark, primary nav, freshness. Search and the
-    remaining sections arrive with their milestones. %>
+<%# The top bar (C5-Chrome): ☰ below 960, wordmark, search, primary nav,
+    freshness as ● + words, generation, SHA. Locals: generation (Hash or nil),
+    nav (Array of [label, href, current?]), search_path (String or nil),
+    label (landmark name, "Primary"; a specimen passes its own). %>
+<% nav = local_assigns[:nav] || [['Units', woods_map.root_path, true]] %>
 <header class="bar">
-  <button class="tool menu-toggle" type="button" aria-label="Files and sections" style="font-size:16px;text-decoration:none">☰</button>
+  <button class="tool menu-toggle" type="button" aria-label="Files and sections" aria-expanded="false" data-action="sheet#open" data-needs-js>☰</button>
   <a href="<%= woods_map.root_path %>" class="brand"><%= render 'woods_map/shared/mark' %>woods</a>
-  <nav aria-label="Primary"><a href="<%= woods_map.root_path %>" aria-current="page">Units</a></nav>
+  <% if local_assigns[:search_path] %>
+    <form class="bar-search" role="search" aria-label="<%= local_assigns.fetch(:label, 'Primary') == 'Primary' ? 'Search' : "Search, #{local_assigns[:label]}" %>" action="<%= local_assigns[:search_path] %>" method="get"><span aria-hidden="true">⌕</span><input class="q" type="search" name="q" placeholder="Search units, files, routes, tables, code" aria-label="Search units, files, routes, tables, code" value="<%= local_assigns[:query] %>"><span class="kbd" aria-hidden="true">/</span></form>
+  <% end %>
+  <nav aria-label="<%= local_assigns.fetch(:label, 'Primary') %>"><% nav.each do |label, href, current| %><a href="<%= href %>"<%= ' aria-current="page"'.html_safe if current %>><%= label %></a><% end %></nav>
   <span class="bar-fresh">
     <% if generation %>
       <span><span class="fresh">●</span><span class="w"> gen <b class="bright"><%= generation['generation'] %></b></span></span>

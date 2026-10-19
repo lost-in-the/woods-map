@@ -1,0 +1,10 @@
+<% content_for :title, 'Woods Map · guidelines' %>
+<%= render 'woods_map/shared/crumbs', crumbs: [['woods', woods_map.root_path], ['guidelines', nil]] %>
+<%= render 'woods_map/shared/ident', title: 'Guidelines', subtitle: 'the component boards C1 to C5, rendered from the engine partials' %>
+<div class="spec">
+  <%= render 'woods_map/guidelines/tokens' %>
+  <%= render 'woods_map/guidelines/table' %>
+  <%= render 'woods_map/guidelines/navigation' %>
+  <%= render 'woods_map/guidelines/diagrams' %>
+  <%= render 'woods_map/guidelines/chrome' %>
+</div>

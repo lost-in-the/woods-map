@@ -1,14 +1,32 @@
 /* Woods Map engine sheet.
    tokens.css is the design's file (D-10) and ships verbatim: a spec keeps it byte-identical to
-   docs/design/foundations/tokens.css. The few rules the engine needs beyond it live here: the
-   document reset the boards carry at board level, the colour-scheme hint for native controls,
-   and the vendored fonts once they land (woods-map#23). No colours or sizes: tokens only. */
+   docs/design/foundations/tokens.css. What the engine needs beyond it lives here: the document
+   reset the boards carry at board level, the colour-scheme hint for native controls, what the
+   page looks like without JavaScript, and the inline-link cue of woods-map#26. No colours or
+   sizes: tokens only. */
 html,body{margin:0;min-height:100%}
-.wm.page{min-height:100vh;display:flex;flex-direction:column}
+.wm.page{min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
 .wm{color-scheme:dark}
 .wm[data-theme=light]{color-scheme:light}
+/* Without JavaScript every detail block is open and the controls that need a script are gone. */
+html.no-js .wm .tgl,html.no-js .wm [data-needs-js]{display:none}
+html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 /* Inline links: a cue besides colour (WCAG 1.4.1, axe link-in-text-block). D-11 keeps standalone
    links bare; a link sitting among other text gets a faint underline in its own hue. The choice is
    open in woods-map#26; until it is settled the accessible reading wins. */
-.wm .crumbs a,.wm .empty-state a,.wm .cap a,.wm .lead a,.wm .det dd a,.wm .facts dd a,.wm .banner .txt a,.wm .legend a,.wm .st a,.wm .mg a,.wm .rail li a,.wm .tip a,.wm .finding a{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--link) 55%,transparent);text-underline-offset:3px}
-.wm .crumbs a:hover,.wm .empty-state a:hover,.wm .cap a:hover,.wm .lead a:hover,.wm .det dd a:hover,.wm .facts dd a:hover,.wm .banner .txt a:hover,.wm .legend a:hover,.wm .st a:hover,.wm .mg a:hover,.wm .rail li a:hover,.wm .tip a:hover,.wm .finding a:hover{text-decoration-color:var(--link)}
+.wm .crumbs a,.wm .empty-state a,.wm .cap a,.wm .lead a,.wm .det dd a,.wm .facts dd a,.wm .banner .txt a,.wm .legend a,.wm .st a,.wm .mg a,.wm .rail li a,.wm .tip a,.wm .finding a,.wm .status a{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--link) 55%,transparent);text-underline-offset:3px}
+.wm .crumbs a:hover,.wm .empty-state a:hover,.wm .cap a:hover,.wm .lead a:hover,.wm .det dd a:hover,.wm .facts dd a:hover,.wm .banner .txt a:hover,.wm .legend a:hover,.wm .st a:hover,.wm .mg a:hover,.wm .rail li a:hover,.wm .tip a:hover,.wm .finding a:hover,.wm .status a:hover{text-decoration-color:var(--link)}
+/* Specimen chrome for /woods/guidelines, the engine's copy of the C boards. */
+.wm .spec{padding:var(--s5)}
+.wm .spec .sec{margin-bottom:var(--s6)}
+.wm .spec .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:var(--s5);align-items:start}
+.wm .spec .row.phone{grid-template-columns:minmax(0,1fr) 390px}
+.wm .spec .row.wide{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+@container wm (max-width:959px){ .wm .spec .row.phone,.wm .spec .row.wide{grid-template-columns:minmax(0,1fr)} }
+.wm .spec .box{min-width:0}
+.wm .spec .lbl{font-family:var(--ff-ui);font-size:var(--fs-11);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:var(--s3)}
+.wm .spec .frame{border:1px dashed var(--rule2);padding:var(--s4);border-radius:var(--r-ctl)}
+.wm .spec .spec-note{font-family:var(--ff-ui);font-size:var(--fs-12);color:var(--mut);margin-top:var(--s3);max-width:980px}
+.wm .spec .spec-note b{color:var(--text);font-weight:500}
+.wm .spec .narrow{overflow:hidden;border:1px solid var(--rule2);border-radius:var(--r-ctl);max-width:100%}
+.wm .spec .sw{display:inline-block;width:14px;height:14px;border-radius:var(--r-chip);border:1px solid var(--rule2);vertical-align:-2px;margin-right:var(--s2)}
