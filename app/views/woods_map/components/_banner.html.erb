@@ -1,0 +1,7 @@
+<%# A state banner (B8-States): a 3px bar in the severity colour, one bold
+    sentence, one plain, tools right. Locals: severity (:warn, :risk, :mod or
+    nil), lead (String), text (HTML), tools (HTML or nil). %>
+<div class="banner<%= " #{severity}" if local_assigns[:severity] %>" role="status">
+  <b><%= lead %></b><span class="txt"><%= text %></span>
+  <% if local_assigns[:tools] %><span class="tools"><%= tools %></span><% end %>
+</div>

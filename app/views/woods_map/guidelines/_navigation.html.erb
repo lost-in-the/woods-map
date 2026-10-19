@@ -1,0 +1,44 @@
+<%# C3 · Navigation: the rail and the file tree, four widths. %>
+<% groups = [
+     { label: 'events', count: 'steps', items: [{ key: '1', text: 'create', own: '6 steps, 1 async' }, { key: '2', text: 'update', own: '4 steps', current: true }, { key: '3', text: 'destroy', own: '2 steps, cascade 3 tables' }] },
+     { label: 'transitions', count: 'state machine', items: [{ text: 'publish', own: 'draft → published, 1 async ⚑' }, { text: 'archive', own: 'published → archived' }, { text: 'restore', own: 'guard user.admin?' }] },
+     { label: 'limits', count: '2', items: [{ text: safe_join(['proc callback on ', tag.code('after_touch'), ' not analysed ', layer_chip('W-20')]) }, { text: safe_join(['nothing here proves a path ran ', layer_chip('static')]) }] }
+   ]
+   filters = { label: 'via', count: '8', filters: [{ label: 'belongs_to, has_many', count: '3', checked: true, name: 'via_assoc' }, { label: 'through, join', count: '1', checked: true, name: 'via_through' }, { label: 'test_coverage', count: '3', checked: false, name: 'via_tests' }] }
+   tree_rows = [
+     { kind: :dir, name: 'app', level: 0, path: 'app', count: '398' },
+     { kind: :dir, name: 'controllers', level: 1, path: 'app/controllers', count: '41' },
+     { kind: :dir, name: 'admin', level: 2, path: 'app/controllers/admin', count: '6', open: false },
+     { kind: :file, name: 'application_controller.rb', level: 2, path: 'app/controllers/application_controller.rb' },
+     { kind: :file, name: 'posts_controller.rb', level: 2, path: 'app/controllers/posts_controller.rb', chips: safe_join([' ', chip(:hot)]) },
+     { kind: :dir, name: 'jobs', level: 1, path: 'app/jobs', count: '9', open: false },
+     { kind: :dir, name: 'mailers', level: 1, path: 'app/mailers', count: '4', open: false },
+     { kind: :dir, name: 'models', level: 1, path: 'app/models', count: '63' },
+     { kind: :dir, name: 'concerns', level: 2, path: 'app/models/concerns', count: '7', open: false },
+     { kind: :file, name: 'comment.rb', level: 2, path: 'app/models/comment.rb' },
+     { kind: :file, name: 'post.rb', level: 2, path: 'app/models/post.rb', current: true, chips: safe_join([' ', chip(:modified)]) },
+     { kind: :file, name: 'tag.rb', level: 2, path: 'app/models/tag.rb' },
+     { kind: :file, name: 'tagging.rb', level: 2, path: 'app/models/tagging.rb' },
+     { kind: :file, name: 'post_decorator.rb', level: 2, path: 'app/models/post_decorator.rb', unindexed: true },
+     { kind: :dir, name: 'views', level: 1, path: 'app/views', count: '281', open: false },
+     { kind: :dir, name: 'config', level: 0, path: 'config', count: 'routes, 2 dbs', open: false },
+     { kind: :dir, name: 'db', level: 0, path: 'db', count: 'schema, 61 migrations', open: false },
+     { kind: :dir, name: 'lib', level: 0, path: 'lib', count: '11', open: false },
+     { kind: :dir, name: 'spec', level: 0, path: 'spec', count: '3 unmapped', open: false }
+   ] %>
+<section class="sec" id="navigation"><header><h2 class="t2">C3 · Navigation</h2><span class="n">the rail and the file tree; both survive every width as a strip, a dropdown or a sheet</span></header>
+  <h3 class="t3" id="nav-rail" style="margin-bottom:var(--s3)">Rail</h3>
+  <div class="row">
+    <div class="box"><div class="lbl">unit page, Lifecycle tab</div><%= render 'woods_map/components/rail', heading: 'Lifecycle', groups: groups, label: 'On this page, Lifecycle specimen' %></div>
+    <div class="box"><div class="lbl">with filters (Graph tab)</div><%= render 'woods_map/components/rail', heading: 'Lifecycle', groups: groups.first(2) + [filters] + groups.last(1), label: 'On this page, Graph specimen' %></div>
+    <div class="box"><div class="lbl">rules</div><%= render 'woods_map/components/detail', rows: [['heading', "11px uppercase slate, Inter; the active section's heading is purple+"], ['group', 'slate label with a count or a word on the right; never a second heading size'], ['item', '18px key column (a number when order matters, · when it does not), then the name in smoke and its facts in gray'], ['current', '3px purple+ bar, 8% tint, snow text; one per rail'], ['separation', 'no stripes in a rail; items separate by spacing, groups by a hairline rule above their label, hover is dusk'], ['filters', 'real checkboxes, the label is the hit area, count on the right'], ['width', '260px, never wider; long names wrap at words, identifiers do not']] %></div>
+  </div>
+  <h3 class="t3" style="margin:var(--s5) 0 var(--s3)" id="nav-tree">File tree</h3>
+  <div class="row">
+    <div class="box"><div class="lbl">open, current file post.rb; filter in place</div><%= render 'woods_map/components/tree', rows: tree_rows, total: '412 units', label: 'Files, open specimen' %></div>
+    <div class="box"><div class="lbl">the same tree, folded</div><%= render 'woods_map/components/tree', rows: tree_rows.map { |r| r[:kind] == :dir && r[:level].positive? ? r.merge(open: false) : r }, total: '412 units', label: 'Files, folded specimen' %></div>
+    <div class="box" style="max-width:120px"><div class="lbl">strip</div><nav class="tree strip" aria-label="Files, collapsed"><div class="th"><span>files</span><span>412 units</span></div></nav></div>
+    <div class="box"><div class="lbl">rules</div><%= render 'woods_map/components/detail', rows: [['placement', safe_join(['left of the rail; 260px open, a 28px strip when closed, a sheet on phones; ', tag.span('t', class: 'kbd'), ' toggles, state persists per browser'])], ['shape', 'directories as on disk, 13px per level, ▸ ▾ folds; folder counts are indexed units, or a word when a count would mislead'], ['files', safe_join(['smoke; unindexed files gray so coverage is honest; chips inline: ', chip(:modified), ' modified, ', chip(:hot), ' churn, ', chip(:risk), ' risk'])], ['current', 'the purple+ row; the tree scrolls to it on every navigation and always agrees with the breadcrumb'], ['filter', 'path match in place, matches marked, counts become "3 of 398"; no fuzzy, no ranking'], ['keyboard', '↑ ↓ move, ← → fold, Enter opens'], ['never', "dependent counts, sizes, dates: those are the page's job"]] %></div>
+  </div>
+  <div class="spec-note"><b>Below 960</b> the tree and the rail share one entry point, the ☰ at the top left of the bar, which opens a sheet with files first and this page's sections below (try it at a narrow width). At 960 the strip stays, because there is room for it.</div>
+</section>

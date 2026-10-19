@@ -27,7 +27,8 @@ mount the engine in a variant, run `woods:extract`, open `/woods`.
 ## Non-negotiables
 
 - **Floors match Woods**: railties >= 6.0, Ruby >= 3.0. Only the RubyLLM guide needs Ruby 3.2 and it degrades to a notice below that.
-- **No build step, no asset-pipeline dependency**: every JavaScript library is vendored under `vendor/javascript/`, served by the engine's own assets route with content hashes, and pinned by a literal `<script type="importmap">` in the layout. No importmap-rails, no turbo-rails, no Node.
+- **No build step, no asset-pipeline dependency**: every JavaScript library is vendored under `vendor/javascript/`, served by the engine's own assets route under one content digest for the whole set (so relative URLs between files work), and pinned by a literal `<script type="importmap">` in the layout. No importmap-rails, no turbo-rails, no Node.
+- **One token sheet**: `tokens.css` is the design's file and ships verbatim (a spec compares the two copies); engine-only rules go in `map.css`; views never hard-code a colour or a size and compose from the partials under `app/views/woods_map/shared/` and `components/`. Every page must pass axe (colour contrast, names) at 1440, 960, 640 and 390.
 - **Engine only**: there is no standalone launcher. The map belongs inside a Rails application, like Woods.
 - **Index only**: every read goes through `Woods::PublishedIndex` or `Woods::MCP::IndexReader` pinned to one generation per request. Never resolve a payload path yourself; never read `manifest.json` from the index root.
 - **Read-only and gated**: loopback without a token boots with a warning; anything else refuses without `WOODS_MAP_TOKEN`; `config.authorize` lets the host add its own gate. Routes take identifiers and generation numbers, never file paths from the client.
@@ -42,12 +43,16 @@ lib/woods_map/repository.rb      # one pinned generation per request, per-genera
 lib/woods_map/assets.rb          # engine-served files: roots, content digests, content types
 lib/woods_map/importmap.rb       # pins for vendored modules, the literal import map
 app/controllers/concerns/woods_map/authentication.rb  # token, cookie and loopback gate (D-4)
-app/controllers/woods_map/       # application (gate order, 403 panel), status, sessions, assets; units, search, ...
-app/helpers/woods_map/           # asset URLs, date shorthand (D-15), short SHA
-app/assets/stylesheets/woods_map/ # tokens.css (verbatim from docs/design/foundations), map.css (engine-only rules)
-app/views/woods_map/             # server-rendered ERB on the token classes; shared/ holds the frame partials
-vendor/javascript/               # turbo, stimulus, mermaid, cytoscape, vis-timeline, highlight.js
-vendor/fonts/                    # Inter and Fira Code WOFF2 (D-12)
+lib/woods_map/glyphs.rb          # the glyph vocabulary (D-20)
+app/controllers/woods_map/       # application (gate order, 403 panel), status, sessions, assets, guidelines; units, search, ...
+app/helpers/woods_map/           # asset URLs, date shorthand (D-15), short SHA; components (glyphs, chips, ⓘ, people)
+app/assets/stylesheets/woods_map/ # tokens.css (verbatim from docs/design/foundations), fonts.css, map.css (engine-only rules)
+app/javascript/woods_map/        # Stimulus application and controllers: cliff, tooltip, rows, tree, sheet, copy
+app/views/woods_map/shared/      # the frame: bar, crumbs, ident, tabs, status, sheet
+app/views/woods_map/components/  # table, steps, detail, rail, tree, facts, legend, diagram, banner, empty state
+app/views/woods_map/guidelines/  # the C1 to C5 boards rendered from the partials above
+vendor/javascript/               # stimulus (vendored); turbo, cytoscape, vis-timeline, highlight.js as milestones land them
+vendor/fonts/                    # Inter (latin subsets) and the complete Fira Code, WOFF2 (D-12)
 docs/design/                     # design study, decisions, boards, foundations, plan
 ```
 

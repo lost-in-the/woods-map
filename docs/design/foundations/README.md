@@ -28,6 +28,16 @@ Pele as a server-side renderer (woods-map#25). When Pele is adopted the eight
 `--pele-*` variables are set from this sheet and the Mermaid overrides at the
 end of `tokens.css` go away.
 
+## In the engine
+
+The engine ships this file verbatim as `app/assets/stylesheets/woods_map/tokens.css`
+(a spec keeps the copies identical) with an *engine additions* block at the
+end for what the boards wrote inline; `map.css` holds the document reset and
+the no-JavaScript rules; `fonts.css` declares the vendored faces. The
+components below live in `app/views/woods_map/shared/` and `components/`,
+the behaviours in `app/javascript/woods_map/controllers/`, and
+`/woods/guidelines` renders C1 to C5 from them.
+
 ## What the engine must add
 
 - A Stimulus controller that toggles `more` on `.hscroll` and `.tblwrap` when

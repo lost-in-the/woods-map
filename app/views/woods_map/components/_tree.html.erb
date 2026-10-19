@@ -1,0 +1,16 @@
+<%# The file-tree explorer (C3-Navigation, D-18): directories as on disk,
+    ▸ ▾ folds, counts of indexed units, the current file, unindexed files in
+    gray, chips inline. Locals: rows (Array of Hash with :kind (:dir or :file),
+    :name, :level, :path, :href, :count, :current, :unindexed, :chips (HTML),
+    :open), total (String for the head), filter (Boolean). %>
+<nav class="tree" aria-label="<%= local_assigns.fetch(:label, 'Files') %>" data-controller="tree">
+  <div class="th" data-tree-target="head" data-action="click->tree#toggleStrip"><span>files</span><span><%= total %></span><button class="tool" type="button" aria-label="Collapse" data-action="click->tree#toggleStrip:stop" data-needs-js>‹</button></div>
+  <% if local_assigns.fetch(:filter, true) %><input class="filter" type="search" placeholder="filter paths" aria-label="Filter paths" data-tree-target="filter" data-action="input->tree#filter" data-needs-js><% end %>
+  <% rows.each do |row| %>
+    <% if row[:kind] == :dir %>
+      <button class="d" type="button" style="--l:<%= row[:level] %>" data-level="<%= row[:level] %>" data-path="<%= row[:path] %>" aria-expanded="<%= row.fetch(:open, true) ? 'true' : 'false' %>" data-tree-target="row" data-action="tree#fold"><span class="c" aria-hidden="true"><%= row.fetch(:open, true) ? '▾' : '▸' %></span><span class="nm"><%= row[:name] %></span><% unless row[:count].nil? %><span class="ct"><%= row[:count] %></span><% end %></button>
+    <% else %>
+      <a class="f<%= ' unindexed' if row[:unindexed] %>" href="<%= row[:href] || '#' %>" style="--l:<%= row[:level] %>" data-level="<%= row[:level] %>" data-path="<%= row[:path] %>"<%= ' aria-current="true"'.html_safe if row[:current] %> data-tree-target="row"><span class="nm"><%= row[:name] %></span><%= row[:chips] %></a>
+    <% end %>
+  <% end %>
+</nav>

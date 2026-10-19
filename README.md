@@ -42,6 +42,14 @@ end
 - `config.authorize` runs before any token check and can refuse on its own.
 - `config.require_token = true` refuses loopback too.
 
+## Guidelines page
+
+`/woods/guidelines` renders the component boards of the design (tokens,
+tables, navigation, diagrams, chrome) from the engine's own partials, so the
+design and the engine cannot drift. Views compose pages from
+`app/views/woods_map/shared/` (the frame) and `app/views/woods_map/components/`
+and never hard-code a colour or a size: everything comes from the token sheet.
+
 ## Principles
 
 - Reads the published index only; no live database, no runtime reflection.

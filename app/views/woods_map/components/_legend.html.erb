@@ -1,0 +1,7 @@
+<%# A legend (C4-Diagrams, D-17): a key with a rule above and below, glyph
+    plus words, provenance aligned right. Locals: entries (Array of [mark, text]),
+    provenance (Array of String or nil). %>
+<div class="legend">
+  <% entries.each do |mark, text| %><span><%= mark %> <%= text %></span><% end %>
+  <% if local_assigns[:provenance] %><span class="prov"><% provenance.each do |item| %><span><%= item %></span><% end %></span><% end %>
+</div>
