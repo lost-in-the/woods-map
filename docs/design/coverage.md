@@ -61,7 +61,7 @@ opens the file tree.
 | settings | Editor URL scheme, lens, wrap and font size, per browser | B-15, D-6 | Code toolbar only | partial |
 | keyboard help | `?` overlay listing every page's keys | NFR-3 | status bars only | **none** |
 | four widths | 1280 / 960 / 640 / 390 | D-19 | C1 to C5, [B8-Widths](boards/B8-Widths.html) | final |
-| light and colour-vision themes | Same markup, `data-theme`, `data-cvd` | D-11 | C1, C2, [B9-Pele](boards/B9-Pele.html) | final for components; B6 diagrams still dark until M3 renders them with Pele (D-21, woods-map#25) |
+| light and colour-vision themes | Same markup, `data-theme`, `data-cvd` | D-11 | C1, C2, [B9-Pele](boards/B9-Pele.html) | final for components; the engine draws diagrams with Pele from the `--pele-*` tokens in every theme (D-21, woods-map#5); the B6 boards keep their static dark renders |
 
 ## Gaps by milestone
 

@@ -1,9 +1,25 @@
 <%# A diagram panel (C4-Diagrams): header band, body that scrolls sideways,
     legend under a rule. Locals: title (String), facts (Array of String),
-    tools (HTML or nil), body (HTML), legend (Array of [mark, text] or nil),
-    provenance (Array of String or nil). %>
-<div class="dia">
-  <div class="dh"><b><%= title %></b><% facts.each do |fact| %><span><%= fact %></span><% end %><% if local_assigns[:tools] %><span class="tools"><%= tools %></span><% end %></div>
-  <div class="dw hscroll" data-controller="cliff"><%= body %></div>
+    tools (HTML or nil), legend (Array of [mark, text] or nil),
+    provenance (Array of String or nil), and either body (HTML) or
+    mermaid (String) with label (String, the diagram's accessible name).
+    Mermaid text is drawn by Pele in the browser (D-21) and stays in the
+    page as the no-JavaScript fallback and the copy source; refusal (String
+    or nil) keeps the text and says why nothing is drawn, such as a node
+    budget (R-4). %>
+<% mermaid = local_assigns[:mermaid] %>
+<% refusal = local_assigns[:refusal] %>
+<% drawn = mermaid && !refusal %>
+<div class="dia"<% if drawn %> data-controller="diagram" data-diagram-label-value="<%= local_assigns[:label] || title %>"<% end %>>
+  <div class="dh"><b><%= title %></b><% facts.each do |fact| %><span><%= fact %></span><% end %><% if local_assigns[:tools] || drawn %><span class="tools"><%= local_assigns[:tools] %><% if drawn %><button class="tool" type="button" hidden data-diagram-target="toggle" data-action="diagram#toggle" aria-pressed="false">Mermaid text</button><% end %></span><% end %></div>
+  <% if mermaid %>
+    <div class="dw hscroll" data-controller="cliff" data-diagram-target="scroller">
+      <% if refusal %><p class="cap refusal"><%= refusal %></p><% end %>
+      <div class="pele-host" data-diagram-target="canvas" hidden></div>
+      <pre class="cmd" style="margin:0;border:0;background:none" aria-label="Mermaid source" data-controller="cliff" data-diagram-target="source"><%= mermaid %></pre>
+    </div>
+  <% else %>
+    <div class="dw hscroll" data-controller="cliff"><%= body %></div>
+  <% end %>
   <% if local_assigns[:legend] %><%= render 'woods_map/components/legend', entries: legend, provenance: local_assigns[:provenance] %><% end %>
 </div>

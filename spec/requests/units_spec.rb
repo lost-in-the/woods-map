@@ -46,6 +46,26 @@ RSpec.describe 'Unit pages', type: :request do
     expect(response.body).to include('List equivalent').and include('has_many')
   end
 
+  it 'gives each diagram panel its Mermaid text for Pele, the text kept as the fallback' do
+    { 'schema' => 'erDiagram', 'lifecycle' => 'sequenceDiagram', 'graph' => 'flowchart LR' }.each do |tab, start|
+      get "/woods/units/model/User/#{tab}"
+      page = response.parsed_body
+      panel = page.at_css('.dia[data-controller="diagram"]')
+      expect(panel['data-diagram-label-value']).to match(/User|users/)
+      expect(panel.at_css('pre[data-diagram-target="source"]').text).to start_with(start)
+      expect(panel.at_css('[data-diagram-target="canvas"]')).to be_present
+    end
+  end
+
+  it 'keeps an over-budget neighbourhood as text and names the budget' do
+    stub_const('WoodsMap::Neighbourhood::NODE_BUDGET', 2)
+    get '/woods/units/model/User/graph'
+    page = response.parsed_body
+    expect(page.at_css('.dia[data-controller="diagram"]')).to be_nil
+    expect(page.at_css('.dia .refusal').text).to include('over the flowchart budget of 2')
+    expect(page.at_css('.dia pre').text).to start_with('flowchart LR')
+  end
+
   it 'serves the history tab and the peek fragment' do
     get '/woods/units/model/User/history'
     expect(response.body).to include('Commits').and include('Leah Armstrong')

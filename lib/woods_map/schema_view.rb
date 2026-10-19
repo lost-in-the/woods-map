@@ -63,29 +63,29 @@ module WoodsMap
       ]
     end
 
-    # Mermaid erDiagram text for this table and one hop of associations.
+    # Mermaid erDiagram text for this table and one hop of associations. The
+    # table is declared first, so a model without associations still draws.
     #
     # @return [String]
     def mermaid
       lines = ['erDiagram']
+      lines << "  #{entity(table_name)}" if table_name.present?
       Array(@metadata['associations']).each do |a|
         next if a['through']
 
-        left, right = if a['type'].to_s.start_with?('belongs_to')
-                        ['}o--||',
-                         [table_name,
-                          a['target'].to_s.tableize]]
-                      else
-                        ['||--o{',
-                         [table_name,
-                          a['target'].to_s.tableize]]
-                      end
-        lines << "  #{right[0]} #{left} #{right[1]} : \"#{a['name']}\""
+        cardinality = a['type'].to_s.start_with?('belongs_to') ? '}o--||' : '||--o{'
+        lines << "  #{entity(table_name)} #{cardinality} #{entity(a['target'].to_s.tableize)} : \"#{a['name']}\""
       end
       lines.join("\n")
     end
 
     private
+
+    # An ER entity name Mermaid accepts: a namespaced model's table
+    # (`active_storage/attachments`) becomes `active_storage_attachments`.
+    def entity(name)
+      name.to_s.gsub(/[^A-Za-z0-9_-]/, '_')
+    end
 
     def options_text(assoc)
       opts = (assoc['options'] || {}).map { |k, v| "#{k}: #{v.inspect}" }

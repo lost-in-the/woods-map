@@ -16,6 +16,10 @@ module WoodsMap
       'cross-cutting' => %w[test_coverage]
     }.freeze
 
+    # Flowchart node budget (R-4): above it the panel names the budget and
+    # keeps the text, rather than drawing a diagram nobody can read.
+    NODE_BUDGET = 150
+
     # @param repository [WoodsMap::Repository]
     # @param identifier [String]
     # @param direction [String] both, dependents or dependencies
@@ -72,11 +76,21 @@ module WoodsMap
       @graph.dig('nodes', identifier, 'type')
     end
 
+    # @return [Integer] distinct units the filtered edges touch, the focus included
+    def node_count
+      edges.flat_map { |e| [e.from, e.to] }.push(@identifier).uniq.size
+    end
+
+    # @return [Boolean] whether the flowchart would exceed {NODE_BUDGET}
+    def over_budget?
+      node_count > NODE_BUDGET
+    end
+
     # Mermaid flowchart text for the filtered edges.
     #
     # @return [String]
     def mermaid
-      lines = ['flowchart LR']
+      lines = ['flowchart LR', "  #{node_id(@identifier)}[\"#{@identifier}\"]"]
       edges.each { |e| lines << "  #{node_id(e.from)}[\"#{e.from}\"] -->|#{e.via}| #{node_id(e.to)}[\"#{e.to}\"]" }
       lines << "  class #{node_id(@identifier)} focus"
       lines.join("\n")

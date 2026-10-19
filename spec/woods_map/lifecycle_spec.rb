@@ -45,4 +45,17 @@ RSpec.describe WoodsMap::Lifecycle do
     expect(slug.effects).to eq(['writes slug'])
     expect(lifecycle.steps('create').last).to be_async.and be_commit
   end
+
+  it 'writes the chain as a numbered sequence, the async step handing off to its job' do
+    expect(lifecycle.mermaid('create')).to eq(<<~MERMAID.chomp)
+      sequenceDiagram
+        autonumber
+        participant App
+        participant M as Post
+        participant A0 as NotifySubscribersJob
+        App->>M: before_save set_slug
+        App->>M: before_save normalize_tags
+        M-)A0: notify
+    MERMAID
+  end
 end
