@@ -1,0 +1,7 @@
+<%# The impact page frame (B8-Impact-*): crumbs, the title block with the
+    depth and show controls, the tabs with one count each. Locals: title,
+    subtitle (Strings), controls (HTML or nil), tabs (Array for the tabs
+    partial, or nil). %>
+<%= render 'woods_map/shared/crumbs', crumbs: [['impact', woods_map.impact_path], [local_assigns.fetch(:crumb, 'blast radius'), nil]], trail: tag.span('', data: { trail_target: 'list' }) %>
+<%= render 'woods_map/shared/ident', title: title, subtitle: subtitle, controls: local_assigns[:controls] %>
+<% if local_assigns[:tabs] %><%= render 'woods_map/shared/tabs', tabs: tabs, label: 'Impact tabs' %><% end %>

@@ -12,6 +12,9 @@ WoodsMap::Engine.routes.draw do
   get 'search', to: 'search#show', as: :search
   get 'search/palette', to: 'search#palette', as: :palette, defaults: { format: :json }
 
+  # The impact page (M4b): a focus set with no range is the blast radius; a range needs woods:impact (W-12).
+  get 'impact', to: 'impact#show', as: :impact
+
   # Unit pages (M1): one route per tab, taking a unit type and an identifier
   # from the pinned generation; never a file path.
   scope 'units/:type', constraints: { type: /[a-z0-9_]+/ }, format: false do

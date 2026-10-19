@@ -15,7 +15,7 @@ export default class extends Controller {
 
   key(event) {
     if (event.target.matches("input, textarea, select, [contenteditable]") || event.metaKey || event.ctrlKey || event.altKey) return
-    const map = { c: "[aria-label=entry] a:nth-child(1)", u: "[aria-label=entry] a:nth-child(2)", d: "[aria-label=entry] a:nth-child(3)", 1: "[aria-label=Depth] a:nth-child(1)", 2: "[aria-label=Depth] a:nth-child(2)" }
+    const map = { c: "[aria-label=entry] a:nth-child(1)", u: "[aria-label=entry] a:nth-child(2)", d: "[aria-label=entry] a:nth-child(3)", 1: "[aria-label=Depth] a:nth-child(1)", 2: "[aria-label=Depth] a:nth-child(2)", 3: "[aria-label=Depth] a:nth-child(3)" }
     if (event.key === "y") {
       const tool = this.element.querySelector("[data-copy-text-value]")
       if (tool) { tool.click(); event.preventDefault() }

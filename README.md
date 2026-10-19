@@ -7,7 +7,7 @@ lifecycles, relationship graphs, schema and history, and share change-impact
 reports with links that open on the interesting part.
 
 Status: M1 Reading (search, unit pages, the two-lens code view, Schema,
-Lifecycle, Graph and History tabs) and M2 Passage. See [`docs/design/`](docs/design/) for the
+Lifecycle, Graph and History tabs), M2 Passage and the pre-change mode of M4b Impact. See [`docs/design/`](docs/design/) for the
 design study, decision log, boards and milestone plan.
 
 ```ruby
@@ -58,6 +58,12 @@ end
   → filters → action → templates → response, with the filter matrix and the
   callback ladder of the model it saves. Declared facts only: what the index
   does not publish yet (W-7, W-8) is named, never guessed.
+
+- `/woods/impact?focus=User,PostsController&depth=2`: the blast radius of a
+  planned change, with the risks, tests and unknowns one generation proves;
+  `&lens=risks|flows|tests|unknown` picks the tab, `&show=no_tests|no_views`,
+  `&types=` and `&via=` filter. A range (`?from=&to=`) needs the report of
+  `woods:impact` (W-12).
 
 Every read goes through one generation pinned for the request; the page says
 which (`gen N`) and whether the working tree has drifted from it.
