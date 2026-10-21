@@ -10,9 +10,14 @@ module WoodsMap
   class PassageTemplates
     # A template of the action, or a partial beneath it.
     Template = Struct.new(:identifier, :unit, :role, :depth, keyword_init: true) do
-      # @return [Array<String>] the instance variables the template reads
+      # @return [Array<String>] the lexical instance-variable mentions published for the template
       def instance_variables
         Array(unit&.dig('metadata', 'instance_variables')).map(&:to_s)
+      end
+
+      # @return [Boolean] whether template ivar metadata is available, including a known-empty list
+      def facts_available?
+        unit&.dig('metadata', 'instance_variables').is_a?(Array)
       end
 
       # @return [Array<String>] the helpers the template calls
@@ -45,6 +50,11 @@ module WoodsMap
       @all ||= rendered.flat_map { |t| [t] + partials_of(t, t.depth + 1, [t.identifier]) }
     end
 
+    # @return [Array<String>] templates with missing ivar facts or an unexpanded partial chain
+    def missing_facts
+      all.reject(&:facts_available?).map(&:identifier).concat(@unexpanded || []).uniq
+    end
+
     private
 
     def mailer?
@@ -70,10 +80,10 @@ module WoodsMap
     def at(path)
       prefix = "#{path}."
       found = Array(@repository.graph.dig('type_index', 'view_template')).select do |id|
-        id.start_with?(prefix) && id.delete_prefix(prefix).exclude?('/')
+        id == path || (id.start_with?(prefix) && id.delete_prefix(prefix).exclude?('/'))
       end
       found = mailer_templates.select { |id| id.start_with?(prefix) } if found.empty? && mailer?
-      found.sort
+      found.empty? ? [path] : found.sort
     end
 
     def mailer_templates
@@ -95,11 +105,17 @@ module WoodsMap
 
     # The partials a template renders, from its own dependency list, to PARTIAL_DEPTH.
     def partials_of(template, depth, seen)
-      return [] if depth > PARTIAL_DEPTH || template.unit.nil?
+      return [] if template.unit.nil?
 
-      Array(template.unit['dependencies']).select { |d| d['via'] == 'render' }.flat_map do |dependency|
-        next [] if seen.include?(dependency['target'])
+      dependencies = Array(template.unit['dependencies']).select do |dependency|
+        dependency['via'] == 'render' && seen.exclude?(dependency['target'])
+      end
+      if depth > PARTIAL_DEPTH
+        (@unexpanded ||= []).concat(dependencies.pluck('target'))
+        return []
+      end
 
+      dependencies.flat_map do |dependency|
         child = template(dependency['target'].to_s, 'partial', depth)
         [child] + partials_of(child, depth + 1, seen + [dependency['target']])
       end

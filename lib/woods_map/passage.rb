@@ -6,7 +6,7 @@ module WoodsMap
   # Filter scopes are shown as declared; the resolved chain and owner (W-8)
   # is named as a limit, never derived here. With W-7's per-action facts the
   # passage knows what the action and its filters assign and render, and
-  # flags an instance variable a template reads that nothing assigns.
+  # notes template ivar mentions with no assignment recorded in those bodies.
   class Passage
     # One application filter with its declared scope.
     Filter = Struct.new(:kind, :name, :only, :except, :file, :line, keyword_init: true) do
@@ -28,8 +28,7 @@ module WoodsMap
       end
     end
 
-    # A template of the action, or a partial beneath it.
-    # An instance variable a template reads that neither the action nor its filters assign.
+    # A template ivar mention with no assignment recorded in the action or its filters.
     Flag = Struct.new(:ivar, :template, keyword_init: true)
 
     # Framework filters: procs from engines, the CSRF and origin checks.
@@ -131,7 +130,12 @@ module WoodsMap
       template_resolver.rendered
     end
 
-    # @return [Array<Flag>, nil] instance variables a template reads that nothing assigns;
+    # @return [Array<String>] templates whose ivar facts or deeper partial chain are unavailable
+    def missing_template_facts
+      template_resolver.missing_facts
+    end
+
+    # @return [Array<Flag>, nil] lexical template ivar mentions without a recorded assignment;
     #   nil when the index has no facts to decide with
     def flags
       return nil unless facts

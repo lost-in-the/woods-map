@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
+require 'set'
+
 module WoodsMap
-  # The impact rule "template reads unassigned ivar" (E-5) over a blast
-  # radius: for every controller or mailer in the focus or one edge away, and
-  # the owner of every template in the focus, each action's passage flags.
-  # Runs on W-7's per-action facts; on an index without them it cannot run.
+  # Advisory comparison of template ivar mentions with recorded action/filter
+  # assignments. Missing action bodies and template facts remain explicit limits.
   class UnassignedIvarRule
     NAME = 'template reads unassigned ivar'
     OWNER_TYPES = %w[controller mailer].freeze
@@ -16,19 +16,25 @@ module WoodsMap
       @radius = radius
     end
 
-    # @return [Boolean] whether the owners in reach carry per-action facts; true when there are none to check
+    # @return [Boolean] whether every admitted action and rendered template has facts
     def runnable?
-      owners.empty? || owners.any? { |unit| unit.dig('metadata', 'action_facts').is_a?(Hash) }
+      missing_actions.zero? && missing_templates.empty?
     end
 
-    # @return [Array<ImpactReview::Finding>]
+    # @return [Integer, String] finding count, or an explicit incomplete-coverage result
+    def result
+      return findings.size if runnable?
+      return 'needs W-7' if passages.empty?
+
+      "#{findings.size} #{'finding'.pluralize(findings.size)}; incomplete: " \
+        "#{missing_actions} #{'action'.pluralize(missing_actions)}, " \
+        "#{missing_templates.size} #{'template'.pluralize(missing_templates.size)}"
+    end
+
+    # @return [Array<ImpactReview::Finding>] findings from actions whose facts are available
     def findings
-      found = owners.flat_map do |unit|
-        Hash(unit.dig('metadata', 'action_facts')).keys.flat_map do |action|
-          Array(Passage.new(@repository, unit, action: action).flags).map { |flag| finding(unit, action, flag) }
-        end
-      end
-      found.uniq { |finding| [finding.where, finding.evidence] }
+      @findings ||= passages.flat_map { |passage| passage.flags.map { |flag| finding(passage, flag) } }
+                            .uniq { |finding| [finding.where, finding.evidence] }
     end
 
     private
@@ -37,20 +43,55 @@ module WoodsMap
       @owners ||= owner_ids.uniq.filter_map { |id| @repository.unit(id, type: @radius.type_of(id)) }
     end
 
+    def passages
+      @passages ||= owners.flat_map do |unit|
+        Array(unit.dig('metadata', 'actions')).filter_map do |action|
+          Passage.new(@repository, unit, action: action) if ActionFacts.for(unit, action)
+        end
+      end
+    end
+
+    def missing_actions
+      owners.sum do |unit|
+        Array(unit.dig('metadata', 'actions')).count { |action| ActionFacts.for(unit, action).nil? }
+      end
+    end
+
+    def missing_templates
+      passages.flat_map(&:missing_template_facts).uniq
+    end
+
     def owner_ids
       near = @radius.focus + @radius.direct.map(&:identifier)
-      templates = @radius.focus.select { |id| @radius.type_of(id) == 'view_template' }
-      rendered_by = templates.flat_map do |id|
+      rendered_by = template_callers(near).flat_map do |id|
         Array(@repository.graph.dig('edges', id)).select { |e| e['via'] == 'view_render' }.pluck('target')
       end
       (near + rendered_by).select { |id| OWNER_TYPES.include?(@radius.type_of(id)) }
     end
 
-    def finding(unit, action, flag)
+    # Follow reverse render edges, including shared partials with no owner edge of their own.
+    def template_callers(near)
+      pending = near.select { |id| @radius.type_of(id) == 'view_template' }
+      seen = Set.new
+      until pending.empty?
+        id = pending.shift
+        next unless seen.add?(id)
+
+        callers = Array(@repository.graph.dig('reverse_via', id)).select do |edge|
+          edge['via'] == 'render' && edge['source_type'] == 'view_template'
+        end
+        pending.concat(callers.pluck('source'))
+      end
+      seen.to_a
+    end
+
+    def finding(passage, flag)
       ImpactReview::Finding.new(
-        severity: 'blocking', text: 'Template reads an instance variable nothing assigns', where: flag.template,
-        evidence: "#{flag.ivar} is read in #{flag.template}; #{unit['identifier']}##{action} and its filters never " \
-                  'assign it, so it renders nil',
+        severity: 'note', text: 'Template mentions an instance variable with no recorded assignment',
+        where: flag.template,
+        evidence: "#{flag.template} mentions #{flag.ivar}; #{passage.identifier}##{passage.action} and its analyzed " \
+                  'filter bodies have no recorded assignment. Helpers, conditions and template-local assignments ' \
+                  'are not resolved.',
         layer: 'template ivars + per-action facts', rule: NAME
       )
     end

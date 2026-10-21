@@ -14,7 +14,7 @@ module WoodsMap
 
     # The rule registry of B8-Impact-Risks: name, severity, what it needs, layer, and what blocks it here.
     RULES = [
-      ['template reads unassigned ivar', 'blocking', 'view instance_variables + action assigns', 'structural', 'W-7'],
+      ['template reads unassigned ivar', 'note', 'view instance_variables + action assigns', 'structural', 'W-7'],
       ['job without retry touched', 'note', 'job retry_on / discard_on', 'job metadata', nil],
       ['hub touched', 'blocking', 'graph_analysis.hubs', 'typed edges', nil],
       ['bridge touched', 'blocking', 'graph_analysis.bridges', 'typed edges', nil],
@@ -66,9 +66,9 @@ module WoodsMap
     # @return [Array<Rule>] every rule with its result, or what it needs to run
     def rules
       RULES.map do |name, severity, needs, layer, blocker|
-        blocker = nil if name == UnassignedIvarRule::NAME && @ivar_rule.runnable?
-        Rule.new(name: name, severity: severity, needs: needs, layer: layer,
-                 result: blocker ? "needs #{blocker}" : findings.count { |f| f.rule == name })
+        result = blocker ? "needs #{blocker}" : findings.count { |f| f.rule == name }
+        result = @ivar_rule.result if name == UnassignedIvarRule::NAME
+        Rule.new(name: name, severity: severity, needs: needs, layer: layer, result: result)
       end
     end
 

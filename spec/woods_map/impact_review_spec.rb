@@ -12,7 +12,7 @@ RSpec.describe WoodsMap::ImpactReview do
     expect(v.findings.map { |f| [f.rule, f.severity, f.where] })
       .to contain_exactly(['hub touched', 'blocking', 'User'], ['cycle entered', 'note', 'User'])
     expect(v.rules.size).to eq(9)
-    expect(v.rules.count { |x| x.result.is_a?(Integer) }).to eq(5)
+    expect(v.rules.count { |x| x.result.is_a?(Integer) }).to eq(4)
   end
 
   it 'names what the other rules need' do
@@ -25,10 +25,10 @@ RSpec.describe WoodsMap::ImpactReview do
     [review('MailingListMailer', depth: 1), review('mailing_list_mailer/new_post.html.erb', depth: 1)].each do |v|
       finding = v.findings.find { |f| f.rule == 'template reads unassigned ivar' }
       expect(finding.where).to eq('mailing_list_mailer/new_post.html.erb')
-      expect(finding.evidence).to start_with('@preferences is read in mailing_list_mailer/new_post.html.erb')
+      expect(finding.evidence).to start_with('mailing_list_mailer/new_post.html.erb mentions @preferences')
     end
     expect(review('UsersController', depth: 1).rules.find { |x| x.name == 'template reads unassigned ivar' }.result)
-      .to eq(0)
+      .to include('incomplete')
   end
 
   it 'lists the gaps where no test reaches the focus or a direct dependent' do

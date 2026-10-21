@@ -14,7 +14,9 @@ module WoodsMap
     # @return [ActionFacts, nil] nil when the index does not record facts for the action
     def self.for(unit, action)
       facts = unit.dig('metadata', 'action_facts', action.to_s)
-      facts.is_a?(Hash) ? new(facts) : nil
+      return nil unless facts.is_a?(Hash) && %w[assigns renders].all? { |key| facts[key].is_a?(Array) }
+
+      new(facts)
     end
 
     # @param facts [Hash] one action's facts as Woods publishes them

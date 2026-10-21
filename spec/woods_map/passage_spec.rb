@@ -59,7 +59,7 @@ RSpec.describe WoodsMap::Passage do
     edit = passage('UsersController', action: 'edit')
     expect(edit.facts.assigns_by('correct_user').pluck('ivar')).to eq(['@user'])
     expect(edit.facts.assigned).to include('@user')
-    expect(edit.action_templates.map(&:identifier)).to eq([])
+    expect(edit.action_templates.map(&:identifier)).to eq(['users/edit'])
     expect(passage('UsersController', action: 'show').action_templates.map(&:identifier)).to eq(['users/show.html.erb'])
   end
 
