@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Resolve file-tree, palette, path-search and source-line links by the typed unit recorded at each file, including additional source paths; keep cached file trees separate across indexes.
+
 - Correct typed graph lookups for the published flat variants array: unknown constants remain unresolved and typed search results retain their own file paths.
 
 - Preserve incomplete Passage and Impact coverage: omitted action facts, missing templates or ivar metadata, and depth-limited partial chains stay unknown while available findings remain visible. Shared-partial focus follows render callers to their owners.

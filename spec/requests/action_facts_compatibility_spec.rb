@@ -9,6 +9,7 @@ RSpec.describe 'Action facts coverage pages', type: :request do
     units = [owner] + templates
     repository = action_repository(units)
     allow(repository).to receive_messages(generation_number: 91, manifest: { 'total_units' => units.size },
+                                          generation_key: ['synthetic-actions', 91], file_owner: nil,
                                           generation_facts: { 'generation' => 91 }, file_map: {},
                                           freshness: { 'state' => 'unknown' })
     allow(WoodsMap::Repository).to receive(:open).and_yield(repository)

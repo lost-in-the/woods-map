@@ -60,6 +60,12 @@ module WoodsMap
       numbers.empty? ? [generation_number] : numbers
     end
 
+    # @return [Array] cache identity of this index and its pinned generation
+    def generation_key
+      [@index.index_dir.expand_path.to_s, @index.payload_dir.expand_path.to_s, generation_number,
+       manifest['extracted_at'], manifest['total_units']]
+    end
+
     # What the bar shows on every page: the generation and the HEAD it was
     # extracted at.
     #
@@ -160,6 +166,21 @@ module WoodsMap
     # @return [Hash{String => Array<String>}] relative path => identifiers
     def file_map
       @file_map ||= (graph['file_map'] || {}).reject { |path, _| path.start_with?('/') }
+    end
+
+    # The first typed unit recorded at a file, including additional source
+    # paths. A colliding identifier's primary node may belong to another file.
+    #
+    # @param path [String] relative application path
+    # @return [Hash, nil] matching node facts with its identifier, or nil when unrecorded
+    def file_owner(path)
+      Array(file_map[path]).each do |identifier|
+        node = Array(nodes_by_identifier[identifier]).find do |candidate|
+          candidate['file_path'] == path || Array(candidate['source_paths']).include?(path)
+        end
+        return node.merge('identifier' => identifier) if node
+      end
+      nil
     end
 
     private
