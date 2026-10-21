@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Give explanation controls native button semantics, name Mermaid source regions, correct the Schema section label, and keep narrow page tabs reachable through contained keyboard-accessible scrolling.
+
 - Keep the Graph tab focus, variant edges, two-hop traversal, deduplication, links and Mermaid node identities typed. Type filters follow the newly reached endpoint; reverse relationships retain their published destination type.
 
 - Resolve file-tree, palette, path-search and source-line links by the typed unit recorded at each file, including additional source paths; keep cached file trees separate across indexes.
