@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Keep the Graph tab focus, variant edges, two-hop traversal, deduplication, links and Mermaid node identities typed. Type filters follow the newly reached endpoint; reverse relationships retain their published destination type.
+
 - Resolve file-tree, palette, path-search and source-line links by the typed unit recorded at each file, including additional source paths; keep cached file trees separate across indexes.
 
 - Correct typed graph lookups for the published flat variants array: unknown constants remain unresolved and typed search results retain their own file paths.
