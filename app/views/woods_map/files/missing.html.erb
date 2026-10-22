@@ -1,0 +1,2 @@
+<% content_for :title, 'File is not indexed · Woods Map' %>
+<%= render 'woods_map/components/empty_state', heading: :h1, title: 'File is not indexed', text: "This generation has no permitted file-map key for the requested path (gen #{@repository.generation_number}).", cap: link_to('Units', woods_map.units_path) %>

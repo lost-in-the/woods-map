@@ -106,7 +106,7 @@ RSpec.describe 'Unit pages', type: :request do
 
   it 'carries the file tree in the sheet with the current file marked' do
     get '/woods/units/model/User'
-    expect(response.body).to include('class="f" href="/woods/units/model/Micropost"')
+    expect(response.body).to include('class="f" href="/woods/files/app/models/micropost.rb"')
     expect(response.body).to match(/aria-current="true"[^>]*data-tree-target="row"><span class="nm">user\.rb/)
   end
 end

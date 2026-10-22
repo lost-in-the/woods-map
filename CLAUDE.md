@@ -31,7 +31,7 @@ mount the engine in a variant, run `woods:extract`, open `/woods`.
 - **One token sheet**: `tokens.css` is the design's file and ships verbatim (a spec compares the two copies); engine-only rules go in `map.css`; views never hard-code a colour or a size and compose from the partials under `app/views/woods_map/shared/` and `components/`. Every page must pass axe (colour contrast, names) at 1440, 960, 640 and 390.
 - **Engine only**: there is no standalone launcher. The map belongs inside a Rails application, like Woods.
 - **Index only**: every read goes through `Woods::PublishedIndex` or `Woods::MCP::IndexReader` pinned to one generation per request. Never resolve a payload path yourself; never read `manifest.json` from the index root.
-- **Read-only and gated**: loopback without a token boots with a warning; anything else refuses without `WOODS_MAP_TOKEN`; `config.authorize` lets the host add its own gate. Routes take identifiers and generation numbers, never file paths from the client.
+- **Read-only and gated**: loopback without a token boots with a warning; anything else refuses without `WOODS_MAP_TOKEN`; `config.authorize` lets the host add its own gate. Unit routes take typed identifiers. File routes admit only exact permitted `file_map` keys; never resolve those keys on the host filesystem.
 - **Mounting is explicit**: `mount WoodsMap::Engine => "/woods"`; the Railtie injects nothing.
 
 ## Architecture (see docs/design/plan.md for what is still planned)
@@ -66,7 +66,7 @@ docs/design/                     # design study, decisions, boards, foundations,
 
 - `Woods::MCP::IndexReader#search` answers with symbol keys and rows of identifier, type and match_field only; `Repository#search` stringifies the keys and adds `file_path` from the graph nodes. Read search results through the repository.
 - Freshness is `Woods::SourceInputs::Status` over the index root (`PublishedIndex#index_dir`), never the payload dir; a quick check that finds no changes can still say `unknown` when Woods could not verify the boot boundary, and the bar reports Woods' reasons rather than upgrading the verdict.
-- File navigation resolves ownership through `Repository#file_owner`, matching both `file_path` and `source_paths` across primary nodes and variants. A bare identifier alone cannot choose the correct unit type for a file. File-tree caches include the index identity and pinned generation.
+- File navigation uses stable ownership pages through `Repository#file_owners`, matching both `file_path` and `source_paths` across primary nodes and variants. File pages never reconstruct source. `file_owner` is retained for existing source-line links only. A bare identifier alone cannot choose the correct unit type for a file. File-tree caches include the index identity and pinned generation.
 - `Neighbourhood` receives the selected unit type from its route and traverses typed identities, including variant edges. Type filters apply to the endpoint first reached by each breadth-first edge visit; missing type metadata on older graphs falls back to the primary node. Graph-analysis notes retain their published identifier-level scope.
 - `Lifecycle` keeps only callbacks whose method the unit's source or an inlined concern defines; framework callbacks and procs are counted as a limit, not drawn as steps.
 - `Outline`, `SchemaView`, `Neighbourhood` and `HistoryView` read the generation at construction, so a view may use them after the repository block closes.
