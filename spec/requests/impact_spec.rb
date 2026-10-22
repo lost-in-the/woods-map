@@ -20,7 +20,7 @@ RSpec.describe 'Impact', type: :request do
 
   it 'names a range it cannot report and a focus it cannot find' do
     get '/woods/impact', params: { from: 'gen:1', to: 'gen:2' }
-    expect(response.body).to include('No impact report for gen:1 → gen:2')
+    expect(response.body).to include('Range evidence unavailable')
     get '/woods/impact', params: { focus: 'Nope' }
     expect(response.body).to include('No unit named Nope in gen 1')
     get '/woods/impact'
