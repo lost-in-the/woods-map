@@ -29,6 +29,9 @@ module WoodsMap
     # @param from [String] retained endpoint selector
     # @param to [String] retained endpoint selector; now resolves once in Woods
     def initialize(index_dir, from:, to: 'now')
+      @state = :invalid
+      return unless from.is_a?(String) && to.is_a?(String)
+
       backend = self.class.backend
       @state = :unavailable
       return unless backend

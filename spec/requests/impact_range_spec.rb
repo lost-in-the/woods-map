@@ -52,4 +52,14 @@ RSpec.describe 'Impact range', type: :request do
     expect(response.body).to include('Invalid range')
     expect(response.body).not_to include('No published Woods index', 'Blast radius')
   end
+
+  ['from[x]=1', 'from[]=gen%3A1', 'from=gen%3A1&to[x]=1', 'from=gen%3A1&to[]=now'].each do |query|
+    it "rejects nonscalar selectors through Rails routing: #{query}" do
+      allow(WoodsMap::ImpactRange).to receive(:backend).and_call_original
+      get "/woods/impact?#{query}"
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('The range could not be resolved')
+      expect(WoodsMap::ImpactRange).not_to have_received(:backend)
+    end
+  end
 end
