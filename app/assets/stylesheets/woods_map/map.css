@@ -11,6 +11,8 @@ html,body{margin:0;min-height:100%}
 /* Without JavaScript every detail block is open and the controls that need a script are gone. */
 html.no-js .wm .tgl,html.no-js .wm [data-needs-js]{display:none}
 html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
+/* Honor the tree controller's filter/fold state over the token row layout. */
+.wm .tree [data-tree-target="row"][hidden] { display:none!important; }
 /* Inline links: a cue besides colour (WCAG 1.4.1, axe link-in-text-block). D-11 keeps standalone
    links bare; a link sitting among other text gets a faint underline in its own hue. The choice is
    open in woods-map#26; until it is settled the accessible reading wins. */
