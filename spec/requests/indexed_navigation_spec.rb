@@ -59,8 +59,17 @@ RSpec.describe 'Indexed navigation', type: :request do
   it 'keeps a single-owner contributor page and selects the requested path' do
     get '/woods/files/spec/report.rb'
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include('data-path="spec/report.rb" aria-current="true"')
+    current = Nokogiri::HTML(response.body).css('.tree [aria-current="true"]')
+    expect(current.pluck('data-path')).to eq(['spec/report.rb'])
     expect(response.body).to include('href="/woods/units/factory/Report"')
+  end
+
+  it 'publishes exact typed owner keys for client filtering without file-map guesses' do
+    get '/woods/units'
+    rows = Nokogiri::HTML(response.body).css('.tree a[data-owner-keys]')
+    row = rows.find { |element| element['data-path'] == path }
+    expect(JSON.parse(row['data-owner-keys']))
+      .to contain_exactly(%w[Report model], %w[Report factory], %w[settings configuration])
   end
 
   it 'returns a missing ownership page for an unindexed key' do

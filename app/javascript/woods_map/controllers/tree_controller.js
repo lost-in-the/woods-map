@@ -75,7 +75,11 @@ export default class extends Controller {
       if (hit && query !== "") {
         const at = name.dataset.name.toLowerCase().indexOf(query)
         if (at >= 0) name.innerHTML = `${this.escape(name.dataset.name.slice(0, at))}<mark>${this.escape(name.dataset.name.slice(at, at + query.length))}</mark>${this.escape(name.dataset.name.slice(at + query.length))}`
-        this.ancestors(row).forEach((dir) => counts.set(dir, (counts.get(dir) || 0) + 1))
+        const owners = JSON.parse(row.dataset.ownerKeys || "[]")
+        this.ancestors(row).forEach((dir) => {
+          if (!counts.has(dir)) counts.set(dir, new Set())
+          owners.forEach((identity) => counts.get(dir).add(JSON.stringify(identity)))
+        })
       }
     })
     rows.filter((row) => row.classList.contains("d")).forEach((dir) => {
@@ -87,11 +91,13 @@ export default class extends Controller {
         if (count) count.textContent = count.dataset.count
         return
       }
-      const hits = counts.get(dir) || 0
-      dir.dataset.filtered = hits > 0 ? "in" : "out"
-      dir.hidden = hits === 0
-      if (count) count.textContent = hits > 0 ? `${hits} of ${count.dataset.count}` : count.dataset.count
-      if (hits > 0) this.setFold(dir, true)
+      // A matching file with no resolved owners still keeps its branch visible.
+      const matched = counts.has(dir)
+      const hits = counts.get(dir)?.size || 0
+      dir.dataset.filtered = matched ? "in" : "out"
+      dir.hidden = !matched
+      if (count) count.textContent = matched ? `${hits} of ${count.dataset.count}` : count.dataset.count
+      if (matched) this.setFold(dir, true)
     })
   }
 

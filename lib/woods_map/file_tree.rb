@@ -6,7 +6,8 @@ module WoodsMap
   # distinct typed owners beneath them, each file retaining its exact path.
   # Built once per generation and kept in a small process cache.
   class FileTree
-    Row = Struct.new(:kind, :name, :level, :path, :count, :identifier, :type, :units, :unresolved, keyword_init: true)
+    Row = Struct.new(:kind, :name, :level, :path, :count, :identifier, :type, :units, :owner_keys, :unresolved,
+                     keyword_init: true)
 
     CACHE_SIZE = 4
     @cache = {}
@@ -109,8 +110,9 @@ module WoodsMap
 
     def file_row(name, level, path)
       owner = owners(path).first
+      keys = identities([path])
       Row.new(kind: :file, name: name, level: level, path: path, identifier: owner&.dig('identifier'),
-              type: owner&.dig('type'), units: identities([path]).size,
+              type: owner&.dig('type'), units: keys.size, owner_keys: keys,
               unresolved: unresolved_identifiers([path]).size)
     end
   end
