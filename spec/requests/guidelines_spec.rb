@@ -26,7 +26,7 @@ RSpec.describe 'Guidelines page', type: :request do
   end
 
   it 'provides typed filter keys for indexed specimen files and none for unindexed ones' do
-    document = Nokogiri::HTML(response.body)
+    document = html_response_document
     indexed = document.css('.tree .f:not(.unindexed)')
     unindexed = document.css('.tree .f.unindexed')
     expect(indexed).not_to be_empty
