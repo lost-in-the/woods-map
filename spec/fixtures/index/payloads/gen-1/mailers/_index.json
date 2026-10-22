@@ -1,1 +1,1 @@
-[{"identifier":"UserMailer","file_path":"app/mailers/user_mailer.rb","namespace":null,"estimated_tokens":390,"chunk_count":2}]
+[{"identifier":"UserMailer","file_path":"app/mailers/user_mailer.rb","namespace":null,"estimated_tokens":390,"chunk_count":2},{"identifier":"MailingListMailer","file_path":"app/mailers/mailing_list_mailer.rb","namespace":null,"estimated_tokens":454,"chunk_count":1}]

@@ -55,6 +55,29 @@ RSpec.describe WoodsMap::Passage do
     expect(mermaid).to include('Browser->>C: GET /users/:id/edit', 'C->>C: before logged_in_user', 'C-->>Browser: html')
   end
 
+  it 'reads the action and filter assigns from the per-action facts (W-7)' do
+    edit = passage('UsersController', action: 'edit')
+    expect(edit.facts.assigns_by('correct_user').pluck('ivar')).to eq(['@user'])
+    expect(edit.facts.assigned).to include('@user')
+    expect(edit.action_templates.map(&:identifier)).to eq(['users/edit'])
+    expect(passage('UsersController', action: 'show').action_templates.map(&:identifier)).to eq(['users/show.html.erb'])
+  end
+
+  it 'flags an instance variable a template reads that neither the action nor its filters assign' do
+    mail = passage('MailingListMailer', type: 'mailer', action: 'new_post')
+    expect(mail.flags.map(&:to_h)).to eq([{ ivar: '@preferences', template: 'mailing_list_mailer/new_post.html.erb' }])
+    expect(mail.declared).to include('file' => 'app/mailers/mailing_list_mailer.rb', 'line' => 5)
+    expect(passage('UsersController', action: 'show').flags).to eq([])
+  end
+
+  it 'raises no flag and says so when the index has no facts' do
+    WoodsMap::Repository.open(FIXTURE_INDEX) do |repository|
+      unit = repository.unit('UsersController', type: 'controller').deep_dup
+      unit['metadata'].delete('action_facts')
+      expect(described_class.new(repository, unit, action: 'show').flags).to be_nil
+    end
+  end
+
   it 'reads a mailer action from its templates' do
     mail = passage('UserMailer', type: 'mailer', action: 'account_activation')
     expect(mail).to be_mailer

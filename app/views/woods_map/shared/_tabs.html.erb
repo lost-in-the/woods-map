@@ -1,6 +1,6 @@
 <%# Page tabs (C5-Chrome): links with one count each. Locals: tabs (Array of
     Hash with :label, :href, :count, :current). %>
-<nav class="tabs page-tabs" aria-label="<%= local_assigns.fetch(:label, 'Sections') %>">
+<nav class="tabs page-tabs hscroll" data-controller="cliff" aria-label="<%= local_assigns.fetch(:label, 'Sections') %>">
   <% tabs.each do |tab| %>
     <a class="tab" href="<%= tab[:href] %>"<%= ' aria-current="page"'.html_safe if tab[:current] %>><%= tab[:label] %><% unless tab[:count].nil? %> <span class="cnt"><%= tab[:count] %></span><% end %></a>
   <% end %>
