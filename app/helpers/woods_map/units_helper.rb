@@ -26,11 +26,11 @@ module WoodsMap
     # @return [ActiveSupport::SafeBuffer, String]
     def code_line_link(file, line, text: nil)
       text ||= [file, line].compact.join(':')
-      owner = Array(current_repository&.file_map&.dig(file)).first
-      type = owner && Array(current_repository.identifier_types(owner)).first
-      return ERB::Util.html_escape(text) unless type
+      owner = current_repository&.file_owner(file)
+      return ERB::Util.html_escape(text) unless owner && owner['type']
 
-      link_to(text, "#{woods_map.unit_path(type: type, identifier: owner)}#{"#L#{line}" if line}")
+      url = woods_map.unit_path(type: owner['type'], identifier: owner['identifier'])
+      link_to(text, "#{url}#{"#L#{line}" if line}")
     end
 
     # @param page [WoodsMap::UnitPage]

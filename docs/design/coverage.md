@@ -34,7 +34,7 @@ opens the file tree.
 | Graph tab | Neighbourhood, filters, depth, hubs | FR-5, A-1, A-2 | [B6-Graph](boards/B6-Graph.html) | final |
 | History tab | Commit strip, commits with description rows, co-change, people | FR-7, B-6, C-5 | [B6-History](boards/B6-History.html) | final; generation picker not drawn |
 | Controller: Routes tab | Routes, helpers, action sources | FR-3 | — | **none** |
-| Controller: Passage tab | Stages, filter matrix, callback ladder, mismatch flags, export | B-16 to B-20 | [B8-Passage](boards/B8-Passage.html) | final; the engine shows declared filter scopes and names W-7 and W-8 as limits until they land |
+| Controller: Passage tab | Stages, filter matrix, callback ladder, mismatch flags, export | B-16 to B-20 | [B8-Passage](boards/B8-Passage.html) | final; the engine shows declared filter scopes (W-8 pending) and compares lexical template ivar mentions with W-7 assignments as advisory notes; missing action/template facts and truncated partial chains remain incomplete |
 | Mailer: Passage and Templates | Mailer action passage, delivery, templates | B-17 | — | **none** (same component as the controller passage) |
 | Unit pages: job, mailer, view, concern, serializer, table | Type-specific facts tiles | B-4 | B6/B8 (model and controller only) | partial |
 | `/woods/files/*path` | File view: every unit a file defines | B-5 | — | **none** |
@@ -68,7 +68,7 @@ opens the file tree.
 The undesigned items above, grouped by the milestone issue that will build
 them. Each is a comment on that issue, so the issue owns it.
 
-- **M1 · Reading (woods-map#2)**: units index; facts tiles for job, mailer, view, concern, serializer and table units; Routes tab; file view; hover card; disambiguation popover; settings popover; keyboard help; Share menu contents.
+- **M1 · Reading (woods-map#34, carried over from #2)**: units index; facts tiles for job, mailer, view, concern, serializer and table units; Routes tab; file view; hover card; disambiguation popover; settings popover; keyboard help; Share menu contents.
 - **M2 · Passage (woods-map#3)**: mailer passage with templates (reuse the controller passage).
 - **M4b · Impact (woods-map#4)**: Overview tab at v8; Graph tab; pre-change mode; `?since=` highlighting on Code, Graph, Lifecycle, Passage, ERD and timeline views.
 - **M3 · Diagrams (woods-map#5)**: Landscape Context L1, Components L3, Domains; C4-dynamic in the Lifecycle view control; the renderer decision (woods-map#25).
@@ -84,4 +84,4 @@ them. Each is a comment on that issue, so the issue owns it.
 - Impact tabs: Overview, Changed, Risks, Flows, Tests, Graph, Unknown, same counts on every tab board; the focus URL carries the tab's `lens`.
 - One application: Blog, Rails 8.0, 412 units, 4 packages, gen 42 at `361468d`; the impact report compares gen 40 `a1b2c3d` to gen 42 `9f8e7d6`.
 - The primary button on a unit page is *Code at L18* (open the code view at the definition); on the Code tab itself it becomes *In editor at L61*, which exists only when the host configures an editor URL scheme.
-- *No retry_on* on `NotifySubscribersJob` is a warning (orange) everywhere; the unassigned instance variable is the one blocking finding (red).
+- *No retry_on* on `NotifySubscribersJob` is a warning (orange) everywhere; an unmatched template ivar mention is an advisory note: lexical metadata and analyzed action/filter bodies cannot prove a runtime value. The original board uses red; the engine qualifies that evidence.

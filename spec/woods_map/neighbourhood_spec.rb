@@ -23,12 +23,14 @@ RSpec.describe WoodsMap::Neighbourhood do
   it 'annotates hubs and cycles from the analysis and emits a flowchart' do
     n = neighbourhood
     expect(n.notes('User').join(', ')).to include('hub')
-    expect(n.mermaid).to start_with('flowchart LR').and include('class User focus')
+    expect(n.mermaid).to start_with('flowchart LR').and include('User (model)')
+    expect(n.mermaid).to match(/class n_\w+ focus/)
   end
 
   it 'counts the flowchart nodes against the budget' do
     n = neighbourhood
-    expect(n.node_count).to eq((n.edges.flat_map { |e| [e.from, e.to] } + ['User']).uniq.size)
+    typed = n.edges.flat_map { |e| [[e.from, e.from_type], [e.to, e.to_type]] }
+    expect(n.node_count).to eq((typed + [%w[User model]]).uniq.size)
     expect(n).not_to be_over_budget
     stub_const('WoodsMap::Neighbourhood::NODE_BUDGET', 1)
     expect(n).to be_over_budget

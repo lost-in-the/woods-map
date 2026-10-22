@@ -102,8 +102,9 @@ module WoodsMap
     def path_hits
       needle = @query.downcase
       @repository.file_map.select { |path, _| path.downcase.include?(needle) }.first(LIMIT).map do |path, identifiers|
-        type = @repository.graph.dig('nodes', identifiers.first, 'type')
-        Hit.new(identifier: identifiers.first, type: type, file_path: path, hits: identifiers.size, match: path)
+        owner = @repository.file_owner(path)
+        Hit.new(identifier: owner&.dig('identifier') || identifiers.first, type: owner&.dig('type'),
+                file_path: path, hits: identifiers.size, match: path)
       end
     end
   end
