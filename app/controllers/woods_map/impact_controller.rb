@@ -35,9 +35,11 @@ module WoodsMap
     end
 
     def render_range
-      @range = [params[:from].to_s, params[:to].presence || 'now']
-      if @range.first.present?
-        @report = WoodsMap::ImpactRange.new(woods_map_config.index_path, from: @range.first, to: @range.last)
+      selectors = [params.fetch(:from, ''), params.fetch(:to, 'now')]
+      selectors[1] = 'now' if selectors.last == ''
+      @range = selectors.map { |selector| selector.is_a?(String) ? selector : '' }
+      if selectors.first.present? || selectors.any? { |selector| !selector.is_a?(String) }
+        @report = WoodsMap::ImpactRange.new(woods_map_config.index_path, from: selectors.first, to: selectors.last)
       end
       render :range
     end
