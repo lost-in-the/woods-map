@@ -35,3 +35,12 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .spec .spec-note b{color:var(--text);font-weight:500}
 .wm .spec .narrow{overflow:hidden;border:1px solid var(--rule2);border-radius:var(--r-ctl);max-width:100%}
 .wm .spec .sw{display:inline-block;width:14px;height:14px;border-radius:var(--r-chip);border:1px solid var(--rule2);vertical-align:-2px;margin-right:var(--s2)}
+
+/* The range form wraps to keep every selector and label reachable on narrow screens. */
+.impact-range-form { display:flex; gap:var(--s3); align-items:center; flex-wrap:wrap; }
+.impact-range-form .filter { max-width:100%; }
+/* Nested historical evidence must remain readable without a current-source link. */
+.wm .impact-evidence { grid-template-columns:minmax(0,1fr); }
+.wm .impact-evidence dt { white-space:normal; overflow-wrap:anywhere; border-right:0; }
+.wm .impact-evidence dd { min-width:0; white-space:normal; overflow-wrap:anywhere; }
+.wm .impact-evidence ul { padding-left:var(--s4); }
