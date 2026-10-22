@@ -21,9 +21,9 @@ module WoodsMap
     # @param html [String, nil] server-rendered markup with links instead
     # @return [ActiveSupport::SafeBuffer]
     def info_tip(text, html: nil)
-      attributes = { class: 'info', tabindex: 0, 'aria-label': 'Explain' }
+      attributes = { class: 'info', type: 'button', 'aria-label': 'Explain' }
       html ? attributes['data-tip-html'] = html : attributes[:title] = text
-      tag.span(WoodsMap::Glyphs[:info], **attributes)
+      tag.button(WoodsMap::Glyphs[:info], **attributes)
     end
 
     # A count on a heading, tab or rail group.

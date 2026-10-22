@@ -16,11 +16,12 @@ module WoodsMap
       # @param repository [WoodsMap::Repository]
       # @return [FileTree]
       def for(repository)
-        key = [repository.generation_number, repository.manifest['extracted_at'], repository.manifest['total_units']]
+        key = repository.generation_key
         @mutex.synchronize do
           @cache.fetch(key) do
             @cache.shift while @cache.size >= CACHE_SIZE
-            @cache[key] = new(repository.file_map, repository.graph['nodes'] || {})
+            owners = repository.file_map.keys.index_with { |path| repository.file_owner(path) }
+            @cache[key] = new(repository.file_map, {}, owners: owners)
           end
         end
       end
@@ -33,9 +34,11 @@ module WoodsMap
 
     # @param file_map [Hash{String => Array<String>}] relative path => identifiers
     # @param nodes [Hash{String => Hash}] identifier => node facts (type)
-    def initialize(file_map, nodes)
+    # @param owners [Hash{String => Hash}, nil] pre-resolved typed owners by file path
+    def initialize(file_map, nodes, owners: nil)
       @file_map = file_map
       @nodes = nodes
+      @owners = owners
     end
 
     # @return [Integer] indexed units across the tree
@@ -78,8 +81,9 @@ module WoodsMap
     def file_row(name, level, path)
       identifiers = Array(@file_map[path])
       first = identifiers.first
-      Row.new(kind: :file, name: name, level: level, path: path, identifier: first,
-              type: first && @nodes.dig(first, 'type'), units: identifiers.size)
+      owner = @owners ? @owners[path] : { 'identifier' => first, 'type' => first && @nodes.dig(first, 'type') }
+      Row.new(kind: :file, name: name, level: level, path: path, identifier: owner&.dig('identifier'),
+              type: owner&.dig('type'), units: identifiers.size)
     end
   end
 end

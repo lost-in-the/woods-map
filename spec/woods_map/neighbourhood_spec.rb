@@ -23,6 +23,7 @@ RSpec.describe WoodsMap::Neighbourhood do
   it 'annotates hubs and cycles from the analysis and emits a flowchart' do
     n = neighbourhood
     expect(n.notes('User').join(', ')).to include('hub')
-    expect(n.mermaid).to start_with('flowchart LR').and include('class User focus')
+    expect(n.mermaid).to start_with('flowchart LR').and include('User (model)')
+    expect(n.mermaid).to match(/class n_\w+ focus/)
   end
 end
