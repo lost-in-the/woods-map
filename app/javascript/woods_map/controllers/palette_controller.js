@@ -23,6 +23,7 @@ export default class extends Controller {
 
   globalKey(event) {
     if (event.key !== "/" || event.target.matches("input, textarea, select, [contenteditable]")) return
+    if (event.target.closest('[aria-modal="true"]')) return
     event.preventDefault()
     this.inputTarget.focus()
     this.inputTarget.select()

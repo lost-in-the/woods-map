@@ -10,7 +10,11 @@ export default class extends Controller {
   static targets = ["overlay", "body", "close"]
 
   connect() {
-    this.onKey = (e) => { if (e.key === "Escape" && this.isOpen) this.close() }
+    this.onKey = (event) => {
+      if (!this.isOpen) return
+      if (event.key === "Escape") this.close()
+      else if (event.key === "Tab") this.trapFocus(event)
+    }
     document.addEventListener("keydown", this.onKey)
   }
 
@@ -20,6 +24,22 @@ export default class extends Controller {
   }
 
   get isOpen() { return this.hasOverlayTarget && !this.overlayTarget.hidden }
+
+  // A modal keeps Tab within its visible controls; Escape restores its opener.
+  trapFocus(event) {
+    const controls = [...this.overlayTarget.querySelectorAll("button, a[href], input, select, textarea, [tabindex]")]
+      .filter((element) => !element.disabled && element.tabIndex >= 0 && element.getClientRects().length > 0)
+    if (controls.length === 0) return
+    const first = controls[0]
+    const last = controls[controls.length - 1]
+    const active = document.activeElement
+    const outside = !this.overlayTarget.contains(active)
+    if (outside || (!event.shiftKey && active === last) || (event.shiftKey && active === first)) {
+      event.preventDefault()
+      const target = event.shiftKey ? last : first
+      target.focus()
+    }
+  }
 
   open(event) {
     if (!this.hasOverlayTarget || this.isOpen) return
