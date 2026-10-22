@@ -33,6 +33,18 @@ module WoodsMap
       link_to(text, "#{url}#{"#L#{line}" if line}")
     end
 
+    # Highlight query text while preserving indexed names and paths as text.
+    #
+    # @param text [String]
+    # @param query [String]
+    # @return [ActiveSupport::SafeBuffer]
+    def search_match(text, query)
+      return ERB::Util.html_escape(text) if query.to_s.empty?
+
+      parts = text.to_s.split(/(#{Regexp.escape(query)})/i)
+      safe_join(parts.map { |part| part.casecmp?(query) ? tag.mark(part) : part })
+    end
+
     # @param page [WoodsMap::UnitPage]
     # @param tab [String] the tab key
     # @return [String] the URL of a tab

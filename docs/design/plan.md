@@ -85,6 +85,7 @@ Run this before a milestone issue is opened and again before it closes.
 | W-13 inverted flow index | [woods#763](https://github.com/lost-in-the/woods/issues/763) |
 | W-14 best-effort flows | [woods#764](https://github.com/lost-in-the/woods/issues/764) |
 | Engine scaffold (the M1 skeleton: gem, Engine, Repository, authentication, states, token sheet served) | [woods-map#11](https://github.com/lost-in-the/woods-map/pull/11) |
+| Bounded M1 units index and indexed file ownership (FR-3, B-5); other M1 follow-ups remain separate | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [design note](notes/m1-indexed-navigation.md) |
 | M1 to M8 | woods-map#2 to #10 as listed in the milestone table |
 | M1 follow-up: the undesigned reading pieces (units index, file view, Routes tab, type tiles, hover card, disambiguation, settings, keyboard help, share menu) | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34) |
 | Design system epic (tokens, fonts, components, responsive tiers) | [woods-map#23](https://github.com/lost-in-the/woods-map/issues/23) |

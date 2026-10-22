@@ -2,7 +2,7 @@
     freshness as ● + words, generation, SHA. Locals: generation (Hash or nil),
     freshness (Hash or nil), nav (Array of [label, href, current?]),
     search_path (String or nil), query (String or nil), label (landmark name). %>
-<% nav = local_assigns[:nav] || [['Units', woods_map.search_path, false], ['Impact', woods_map.impact_path, false]] %>
+<% nav = local_assigns[:nav] || [['Units', woods_map.units_path, false], ['Impact', woods_map.impact_path, false]] %>
 <% fresh_class, fresh_words = freshness_words(local_assigns[:freshness].to_h['state'].to_s) %>
 <% fresh_detail = freshness_detail(local_assigns[:freshness]) %>
 <header class="bar">

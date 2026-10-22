@@ -1,0 +1,18 @@
+<% content_for :title, "#{@file_path} · file · Woods Map" %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<%= render 'woods_map/shared/crumbs', crumbs: [['units', woods_map.units_path], ['file', nil]], path: @file_path %>
+<%= render 'woods_map/shared/ident', title: @file_path, subtitle: "Indexed file, #{@owners.size} units, gen #{@repository.generation_number}" %>
+<section class="sec" aria-labelledby="file-owners">
+  <header><h2 class="t2" id="file-owners">Indexed owners <%= count_tag(@owners.size) %></h2></header>
+  <% if @owners.empty? %>
+    <%= render 'woods_map/components/empty_state', title: 'No resolved typed owners', text: 'The file map includes this path, but this generation has no matching typed ownership facts.' %>
+  <% else %>
+    <%= render 'woods_map/components/table', label: 'Indexed file owners', min_width: '640px', columns: [{ label: 'unit', width: '300px', cell_class: 'id' }, { label: 'type' }, { label: 'ownership' }], rows: @owners.map { |owner| { cells: [unit_link(owner['identifier'], owner['type']), owner['type'].tr('_', ' '), owner['kind'] == 'file_profile' ? 'file profile' : 'unit'] } }, caption: 'Ownership comes from published file paths and source contributors. Unit source can be annotated or span several files; this page does not reconstruct file contents.' %>
+  <% end %>
+</section>
+<% if @unresolved.any? %>
+  <section class="sec" aria-labelledby="file-unresolved">
+    <header><h2 class="t2" id="file-unresolved">Unresolved membership <%= count_tag(@unresolved.size) %></h2></header>
+    <%= render 'woods_map/components/table', label: 'Unresolved file membership', min_width: '640px', columns: [{ label: 'identifier', cell_class: 'id' }, { label: 'ownership' }], rows: @unresolved.map { |identifier| { cells: [identifier, 'No matching typed ownership facts in this generation'] } } %>
+  </section>
+<% end %>
