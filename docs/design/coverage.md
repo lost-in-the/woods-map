@@ -68,7 +68,7 @@ opens the file tree.
 The undesigned items above, grouped by the milestone issue that will build
 them. Each is a comment on that issue, so the issue owns it.
 
-- **M1 · Reading (woods-map#2)**: units index and indexed ownership now have a [bounded design note](notes/m1-indexed-navigation.md) under [#34](https://github.com/lost-in-the/woods-map/issues/34); remaining gaps include facts tiles for job, mailer, view, concern, serializer and table units; Routes tab; hover card; disambiguation popover; settings popover; keyboard help; Share menu contents.
+- **M1 · Reading (woods-map#34, carried over from #2)**: units index and indexed ownership now have a [bounded design note](notes/m1-indexed-navigation.md) under [#34](https://github.com/lost-in-the/woods-map/issues/34); remaining gaps include facts tiles for job, mailer, view, concern, serializer and table units; Routes tab; hover card; disambiguation popover; settings popover; keyboard help; Share menu contents.
 - **M2 · Passage (woods-map#3)**: mailer passage with templates (reuse the controller passage).
 - **M4b · Impact (woods-map#4)**: Overview tab at v8; Graph tab; pre-change mode; `?since=` highlighting on Code, Graph, Lifecycle, Passage, ERD and timeline views.
 - **M3 · Diagrams (woods-map#5)**: Landscape Context L1, Components L3, Domains; C4-dynamic in the Lifecycle view control; the renderer decision (woods-map#25).
