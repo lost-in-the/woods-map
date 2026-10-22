@@ -25,6 +25,15 @@ RSpec.describe 'Guidelines page', type: :request do
     WoodsMap::Glyphs::VOCABULARY.each_value { |mark, _meaning, _where| expect(response.body).to include(mark) }
   end
 
+  it 'provides typed filter keys for indexed specimen files and none for unindexed ones' do
+    document = Nokogiri::HTML(response.body)
+    indexed = document.css('.tree .f:not(.unindexed)')
+    unindexed = document.css('.tree .f.unindexed')
+    expect(indexed).not_to be_empty
+    expect(indexed.map { |row| JSON.parse(row['data-owner-keys']) }).to all(satisfy(&:any?))
+    expect(unindexed.map { |row| JSON.parse(row['data-owner-keys']) }).to all(eq([]))
+  end
+
   it 'works without a published index' do
     WoodsMap.configuration.index_dir = '/nonexistent/woods'
     get '/woods/guidelines'
