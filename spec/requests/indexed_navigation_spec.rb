@@ -31,7 +31,7 @@ RSpec.describe 'Indexed navigation', type: :request do
 
   it 'groups distinct typed entries, preserving fileless and unfamiliar types' do
     get '/woods/units'
-    document = Nokogiri::HTML(response.body)
+    document = html_response_document
     expect(response).to have_http_status(:ok)
     expect(document.css('table a').pluck('href'))
       .to eq(%w[/woods/units/factory/Report /woods/units/model/Report /woods/units/new_type/Floating])
@@ -47,7 +47,7 @@ RSpec.describe 'Indexed navigation', type: :request do
 
   it 'renders every typed owner and explicit unresolved membership without source reconstruction' do
     get WoodsMap::Engine.routes.url_helpers.file_path(path: path, script_name: '/woods')
-    document = Nokogiri::HTML(response.body)
+    document = html_response_document
     expect(response).to have_http_status(:ok)
     expect(document.css('table a').pluck('href'))
       .to contain_exactly('/woods/units/model/Report', '/woods/units/factory/Report',
@@ -59,14 +59,14 @@ RSpec.describe 'Indexed navigation', type: :request do
   it 'keeps a single-owner contributor page and selects the requested path' do
     get '/woods/files/spec/report.rb'
     expect(response).to have_http_status(:ok)
-    current = Nokogiri::HTML(response.body).css('.tree [aria-current="true"]')
+    current = html_response_document.css('.tree [aria-current="true"]')
     expect(current.pluck('data-path')).to eq(['spec/report.rb'])
     expect(response.body).to include('href="/woods/units/factory/Report"')
   end
 
   it 'publishes exact typed owner keys for client filtering without file-map guesses' do
     get '/woods/units'
-    rows = Nokogiri::HTML(response.body).css('.tree a[data-owner-keys]')
+    rows = html_response_document.css('.tree a[data-owner-keys]')
     row = rows.find { |element| element['data-path'] == path }
     expect(JSON.parse(row['data-owner-keys']))
       .to contain_exactly(%w[Report model], %w[Report factory], %w[settings configuration])
@@ -80,7 +80,7 @@ RSpec.describe 'Indexed navigation', type: :request do
 
   it 'links file search results to files and marks them as files' do
     get '/woods/search', params: { q: 'report query', in: 'path' }
-    document = Nokogiri::HTML(response.body)
+    document = html_response_document
     expect(document.css('table a').pluck('href'))
       .to include(WoodsMap::Engine.routes.url_helpers.file_path(path: path, script_name: '/woods'))
     expect(document.css('table').text).to include('file')
