@@ -80,6 +80,19 @@ RSpec.describe 'Unit pages', type: :request do
     expect(response.body).to include('not in the index')
   end
 
+  it 'flags the seeded instance variable on the mailer passage, with the template it is read in' do
+    get '/woods/units/mailer/MailingListMailer/passage?action_name=new_post'
+    expect(response.body).to include('<span class="iv bad">@preferences</span>, no recorded assignment')
+    template = '/woods/units/view_template/mailing_list_mailer/new_post.html.erb'
+    expect(response.body).to include(%(is mentioned in <a href="#{template}">))
+  end
+
+  it 'shows the assigns a filter makes for the action, at their lines' do
+    get '/woods/units/controller/UsersController/passage?action_name=edit'
+    expect(response.body).to include('correct_user</a> only: edit, update, assigns <span class="iv">@user</span>')
+    expect(response.body).to include('Flag coverage is incomplete')
+  end
+
   it 'sends a type without actions from the passage route to its Code tab' do
     get '/woods/units/model/User/passage'
     expect(response).to redirect_to('/woods/units/model/User')

@@ -54,9 +54,12 @@ module WoodsMap
 
     def graph
       with_unit do
-        @neighbourhood = WoodsMap::Neighbourhood.new(@repository, @unit['identifier'],
-                                                     direction: params[:direction].to_s, depth: params.fetch(:depth, 1),
-                                                     filters: { types: params[:types], via: params[:via] })
+        @neighbourhood = WoodsMap::Neighbourhood.new(
+          @repository, @unit['identifier'],
+          type: @unit['type'],
+          direction: params[:direction].to_s, depth: params.fetch(:depth, 1),
+          filters: { types: params[:types], via: params[:via] }
+        )
         render :graph
       end
     end

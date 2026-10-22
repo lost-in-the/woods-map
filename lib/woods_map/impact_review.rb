@@ -14,7 +14,7 @@ module WoodsMap
 
     # The rule registry of B8-Impact-Risks: name, severity, what it needs, layer, and what blocks it here.
     RULES = [
-      ['template reads unassigned ivar', 'blocking', 'view instance_variables + action assigns', 'structural', 'W-7'],
+      ['template reads unassigned ivar', 'note', 'view instance_variables + action assigns', 'structural', 'W-7'],
       ['job without retry touched', 'note', 'job retry_on / discard_on', 'job metadata', nil],
       ['hub touched', 'blocking', 'graph_analysis.hubs', 'typed edges', nil],
       ['bridge touched', 'blocking', 'graph_analysis.bridges', 'typed edges', nil],
@@ -55,18 +55,20 @@ module WoodsMap
       @radius = radius
       @graph = repository.graph
       @analysis = repository.graph_analysis
+      @ivar_rule = UnassignedIvarRule.new(repository, radius)
     end
 
     # @return [Array<Finding>] the findings of the rules that ran
     def findings
-      @findings ||= hub_findings + bridge_findings + cycle_findings + job_findings
+      @findings ||= @ivar_rule.findings + hub_findings + bridge_findings + cycle_findings + job_findings
     end
 
     # @return [Array<Rule>] every rule with its result, or what it needs to run
     def rules
       RULES.map do |name, severity, needs, layer, blocker|
-        Rule.new(name: name, severity: severity, needs: needs, layer: layer,
-                 result: blocker ? "needs #{blocker}" : findings.count { |f| f.rule == name })
+        result = blocker ? "needs #{blocker}" : findings.count { |f| f.rule == name }
+        result = @ivar_rule.result if name == UnassignedIvarRule::NAME
+        Rule.new(name: name, severity: severity, needs: needs, layer: layer, result: result)
       end
     end
 
@@ -92,9 +94,8 @@ module WoodsMap
       ids = (@radius.focus + @radius.direct.map(&:identifier)).uniq
       ids.select { |id| TESTABLE.include?(@radius.type_of(id)) && coverage_of(id).empty? }.map do |id|
         blocking = findings.any? { |f| f.where == id && f.severity == 'blocking' }
-        why = blocking ? 'a blocking finding names it and no spec reaches it' : 'no test_coverage edge reaches it'
         Gap.new(severity: blocking ? 'blocking' : 'note', text: "#{id} has no mapped test", layer: 'test_mapping',
-                why: why)
+                why: blocking ? 'a blocking finding names it; no spec reaches it' : 'no test_coverage edge reaches it')
       end
     end
 

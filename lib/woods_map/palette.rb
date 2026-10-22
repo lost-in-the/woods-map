@@ -60,8 +60,9 @@ module WoodsMap
       needle = @query.downcase
       files = @repository.file_map.select { |path, _| path.downcase.include?(needle) }
       items = files.map do |path, identifiers|
-        { 'label' => path, 'identifier' => identifiers.first,
-          'type' => @repository.graph.dig('nodes', identifiers.first, 'type'),
+        owner = @repository.file_owner(path)
+        { 'label' => path, 'identifier' => owner&.dig('identifier') || identifiers.first,
+          'type' => owner&.dig('type'),
           'detail' => "#{identifiers.size} #{'unit'.pluralize(identifiers.size)}" }
       end
       group('files', items)

@@ -18,7 +18,17 @@ RSpec.describe WoodsMap::ImpactReview do
   it 'names what the other rules need' do
     v = review('User')
     expect(v.rules.find { |x| x.name == 'foreign key dropped' }.result).to eq('needs a range')
-    expect(v.rules.find { |x| x.name == 'template reads unassigned ivar' }.result).to eq('needs W-7')
+    expect(v.rules.find { |x| x.name == 'filter chain changed' }.result).to eq('needs W-8 and a range')
+  end
+
+  it 'runs the unassigned-ivar rule on the per-action facts, from the mailer or from its template' do
+    [review('MailingListMailer', depth: 1), review('mailing_list_mailer/new_post.html.erb', depth: 1)].each do |v|
+      finding = v.findings.find { |f| f.rule == 'template reads unassigned ivar' }
+      expect(finding.where).to eq('mailing_list_mailer/new_post.html.erb')
+      expect(finding.evidence).to start_with('mailing_list_mailer/new_post.html.erb mentions @preferences')
+    end
+    expect(review('UsersController', depth: 1).rules.find { |x| x.name == 'template reads unassigned ivar' }.result)
+      .to include('incomplete')
   end
 
   it 'lists the gaps where no test reaches the focus or a direct dependent' do
