@@ -3,10 +3,10 @@
 module WoodsMap
   # The file-tree explorer's rows (C3, D-18) from the graph's file map: the
   # application's files as they are on disk, directories with the count of
-  # indexed units beneath them, each file linking to the unit it defines.
+  # distinct typed owners beneath them, each file retaining its exact path.
   # Built once per generation and kept in a small process cache.
   class FileTree
-    Row = Struct.new(:kind, :name, :level, :path, :count, :identifier, :type, :units, keyword_init: true)
+    Row = Struct.new(:kind, :name, :level, :path, :count, :identifier, :type, :units, :unresolved, keyword_init: true)
 
     CACHE_SIZE = 4
     @cache = {}
@@ -20,7 +20,7 @@ module WoodsMap
         @mutex.synchronize do
           @cache.fetch(key) do
             @cache.shift while @cache.size >= CACHE_SIZE
-            owners = repository.file_map.keys.index_with { |path| repository.file_owner(path) }
+            owners = repository.file_map.keys.index_with { |path| repository.file_owners(path) }
             @cache[key] = new(repository.file_map, {}, owners: owners)
           end
         end
@@ -34,7 +34,7 @@ module WoodsMap
 
     # @param file_map [Hash{String => Array<String>}] relative path => identifiers
     # @param nodes [Hash{String => Hash}] identifier => node facts (type)
-    # @param owners [Hash{String => Hash}, nil] pre-resolved typed owners by file path
+    # @param owners [Hash{String => Array<Hash>}, nil] pre-resolved typed owners by file path
     def initialize(file_map, nodes, owners: nil)
       @file_map = file_map
       @nodes = nodes
@@ -43,7 +43,12 @@ module WoodsMap
 
     # @return [Integer] indexed units across the tree
     def unit_count
-      @unit_count ||= @file_map.values.flatten.uniq.size
+      @unit_count ||= identities(@file_map.keys).size
+    end
+
+    # @return [Integer] distinct unresolved identifiers across the tree
+    def unresolved_count
+      unresolved_identifiers(@file_map.keys).size
     end
 
     # @return [Array<Row>] directories and files, depth first, as on disk
@@ -71,19 +76,42 @@ module WoodsMap
     end
 
     def dir_row(name, level, prefix, children)
-      Row.new(kind: :dir, name: name, level: level, path: "#{prefix}#{name}", count: count_units(children))
+      paths = leaf_paths(children)
+      Row.new(kind: :dir, name: name, level: level, path: "#{prefix}#{name}", count: identities(paths).size,
+              unresolved: unresolved_identifiers(paths).size)
     end
 
-    def count_units(node)
-      node.values.sum { |v| v.is_a?(Hash) ? count_units(v) : Array(@file_map[v]).size }
+    def leaf_paths(node)
+      node.values.flat_map { |value| value.is_a?(Hash) ? leaf_paths(value) : [value] }
+    end
+
+    def identities(paths)
+      paths.flat_map { |path| owners(path).map { |owner| owner.values_at('identifier', 'type') } }.uniq
+    end
+
+    def unresolved_identifiers(paths)
+      paths.flat_map do |path|
+        Array(@file_map[path]).uniq - owners(path).pluck('identifier')
+      end.uniq
+    end
+
+    def owners(path)
+      @owners_by_path ||= {}
+      @owners_by_path[path] ||= @owners ? @owners.fetch(path, []) : legacy_owners(path)
+    end
+
+    def legacy_owners(path)
+      Array(@file_map[path]).filter_map do |identifier|
+        node = @nodes[identifier]
+        node.merge('identifier' => identifier) if node && node['type'].present?
+      end
     end
 
     def file_row(name, level, path)
-      identifiers = Array(@file_map[path])
-      first = identifiers.first
-      owner = @owners ? @owners[path] : { 'identifier' => first, 'type' => first && @nodes.dig(first, 'type') }
+      owner = owners(path).first
       Row.new(kind: :file, name: name, level: level, path: path, identifier: owner&.dig('identifier'),
-              type: owner&.dig('type'), units: identifiers.size)
+              type: owner&.dig('type'), units: identities([path]).size,
+              unresolved: unresolved_identifiers([path]).size)
     end
   end
 end

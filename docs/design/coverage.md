@@ -22,7 +22,7 @@ opens the file tree.
 |---|---|---|---|---|
 | `/woods` | Status page (generation, HEAD, freshness, extractors, host) | FR-1 | [B8-States](boards/B8-States.html) (stale panel) | final |
 | `/woods?token=` refused, no index, drifted, stale, degraded, empty results, guide unavailable | States and banners | FR-1, D-4, R-1, E-10 | [B8-States](boards/B8-States.html) | final |
-| `/woods/units` | Units index, grouped by type with counts | FR-3 | — | **none** |
+| `/woods/units` | Units index, grouped by actual type with distinct typed counts | FR-3 | [M1 navigation note](notes/m1-indexed-navigation.md) | shared components; mounted acceptance separate |
 | search palette, `/woods/search` | Name, path and full-text code search, completeness | FR-2, B-12 | [B8-Search](boards/B8-Search.html) | final |
 | `/woods/units/model/Post` Code | Two lenses, outline, marginalia, peek, confidence marks, folds, concerns inlined | FR-3, FR-4, B-1, B-2, B-7 to B-11, B-15 | [B8-Code](boards/B8-Code.html) | final; the engine scrolls the view as one region ([woods-map#29](https://github.com/lost-in-the/woods-map/issues/29)) |
 | hover card on a reference | Type, path, PageRank, last author, churn in 100 ms | B-3 | — | **none** (tooltip component exists, C5) |
@@ -37,7 +37,7 @@ opens the file tree.
 | Controller: Passage tab | Stages, filter matrix, callback ladder, mismatch flags, export | B-16 to B-20 | [B8-Passage](boards/B8-Passage.html) | final; the engine shows declared filter scopes (W-8 pending) and compares lexical template ivar mentions with W-7 assignments as advisory notes; missing action/template facts and truncated partial chains remain incomplete |
 | Mailer: Passage and Templates | Mailer action passage, delivery, templates | B-17 | — | **none** (same component as the controller passage) |
 | Unit pages: job, mailer, view, concern, serializer, table | Type-specific facts tiles | B-4 | B6/B8 (model and controller only) | partial |
-| `/woods/files/*path` | File view: every unit a file defines | B-5 | — | **none** |
+| `/woods/files/*path` | Indexed file ownership: primary and contributor paths, typed owners and unresolved membership | B-5 | [M1 navigation note](notes/m1-indexed-navigation.md) | shared components; mounted acceptance separate |
 | `/woods/landscape` Context L1 | People and external systems | B-21 | [B8-Landscape](boards/B8-Landscape.html) (ladder only) | partial |
 | Landscape Containers L2 | C4 containers, relationships, structural risk | B-21, W-9 | [B8-Landscape](boards/B8-Landscape.html) | final |
 | Landscape Components L3 | Compound graph by package with container frame | B-22 | — | **none** |
@@ -68,7 +68,7 @@ opens the file tree.
 The undesigned items above, grouped by the milestone issue that will build
 them. Each is a comment on that issue, so the issue owns it.
 
-- **M1 · Reading (woods-map#2)**: units index; facts tiles for job, mailer, view, concern, serializer and table units; Routes tab; file view; hover card; disambiguation popover; settings popover; keyboard help; Share menu contents.
+- **M1 · Reading (woods-map#2)**: units index and indexed ownership now have a [bounded design note](notes/m1-indexed-navigation.md) under [#34](https://github.com/lost-in-the/woods-map/issues/34); remaining gaps include facts tiles for job, mailer, view, concern, serializer and table units; Routes tab; hover card; disambiguation popover; settings popover; keyboard help; Share menu contents.
 - **M2 · Passage (woods-map#3)**: mailer passage with templates (reuse the controller passage).
 - **M4b · Impact (woods-map#4)**: Overview tab at v8; Graph tab; pre-change mode; `?since=` highlighting on Code, Graph, Lifecycle, Passage, ERD and timeline views.
 - **M3 · Diagrams (woods-map#5)**: Landscape Context L1, Components L3, Domains; C4-dynamic in the Lifecycle view control; the renderer decision (woods-map#25).

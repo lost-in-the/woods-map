@@ -15,6 +15,11 @@ WoodsMap::Engine.routes.draw do
   # The impact page (M4b): a focus set with no range is the blast radius; a range needs woods:impact (W-12).
   get 'impact', to: 'impact#show', as: :impact
 
+  get 'units', to: 'units#index', as: :units
+  # File paths are exact admitted file_map keys, never host filesystem paths.
+  get 'files', to: 'files#show', format: false
+  get 'files/*path', to: 'files#show', as: :file, format: false
+
   # Unit pages (M1): one route per tab, taking a unit type and an identifier
   # from the pinned generation; never a file path.
   scope 'units/:type', constraints: { type: /[a-z0-9_]+/ }, format: false do

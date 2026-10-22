@@ -1,0 +1,23 @@
+<% content_for :title, 'Units · Woods Map' %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<%= render 'woods_map/shared/crumbs', crumbs: [['units', nil]] %>
+<%= render 'woods_map/shared/ident', title: 'Units', subtitle: "#{@unit_count} units, #{@unit_groups.size} types, gen #{@repository.generation_number}" %>
+<div class="body" style="margin-top:var(--s4)">
+  <nav class="rail" aria-label="Unit types">
+    <h2 class="t3 on">Types</h2>
+    <% @unit_groups.each do |type, units| %>
+      <%= link_to woods_map.units_path(anchor: "type-#{type}"), class: 'f' do %><%= type.tr('_', ' ') %><span class="cnt"><%= units.size %></span><% end %>
+    <% end %>
+  </nav>
+  <div class="main">
+    <% if @unit_groups.empty? %>
+      <%= render 'woods_map/components/empty_state', title: 'No indexed units', text: 'This published generation contains no units.' %>
+    <% end %>
+    <% @unit_groups.each do |type, units| %>
+      <section class="sec" aria-labelledby="type-<%= type %>">
+        <header><h2 class="t2" id="type-<%= type %>"><%= type.tr('_', ' ') %> <%= count_tag(units.size) %></h2></header>
+        <%= render 'woods_map/components/table', label: "#{type.tr('_', ' ')} units", min_width: '640px', columns: [{ label: 'unit', width: '300px', cell_class: 'id' }, { label: 'indexed file' }], rows: units.map { |unit| { cells: [unit_link(unit['identifier'], type), unit['file_path'].presence || tag.span('No indexed file', class: 'dim')] } } %>
+      </section>
+    <% end %>
+  </div>
+</div>

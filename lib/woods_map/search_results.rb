@@ -101,10 +101,10 @@ module WoodsMap
 
     def path_hits
       needle = @query.downcase
-      @repository.file_map.select { |path, _| path.downcase.include?(needle) }.first(LIMIT).map do |path, identifiers|
-        owner = @repository.file_owner(path)
-        Hit.new(identifier: owner&.dig('identifier') || identifiers.first, type: owner&.dig('type'),
-                file_path: path, hits: identifiers.size, match: path)
+      paths = @repository.file_map.keys.select { |path| path.downcase.include?(needle) }.sort
+      @raw = { 'complete' => paths.size <= LIMIT }
+      paths.first(LIMIT).map do |path|
+        Hit.new(type: 'file', file_path: path, hits: @repository.file_owners(path).size, match: path)
       end
     end
   end
