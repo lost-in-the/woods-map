@@ -4,14 +4,14 @@ module WoodsMap
   # The impact page (M4b). With a focus set and no range it is the pre-change
   # mode (E-9): the blast radius from the graph of one generation, with the
   # tabs of the report boards over what that generation proves. With a range
-  # it needs the report Woods publishes with woods:impact (W-12), and says so.
+  # it delegates retained-generation evidence to Woods::Impact::Report (W-12).
   class ImpactController < ApplicationController
     LENSES = %w[changed risks flows tests unknown].freeze
 
     def show
       with_repository do |repository|
         load_frame(repository)
-        next render_range if params[:from].present? || params[:to].present?
+        next render_range if params[:mode] == 'range' || params[:from].present? || params[:to].present?
 
         @radius = radius_from_params(repository)
         @review = WoodsMap::ImpactReview.new(repository, @radius)
@@ -35,7 +35,10 @@ module WoodsMap
     end
 
     def render_range
-      @range = [params[:from].presence || 'the base', params[:to].presence || "gen:#{@repository.generation_number}"]
+      @range = [params[:from].to_s, params[:to].presence || 'now']
+      if @range.first.present?
+        @report = WoodsMap::ImpactRange.new(woods_map_config.index_path, from: @range.first, to: @range.last)
+      end
       render :range
     end
   end
