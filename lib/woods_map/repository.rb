@@ -60,6 +60,12 @@ module WoodsMap
       numbers.empty? ? [generation_number] : numbers
     end
 
+    # @return [Array] cache identity of this index and its pinned generation
+    def generation_key
+      [@index.index_dir.expand_path.to_s, @index.payload_dir.expand_path.to_s, generation_number,
+       manifest['extracted_at'], manifest['total_units']]
+    end
+
     # What the bar shows on every page: the generation and the HEAD it was
     # extracted at.
     #
@@ -91,16 +97,20 @@ module WoodsMap
     end
 
     # Resolve a constant or identifier to the unit types that own it, from
-    # the graph's node table (one lookup, every unit of the generation).
+    # the primary node and any coexisting types in the graph's variants.
     #
     # @param identifier [String]
     # @return [Array<String>] unit types; empty when unknown
     def identifier_types(identifier)
-      node = graph.dig('nodes', identifier)
-      return [node['type'].to_s] if node
+      Array(nodes_by_identifier[identifier]).filter_map { |node| node['type']&.to_s }.uniq
+    end
 
-      variants = Array(graph.dig('variants', identifier)).filter_map { |v| v['type'] }
-      variants.empty? ? [] : variants.map(&:to_s)
+    # @param identifier [String]
+    # @param type [String, nil] the unit type; nil selects the primary node
+    # @return [Hash, nil] the matching graph node, or nil when that typed unit is absent
+    def graph_node(identifier, type: nil)
+      nodes = Array(nodes_by_identifier[identifier])
+      type ? nodes.find { |node| node['type'].to_s == type.to_s } : nodes.first
     end
 
     # @return [Hash] the raw dependency graph (nodes, edges, reverse, reverse_via, pagerank, file_map)
@@ -146,7 +156,7 @@ module WoodsMap
     def search(query, **options)
       response = @reader.search(query, **options).deep_stringify_keys
       response['results'] = Array(response['results']).map do |row|
-        row.merge('file_path' => graph.dig('nodes', row['identifier'], 'file_path'))
+        row.merge('file_path' => graph_node(row['identifier'], type: row['type'])&.dig('file_path'))
       end
       response
     end
@@ -158,7 +168,36 @@ module WoodsMap
       @file_map ||= (graph['file_map'] || {}).reject { |path, _| path.start_with?('/') }
     end
 
+    # The first typed unit recorded at a file, including additional source
+    # paths. A colliding identifier's primary node may belong to another file.
+    #
+    # @param path [String] relative application path
+    # @return [Hash, nil] matching node facts with its identifier, or nil when unrecorded
+    def file_owner(path)
+      Array(file_map[path]).each do |identifier|
+        node = Array(nodes_by_identifier[identifier]).find do |candidate|
+          candidate['file_path'] == path || Array(candidate['source_paths']).include?(path)
+        end
+        return node.merge('identifier' => identifier) if node
+      end
+      nil
+    end
+
     private
+
+    # Woods publishes coexisting types as a flat variants array; older
+    # generations omit it. Build the lookup once for this pinned generation.
+    def nodes_by_identifier
+      @nodes_by_identifier ||= begin
+        nodes = (graph['nodes'] || {}).transform_values { |node| [node] }
+        Array(graph['variants']).grep(Hash).each do |record|
+          next unless record['identifier']
+
+          (nodes[record['identifier']] ||= []) << record
+        end
+        nodes
+      end
+    end
 
     # A JSON artifact of the pinned payload (the directory PublishedIndex
     # pinned, never resolved here); nil when the artifact is absent.

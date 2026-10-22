@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
+require 'digest'
+
 module WoodsMap
   # The Graph tab's list equivalent (B6-Graph): the typed edges around one
   # unit, filtered by direction, depth, type and mechanism, with the notes
   # the graph analysis adds (hubs, cycles, PageRank).
   class Neighbourhood
-    Edge = Struct.new(:from, :from_type, :via, :to, :to_type, :depth, keyword_init: true)
+    # reached_type records the endpoint reached on this edge's first breadth-first visit.
+    Edge = Struct.new(:from, :from_type, :via, :to, :to_type, :depth, :reached_type, keyword_init: true)
 
     # Mechanism families (A1 to A5 on the board).
     FAMILIES = {
@@ -22,13 +25,16 @@ module WoodsMap
 
     # @param repository [WoodsMap::Repository]
     # @param identifier [String]
+    # @param type [String, nil] the selected unit type; defaults to the primary graph node
     # @param direction [String] both, dependents or dependencies
     # @param depth [Integer] 1 or 2
     # @param filters [Hash] :types (unit types to keep) and :via (mechanisms to keep); nil keeps all
-    def initialize(repository, identifier, direction: 'both', depth: 1, filters: {})
+    # The typed focus is explicit alongside the existing traversal options.
+    def initialize(repository, identifier, type: nil, direction: 'both', depth: 1, filters: {}) # rubocop:disable Metrics/ParameterLists
+      @repository = repository
       @graph = repository.graph
       @analysis = repository.graph_analysis
-      @identifier = identifier
+      @focus = [identifier, type || type_of(identifier)]
       @direction = %w[dependents dependencies].include?(direction) ? direction : 'both'
       @depth = depth.to_i.clamp(1, 2)
       @types = filters[:types]&.map(&:to_s)
@@ -73,12 +79,19 @@ module WoodsMap
     # @param identifier [String]
     # @return [String, nil] a node's type
     def type_of(identifier)
-      @graph.dig('nodes', identifier, 'type')
+      @repository.graph_node(identifier)&.dig('type')
     end
 
-    # @return [Integer] distinct units the filtered edges touch, the focus included
+    # @param identifier [String]
+    # @param type [String]
+    # @return [Boolean] whether this typed unit is the selected focus
+    def focus?(identifier, type)
+      @focus == [identifier, type]
+    end
+
+    # @return [Integer] distinct typed units the filtered edges touch, the focus included
     def node_count
-      edges.flat_map { |e| [e.from, e.to] }.push(@identifier).uniq.size
+      edges.flat_map { |e| [[e.from, e.from_type], [e.to, e.to_type]] }.push(@focus).uniq.size
     end
 
     # @return [Boolean] whether the flowchart would exceed {NODE_BUDGET}
@@ -90,22 +103,30 @@ module WoodsMap
     #
     # @return [String]
     def mermaid
-      lines = ['flowchart LR', "  #{node_id(@identifier)}[\"#{@identifier}\"]"]
-      edges.each { |e| lines << "  #{node_id(e.from)}[\"#{e.from}\"] -->|#{e.via}| #{node_id(e.to)}[\"#{e.to}\"]" }
-      lines << "  class #{node_id(@identifier)} focus"
+      lines = ['flowchart LR', "  #{mermaid_node(*@focus)}"]
+      edges.each do |edge|
+        from = mermaid_node(edge.from, edge.from_type)
+        to = mermaid_node(edge.to, edge.to_type)
+        lines << "  #{from} -->|#{edge.via}| #{to}"
+      end
+      lines << "  class #{node_id(*@focus)} focus"
       lines.join("\n")
     end
 
     private
 
-    def node_id(identifier)
-      identifier.to_s.gsub(/[^A-Za-z0-9_]/, '_')
+    def node_id(identifier, type)
+      "n_#{Digest::SHA256.hexdigest([type, identifier].to_json)[0, 16]}"
+    end
+
+    def mermaid_node(identifier, type)
+      "#{node_id(identifier, type)}[#{"#{identifier} (#{type})".to_json}]"
     end
 
     # Breadth-first over the typed edges, one level per depth, each edge once.
     def collect
       seen = {}
-      frontier = [@identifier]
+      frontier = [@focus]
       (1..@depth).each do |level|
         frontier = frontier.flat_map { |node| expand(node, level, seen) }.uniq
       end
@@ -114,12 +135,15 @@ module WoodsMap
 
     def expand(node, level, seen)
       around(node).filter_map do |edge|
-        key = [edge.from, edge.via, edge.to]
+        key = [edge.from, edge.from_type, edge.via, edge.to, edge.to_type]
         next if seen.key?(key)
 
         edge.depth = level
         seen[key] = edge
-        edge.from == node ? edge.to : edge.from
+        from = [edge.from, edge.from_type]
+        reached = from == node ? [edge.to, edge.to_type] : from
+        edge.reached_type = reached.last
+        reached
       end
     end
 
@@ -130,24 +154,31 @@ module WoodsMap
     end
 
     def outgoing(node)
-      Array(@graph.dig('edges', node)).map do |e|
-        Edge.new(from: node, from_type: type_of(node), via: e['via'].to_s, to: e['target'],
-                 to_type: e['type'] || type_of(e['target']))
+      identifier, type = node
+      record = @repository.graph_node(identifier, type: type)
+      primary = type_of(identifier) == type
+      raw = primary ? @graph.dig('edges', identifier) : record&.dig('edges')
+      Array(raw).map do |edge|
+        Edge.new(from: identifier, from_type: type, via: edge['via'].to_s, to: edge['target'],
+                 to_type: edge['type'] || type_of(edge['target']))
       end
     end
 
     def incoming(node)
-      Array(@graph.dig('reverse_via', node)).map do |e|
-        Edge.new(from: e['source'], from_type: e['source_type'] || type_of(e['source']), via: e['via'].to_s,
-                 to: node, to_type: type_of(node))
+      identifier, type = node
+      Array(@graph.dig('reverse_via', identifier)).filter_map do |edge|
+        target_type = edge['type'] || type_of(identifier)
+        next unless target_type == type
+
+        Edge.new(from: edge['source'], from_type: edge['source_type'] || type_of(edge['source']),
+                 via: edge['via'].to_s, to: identifier, to_type: target_type)
       end
     end
 
     def keep_type?(edge)
       return true if @types.nil?
 
-      other = edge.from == @identifier ? edge.to_type : edge.from_type
-      other.nil? || @types.include?(other)
+      edge.reached_type.nil? || @types.include?(edge.reached_type)
     end
 
     def keep_via?(edge)

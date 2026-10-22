@@ -8,7 +8,7 @@
         { label: 'associations', count: assocs.size, items: assocs.each_with_index.map { |a, i| { key: i + 1, text: unit_link(a.target), own: a.macro } } }
       ].reject { |g| g[:items].empty? } %>
   <div class="main">
-    <section class="sec" aria-labelledby="er">
+    <section class="sec" aria-label="Entity relationship">
       <%= render 'woods_map/components/diagram', title: 'Entity relationship', facts: ["#{@schema.table_name} + 1 hop", "#{assocs.size + 1} tables"], tools: tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: @schema.mermaid, action: 'copy#copy' }), mermaid: @schema.mermaid, label: "Entity relationship diagram of #{@schema.table_name} and the tables one association away", legend: [['|', 'one'], ['○', 'zero or more'], ['crow\'s foot', 'many']], provenance: ['model metadata', "gen #{@repository.generation_number}"] %>
     </section>
     <section class="sec" aria-labelledby="assoc" data-controller="rows">
