@@ -23,6 +23,7 @@ export default class extends Controller {
 
   globalKey(event) {
     if (event.key !== "/" || event.target.matches("input, textarea, select, [contenteditable]")) return
+    if (event.target.closest('[aria-modal="true"]')) return
     event.preventDefault()
     this.inputTarget.focus()
     this.inputTarget.select()
@@ -89,25 +90,20 @@ export default class extends Controller {
 
   render() {
     const data = this.result || { groups: [], complete: true }
-    const base = this.urlValue.replace(/\/search\/palette$/, "")
     this.hits = []
     let html = ""
     for (const group of data.groups) {
       html += `<div class="grp">${this.escape(group.name)}<span class="cnt">${group.items.length} of ${group.total}</span></div>`
       for (const item of group.items) {
-        const href = item.type ? `${base}/units/${encodeURIComponent(item.type)}/${this.encodeIdentifier(item.identifier)}` : null
+        const href = item.href || null
         const index = this.hits.length
         this.hits.push({ href })
-        html += `<a class="hit" role="option" href="${href || "#"}" aria-selected="${index === this.selected}" data-index="${index}"><span>${this.mark(item.label, data.query)}</span><span class="path">${this.escape(item.detail || "")}</span></a>`
+        html += `<a class="hit" role="option" href="${this.escape(href || "#")}" aria-selected="${index === this.selected}" data-index="${index}"><span>${this.mark(item.label, data.query)}</span><span class="path">${this.escape(item.detail || "")}</span></a>`
       }
     }
     if (data.groups.length === 0) html += `<div class="grp">no match for ${this.escape(data.query || "")}<span class="cnt">0</span></div>`
     html += `<div class="foot"><span><span class="kbd">↑</span> <span class="kbd">↓</span> move</span><span><span class="kbd">enter</span> open</span><span><span class="kbd">esc</span> close</span><span class="right">${data.complete ? "complete" : "partial"}${data.generation ? `, gen ${data.generation}` : ""}</span></div>`
     this.panelTarget.innerHTML = html
-  }
-
-  encodeIdentifier(identifier) {
-    return identifier.split("/").map(encodeURIComponent).join("/")
   }
 
   mark(label, query) {

@@ -25,7 +25,7 @@ module WoodsMap
       @repository = repository
       @freshness = repository.freshness
       @tree = WoodsMap::FileTree.for(repository)
-      @nav = [['Units', woods_map.search_path, false], ['Impact', woods_map.impact_path, true]]
+      @nav = [['Units', woods_map.units_path, false], ['Impact', woods_map.impact_path, true]]
       @lens = LENSES.include?(params[:lens]) ? params[:lens] : 'changed'
     end
 
