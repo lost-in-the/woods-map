@@ -30,6 +30,7 @@ module WoodsMap
         @lifecycle = lifecycle_for(@unit)
         @code = code_view(@unit, lens, @lifecycle)
         @outline = WoodsMap::Outline.new(@unit, lifecycle: @lifecycle, concern_methods: concern_methods(@unit))
+        @cards = WoodsMap::HoverCard.for(@repository, @code.linked_targets)
         render :show
       end
     end
