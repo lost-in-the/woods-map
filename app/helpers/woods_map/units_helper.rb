@@ -4,8 +4,8 @@ module WoodsMap
   # Helpers for the unit pages: links to units, the facts tile values, the
   # freshness words, the tab table.
   module UnitsHelper
-    TAB_LABELS = { 'code' => 'Code', 'schema' => 'Schema', 'passage' => 'Passage', 'lifecycle' => 'Lifecycle',
-                   'graph' => 'Graph', 'history' => 'History' }.freeze
+    TAB_LABELS = { 'code' => 'Code', 'routes' => 'Routes', 'schema' => 'Schema', 'passage' => 'Passage',
+                   'lifecycle' => 'Lifecycle', 'graph' => 'Graph', 'history' => 'History' }.freeze
 
     # @param identifier [String]
     # @param type [String, nil]

@@ -16,7 +16,7 @@ module WoodsMap
     TABS = {
       'model' => %w[code schema lifecycle graph history],
       'database_table' => %w[schema graph],
-      'controller' => %w[code passage lifecycle graph history],
+      'controller' => %w[code routes passage lifecycle graph history],
       'mailer' => %w[code passage lifecycle graph history],
       'job' => %w[code lifecycle graph history]
     }.freeze
@@ -89,6 +89,7 @@ module WoodsMap
       when 'code' then @metadata['loc'] && "#{@metadata['loc']} lines"
       when 'schema' then @metadata['column_count']
       when 'passage' then Array(@metadata['actions']).size.nonzero?
+      when 'routes' then routes_count
       when 'lifecycle' then lifecycle_count
       when 'graph' then dependencies.size + dependents.size
       when 'history' then @metadata.dig('git', 'commit_count')
@@ -120,6 +121,10 @@ module WoodsMap
     end
 
     private
+
+    def routes_count
+      Array(@metadata['routes']).sum { |_, list| Array(list).size }.nonzero?
+    end
 
     def lifecycle_count
       Array(@metadata['callbacks']).count { |cb| !cb['filter'].to_s.match?(Lifecycle::INTERNAL) }.nonzero? ||
