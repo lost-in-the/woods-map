@@ -10,17 +10,33 @@ RSpec.describe WoodsMap::SchemaView do
       ] } }
   end
 
-  it 'writes one ER line per direct association, a namespaced table as a valid entity name' do
+  it 'writes one ER line per direct association, each table quoted as written' do
     expect(described_class.new(unit).mermaid).to eq(<<~MERMAID.chomp)
       erDiagram
-        microposts
-        microposts }o--|| users : "user"
-        microposts ||--o{ active_storage_attachments : "image_attachment"
+        "microposts"
+        "microposts" }o--|| "users" : "user"
+        "microposts" ||--o{ "active_storage/attachments" : "image_attachment"
     MERMAID
+  end
+
+  it 'keeps a schema-qualified table apart from a table whose name differs only in punctuation' do
+    unit['metadata'] = { 'table_name' => 'audit.logs',
+                         'associations' => [{ 'type' => 'belongs_to', 'name' => 'archive', 'target' => 'AuditLog' }] }
+    expect(described_class.new(unit).mermaid).to include('"audit.logs" }o--|| "audit_logs" : "archive"')
+    expect(described_class.new(unit).table_count).to eq(2)
   end
 
   it 'declares the table on its own when the model has no associations' do
     unit['metadata']['associations'] = []
-    expect(described_class.new(unit).mermaid).to eq("erDiagram\n  microposts")
+    expect(described_class.new(unit).mermaid).to eq("erDiagram\n  \"microposts\"")
+  end
+
+  it 'counts the tables against the ER budget, refusing only above it' do
+    targets = ->(n) { (1..n).map { |i| { 'type' => 'has_many', 'name' => "t#{i}", 'target' => "Thing#{i}" } } }
+    unit['metadata']['associations'] = targets.call(WoodsMap::SchemaView::TABLE_BUDGET - 1)
+    expect(described_class.new(unit)).not_to be_over_budget
+    unit['metadata']['associations'] = targets.call(WoodsMap::SchemaView::TABLE_BUDGET)
+    expect(described_class.new(unit).table_count).to eq(WoodsMap::SchemaView::TABLE_BUDGET + 1)
+    expect(described_class.new(unit)).to be_over_budget
   end
 end

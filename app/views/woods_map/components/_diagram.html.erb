@@ -14,7 +14,7 @@
   <div class="dh"><b><%= title %></b><% facts.each do |fact| %><span><%= fact %></span><% end %><% if local_assigns[:tools] || drawn %><span class="tools"><%= local_assigns[:tools] %><% if drawn %><button class="tool" type="button" hidden data-diagram-target="toggle" data-action="diagram#toggle" aria-pressed="false">Mermaid text</button><% end %></span><% end %></div>
   <% if mermaid %>
     <div class="dw hscroll" data-controller="cliff" data-diagram-target="scroller">
-      <% if refusal %><p class="cap refusal"><%= refusal %></p><% end %>
+      <% if refusal %><p class="cap refusal"><%= refusal %></p><% else %><p class="cap refusal" role="status" data-diagram-target="message" hidden></p><% end %>
       <div class="pele-host" data-diagram-target="canvas" hidden></div>
       <pre class="cmd" style="margin:0;border:0;background:none" role="region" aria-label="Mermaid source" data-controller="cliff" data-diagram-target="source"><%= mermaid %></pre>
     </div>

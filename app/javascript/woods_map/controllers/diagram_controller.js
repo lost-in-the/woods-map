@@ -6,7 +6,7 @@ import { Controller } from "@hotwired/stimulus"
 // Pele is loaded on the first panel that needs it, so pages without a
 // diagram never fetch it. Colours and fonts come from the --pele-* tokens.
 export default class extends Controller {
-  static targets = ["source", "canvas", "toggle", "scroller"]
+  static targets = ["source", "canvas", "toggle", "scroller", "message"]
   static values = { label: String }
 
   async connect() {
@@ -63,11 +63,19 @@ export default class extends Controller {
     this.scrollerTarget.dispatchEvent(new Event("scroll"))
   }
 
+  // Pele refused the text (too long, a syntax it does not know) or could
+  // not load: say so above the text, as a refusal would. textContent keeps
+  // the renderer's message inert.
   fail(error) {
     this.canvasTarget.hidden = true
     this.sourceTarget.hidden = false
     if (this.hasToggleTarget) this.toggleTarget.hidden = true
     this.element.dataset.diagramError = error?.code || "error"
+    if (this.hasMessageTarget) {
+      const reason = error?.message ? `: ${String(error.message).replace(/\.\s*$/, "")}` : ""
+      this.messageTarget.textContent = `The diagram could not be drawn${reason}. The Mermaid text is shown instead.`
+      this.messageTarget.hidden = false
+    }
     console.warn("woods-map: diagram left as text", error)
   }
 }
