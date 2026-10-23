@@ -14,7 +14,7 @@ module WoodsMap
       @analysis = repository.graph_analysis
       @focus = focus
       @hubs = Array(@analysis['hubs']).to_h { |hub| [hub['identifier'], true] }
-      @cycles = Array(@analysis['cycles']).flatten.to_h { |identifier| [identifier, true] }
+      @cycles = Array(@analysis['cycles']).flatten.index_with(true)
     end
 
     # Stable, unambiguous typed identity; the full digest avoids truncating collisions.
