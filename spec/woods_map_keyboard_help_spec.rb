@@ -33,8 +33,8 @@ RSpec.describe 'Keyboard help focus and shortcuts', type: :request do
     styles = %w[tokens.css map.css].map do |name|
       File.read(File.join(root, 'app/assets/stylesheets/woods_map', name))
     end.join("\n")
-    controllers = %w[help keys palette].to_h do |name|
-      [name, File.read(File.join(root, "app/javascript/woods_map/controllers/#{name}_controller.js"))]
+    controllers = %w[help keys palette].index_with do |name|
+      File.read(File.join(root, "app/javascript/woods_map/controllers/#{name}_controller.js"))
     end
     runner = File.read(File.join(root, 'spec/javascript/help_accessibility_runner.js'))
     data = JSON.generate(pages: help_pages, styles: styles, controllers: controllers).gsub('</', '<\\/')
