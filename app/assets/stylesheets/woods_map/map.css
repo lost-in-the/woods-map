@@ -46,3 +46,12 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .impact-evidence dt { white-space:normal; overflow-wrap:anywhere; border-right:0; }
 .wm .impact-evidence dd { min-width:0; white-space:normal; overflow-wrap:anywhere; }
 .wm .impact-evidence ul { padding-left:var(--s4); }
+
+/* Keyboard help uses the shared page typography and token colours. Native modal
+   focus/inert behavior also prevents background shortcuts from navigating. */
+.wm .keyboard-help{color:var(--text);background:var(--panel);border:1px solid var(--rule2);border-radius:var(--r-ctl);padding:var(--s5);max-width:calc(100vw - var(--s6));max-height:calc(100vh - var(--s6));box-sizing:border-box;overflow:auto}
+.wm .keyboard-help::backdrop{background:var(--ground2);opacity:.8}
+.wm .keyboard-help header{display:flex;align-items:center;justify-content:space-between;gap:var(--s4)}
+.wm .keyboard-help section{margin-top:var(--s5)}
+.wm .keyboard-help dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--s2) var(--s4)}
+.wm .keyboard-help dd{margin:0;overflow-wrap:anywhere}

@@ -28,7 +28,8 @@ export default class extends Controller {
 
   globalKey(event) {
     if (event.key === "Escape" && !event.defaultPrevented && !this.wrapTarget.hidden) { this.dismiss(event); return }
-    if (event.key !== "/" || event.target.matches("input, textarea, select, [contenteditable]")) return
+    if (event.key !== "/" || event.defaultPrevented || event.isComposing || event.metaKey || event.ctrlKey || event.altKey) return
+    if (event.target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return
     if (event.target.closest('[aria-modal="true"]') || !this.inputTarget.getClientRects().length) return
     event.preventDefault()
     this.inputTarget.focus()
