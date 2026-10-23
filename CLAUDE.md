@@ -44,6 +44,7 @@ lib/woods_map/unit_facts.rb       # type-specific tiles from published unit meta
 lib/woods_map/{unit_page,code_view,composite_source,highlighter,marginalia,references,outline}.rb  # the unit page and Code tab
 lib/woods_map/{schema_view,lifecycle,neighbourhood,history_view}.rb  # the Schema, Lifecycle, Graph and History tabs
 lib/woods_map/passage.rb         # the Passage tab: declared filters, templates by the view_render edge, the ladder's model and event
+lib/woods_map/{neighbourhood_query,neighbourhood_response,graph_elements}.rb  # bounded JSON projection of existing traversal
 lib/woods_map/{blast_radius,impact_review}.rb  # the impact page's pre-change mode: reverse-edge propagation with paths; rules, tests, gaps, unknowns
 lib/woods_map/{search_results,palette,file_tree}.rb  # search modes, the palette's groups, the per-generation file tree
 lib/woods_map/assets.rb          # engine-served files: roots, content digests, content types

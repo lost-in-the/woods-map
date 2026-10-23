@@ -66,6 +66,10 @@ The dialog contains focus and restores the opener when dismissed. See the
   callback ladder of the model it saves. Declared facts only: what the index
   does not publish yet (W-7, W-8) is named, never guessed.
 
+- `/woods/graph/neighbourhood?centre=User&type=model`: bounded typed graph JSON
+  with generation provenance and truncation. See the [query and response
+  contract](docs/design/notes/neighbourhood-json.md).
+
 - `/woods/impact?focus=User,PostsController&depth=2`: the blast radius of a
   planned change, with the risks, tests and unknowns one generation proves;
   `&lens=risks|flows|tests|unknown` picks the tab, `&show=no_tests|no_views`,
