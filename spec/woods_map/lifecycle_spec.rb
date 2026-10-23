@@ -21,6 +21,45 @@ RSpec.describe WoodsMap::Lifecycle do
     }
   end
   let(:lifecycle) { described_class.new(unit, concern_methods: { 'Taggable' => ['normalize_tags'] }) }
+  let(:flowchart_text) do
+    <<~MERMAID.chomp
+      flowchart TD
+        start(["Post create"])
+        s1["1 · before_save set_slug"]
+        c1{"if: title_changed?"}
+        start --> c1
+        c1 -->|yes| s1
+        s2["2 · before_save normalize_tags"]
+        s1 --> s2
+        c1 -.->|no| s2
+        commit[["transaction commits"]]
+        s2 --> commit
+        s3["3 · after_commit notify"]
+        commit --> s3
+        done(["done"])
+        s3 --> done
+        a0[/"NotifySubscribersJob"/]
+        s3 -.->|enqueues| a0
+    MERMAID
+  end
+  let(:lanes_text) do
+    <<~MERMAID.chomp
+      swimlane-beta TB
+        subgraph l_transaction ["in the transaction"]
+          s1["1 · before_save set_slug"]
+          s2["2 · before_save normalize_tags"]
+        end
+        subgraph l_commit ["after commit"]
+          s3["3 · after_commit notify"]
+        end
+        subgraph l_async ["another process"]
+          a0["NotifySubscribersJob"]
+        end
+        s1 --> s2
+        s2 --> s3
+        s3 -.->|enqueues| a0
+    MERMAID
+  end
 
   it 'orders the create chain as Rails runs it and numbers the steps' do
     steps = lifecycle.steps('create')
@@ -70,5 +109,37 @@ RSpec.describe WoodsMap::Lifecycle do
     expect(at_budget.sequence_size('create')).to eq(budget)
     expect(at_budget).not_to be_over_budget('create')
     expect(described_class.new(chain.call(budget - 1))).to be_over_budget('create')
+  end
+
+  it 'draws the branching flowchart: a decision per condition, the commit as a node, async hops dotted' do
+    expect(lifecycle.flowchart('create')).to eq(flowchart_text)
+  end
+
+  it 'draws lanes for where each step runs, leaving empty lanes out' do
+    expect(lifecycle.lanes('create')).to eq(lanes_text)
+    expect(lifecycle.lanes('update')).not_to include('l_commit', 'l_async')
+  end
+
+  it 'picks the text by view, the sequence by default' do
+    expect(lifecycle.diagram('flowchart', 'create')).to eq(flowchart_text)
+    expect(lifecycle.diagram('lanes', 'create')).to eq(lanes_text)
+    expect(lifecycle.diagram('sequence', 'create')).to eq(lifecycle.mermaid('create'))
+  end
+
+  it 'counts flowchart and lanes nodes against the flowchart budget' do
+    expect([lifecycle.size('flowchart', 'create'), lifecycle.size('lanes', 'create')]).to eq([8, 4])
+    expect(lifecycle.budget('lanes')).to eq(WoodsMap::Lifecycle::FLOWCHART_BUDGET)
+  end
+
+  it 'refuses a view only above its own budget' do
+    stub_const('WoodsMap::Lifecycle::FLOWCHART_BUDGET', 7)
+    expect(lifecycle).to be_over_budget('create', view: 'flowchart')
+    expect(lifecycle).not_to be_over_budget('create', view: 'lanes')
+    expect(lifecycle).not_to be_over_budget('create')
+  end
+
+  it 'keeps a double quote in a label from closing it' do
+    unit['metadata']['callbacks'][1]['conditions'] = { 'if' => ['say "hi"'] }
+    expect(lifecycle.flowchart('create')).to include(%(c1{"if: say 'hi'"}))
   end
 end

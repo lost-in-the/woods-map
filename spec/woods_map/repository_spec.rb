@@ -4,7 +4,7 @@ RSpec.describe WoodsMap::Repository do
   it 'opens the published generation and reports its status' do
     status = described_class.open(FIXTURE_INDEX, &:status)
     expect(status['generation']).to eq(1)
-    expect(status['total_units']).to eq(20)
+    expect(status['total_units']).to eq(21)
     expect(status['git_branch']).to eq('main')
   end
 
