@@ -120,4 +120,12 @@ RSpec.describe WoodsMap::ActionFacts do
     expect(passage.flags).to be_nil
     expect(ivar_result(action_review(repository, 'WidgetsController'))).to eq('needs W-7')
   end
+
+  it 'carries the locals an action passes a partial it renders itself, and nil where none are published' do
+    renders = [{ 'partial' => 'widgets/_card', 'locals' => %w[widget size] }, { 'partial' => 'widgets/_bare' }]
+    owner = action_owner(facts: { 'show' => action_entry(renders: renders) })
+    passage = WoodsMap::Passage.new(action_repository([owner]), owner, action: 'show')
+    expect(passage.templates.map { |t| [t.identifier, t.locals] })
+      .to eq([['widgets/_card', %w[widget size]], ['widgets/_bare', nil]])
+  end
 end

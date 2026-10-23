@@ -133,6 +133,20 @@ RSpec.describe 'Unit pages', type: :request do
     expect(response.body).to include('Flag coverage is incomplete')
   end
 
+  it 'sets permitted keys against the model and leaves unmatched ones unverified, not flagged' do
+    get '/woods/units/controller/UsersController/passage?action_name=create'
+    expect(response.body).to include('column: <span class="iv">name</span>, <span class="iv">email</span>')
+    expect(response.body).to include('unverified: <span class="iv">password</span>, ' \
+                                     '<span class="iv">password_confirmation</span>')
+    expect(response.body).to include('Unverified, not flagged', 'woods#797', 'woods#798')
+    expect(response.body).not_to include('<span class="iv bad">password</span>')
+  end
+
+  it 'names partial locals as a limit where partials are shown' do
+    get '/woods/units/controller/UsersController/passage?action_name=show'
+    expect(response.body).to include('Partial locals are not checked', 'partial locals passed and read')
+  end
+
   it 'sends a type without actions from the passage route to its Code tab' do
     get '/woods/units/model/User/passage'
     expect(response).to redirect_to('/woods/units/model/User')

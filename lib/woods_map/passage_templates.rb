@@ -9,7 +9,8 @@ module WoodsMap
   # with no unit, so the page can say so.
   class PassageTemplates
     # A template of the action, or a partial beneath it.
-    Template = Struct.new(:identifier, :unit, :role, :depth, keyword_init: true) do
+    # +locals+ are the keys the action passes a partial it renders itself (W-7); nil when not published.
+    Template = Struct.new(:identifier, :unit, :role, :depth, :locals, keyword_init: true) do
       # @return [Array<String>] the lexical instance-variable mentions published for the template
       def instance_variables
         Array(unit&.dig('metadata', 'instance_variables')).map(&:to_s)
@@ -74,7 +75,9 @@ module WoodsMap
     # for a mailer, its own template list answers when the index holds none.
     def from_facts
       named = @facts.template_paths.flat_map { |path| at(path) }.map { |id| template(id, 'template', 0) }
-      named + @facts.partial_paths.flat_map { |path| at(path) }.map { |id| template(id, 'partial', 1) }
+      named + @facts.partial_paths.flat_map do |path|
+        at(path).map { |id| template(id, 'partial', 1, locals: @facts.partial_locals(path)) }
+      end
     end
 
     def at(path)
@@ -98,9 +101,9 @@ module WoodsMap
       edges.map { |edge| edge['source'].to_s }.sort
     end
 
-    def template(identifier, role, depth)
+    def template(identifier, role, depth, locals: nil)
       Template.new(identifier: identifier, unit: @repository.unit(identifier, type: 'view_template'), role: role,
-                   depth: depth)
+                   depth: depth, locals: locals)
     end
 
     # The partials a template renders, from its own dependency list, to PARTIAL_DEPTH.

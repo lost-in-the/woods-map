@@ -35,6 +35,8 @@ module WoodsMap
     FRAMEWORK = /\A(#<|verify_authenticity_token\z|verify_same_origin_request\z)/
     # The model event an action name implies, for the callback ladder.
     EVENT_BY_ACTION = { 'create' => 'create', 'update' => 'update', 'destroy' => 'destroy' }.freeze
+    # The Woods issue that would publish partial locals passed and read (B-18's partial-local flag).
+    LOCALS_ITEM = 'woods#798'
 
     # @param repository [WoodsMap::Repository]
     # @param unit [Hash] a controller or mailer unit
@@ -111,6 +113,11 @@ module WoodsMap
         { 'method' => method.to_s, 'model' => facts['model'].to_s,
           'permitted' => Array(facts['permitted']).map(&:to_s) }
       end
+    end
+
+    # @return [Array<PermittedAttributes>] each permitted-params method set against its model's published facts
+    def permitted_attributes
+      @permitted_attributes ||= permitted.map { |entry| PermittedAttributes.new(@repository, entry) }
     end
 
     # @return [Array<PassageTemplates::Template>] the action's templates (depth 0) and their partial chain
