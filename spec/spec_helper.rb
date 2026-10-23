@@ -3,10 +3,12 @@
 ENV['RAILS_ENV'] = 'test'
 require File.expand_path('dummy/config/environment', __dir__)
 require 'rspec/rails'
+require_relative 'support/html_response'
 
 FIXTURE_INDEX = File.expand_path('fixtures/index', __dir__)
 
 RSpec.configure do |config|
+  config.include WoodsMap::HtmlResponse, type: :request
   config.expect_with(:rspec) { |c| c.syntax = :expect }
   config.disable_monkey_patching!
   config.order = :random

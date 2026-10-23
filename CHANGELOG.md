@@ -3,6 +3,10 @@
 ## [Unreleased]
 
 - M3, first slice (woods-map#5, D-21): diagram panels draw their Mermaid text with Pele 1.6.0, vendored as `vendor/javascript/pele.js` and loaded on the first panel that needs it. The text stays in the page as the fallback without JavaScript or when Pele refuses it, and *Mermaid text* swaps back to it. Diagrams keep their natural width and scroll sideways (C4), themed by the `--pele-*` tokens of B9-Pele in `tokens.css`, which replace the Mermaid overrides. The Schema ER and the Lifecycle sequence are drawn; the Graph tab gains the neighbourhood flowchart above the list equivalent, with a 150-node budget (R-4) that keeps the text and names the budget when exceeded. The lifecycle sequence moves into `Lifecycle#mermaid`, with aliased participants so namespaced names stay valid. An ER line naming a namespaced table (`active_storage/attachments`) was invalid Mermaid and is now `active_storage_attachments`. A headless render spec draws every generated text from the fixture with the vendored build in Node (`WOODS_MAP_RENDER_SPEC=1` in CI).
+- Keep source gutters visible during horizontal scrolling; dismiss the search palette when focus leaves or Escape is pressed, reopen it on typing, ArrowDown or input click, and expose only actual choices as listbox options.
+
+- Link only published, typed-registry-verified constant spans; legacy source without span metadata stays highlighted but unlinked. Correct source-map run lengths so annotated source keeps the original file gutters.
+
 - Give explanation controls native button semantics, name Mermaid source regions, correct the Schema section label, and keep narrow page tabs reachable through contained keyboard-accessible scrolling. Use native scrollbars without fades that obscure text at scroll edges.
 
 - Keep the Graph tab focus, variant edges, two-hop traversal, deduplication, links and Mermaid node identities typed. Type filters follow the newly reached endpoint; reverse relationships retain their published destination type.

@@ -11,6 +11,8 @@ html,body{margin:0;min-height:100%}
 /* Without JavaScript every detail block is open and the controls that need a script are gone. */
 html.no-js .wm .tgl,html.no-js .wm [data-needs-js]{display:none}
 html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
+/* Honor the tree controller's filter/fold state over the token row layout. */
+.wm .tree [data-tree-target="row"][hidden] { display:none!important; }
 /* Inline links: a cue besides colour (WCAG 1.4.1, axe link-in-text-block). D-11 keeps standalone
    links bare; a link sitting among other text gets a faint underline in its own hue. The choice is
    open in woods-map#26; until it is settled the accessible reading wins. */
@@ -41,3 +43,12 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .dia .refusal{margin:0 0 var(--s3);color:var(--mut)}
 /* On a phone the band would clip its tools; they drop to a second line instead. */
 @container wm (max-width:639px){ .wm .dia .dh{flex-wrap:wrap;row-gap:var(--s2)} .wm .dia .dh .tools{margin-left:0} }
+
+/* The range form wraps to keep every selector and label reachable on narrow screens. */
+.impact-range-form { display:flex; gap:var(--s3); align-items:center; flex-wrap:wrap; }
+.impact-range-form .filter { max-width:100%; }
+/* Nested historical evidence must remain readable without a current-source link. */
+.wm .impact-evidence { grid-template-columns:minmax(0,1fr); }
+.wm .impact-evidence dt { white-space:normal; overflow-wrap:anywhere; border-right:0; }
+.wm .impact-evidence dd { min-width:0; white-space:normal; overflow-wrap:anywhere; }
+.wm .impact-evidence ul { padding-left:var(--s4); }

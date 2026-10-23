@@ -25,11 +25,20 @@ module WoodsMap
     before_action :exchange_query_token!
     before_action :authenticate!
 
-    helper_method :woods_map_config, :current_repository
+    helper_method :woods_map_config, :current_repository, :woods_map
 
     rescue_from WoodsMap::Repository::Unavailable, with: :render_unavailable
 
     private
+
+    # Use the engine helpers already mixed into this controller. A named
+    # mounted proxy selects one host mount and can lose the current prefix
+    # when the same engine is mounted more than once.
+    #
+    # @return [ApplicationController] route helpers in this request's context
+    def woods_map
+      self
+    end
 
     # @return [WoodsMap::Configuration]
     def woods_map_config

@@ -52,8 +52,8 @@ module WoodsMap
     # @param file_line [Integer]
     # @return [Integer, nil] the composite line that holds a file line
     def composite_line_for(file_line)
-      @map.each do |composite_start, file_start, file_end|
-        return composite_start + (file_line - file_start) if file_line.between?(file_start, file_end)
+      @map.each do |composite_start, file_start, length|
+        return composite_start + (file_line - file_start) if file_line.between?(file_start, file_start + length - 1)
       end
       nil
     end
@@ -100,8 +100,8 @@ module WoodsMap
     def file_line_numbers(total)
       return (1..total).to_h { |n| [n, n] } if @map.empty?
 
-      @map.each_with_object({}) do |(composite_start, file_start, file_end), numbers|
-        (file_start..file_end).each_with_index { |file_line, offset| numbers[composite_start + offset] = file_line }
+      @map.each_with_object({}) do |(composite_start, file_start, length), numbers|
+        length.times { |offset| numbers[composite_start + offset] = file_start + offset }
       end
     end
   end

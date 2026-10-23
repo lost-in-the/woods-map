@@ -69,14 +69,15 @@ RSpec.describe WoodsMap::UnitsHelper, type: :helper do
     expect(tree.rows.find { |row| row.kind == :file }.type).to eq('factory')
   end
 
-  it 'uses the file owner type in palette file results' do
+  it 'identifies palette file results as files with the exact selected path' do
     group = WoodsMap::Palette.new(repository, 'models/report.rb').to_h['groups'].find { |item| item['name'] == 'files' }
-    expect(group['items'].first).to include('identifier' => 'Report', 'type' => 'model')
+    expect(group['items'].first).to include('file_path' => 'app/models/report.rb', 'type' => 'file')
+    expect(group['items'].first).not_to have_key('identifier')
   end
 
-  it 'uses the file owner type in path search results' do
+  it 'identifies path search results as files without selecting a unit owner' do
     hit = WoodsMap::SearchResults.new(repository, 'models/report.rb', mode: 'path').hits.first
-    expect([hit.identifier, hit.type, hit.file_path]).to eq(['Report', 'model', 'app/models/report.rb'])
+    expect([hit.identifier, hit.type, hit.file_path]).to eq([nil, 'file', 'app/models/report.rb'])
   end
 
   it 'links source lines to the secondary type at the recorded file' do

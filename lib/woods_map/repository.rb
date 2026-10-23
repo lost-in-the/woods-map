@@ -2,9 +2,7 @@
 
 require 'active_support/core_ext/enumerable'
 require 'active_support/core_ext/module/delegation'
-require 'json'
 require 'woods/published_index'
-require 'woods/atomic_file'
 require 'woods/mcp/index_reader'
 require 'woods/source_inputs/status'
 
@@ -125,16 +123,6 @@ module WoodsMap
       @graph_analysis = {}
     end
 
-    # The per-file constant references the extractor recorded (an internal,
-    # versioned artifact; absent on older indexes).
-    #
-    # @param file_path [String]
-    # @return [Hash, nil] `analysis` with declarations and references
-    def source_references(file_path)
-      references = payload_json('source_references.json')
-      references&.dig('files', file_path, 'analysis')
-    end
-
     # Drift of the working tree against this generation, within a quarter
     # second budget; compares file identities, never runs git.
     #
@@ -161,29 +149,68 @@ module WoodsMap
       response
     end
 
-    # The dependency-graph file map restricted to application paths.
+    # The dependency-graph file map restricted to permitted relative keys.
+    # No path is normalized or decoded here.
     #
-    # @return [Hash{String => Array<String>}] relative path => identifiers
+    # @return [Hash{String => Array<String>}] exact path => identifiers
     def file_map
-      @file_map ||= (graph['file_map'] || {}).reject { |path, _| path.start_with?('/') }
+      @file_map ||= (graph['file_map'] || {}).select { |path, _| permitted_file_path?(path) }
     end
 
-    # The first typed unit recorded at a file, including additional source
-    # paths. A colliding identifier's primary node may belong to another file.
+    # @param path [String] already Rails-decoded relative application path
+    # @return [Boolean] whether the key is safe for exact payload lookup
+    def permitted_file_path?(path)
+      path.is_a?(String) && path.present? && path.valid_encoding? &&
+        !path.match?(%r{\A(?:/|[a-z]:)|[\\\p{Cc}]}i) &&
+        path.split('/', -1).none? { |part| part.empty? || %w[. ..].include?(part) }
+    end
+
+    # All typed owners whose published primary or contributor path matches
+    # an admitted file-map key. Never infer ownership from an identifier alone.
     #
-    # @param path [String] relative application path
-    # @return [Hash, nil] matching node facts with its identifier, or nil when unrecorded
+    # @param path [String] exact permitted file-map key
+    # @return [Array<Hash>] deterministic, distinct typed node facts
+    def file_owners(path)
+      file_map.key?(path) ? file_owners_by_path.fetch(path, []) : []
+    end
+
+    # @param path [String] exact permitted file-map key
+    # @return [Array<String>] membership without a matching typed owner
+    def unresolved_file_identifiers(path)
+      (Array(file_map[path]).uniq - file_owners(path).pluck('identifier')).sort
+    end
+
+    # Legacy first-owner lookup for existing source-line links. File
+    # navigation uses {#file_owners} and never selects one owner's page.
+    #
+    # @param path [String] exact permitted file-map key
+    # @return [Hash, nil] the first resolved typed owner
     def file_owner(path)
-      Array(file_map[path]).each do |identifier|
-        node = Array(nodes_by_identifier[identifier]).find do |candidate|
-          candidate['file_path'] == path || Array(candidate['source_paths']).include?(path)
-        end
-        return node.merge('identifier' => identifier) if node
-      end
-      nil
+      file_owners(path).first
     end
 
     private
+
+    # Index published ownership once per request, rather than scanning every
+    # node for each file in the tree. Only admitted exact keys enter it.
+    def file_owners_by_path
+      @file_owners_by_path ||= begin
+        owners = {}
+        nodes_by_identifier.each do |identifier, nodes|
+          nodes.each { |node| add_file_owner(owners, identifier, node) if node['type'].present? }
+        end
+        owners.transform_values { |members| members.sort.map(&:last) }
+      end
+    end
+
+    def add_file_owner(owners, identifier, node)
+      owner = node.merge('identifier' => identifier)
+      ([node['file_path']] + Array(node['source_paths'])).uniq.each do |path|
+        next unless file_map.key?(path)
+
+        (owners[path] ||= {})[[identifier, node['type']]] ||= owner
+      end
+    end
 
     # Woods publishes coexisting types as a flat variants array; older
     # generations omit it. Build the lookup once for this pinned generation.
@@ -197,18 +224,6 @@ module WoodsMap
         end
         nodes
       end
-    end
-
-    # A JSON artifact of the pinned payload (the directory PublishedIndex
-    # pinned, never resolved here); nil when the artifact is absent.
-    def payload_json(filename)
-      @payload_json ||= {}
-      @payload_json.fetch(filename) do
-        path = @index.payload_dir.join(filename)
-        @payload_json[filename] = path.file? ? JSON.parse(Woods::AtomicFile.read(path)) : nil
-      end
-    rescue StandardError
-      @payload_json[filename] = nil
     end
 
     def manifest_facts
