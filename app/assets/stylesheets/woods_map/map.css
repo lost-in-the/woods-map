@@ -62,6 +62,6 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .keyboard-help dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--s2) var(--s4)}
 .wm .keyboard-help dd{margin:0;overflow-wrap:anywhere}
 
-/* The current rail item's note sits on the selection tint, where light
-   --dim falls short of AA at 12px; --mut keeps it de-emphasised. */
-.wm .rail li[aria-current=true] .own{color:var(--mut)}
+/* The current rail item's number and note sit on the selection tint, where
+   light --dim falls short of AA at 12px; --mut keeps them de-emphasised. */
+.wm .rail li[aria-current=true] .k,.wm .rail li[aria-current=true] .own{color:var(--mut)}
