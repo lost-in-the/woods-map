@@ -44,7 +44,7 @@ opens the file tree.
 | Landscape Hotspots | Quadrant, coupling matrix, sankey, treemap, structural risk | design study §7 | [B6-Overview](boards/B6-Overview.html) | final |
 | Landscape Domains | Domain clusters | design study §7 | — | **none** |
 | `/woods/graph` | Full-screen graph, domain clusters, list equivalent, flow overlay | FR-5, A-3 to A-6 | B5-Graph (tab only) | **none** for the page |
-| `/woods/erd` | Whole database by chunk, findings | FR-6 | [B6-ERD](boards/B6-ERD.html) | final |
+| `/woods/erd` | Whole database by chunk, findings | FR-6 | [B6-ERD](boards/B6-ERD.html) | final; the engine cuts chunks at the ER budget of 40 tables (R-4), not the board's ~15, lists relations to other chunks instead of drawing their far table, and leaves out the board's commits column and polymorphic candidates (W-23) |
 | `/woods/history` | Cross-unit timeline for a selected set, commit → node | FR-7, A-6 | — | **none** |
 | `/woods/impact` Overview | The PR comment, rendered | E-7 | B5-Impact-Overview | v5 |
 | Impact Changed | Units as subdivided rows, focus detail, diff | E-2, E-6 | [B8-Impact-Changed](boards/B8-Impact-Changed.html) | final |

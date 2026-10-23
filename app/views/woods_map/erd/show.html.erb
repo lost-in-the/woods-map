@@ -1,0 +1,66 @@
+<% content_for :title, "ERD#{" · #{@chunk.label}" if @chunk} · Woods Map" %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<% here = ->(chunk: @chunk&.number, by: @by, columns: @columns) { woods_map.erd_path(chunk: chunk, by: (by == WoodsMap::Erd::GROUPINGS.first ? nil : by), columns: (columns == 'keys' ? nil : columns)) } %>
+<% counts = @erd.findings.counts %>
+<% chunks = @erd.chunks(@by) %>
+<%= render 'woods_map/shared/crumbs', crumbs: @chunk ? [['erd', woods_map.erd_path], [@chunk.database, nil], [@chunk.label, nil]] : [['erd', nil]] %>
+<% mermaid = @chunk && @erd.mermaid(@chunk, columns: @columns) %>
+<% controls = safe_join([
+     tag.span('columns', class: 'lbl'), tag.span(safe_join(WoodsMap::Erd::COLUMN_MODES.map { |mode| link_to(mode, here.call(columns: mode), 'aria-current': (mode == @columns ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'columns'),
+     tag.span('chunk by', class: 'lbl'), tag.span(safe_join(WoodsMap::Erd::GROUPINGS.map { |by| link_to(by, here.call(by: by, chunk: nil), 'aria-current': (by == @by ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'chunk by'),
+     (tag.button('Copy Mermaid for this chunk', class: 'btn primary', type: 'button', data: { controller: 'copy', copy_text_value: mermaid, action: 'copy#copy' }) if mermaid)
+   ].compact, ' ') %>
+<%= render 'woods_map/shared/ident', title: 'Schema', subtitle: "#{counts[:tables]} #{'table'.pluralize(counts[:tables])}, #{@erd.databases.size} #{'database'.pluralize(@erd.databases.size)}, #{chunks.size} #{'chunk'.pluralize(chunks.size)}, #{counts[:foreign_keys]} foreign #{'key'.pluralize(counts[:foreign_keys])}", controls: controls %>
+<% if @erd.tables.empty? %>
+  <%= render 'woods_map/components/empty_state', title: "No tables in gen #{@repository.generation_number}", text: tag.p(safe_join(['This generation published no ', tag.code('database_table'), ' units. The ERD reads only those and the models that map them.'])), cap: link_to('status', woods_map.root_path) %>
+<% else %>
+<div style="margin:var(--s4) var(--s5) 0"><%= render 'woods_map/components/facts', tiles: [
+      { eyebrow: "tables #{counts[:tables]}", rows: [['with a model', counts[:modelled]], ['unmodelled', counts[:unmodelled]], ['source', layer_chip('database_table units')]] },
+      { eyebrow: "foreign keys #{counts[:foreign_keys]}", rows: [['with an association', counts[:fks_with_association]], ['without', counts[:foreign_keys] - counts[:fks_with_association]], ['source', layer_chip('foreign_keys')]] },
+      { eyebrow: "associations without FK #{counts[:associations_without_fk]}", rows: [['polymorphic', counts[:polymorphic]], ['not polymorphic', counts[:associations_without_fk] - counts[:polymorphic]], ['source', layer_chip('associations ∖ foreign_keys')]] },
+      { eyebrow: "cross-database #{counts[:cross_database]}", rows: [['pairs', @erd.findings.cross_database_pairs.presence&.join(', ') || empty_value], ['source', layer_chip('from_db, to_db')]] }
+    ] %></div>
+<% inner = @erd.inner_relations(@chunk) %>
+<% crossing = @erd.crossing_relations(@chunk, @by) %>
+<% tables = @chunk.tables.map { |name| @erd.table_named(name) } %>
+<div class="body" data-controller="trail" data-trail-title-value="ERD <%= @chunk.label %>">
+  <%= render 'woods_map/components/rail', heading: "Chunks by #{@by}", groups: @erd.databases.map { |db|
+        members = chunks.select { |c| c.database == db }
+        { label: db, count: "#{members.sum { |c| c.tables.size }} tables", items: members.map { |c| { key: c.tables.size, text: link_to(c.label, here.call(chunk: c.number)), own: "#{c.tables.first(3).join(', ')}#{'…' if c.tables.size > 3}", current: c == @chunk } } }
+      } + [{ label: 'limits', count: 2, items: [{ key: '·', text: "a chunk is at most #{WoodsMap::SchemaView::TABLE_BUDGET} tables", own: layer_chip('R-4') }, { key: '·', text: 'relations to other chunks are listed, not drawn', own: layer_chip('rule') }] }] %>
+  <div class="main">
+    <section class="sec" aria-label="Entity relationship, <%= @chunk.label %>">
+      <% prev_chunk = chunks.find { |c| c.number == @chunk.number - 1 } %>
+      <% next_chunk = chunks.find { |c| c.number == @chunk.number + 1 } %>
+      <% tools = safe_join([
+           (link_to('‹ previous chunk', here.call(chunk: prev_chunk.number), class: 'tool', data: { key: 'prev-chunk' }) if prev_chunk),
+           (link_to('next chunk ›', here.call(chunk: next_chunk.number), class: 'tool', data: { key: 'next-chunk' }) if next_chunk),
+           tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: mermaid, action: 'copy#copy' })
+         ].compact, ' ') %>
+      <%= render 'woods_map/components/diagram', title: @chunk.label, facts: ["#{tables.size} #{'table'.pluralize(tables.size)}", @columns == 'keys' ? 'keys only' : 'all columns', "#{inner.size} #{'relation'.pluralize(inner.size)}"], tools: tools, mermaid: mermaid, label: "Entity relationship diagram of chunk #{@chunk.number}, #{@chunk.label}: #{tables.size} tables on #{@chunk.database}", refusal: (tables.size > WoodsMap::SchemaView::TABLE_BUDGET ? "#{tables.size} tables is over the ER budget of #{WoodsMap::SchemaView::TABLE_BUDGET}; the tables below list every one." : nil), legend: [['──', 'association with a foreign key'], ['┄┄', 'association with no foreign key'], ['|', 'one'], ['○', 'zero or more'], ["crow's foot", 'many']], provenance: ['foreign_keys + associations', "gen #{@repository.generation_number}"] %>
+    </section>
+    <section class="sec" aria-labelledby="erd-tables">
+      <header><h2 class="t2" id="erd-tables">Tables in this chunk <%= count_tag(tables.size) %></h2></header>
+      <%= render 'woods_map/components/table', label: 'Tables in this chunk', min_width: '860px', columns: [{ label: 'table', width: '200px', cell_class: 'nw id' }, { label: 'model', width: '180px' }, { label: 'columns', width: '80px' }, { label: 'foreign keys' }, { label: 'indexes', width: '120px' }, { label: 'finding', width: '220px' }],
+            rows: tables.map { |t| unique = t.indexes.count { |i| i['unique'] }; findings = @erd.findings.for_table(t); { cells: [unit_link(t.identifier, 'database_table', label: t.name), t.model ? unit_link(t.model, 'model') : tag.span('none, unmodelled', class: 'dim'), t.columns.size, t.foreign_keys.any? ? safe_join(t.foreign_keys.map { |fk| "#{fk['column']} → #{fk['to_table']}" }, tag.br) : empty_value(applicable: false), "#{t.indexes.size}#{", #{unique} unique" if unique.positive?}", findings.any? ? safe_join(findings.map { |f| safe_join([chip(:note), ' ', f]) }, tag.br) : empty_value(applicable: false)] } } %>
+    </section>
+    <% if crossing.any? %>
+      <section class="sec" aria-labelledby="erd-crossing">
+        <header><h2 class="t2" id="erd-crossing">Relations to other chunks <%= count_tag(crossing.size) %><%= info_tip('Listed, not drawn: drawing the other end would put tables from another chunk in this one and break the budget.') %></h2></header>
+        <%= render 'woods_map/components/table', label: 'Relations to other chunks', min_width: '700px', columns: [{ label: 'from', width: '260px', cell_class: 'nw id' }, { label: 'to', width: '200px' }, { label: 'foreign key', width: '120px' }, { label: 'other chunk' }],
+              rows: crossing.map { |r, other| { cells: ["#{r.from}.#{r.column}", r.to, r.enforced ? 'enforced' : tag.span('none', class: 'dim'), other ? link_to("#{other.number} · #{other.label}", here.call(chunk: other.number)) : tag.span('not in the index', class: 'dim')] } } %>
+      </section>
+    <% end %>
+    <section class="sec" aria-labelledby="erd-findings">
+      <header><h2 class="t2" id="erd-findings">Schema findings <%= count_tag("whole database, #{@erd.findings.size}") %><%= info_tip('Set differences of published facts: the tables\' foreign keys, the models\' associations and their databases. Nothing here ran against the database.') %></h2></header>
+      <% if @erd.findings.any? %>
+        <%= render 'woods_map/components/table', label: 'Schema findings', min_width: '860px', columns: [{ label: 'severity', width: '110px' }, { label: 'finding', width: '300px', cell_class: 'id' }, { label: 'where' }, { label: 'evidence', width: '220px' }],
+              rows: @erd.findings.map { |f| { cells: [chip(f.severity), f.rule, safe_join(f.where, tag.br), layer_chip(f.evidence)] } } %>
+      <% else %>
+        <p class="cap">No findings: every association has a foreign key, every foreign key an association, and every table a model.</p>
+      <% end %>
+    </section>
+    <%= render 'woods_map/shared/status', items: ['ERD', 'one chunk at a time', 'relations to other chunks listed', "gen #{@repository.generation_number}"], keys: [[%w[[ ]], 'chunk'], [%w[y], 'copy'], [%w[/], 'search']] %>
+  </div>
+</div>
+<% end %>
