@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add contextual keyboard help (`?` and a primary-bar button), focus containment and return, typing/modal guards and Chromium keyboard regressions (NFR-3, #34). Remove the unimplemented source-line j/k hint.
+
 - Keep source gutters visible during horizontal scrolling; dismiss the search palette when focus leaves or Escape is pressed, reopen it on typing, ArrowDown or input click, and expose only actual choices as listbox options.
 
 - Link only published, typed-registry-verified constant spans; legacy source without span metadata stays highlighted but unlinked. Correct source-map run lengths so annotated source keeps the original file gutters.
