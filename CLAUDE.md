@@ -40,9 +40,11 @@ mount the engine in a variant, run `woods:extract`, open `/woods`.
 lib/woods_map.rb                 # module, Configuration (boot_warning)
 lib/woods_map/engine.rb          # Rails::Engine, isolate_namespace WoodsMap, after_initialize warning
 lib/woods_map/repository.rb      # one pinned generation per request: units, graph, analysis, search (string keys), freshness
+lib/woods_map/unit_facts.rb       # type-specific tiles from published unit metadata
 lib/woods_map/{unit_page,code_view,composite_source,highlighter,marginalia,references,outline}.rb  # the unit page and Code tab
 lib/woods_map/{schema_view,lifecycle,neighbourhood,history_view}.rb  # the Schema, Lifecycle, Graph and History tabs
 lib/woods_map/passage.rb         # the Passage tab: declared filters, templates by the view_render edge, the ladder's model and event
+lib/woods_map/{neighbourhood_query,neighbourhood_response,graph_elements}.rb  # bounded JSON projection of existing traversal
 lib/woods_map/{blast_radius,impact_review}.rb  # the impact page's pre-change mode: reverse-edge propagation with paths; rules, tests, gaps, unknowns
 lib/woods_map/{search_results,palette,file_tree}.rb  # search modes, the palette's groups, the per-generation file tree
 lib/woods_map/assets.rb          # engine-served files: roots, content digests, content types
@@ -52,7 +54,7 @@ lib/woods_map/glyphs.rb          # the glyph vocabulary (D-20)
 app/controllers/woods_map/       # application (gate order, 403 panel), status, sessions, assets, guidelines, units, search, impact
 app/helpers/woods_map/           # asset URLs, date shorthand (D-15), short SHA; components (glyphs, chips, ⓘ, people)
 app/assets/stylesheets/woods_map/ # tokens.css (verbatim from docs/design/foundations), fonts.css, map.css (engine-only rules)
-app/javascript/woods_map/        # Stimulus controllers: cliff, tooltip, rows, tree, sheet, copy, palette, peek, trail, keys, diagram (Pele, D-21)
+app/javascript/woods_map/        # Stimulus controllers: cliff, tooltip, rows, tree, sheet, copy, palette, peek, trail, keys, help, diagram (Pele, D-21)
 app/views/woods_map/shared/      # the frame: bar, crumbs, ident, tabs, status, sheet
 app/views/woods_map/components/  # table, steps, detail, rail, tree, facts, legend, diagram, banner, empty state
 app/views/woods_map/guidelines/  # the C1 to C5 boards rendered from the partials above

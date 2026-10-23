@@ -36,7 +36,7 @@ opens the file tree.
 | Controller: Routes tab | Routes, helpers, action sources | FR-3 | — | **none** |
 | Controller: Passage tab | Stages, filter matrix, callback ladder, mismatch flags, export | B-16 to B-20 | [B8-Passage](boards/B8-Passage.html) | final; the engine shows declared filter scopes (W-8 pending) and compares lexical template ivar mentions with W-7 assignments as advisory notes; missing action/template facts and truncated partial chains remain incomplete |
 | Mailer: Passage and Templates | Mailer action passage, delivery, templates | B-17 | — | **none** (same component as the controller passage) |
-| Unit pages: job, mailer, view, concern, serializer, table | Type-specific facts tiles | B-4 | B6/B8 (model and controller only) | partial |
+| Unit pages: job, mailer, view, concern, serializer, table | Type-specific facts tiles | B-4 | [Published facts note](notes/published-type-facts.md) | bounded published-metadata tiles |
 | `/woods/files/*path` | Indexed file ownership: primary and contributor paths, typed owners and unresolved membership | B-5 | [M1 navigation note](notes/m1-indexed-navigation.md) | shared components; mounted acceptance separate |
 | `/woods/landscape` Context L1 | People and external systems | B-21 | [B8-Landscape](boards/B8-Landscape.html) (ladder only) | partial |
 | Landscape Containers L2 | C4 containers, relationships, structural risk | B-21, W-9 | [B8-Landscape](boards/B8-Landscape.html) | final |
@@ -59,7 +59,7 @@ opens the file tree.
 | Trail board | Pinned units, lanes, flags, board state, export | C-1 to C-5 | — | **none** (release 0.2, M6) |
 | Guide panel | Context chips, actions, tool cards, streamed answer, budget | FR-8 | [B8-Guide](boards/B8-Guide.html) | final; chat history list not drawn |
 | settings | Editor URL scheme, lens, wrap and font size, per browser | B-15, D-6 | Code toolbar only | partial |
-| keyboard help | `?` overlay listing every page's keys | NFR-3 | status bars only | **none** |
+| keyboard help | `?` overlay listing every page's keys | NFR-3 | [Keyboard help note](notes/keyboard-help.md) | contextual modal and keyboard coverage |
 | four widths | 1280 / 960 / 640 / 390 | D-19 | C1 to C5, [B8-Widths](boards/B8-Widths.html) | final |
 | light and colour-vision themes | Same markup, `data-theme`, `data-cvd` | D-11 | C1, C2, [B9-Pele](boards/B9-Pele.html) | final for components; the engine draws diagrams with Pele from the `--pele-*` tokens in every theme (D-21, woods-map#5); the B6 boards keep their static dark renders |
 
@@ -73,7 +73,7 @@ them. Each is a comment on that issue, so the issue owns it.
 - **M4b · Impact (woods-map#4)**: Overview tab at v8; Graph tab; pre-change mode; `?since=` highlighting on Code, Graph, Lifecycle, Passage, ERD and timeline views.
 - **M3 · Diagrams (woods-map#5)**: Landscape Context L1, Components L3, Domains; C4-dynamic in the Lifecycle view control; the renderer decision (woods-map#25).
 - **M4 · History (woods-map#6)**: `/woods/history` cross-unit timeline; generation picker; unit diff entry from the History tab.
-- **M5 · Graph (woods-map#7)**: full-screen graph page with list equivalent and flow overlay.
+- **M5 · Graph (woods-map#7)**: [neighbourhood JSON contract](notes/neighbourhood-json.md); full-screen graph, list equivalent and flow overlay remain separate.
 - **M6 · Trail (woods-map#8)**: the board, end to end.
 - **M7 · Guide (woods-map#9)**: chat history, pin and "open as investigation" handoff.
 
