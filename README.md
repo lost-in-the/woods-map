@@ -51,6 +51,9 @@ end
 - `/woods/units/:type/*identifier`: a unit's Code tab, the file as written or
   the effective class (schema header and inlined concerns folded in), with
   marginalia, outline, peek (`p`) and references linked with their confidence.
+- Jobs, mailers, templates, concerns, serializers and tables show
+  [type-specific facts](docs/design/notes/published-type-facts.md) from
+  published metadata, with missing values explicitly marked.
 - `…/schema`, `…/lifecycle?event=`, `…/graph`, `…/history`: the tabs a type
   has (models: all four; tables: schema and graph; controllers, mailers and
   jobs: lifecycle, graph and history; everything else: graph and history).

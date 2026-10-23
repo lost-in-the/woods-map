@@ -88,6 +88,7 @@ Run this before a milestone issue is opened and again before it closes.
 | Bounded M1 units index and indexed file ownership (FR-3, B-5); other M1 follow-ups remain separate | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [design note](notes/m1-indexed-navigation.md) |
 | M1 to M8 | woods-map#2 to #10 as listed in the milestone table |
 | M1 follow-up: the undesigned reading pieces (units index, file view, Routes tab, type tiles, hover card, disambiguation, settings, keyboard help, share menu) | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34) |
+| Type-specific facts tiles (B-4); other M1 follow-ups remain separate | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/published-type-facts.md) |
 | Design system epic (tokens, fonts, components, responsive tiers) | [woods-map#23](https://github.com/lost-in-the/woods-map/issues/23) |
 | Inline links need a cue besides colour (needs-decision, amends D-11) | [woods-map#26](https://github.com/lost-in-the/woods-map/issues/26) |
 | Token contrast corrections for AA (needs-decision, amends D-11) | [woods-map#27](https://github.com/lost-in-the/woods-map/issues/27) |
