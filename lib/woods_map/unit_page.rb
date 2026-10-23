@@ -108,7 +108,7 @@ module WoodsMap
 
     # @return [Array<Hash>] the facts tiles (eyebrow, rows)
     def tiles
-      [table_tile, used_by_tile, depends_on_tile, history_tile].compact
+      [UnitFacts.new(@unit).tile || table_tile, used_by_tile, depends_on_tile, history_tile].compact
     end
 
     # @return [Hash, nil] the database table unit behind a model
