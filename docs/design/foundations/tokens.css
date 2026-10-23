@@ -510,7 +510,8 @@
 /* The code view scrolls as one region (axe scrollable-region-focusable, every width): long lines widen the
    source column, the heat strip, line numbers and marginalia stay put, the header and folds keep to the viewport. */
 .wm .cvwrap{overflow-x:auto;scrollbar-width:thin;container-type:inline-size}
-.wm .cvwrap .cv{grid-template-columns:8px 44px minmax(max-content,1fr) 440px}
+/* Enclose the overflowing tracks so sticky cells remain bounded by the whole code grid. */
+.wm .cvwrap .cv{width:max-content;min-width:100%;grid-template-columns:8px 44px minmax(max-content,1fr) 440px}
 .wm .cvwrap .cv.nomargin{grid-template-columns:8px 44px minmax(max-content,1fr)}
 .wm .cv .src{overflow:visible}
 .wm .cv .heat,.wm .cv .ln,.wm .cv .mg{position:sticky;z-index:1}

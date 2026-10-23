@@ -11,6 +11,6 @@
   <%= render 'woods_map/components/rail', heading: 'Outline, as Rails runs it', groups: groups %>
   <div class="main">
     <%= render 'woods_map/units/code_view', code: @code, page: @page %>
-    <%= render 'woods_map/shared/status', items: ['unmarked: runtime-verified', '○ static reference', "heat strip: #{@page.unit.dig('metadata', 'git', 'change_frequency') || 'unknown'} churn, per unit until W-3", "gen #{@repository.generation_number}"], keys: [[%w[j k], 'lines'], [%w[p], 'peek'], [%w[/], 'search']] %>
+    <%= render 'woods_map/shared/status', items: ['links: published typed-registry verified constants', "heat strip: #{@page.unit.dig('metadata', 'git', 'change_frequency') || 'unknown'} churn, per unit until W-3", "gen #{@repository.generation_number}"], keys: [[%w[j k], 'lines'], [%w[p], 'peek'], [%w[/], 'search']] %>
   </div>
 </div>

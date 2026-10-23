@@ -1,8 +1,39 @@
-<% content_for :title, 'Impact · Woods Map' %>
+<% content_for :title, 'Impact range · Woods Map' %>
 <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
-<%= render 'woods_map/impact/frame', title: 'Impact', subtitle: "#{@range.first} → #{@range.last}", crumb: 'range' %>
-<div class="body" data-controller="trail">
+<%= render 'woods_map/impact/frame', title: 'Impact range', subtitle: 'retained generation evidence', crumb: 'range' %>
+<div class="body">
   <div class="main" style="margin-left:var(--s5)">
-    <%= render 'woods_map/components/empty_state', title: "No impact report for #{@range.first} → #{@range.last}", text: safe_join(['A range compares two generations: Woods publishes that report with ', tag.code('woods:impact'), ' (W-12, ', link_to('woods#762', 'https://github.com/lost-in-the/woods/issues/762'), '), which also needs the facet diff (W-10) and the generation pin (W-11). This generation is gen ', tag.b(@repository.generation_number.to_s), '. Without a range the map reads the blast radius of a focus set from the graph: ', link_to('open the pre-change mode', woods_map.impact_path), '.']) %>
+    <section class="sec" aria-labelledby="range-selectors">
+      <h2 class="t2" id="range-selectors">Compare retained generations</h2>
+      <p>Use gen:N, now, or an unambiguous retained commit SHA. Woods resolves both endpoints once. The bar above describes the current index, not historical evidence.</p>
+      <form method="get" action="<%= woods_map.impact_path %>" class="impact-range-form">
+        <input type="hidden" name="mode" value="range">
+        <label class="lbl" for="range-from">From</label>
+        <input class="filter" id="range-from" name="from" value="<%= @range.first %>" placeholder="gen:1" required>
+        <label class="lbl" for="range-to">To</label>
+        <input class="filter" id="range-to" name="to" value="<%= @range.last %>" required>
+        <button class="btn primary" type="submit">Compare range</button>
+      </form>
+      <p><%= link_to 'Open pre-change blast radius', woods_map.impact_path %></p>
+    </section>
+    <% if @report && @report.state != :available %>
+      <%= render 'woods_map/components/empty_state', title: 'Range evidence unavailable', text: @report.message %>
+    <% elsif @report %>
+      <% report = @report.data %>
+      <section class="sec" aria-labelledby="range-provenance">
+        <h2 class="t2" id="range-provenance">Endpoint provenance</h2>
+        <p>Manifest checksums cover manifests only; they do not attest payload contents. Historical identities have no current-source links.</p>
+        <%= impact_evidence(report['range']) %>
+      </section>
+      <% { 'coverage' => 'Coverage', 'unknowns' => 'Unknowns', 'parameters' => 'Applied parameters', 'changed' => 'Changed typed units', 'affected' => 'Affected typed units', 'flows' => 'Retained flow evidence' }.each do |key, title| %>
+        <section class="sec" aria-labelledby="range-<%= key %>">
+          <h2 class="t2" id="range-<%= key %>"><%= title %></h2>
+          <% if key == 'changed' %><p>Facets compare retained payloads. Source sizes are whole-source bytes and lines, not added or deleted line counts. Removed units belong to From; added and modified units belong to To.</p><% end %>
+          <% if key == 'affected' %><p>Each record and witness path retains its endpoint and generation. An unavailable weight is not zero.</p><% end %>
+          <% if key == 'flows' %><p>These are retained expanded memberships and changed steps, not newly computed routes.</p><% end %>
+          <% if %w[changed affected flows].include?(key) && report[key].empty? %><p>No records returned. Interpret this alongside coverage and unknowns above; unavailable or not_computed evidence is not a conclusive zero.</p><% elsif key == 'parameters' %><%= impact_parameters(report[key]) %><% else %><%= impact_evidence(report[key]) %><% end %>
+        </section>
+      <% end %>
+    <% end %>
   </div>
 </div>

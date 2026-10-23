@@ -24,7 +24,7 @@ RSpec.describe WoodsMap::CompositeSource do
           has_many :comments
         end
       SRC
-      'metadata' => { 'source_line_map' => [[9, 1, 1], [16, 2, 4]] }
+      'metadata' => { 'source_line_map' => [[9, 1, 1], [16, 2, 3]] }
     }
   end
   let(:source) { described_class.new(unit) }
@@ -54,5 +54,13 @@ RSpec.describe WoodsMap::CompositeSource do
   it 'treats a unit without a line map as all file' do
     plain = described_class.new('source_code' => "a\nb\n", 'metadata' => {})
     expect(plain.file_lines.map(&:label)).to eq(%w[1 2])
+  end
+
+  it 'interprets each published run as annotated start, original start and length' do
+    mapped = described_class.new('source_code' => "# header\na\nb\n# hidden\nc\n",
+                                 'metadata' => { 'source_line_map' => [[2, 20, 2], [5, 22, 1]] })
+    expect(mapped.file_lines.map { |line| [line.number, line.label] }).to eq([[2, '20'], [3, '21'], [5, '22']])
+    expect(mapped.composite_line_for(21)).to eq(3)
+    expect(mapped.composite_line_for(23)).to be_nil
   end
 end

@@ -58,19 +58,20 @@ module WoodsMap
 
     def files_group
       needle = @query.downcase
-      files = @repository.file_map.select { |path, _| path.downcase.include?(needle) }
-      items = files.map do |path, identifiers|
-        owner = @repository.file_owner(path)
-        { 'label' => path, 'identifier' => owner&.dig('identifier') || identifiers.first,
-          'type' => owner&.dig('type'),
-          'detail' => "#{identifiers.size} #{'unit'.pluralize(identifiers.size)}" }
+      files = @repository.file_map.keys.select { |path| path.downcase.include?(needle) }.sort
+      items = files.map do |path|
+        count = @repository.file_owners(path).size
+        unresolved = @repository.unresolved_file_identifiers(path).size
+        detail = "file, #{count} #{'unit'.pluralize(count)}"
+        detail += ", #{unresolved} unresolved" if unresolved.positive?
+        { 'label' => path, 'file_path' => path, 'type' => 'file', 'detail' => detail }
       end
       group('files', items)
     end
 
     def group(name, items)
       { 'name' => name, 'total' => items.size, 'items' => items.first(PER_GROUP).map do |i|
-        i.merge('identifier' => i['identifier'] || i['label'])
+        i['type'] == 'file' ? i : i.merge('identifier' => i['identifier'] || i['label'])
       end }
     end
   end
