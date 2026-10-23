@@ -2,9 +2,7 @@
 
 require 'active_support/core_ext/enumerable'
 require 'active_support/core_ext/module/delegation'
-require 'json'
 require 'woods/published_index'
-require 'woods/atomic_file'
 require 'woods/mcp/index_reader'
 require 'woods/source_inputs/status'
 
@@ -125,16 +123,6 @@ module WoodsMap
       @graph_analysis = {}
     end
 
-    # The per-file constant references the extractor recorded (an internal,
-    # versioned artifact; absent on older indexes).
-    #
-    # @param file_path [String]
-    # @return [Hash, nil] `analysis` with declarations and references
-    def source_references(file_path)
-      references = payload_json('source_references.json')
-      references&.dig('files', file_path, 'analysis')
-    end
-
     # Drift of the working tree against this generation, within a quarter
     # second budget; compares file identities, never runs git.
     #
@@ -236,18 +224,6 @@ module WoodsMap
         end
         nodes
       end
-    end
-
-    # A JSON artifact of the pinned payload (the directory PublishedIndex
-    # pinned, never resolved here); nil when the artifact is absent.
-    def payload_json(filename)
-      @payload_json ||= {}
-      @payload_json.fetch(filename) do
-        path = @index.payload_dir.join(filename)
-        @payload_json[filename] = path.file? ? JSON.parse(Woods::AtomicFile.read(path)) : nil
-      end
-    rescue StandardError
-      @payload_json[filename] = nil
     end
 
     def manifest_facts

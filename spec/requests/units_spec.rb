@@ -17,15 +17,15 @@ RSpec.describe 'Unit pages', type: :request do
       expect(response.body).to include('chain 1 of 2 on create, writes email')
     end
 
-    it 'links constant references to their units with their confidence' do
-      verified = '<a href="/woods/units/model/Micropost" class="const" title="runtime-verified">Micropost</a>'
-      static = '<a href="/woods/units/mailer/UserMailer" class="const s" title="static reference">UserMailer</a>'
-      expect(response.body).to include(verified).and include(static)
+    it 'keeps legacy source highlighted without guessing links from the private cache' do
+      source = html_response_document.css('.cv .src')
+      expect(source.css('a')).to be_empty
+      expect(source.css('.const').map(&:text)).to include('Micropost', 'UserMailer')
     end
 
     it 'shows the outline rail in chain order and the status bar keys' do
       expect(response.body).to include('lifecycle, create').and include('before_save downcase_email')
-      expect(response.body).to include('unmarked: runtime-verified')
+      expect(response.body).to include('links: published typed-registry verified constants')
     end
   end
 
