@@ -23,6 +23,7 @@ widths are the tiers of D-19.
 | Lifecycle tab (`Post` create, the sequence drawn by Pele) | [B6-Lifecycle](../boards/B6-Lifecycle.html) | [1440](unit-lifecycle-1440.png), [the panel at 390](unit-lifecycle-390.png), [light](unit-lifecycle-light-1440.png) |
 | Graph tab (`Post`, the neighbourhood flowchart drawn by Pele above the list equivalent; the interactive canvas is M5) | [B6-Graph](../boards/B6-Graph.html), [B9-Pele](../boards/B9-Pele.html) | [1440](unit-graph-1440.png), [light](unit-graph-light-1440.png), [colour-vision](unit-graph-cvd-1440.png), [*Mermaid text* pressed](unit-graph-text-1440.png) |
 | History tab | [B6-History](../boards/B6-History.html) | [1440](unit-history-1440.png) |
+| ERD (`/woods/erd`, chunk 1 by namespace; then by database with all columns; a chunk of the generated 300-model index) | [B6-ERD](../boards/B6-ERD.html) | [1440](erd-1440.png), [light](erd-light-1440.png), [by database, all columns, colour-vision](erd-database-all-cvd-1440.png), [390](erd-390.png), [300 models, chunk 3 of 9](erd-300-models-1440.png) |
 | Controller unit page | [B8-Code](../boards/B8-Code.html), outline of actions and filters | [1440](controller-1440.png) |
 | Table, template and route unit pages (type-specific tiles are an M1 gap in coverage.md) | B6/B8 frame | [table](table-1440.png), [template](template-1440.png), [route](route-1440.png) |
 | No such unit (404) | [B8-States](../boards/B8-States.html), *empty results* panel | [1440](missing-1440.png) |
