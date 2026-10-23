@@ -61,3 +61,5 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .keyboard-help section{margin-top:var(--s5)}
 .wm .keyboard-help dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--s2) var(--s4)}
 .wm .keyboard-help dd{margin:0;overflow-wrap:anywhere}
+/* The current rail item sits on --select-tint, where --dim misses AA in the light theme (4.23:1). */
+.wm .rail li[aria-current=true] .own{color:var(--mut)}
