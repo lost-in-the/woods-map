@@ -17,7 +17,8 @@ module WoodsMap
     # Third-party pins are added as the milestones vendor them.
     PINS = {
       'woods_map' => 'woods_map/application.js',
-      '@hotwired/stimulus' => 'stimulus.js'
+      '@hotwired/stimulus' => 'stimulus.js',
+      'pele' => 'pele.js'
     }.freeze
 
     module_function

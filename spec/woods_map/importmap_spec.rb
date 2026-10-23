@@ -7,4 +7,9 @@ RSpec.describe WoodsMap::Importmap do
     expect(json['imports']['woods_map']).to eq("/woods/assets/#{digest}/woods_map/application.js")
     expect(json['imports']['@hotwired/stimulus']).to eq("/woods/assets/#{digest}/stimulus.js")
   end
+
+  it 'pins the vendored Pele build the diagram panels load on demand (D-21)' do
+    json = JSON.parse(described_class.to_json(url_for: ->(digest, path) { "/woods/assets/#{digest}/#{path}" }))
+    expect(json['imports']['pele']).to eq("/woods/assets/#{WoodsMap::Assets.digest}/pele.js")
+  end
 end

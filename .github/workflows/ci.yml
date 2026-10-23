@@ -23,7 +23,11 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
+      # The headless render spec draws every generated diagram with the
+      # vendored Pele in the runner's Node; a missing Node fails it.
       - run: bundle exec rake spec
+        env:
+          WOODS_MAP_RENDER_SPEC: '1'
   lint:
     name: RuboCop
     runs-on: ubuntu-latest

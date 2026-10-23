@@ -14,6 +14,7 @@ import PeekController from "./controllers/peek_controller.js"
 import TrailController from "./controllers/trail_controller.js"
 import KeysController from "./controllers/keys_controller.js"
 import HelpController from "./controllers/help_controller.js"
+import DiagramController from "./controllers/diagram_controller.js"
 
 const application = Application.start()
 application.register("cliff", CliffController)
@@ -27,5 +28,6 @@ application.register("peek", PeekController)
 application.register("trail", TrailController)
 application.register("keys", KeysController)
 application.register("help", HelpController)
+application.register("diagram", DiagramController)
 
 document.documentElement.dataset.woodsMap = "ready"
