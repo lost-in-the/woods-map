@@ -2,7 +2,7 @@
 document.body.className = "wm page"
 document.body.dataset.theme = "dark"
 document.body.innerHTML = `
-<input id="search" type="search" aria-label="Search"><div id="palette-wrap" hidden><div id="palette-panel"></div></div>
+<form id="palette-form"><input id="search" type="search" aria-label="Search" aria-controls="wm-palette"><div id="palette-wrap" hidden><div id="palette-panel"></div></div></form>
 <button id="opener">Open files</button>
 <div class="sheet-overlay" hidden><div class="sheet" role="dialog" aria-modal="true" aria-label="Files">
 <button id="close">Close</button><div id="sheet-body"><nav class="tree">
@@ -19,7 +19,7 @@ const filter = nav.querySelector("input")
 const close = document.getElementById("close")
 const opener = document.getElementById("opener")
 const palette = new PaletteController()
-Object.assign(palette, { inputTarget: document.getElementById("search"),
+Object.assign(palette, { element: document.getElementById("palette-form"), inputTarget: document.getElementById("search"),
   wrapTarget: document.getElementById("palette-wrap"), panelTarget: document.getElementById("palette-panel") })
 palette.connect()
 const tree = new TreeController()

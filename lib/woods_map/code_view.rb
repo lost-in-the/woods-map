@@ -47,11 +47,11 @@ module WoodsMap
     private
 
     def written_rows
-      highlighted = highlight(@composite.file_lines)
-      links = @references.by_file_line
+      links = @references.by_source_line(@composite.file_lines)
+      highlighted = highlight(@composite.file_lines, links)
       @composite.file_lines.zip(highlighted).map do |line, html|
         file_line = line.label.to_i
-        Row.new(kind: :line, number: file_line, label: line.label, html: link(html, links[file_line]),
+        Row.new(kind: :line, number: file_line, label: line.label, html: html,
                 note: @marginalia.for_line(line.text))
       end
     end
@@ -81,23 +81,11 @@ module WoodsMap
       ERB::Util.html_escape("# schema: #{table}, #{shown.join(', ')}#{more}")
     end
 
-    def highlight(lines)
-      Highlighter.lines(lines.map(&:text).join("\n"), language: Highlighter.language_for(@unit['file_path']))
-    end
-
-    # Wrap the first plain occurrence of each referenced constant in a link.
-    def link(html, links)
-      return html if links.blank?
-
-      links.uniq(&:identifier).reduce(html) do |out, ref|
-        escaped = Regexp.escape(ERB::Util.html_escape(ref.name))
-        css = ref.confidence == :static ? 'const s' : 'const'
-        title = ref.confidence == :static ? 'static reference' : 'runtime-verified'
-        href = @unit_path.call(ref.identifier, ref.type)
-        out.sub(/(?<=>|^)(#{escaped})(?=<|$)/) do
-          "<a href=\"#{href}\" class=\"#{css}\" title=\"#{title}\">#{Regexp.last_match(1)}</a>"
-        end
-      end
+    def highlight(lines, links = {})
+      references = lines.each_with_index.to_h { |line, index| [index + 1, links.fetch(line.number, [])] }
+      source = "#{lines.map(&:text).join("\n")}\n"
+      Highlighter.lines(source, language: Highlighter.language_for(@unit['file_path']),
+                                references: references, unit_path: @unit_path)
     end
   end
 end
