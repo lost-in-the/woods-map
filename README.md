@@ -45,6 +45,10 @@ end
 
 ## Pages
 
+Press `?` or use the primary bar’s help button for contextual shortcuts.
+The dialog contains focus and restores the opener when dismissed. See the
+[keyboard help contract](docs/design/notes/keyboard-help.md).
+
 - `/woods`: the status page (generation, HEAD, freshness, extractors, host).
 - `/woods/search?q=…&in=name|code|path`: name, full-text and path search over
   the pinned generation, with type filters; `/` on any page opens the palette.

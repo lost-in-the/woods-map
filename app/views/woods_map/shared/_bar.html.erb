@@ -21,4 +21,5 @@
       <span><span class="dim">○</span><span class="w"> no index</span></span>
     <% end %>
   </span>
+  <% if local_assigns.fetch(:label, 'Primary') == 'Primary' %><button class="tool" type="button" aria-label="Keyboard shortcuts" aria-controls="wm-keyboard-help" aria-haspopup="dialog" aria-keyshortcuts="?" data-action="help#open" data-needs-js>?</button><% end %>
 </header>
