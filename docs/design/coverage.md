@@ -73,7 +73,7 @@ them. Each is a comment on that issue, so the issue owns it.
 - **M4b · Impact (woods-map#4)**: Overview tab at v8; Graph tab; pre-change mode; `?since=` highlighting on Code, Graph, Lifecycle, Passage, ERD and timeline views.
 - **M3 · Diagrams (woods-map#5)**: Landscape Context L1, Components L3, Domains; C4-dynamic in the Lifecycle view control; the renderer decision (woods-map#25).
 - **M4 · History (woods-map#6)**: `/woods/history` cross-unit timeline; generation picker; unit diff entry from the History tab.
-- **M5 · Graph (woods-map#7)**: full-screen graph page with list equivalent and flow overlay.
+- **M5 · Graph (woods-map#7)**: [neighbourhood JSON contract](notes/neighbourhood-json.md); full-screen graph, list equivalent and flow overlay remain separate.
 - **M6 · Trail (woods-map#8)**: the board, end to end.
 - **M7 · Guide (woods-map#9)**: chat history, pin and "open as investigation" handoff.
 
