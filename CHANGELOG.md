@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+- Keep source gutters visible during horizontal scrolling; dismiss the search palette when focus leaves or Escape is pressed, reopen it on typing, ArrowDown or input click, and expose only actual choices as listbox options.
+
+- Link only published, typed-registry-verified constant spans; legacy source without span metadata stays highlighted but unlinked. Correct source-map run lengths so annotated source keeps the original file gutters.
+
 - Give explanation controls native button semantics, name Mermaid source regions, correct the Schema section label, and keep narrow page tabs reachable through contained keyboard-accessible scrolling. Use native scrollbars without fades that obscure text at scroll edges.
 
 - Keep the Graph tab focus, variant edges, two-hop traversal, deduplication, links and Mermaid node identities typed. Type filters follow the newly reached endpoint; reverse relationships retain their published destination type.
