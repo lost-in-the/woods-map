@@ -45,12 +45,19 @@ end
 
 ## Pages
 
+Press `?` or use the primary bar’s help button for contextual shortcuts.
+The dialog contains focus and restores the opener when dismissed. See the
+[keyboard help contract](docs/design/notes/keyboard-help.md).
+
 - `/woods`: the status page (generation, HEAD, freshness, extractors, host).
 - `/woods/search?q=…&in=name|code|path`: name, full-text and path search over
   the pinned generation, with type filters; `/` on any page opens the palette.
 - `/woods/units/:type/*identifier`: a unit's Code tab, the file as written or
   the effective class (schema header and inlined concerns folded in), with
   marginalia, outline, peek (`p`) and references linked with their confidence.
+- Jobs, mailers, templates, concerns, serializers and tables show
+  [type-specific facts](docs/design/notes/published-type-facts.md) from
+  published metadata, with missing values explicitly marked.
 - `…/schema`, `…/lifecycle?event=`, `…/graph`, `…/history`: the tabs a type
   has (models: all four; tables: schema and graph; controllers, mailers and
   jobs: lifecycle, graph and history; everything else: graph and history).
@@ -58,6 +65,10 @@ end
   → filters → action → templates → response, with the filter matrix and the
   callback ladder of the model it saves. Declared facts only: what the index
   does not publish yet (W-7, W-8) is named, never guessed.
+
+- `/woods/graph/neighbourhood?centre=User&type=model`: bounded typed graph JSON
+  with generation provenance and truncation. See the [query and response
+  contract](docs/design/notes/neighbourhood-json.md).
 
 - `/woods/impact?focus=User,PostsController&depth=2`: the blast radius of a
   planned change, with the risks, tests and unknowns one generation proves;
