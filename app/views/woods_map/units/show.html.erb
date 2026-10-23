@@ -4,13 +4,14 @@
      link_to('as written', woods_map.unit_path(type: @page.type, identifier: @page.identifier, lens: 'written'), 'aria-current': (@code.lens == 'written' ? 'true' : nil)),
      link_to('effective class', woods_map.unit_path(type: @page.type, identifier: @page.identifier, lens: 'effective'), 'aria-current': (@code.lens == 'effective' ? 'true' : nil))
    ]), class: 'seg', role: 'group', 'aria-label': 'lens')]) %>
-<%= render 'woods_map/units/frame', page: @page, tab: 'code', controls: lens_controls, definition: @code.definition_line %>
+<%= render 'woods_map/units/frame', page: @page, tab: 'code', controls: lens_controls, definition: @code.definition_line, editor: true %>
 <div class="body" data-controller="trail peek" data-trail-title-value="<%= @page.identifier %>">
   <% groups = @outline.groups.map { |g| { label: g.label, count: g.count, items: g.items.map { |i| { key: i.key, text: i.text, own: i.own } } } } %>
   <% groups = [{ label: 'nothing to outline', count: '', items: [{ key: '·', text: 'the index records no members for this unit' }] }] if groups.empty? %>
   <%= render 'woods_map/components/rail', heading: 'Outline, as Rails runs it', groups: groups %>
   <div class="main">
     <%= render 'woods_map/units/code_view', code: @code, page: @page %>
+    <%= render 'woods_map/units/settings', page: @page, lens: @code.lens %>
     <%= render 'woods_map/shared/status', items: ['links: published typed-registry verified constants', "heat strip: #{@page.unit.dig('metadata', 'git', 'change_frequency') || 'unknown'} churn, per unit until W-3", "gen #{@repository.generation_number}"], keys: [[%w[?], 'keyboard help'], [%w[p], 'peek'], [%w[/], 'search']] %>
   </div>
 </div>

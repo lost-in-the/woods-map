@@ -89,6 +89,7 @@ Run this before a milestone issue is opened and again before it closes.
 | Keyboard help (NFR-3), with focus and shortcut browser coverage | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/keyboard-help.md) |
 | M1 to M8 | woods-map#2 to #10 as listed in the milestone table |
 | M1 follow-up: the undesigned reading pieces (units index, file view, Routes tab, type tiles, hover card, disambiguation, settings, keyboard help, share menu) | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34) |
+| Reading settings (B-15, D-6): lens, wrap, font size and editor link per browser | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/settings.md) |
 | Type-specific facts tiles (B-4); other M1 follow-ups remain separate | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/published-type-facts.md) |
 | Design system epic (tokens, fonts, components, responsive tiers) | [woods-map#23](https://github.com/lost-in-the/woods-map/issues/23) |
 | Inline links need a cue besides colour (needs-decision, amends D-11) | [woods-map#26](https://github.com/lost-in-the/woods-map/issues/26) |

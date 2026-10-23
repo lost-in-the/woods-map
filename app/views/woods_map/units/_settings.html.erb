@@ -1,0 +1,38 @@
+<%# Reading settings (B-15, D-6): per browser, kept in localStorage by the
+    settings controller; the lens follows its own ?lens= link (the cookie the
+    server already remembers). Locals: page (UnitPage), lens (String). %>
+<% lens_url = ->(value) { woods_map.unit_path(type: page.type, identifier: page.identifier, lens: value) } %>
+<dialog id="wm-settings" class="settings-dialog" aria-labelledby="wm-settings-title" aria-modal="true" data-settings-target="dialog" data-action="close->settings#restore click->settings#outside">
+  <form method="dialog" data-settings-target="form" data-action="change->settings#change input->settings#change">
+    <header><h2 class="t2" id="wm-settings-title">Reading settings</h2><button class="tool" type="submit" aria-label="Close reading settings">Close</button></header>
+    <p>Kept in this browser only; the map never sends them to the server or guesses them from the index.</p>
+    <fieldset>
+      <legend>Lens</legend>
+      <label><input type="radio" name="lens" value="written" data-url="<%= lens_url.call('written') %>"<%= ' checked'.html_safe if lens == 'written' %>> as written</label>
+      <label><input type="radio" name="lens" value="effective" data-url="<%= lens_url.call('effective') %>"<%= ' checked'.html_safe if lens == 'effective' %>> effective class</label>
+    </fieldset>
+    <fieldset>
+      <legend>Code</legend>
+      <label><input type="checkbox" name="wrap"> wrap long lines</label>
+      <div class="opts" role="radiogroup" aria-label="Font size">
+        <span class="lbl" aria-hidden="true">font size</span>
+        <% %w[small medium large].each do |size| %><label><input type="radio" name="size" value="<%= size %>"> <%= size %></label><% end %>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Open in editor</legend>
+      <label class="field">editor <select name="editor">
+        <option value="none">none</option>
+        <option value="vscode">VS Code</option>
+        <option value="cursor">Cursor</option>
+        <option value="idea">JetBrains (idea://)</option>
+        <option value="textmate">TextMate</option>
+        <option value="zed">Zed</option>
+        <option value="custom">custom link template</option>
+      </select></label>
+      <label class="field">checkout path <input type="text" name="root" spellcheck="false" autocomplete="off" placeholder="/Users/you/code/app"></label>
+      <label class="field" data-settings-target="custom" hidden>template <input type="text" name="template" spellcheck="false" autocomplete="off" placeholder="editor://open?file={path}&amp;line={line}"></label>
+      <p class="hint" role="status" data-settings-target="preview"></p>
+    </fieldset>
+  </form>
+</dialog>

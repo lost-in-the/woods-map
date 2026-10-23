@@ -61,3 +61,23 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .keyboard-help section{margin-top:var(--s5)}
 .wm .keyboard-help dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--s2) var(--s4)}
 .wm .keyboard-help dd{margin:0;overflow-wrap:anywhere}
+/* Reading settings (B-15): the dialog shares the keyboard help's frame. Wrap is opt-in and keeps the code view's one
+   scroll region (D-24): the source column fits the region instead of growing to the longest line. */
+.wm .btn[hidden]{display:none}
+.wm .settings-dialog{color:var(--text);background:var(--panel);border:1px solid var(--rule2);border-radius:var(--r-ctl);padding:var(--s5);width:360px;max-width:calc(100vw - var(--s6));max-height:calc(100vh - var(--s6));box-sizing:border-box;overflow:auto;font-family:var(--ff-ui);font-size:var(--fs-13)}
+.wm .settings-dialog::backdrop{background:var(--ground2);opacity:.8}
+.wm .settings-dialog header{display:flex;align-items:center;justify-content:space-between;gap:var(--s4)}
+.wm .settings-dialog p{color:var(--mut);font-size:var(--fs-12)}
+.wm .settings-dialog fieldset{border:0;border-top:1px solid var(--rule);margin:var(--s4) 0 0;padding:var(--s3) 0 0;display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4)}
+.wm .settings-dialog legend{font-size:var(--fs-11);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);padding:0 var(--s2) 0 0}
+.wm .settings-dialog .opts{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);align-items:center}
+.wm .settings-dialog .field{display:grid;grid-template-columns:110px minmax(0,1fr);align-items:center;gap:var(--s3);width:100%}
+.wm .settings-dialog .field[hidden]{display:none}
+.wm .settings-dialog input[type=text],.wm .settings-dialog select{font:inherit;font-family:var(--ff-data);font-size:var(--fs-12);color:var(--text);background:var(--ground2);border:1px solid var(--rule2);border-radius:var(--r-ctl);padding:var(--s1) var(--s2);min-width:0}
+.wm .settings-dialog .hint{width:100%;margin:0;font-family:var(--ff-data);overflow-wrap:anywhere}
+.wm[data-code-size=small] .cv{font-size:var(--fs-12)}
+.wm[data-code-size=large] .cv{font-size:var(--fs-15)}
+.wm[data-code-wrap=on] .cvwrap .cv{width:auto;grid-template-columns:8px 44px minmax(0,1fr) 440px}
+.wm[data-code-wrap=on] .cvwrap .cv.nomargin{grid-template-columns:8px 44px minmax(0,1fr)}
+.wm[data-code-wrap=on] .cv .src{white-space:pre-wrap;overflow-wrap:anywhere}
+@container wm (max-width:639px){ .wm[data-code-wrap=on] .cvwrap .cv{grid-template-columns:28px 40px minmax(0,1fr)} }
