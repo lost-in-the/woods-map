@@ -7,7 +7,7 @@ relationship graphs, schema and history, and get change-impact reports with
 sharable focus URLs. It reads the published index only: no live database, no
 runtime reflection, no git subprocess at request time.
 
-Status: scaffold, design system, M1 Reading, M2 Passage and the pre-change mode of M4b Impact landed. The design study, decision log, boards
+Status: scaffold, design system, M1 Reading, M2 Passage, the pre-change and range modes of M4b Impact, the Pele renderer slice of M3 Diagrams and the neighbourhood endpoint of M5 Graph landed. The design study, decision log, boards
 and milestone plan live in `docs/design/` and are the source of truth for
 scope; `docs/design/foundations/tokens.css` is the stylesheet the engine ships
 verbatim (a spec keeps the two copies identical).
