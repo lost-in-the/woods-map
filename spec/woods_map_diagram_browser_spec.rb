@@ -20,6 +20,15 @@ RSpec.describe WoodsMap do
       .and end_with('The Mermaid text is shown instead.')
   end
 
+  it 'draws the Lifecycle lanes and a state diagram with the vendored Pele' do
+    skip 'Set WOODS_MAP_BROWSER to run the Chromium DOM/CSS regression' unless ENV['WOODS_MAP_BROWSER']
+
+    expect(browser_result).to include(
+      'lanes' => include('drawn' => true, 'svgLabel' => 'lanes diagram', 'error' => nil),
+      'state' => include('drawn' => true, 'svgLabel' => 'state diagram', 'error' => nil)
+    )
+  end
+
   def browser_result
     @browser_result ||= Dir.mktmpdir('woods-map-diagram') do |directory|
       fixture = File.join(directory, 'diagram.html')

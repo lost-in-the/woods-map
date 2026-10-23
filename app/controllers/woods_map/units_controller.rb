@@ -62,6 +62,9 @@ module WoodsMap
         @lifecycle = lifecycle_for(@unit)
         @event = params[:event] if WoodsMap::Lifecycle::EVENTS.include?(params[:event])
         @event ||= @lifecycle.chains.keys.first || 'create'
+        @view = WoodsMap::Lifecycle::VIEWS.include?(params[:view]) ? params[:view] : WoodsMap::Lifecycle::VIEWS.first
+        @state_machines = []
+        @state_machines = WoodsMap::StateMachineView.for_model(@repository, @page.identifier) if @page.type == 'model'
         render :lifecycle
       end
     end
