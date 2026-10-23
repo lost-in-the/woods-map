@@ -50,4 +50,31 @@ RSpec.describe 'Action facts coverage pages', type: :request do
     expect(response.body).not_to include('@post</span>, no recorded assignment', '@user</span>, no recorded assignment')
     expect(response.body).not_to include('It renders nil', 'never assigned')
   end
+
+  def serve_unresolved
+    template = action_template
+    template['metadata']['unresolved_partials'] = [{ 'kind' => 'interpolation', 'name' => 'shared/#{variant}' }] # rubocop:disable Lint/InterpolationCheck
+    renders = [{ 'template' => 'widgets/show' },
+               { 'object' => 'params[:template]', 'line' => 2, 'method' => 'show',
+                 'file' => 'app/controllers/widgets_controller.rb' }]
+    serve_actions(action_owner(facts: { 'show' => action_entry(renders: renders) }), [template])
+  end
+
+  it 'names a dynamic render target and an unresolved partial in the passage coverage note (#47)' do
+    serve_unresolved
+    get '/woods/units/controller/WidgetsController/passage?action_name=show'
+    expect(response.body).to include('Flags 0, incomplete', 'Flag coverage is incomplete',
+                                     'render target <code>params[:template]</code> in WidgetsController#show',
+                                     'partial <code>shared/#{variant}</code> in widgets/show.html.erb, interpolation') # rubocop:disable Lint/InterpolationCheck
+    expect(response.body).not_to include('none in available facts')
+  end
+
+  it 'reports a dynamic render target and an unresolved partial as incomplete on Impact (#47)' do
+    serve_unresolved
+    get '/woods/impact', params: { focus: 'WidgetsController', lens: 'risks' }
+    expect(response.body).to include('0 findings; incomplete: 0 actions, 0 templates, 1 dynamic render target, ' \
+                                     '1 unresolved partial')
+    get '/woods/impact', params: { focus: 'WidgetsController', lens: 'unknown' }
+    expect(response.body).to include('dynamic render', 'render params[:template]', 'unresolved partial')
+  end
 end
