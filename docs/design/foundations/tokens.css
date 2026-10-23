@@ -223,16 +223,11 @@
 .wm .legend span{display:inline-flex;gap:var(--s2);align-items:center}
 .wm .legend .ar{display:inline-block;width:18px;text-align:center;color:var(--dim)}
 .wm .legend i.sw{display:inline-block;width:12px;height:12px;border-radius:var(--r-chip);border:1px solid var(--rule2)}
-/* mermaid overrides */
-.wm .dia svg{font-family:var(--ff-data)!important}
-.wm .dia svg .relationshipLabelBox,.wm .dia svg .relationshipLabelBox rect{fill:var(--bg)!important;opacity:1!important}
-.wm .dia svg .edgeLabel,.wm .dia svg .edgeLabel p,.wm .dia svg .labelBkg{background-color:var(--bg)!important}
-.wm .dia svg .edgeLabel rect{fill:var(--bg)!important;opacity:1!important}
-.wm .dia svg .changed > rect,.wm .dia svg .changed > polygon{stroke:var(--mod)!important;stroke-width:1.5px!important;fill:var(--mod-tint)!important}
-.wm .dia svg .risk > rect,.wm .dia svg .risk > polygon{stroke:var(--risk)!important;stroke-width:1.5px!important}
-.wm .dia svg .focus > rect,.wm .dia svg .focus > polygon{stroke:var(--select)!important;stroke-width:1.5px!important}
-.wm .dia svg .node small{font-size:10.5px;color:var(--mut);letter-spacing:.04em}
-.wm .dia svg foreignObject p,.wm .dia svg foreignObject span{line-height:1.45;margin:0;font-size:12.5px}
+/* diagrams: Pele draws the Mermaid text (D-21) and reads its theme from these, as on B9-Pele; dark, light and colour-vision follow the tokens above. --dia-fs is the diagram text size (C4: 12.5px, set by the renderer) */
+.wm .dia{--pele-bg:var(--bg);--pele-fg:var(--text);--pele-muted:var(--mut);--pele-line:var(--dim);--pele-surface:var(--panel);--pele-surface-alt:var(--ground2);--pele-border:var(--rule2);--pele-accent:var(--select);--pele-font:var(--ff-data);--pele-font-mono:var(--ff-data);--pele-radius:var(--r-ctl);--dia-fs:12.5px}
+.wm .dia svg .changed > rect,.wm .dia svg .changed > polygon{stroke:var(--mod);stroke-width:1.5px;fill:var(--mod-tint)}
+.wm .dia svg .risk > rect,.wm .dia svg .risk > polygon{stroke:var(--risk);stroke-width:1.5px}
+.wm .dia svg .focus > rect,.wm .dia svg .focus > polygon{stroke:var(--select);stroke-width:1.5px}
 
 /* status bar */
 .wm .status{display:flex;gap:var(--s5);align-items:center;padding:0 var(--s5);height:32px;border-top:1px solid var(--rule);background:var(--panel);color:var(--mut);font-size:var(--fs-12);white-space:nowrap;overflow:hidden;font-family:var(--ff-ui)}

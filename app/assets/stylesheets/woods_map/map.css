@@ -37,6 +37,12 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .spec .spec-note b{color:var(--text);font-weight:500}
 .wm .spec .narrow{overflow:hidden;border:1px solid var(--rule2);border-radius:var(--r-ctl);max-width:100%}
 .wm .spec .sw{display:inline-block;width:14px;height:14px;border-radius:var(--r-chip);border:1px solid var(--rule2);vertical-align:-2px;margin-right:var(--s2)}
+/* Diagrams (D-21): Pele's SVG keeps its natural width and the panel scrolls (C4 rule); a refused
+   diagram says why above its text. */
+.wm .dia .pele-host svg{max-width:none!important}
+.wm .dia .refusal{margin:0 0 var(--s3);color:var(--mut)}
+/* On a phone the band would clip its tools; they drop to a second line instead. */
+@container wm (max-width:639px){ .wm .dia .dh{flex-wrap:wrap;row-gap:var(--s2)} .wm .dia .dh .tools{margin-left:0} }
 
 /* The range form wraps to keep every selector and label reachable on narrow screens. */
 .impact-range-form { display:flex; gap:var(--s3); align-items:center; flex-wrap:wrap; }

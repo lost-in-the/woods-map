@@ -26,8 +26,9 @@ Mermaid sources for every diagram the boards render are in
 [../diagrams](../diagrams/), with `pele-render.mjs`, the script used to verify
 Pele as a renderer (woods-map#25). D-21 adopts Pele in the browser, vendored
 like every other module, with the Mermaid text kept in the page as the
-fallback; when M3 lands the eight `--pele-*` variables are set from this sheet
-and the Mermaid overrides at the end of `tokens.css` go away.
+fallback. The eight `--pele-*` variables are set from this sheet on `.wm .dia`,
+as on [B9-Pele](../boards/B9-Pele.html), with `--dia-fs` for the diagram text
+size; the Mermaid overrides that used to end `tokens.css` are gone.
 
 ## In the engine
 
