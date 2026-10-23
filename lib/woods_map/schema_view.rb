@@ -8,6 +8,10 @@ module WoodsMap
     Association = Struct.new(:macro, :name, :target, :options, :foreign_key, :enforced, :finding, keyword_init: true)
     Column = Struct.new(:name, :type, :null, :default, :index, :written_by, keyword_init: true)
 
+    # ER table budget (R-4): above it the panel names the budget and keeps
+    # the text, rather than drawing a diagram nobody can read.
+    TABLE_BUDGET = 40
+
     # @param unit [Hash] a model or database_table unit
     # @param table [Hash, nil] the database_table unit behind a model
     # @param graph_analysis [Hash]
@@ -70,21 +74,35 @@ module WoodsMap
     def mermaid
       lines = ['erDiagram']
       lines << "  #{entity(table_name)}" if table_name.present?
-      Array(@metadata['associations']).each do |a|
-        next if a['through']
-
+      er_associations.each do |a|
         cardinality = a['type'].to_s.start_with?('belongs_to') ? '}o--||' : '||--o{'
         lines << "  #{entity(table_name)} #{cardinality} #{entity(a['target'].to_s.tableize)} : \"#{a['name']}\""
       end
       lines.join("\n")
     end
 
+    # @return [Integer] distinct tables the ER diagram draws, this one included
+    def table_count
+      # compact_blank arrived in Rails 6.1; the engine's floor is 6.0.
+      ([table_name] + er_associations.map { |a| a['target'].to_s.tableize }).reject(&:blank?).uniq.size # rubocop:disable Rails/CompactBlank
+    end
+
+    # @return [Boolean] whether the ER diagram would exceed {TABLE_BUDGET}
+    def over_budget?
+      table_count > TABLE_BUDGET
+    end
+
     private
 
-    # An ER entity name Mermaid accepts: a namespaced model's table
-    # (`active_storage/attachments`) becomes `active_storage_attachments`.
+    def er_associations
+      Array(@metadata['associations']).reject { |a| a['through'] }
+    end
+
+    # An ER entity as a quoted name: Mermaid keeps `audit.logs` and
+    # `audit_logs` apart and shows each as written. A double quote cannot be
+    # escaped inside the name, so it reads as a single one.
     def entity(name)
-      name.to_s.gsub(/[^A-Za-z0-9_-]/, '_')
+      "\"#{name.to_s.tr('"', "'")}\""
     end
 
     def options_text(assoc)

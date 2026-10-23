@@ -58,4 +58,17 @@ RSpec.describe WoodsMap::Lifecycle do
         M-)A0: notify
     MERMAID
   end
+
+  it 'counts participants and messages against the sequence budget, refusing only above it' do
+    chain = lambda do |n|
+      names = (1..n).map { |i| "step_#{i}" }
+      { 'identifier' => 'Post', 'source_code' => names.map { |m| "def #{m}; end" }.join("\n"),
+        'metadata' => { 'callbacks' => names.map { |m| { 'type' => 'before_save', 'filter' => m } } } }
+    end
+    budget = WoodsMap::Lifecycle::SEQUENCE_BUDGET
+    at_budget = described_class.new(chain.call(budget - 2))
+    expect(at_budget.sequence_size('create')).to eq(budget)
+    expect(at_budget).not_to be_over_budget('create')
+    expect(described_class.new(chain.call(budget - 1))).to be_over_budget('create')
+  end
 end
