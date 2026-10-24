@@ -27,10 +27,49 @@ RSpec.describe WoodsMap::Passage do
     expect(show.filters.first.scope).to start_with('only: destroy, edit')
   end
 
-  it 'applies only/except as declared, never resolved' do
+  it 'applies only/except as declared on a generation without the resolved chain' do
     show = passage('UsersController', action: 'show')
     expect(show.filters_for.map(&:name)).to eq([])
     expect(show.filters_for('edit').map(&:name)).to eq(%w[logged_in_user correct_user])
+  end
+
+  # W-8 (woods#758): each filter carries the actions it applies to, its owner
+  # and whether an if/unless condition still decides it.
+  def resolved_passage(action)
+    WoodsMap::Repository.open(FIXTURE_INDEX) do |repository|
+      unit = repository.unit('UsersController', type: 'controller').deep_dup
+      unit['metadata']['filters'] = unit['metadata']['filters'].map do |f|
+        f.merge('owner' => 'ActionController::Base', 'applies_to' => unit['metadata']['actions'],
+                'applicability' => 'resolved')
+      end
+      apps = unit['metadata']['filters'].select { |f| f['file'] }
+      apps[0].merge!('owner' => 'UsersController', 'applies_to' => %w[edit update], 'applicability' => 'resolved')
+      apps[1].merge!('owner' => 'Authenticating', 'applies_to' => %w[create edit], 'applicability' => 'conditional',
+                     'unless' => ':api_request?')
+      apps[2].merge!('owner' => 'ApplicationController', 'applies_to' => [], 'applicability' => 'resolved')
+      described_class.new(repository, unit, action: action)
+    end
+  end
+
+  it 'applies the published resolved chain when the generation carries it (W-8)' do
+    edit = resolved_passage('edit')
+    expect(edit).to be_resolved
+    expect(edit.filters_for.map(&:name)).to eq(%w[logged_in_user correct_user])
+    expect(edit.filters_for('destroy').map(&:name)).to eq([])
+    expect(edit.filters_for('create').map(&:name)).to eq(%w[correct_user])
+  end
+
+  it 'keeps each filter owner and marks a conditional filter as such' do
+    filters = resolved_passage('edit').filters
+    expect(filters.map(&:owner)).to eq(%w[UsersController Authenticating ApplicationController])
+    expect(filters.map(&:conditional?)).to eq([false, true, false])
+    expect(filters[1].condition).to eq('unless: :api_request?')
+    expect(filters[0].condition).to be_nil
+  end
+
+  it 'falls back to declared scopes on a generation without the resolved chain' do
+    expect(passage('UsersController', action: 'edit')).not_to be_resolved
+    expect(passage('UsersController', action: 'edit').filters.map(&:owner)).to all(be_nil)
   end
 
   it 'ties the templates to the action through the view_render edge and follows their partials' do
