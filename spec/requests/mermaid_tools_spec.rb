@@ -11,7 +11,8 @@ RSpec.describe 'Mermaid tools on the diagram panels', type: :request do
       'graph?depth=2' => '/woods/units/model/User/graph.mmd?depth=2&direction=both' }.each do |tab, url|
       get "/woods/units/model/User/#{tab}"
       tools = response.parsed_body.at_css('.dia .dh .tools')
-      expect(tools.css('[data-controller="copy"]').pluck('data-copy-text-value')).to eq([panel_source])
+      expect(tools.css('[data-controller="copy"]:not([data-pr-comment])').pluck('data-copy-text-value'))
+        .to eq([panel_source])
       link = tools.at_css('a[data-mermaid-url]')
       expect([link['href'], link['rel'], link['type']]).to eq([url, 'alternate', 'text/plain'])
     end
@@ -26,20 +27,23 @@ RSpec.describe 'Mermaid tools on the diagram panels', type: :request do
       .to eq('/woods/impact.mmd?depth=1&focus=User')
   end
 
-  it 'gives every panel exactly one copy tool' do
+  it 'gives every panel exactly one Mermaid copy and one PR-comment copy' do
     %w[/woods/units/model/User/lifecycle /woods/erd /woods/units/model/User/schema].each do |path|
       get path
       bands = response.parsed_body.css('.dia .dh')
-      expect(bands.map { |band| band.css('[data-controller="copy"]').size }.uniq).to eq([1]), path
+      count = ->(selector) { bands.map { |band| band.css(selector).size }.uniq }
+      expect(count.call('[data-controller="copy"]:not([data-pr-comment])')).to eq([1]), path
+      expect(count.call('[data-pr-comment][data-controller="copy"]')).to eq([1]), path
     end
   end
 
-  it 'marks only the lanes, newer than GitHub\'s Mermaid, and needs JavaScript only to copy' do
+  it 'marks no generated type, the lanes included, as newer than GitHub\'s Mermaid; copying needs JavaScript' do
     get '/woods/units/model/User/schema'
     buttons = response.parsed_body.css('.dia .dh .tools button[data-controller]')
     expect(buttons.pluck('data-needs-js')).to all(eq('true'))
     expect(response.body).not_to include('may not render on GitHub')
     get '/woods/units/model/User/lifecycle', params: { view: 'lanes' }
-    expect(response.body).to include('may not render on GitHub')
+    expect(response.body).to include('swimlane-beta')
+    expect(response.body).not_to include('may not render on GitHub')
   end
 end

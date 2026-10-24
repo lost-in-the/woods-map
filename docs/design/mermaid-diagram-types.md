@@ -83,7 +83,7 @@ The connection inventory in [`connection-types.md`](connection-types.md) is the 
 
 1. **One Ruby renderer per type**, extending `Woods::RubyAnalyzer::MermaidRenderer` (it already sanitises identifiers and escapes labels). Renderers take unit JSON, flow documents or graph data and return text; nothing in the map builds Mermaid text inline in a view.
 2. **A node budget per type** (flowchart and sequence about 150 nodes, ER about 40 tables, quadrant about 25 points, sankey about 40 links). Above the budget the renderer chunks (by namespace, database, package or async boundary) or refuses with a message naming the budget; it never truncates silently.
-3. **Every diagram has a copy-as-Mermaid action** and the same text is the export. The copied text must render in GitHub Markdown, which lags the vendored Mermaid; mark types newer than GitHub's renderer as "may not render on GitHub" in the copy affordance.
+3. **Every diagram has a copy-as-Mermaid action** and the same text is the export. The copied text must render in GitHub Markdown, which lags the vendored Mermaid; mark types newer than GitHub's renderer as "may not render on GitHub" in the copy affordance. `spec/diagrams/github_mermaid_spec.rb` parses every generated text with GitHub's version (woods-map#76).
 4. **A headless render spec** renders every generated type with the vendored build in CI (a JSDOM or Playwright run) so a Mermaid upgrade that breaks a syntax fails a test, not a page.
 5. **Security and theme**: `securityLevel: "loose"` only for text the map generated from the index; `htmlLabels: true`; theme variables from the map's own tokens for light and dark; `maxTextSize` and `maxEdges` raised explicitly.
 6. **Layout**: ELK by default in 12.x; dagre selectable per diagram for the butterfly and impact layouts where ELK's wandering hurts reading. Record the choice per renderer.
@@ -98,6 +98,6 @@ The connection inventory in [`connection-types.md`](connection-types.md) is the 
 - [ ] Event modeling (25): fit on a testbed variant with `event` units; skip if the result is a decorated sequence diagram.
 - [ ] Use case (12): only if the host supplies actors; decide with the Landscape L1 design.
 - [ ] Agentflow (32): render one real guide transcript; revisit when it enters the public docs nav and its syntax is declared stable.
-- [ ] GitHub's Mermaid version at the time of M3, to mark which exports render in pull requests. Not yet measured. Until it is, `WoodsMap::MermaidExport::NEWER_THAN_GITHUB` marks the types from Mermaid 11.13 on, and of the generated types only `swimlane-beta` is among them.
+- [x] GitHub's Mermaid version, to mark which exports render in pull requests: 11.16.1, from the latest `info` check on record (GitHub Community discussion #70672, 20 August 2026; woods-map#76). Every generated text parses and renders with that build (`spec/diagrams/github_mermaid_spec.rb`), `swimlane-beta` included. `WoodsMap::MermaidExport::NEWER_THAN_GITHUB` now holds only Mermaid 12's `usecase-beta` and `agentflow-beta`; see [notes/pr-comment-share.md](notes/pr-comment-share.md).
 
 Record each outcome in `decisions.md` with the testbed variant and the Mermaid version used.

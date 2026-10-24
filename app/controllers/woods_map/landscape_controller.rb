@@ -30,8 +30,8 @@ module WoodsMap
 
         exporter = WoodsMap::LandscapeExport.new(landscape, generation: repository.generation_number,
                                                             actors: woods_map_config.landscape_actors)
-        response.headers['Content-Disposition'] = %(inline; filename="#{exporter.filename(format)}")
-        render plain: "#{exporter.text_for(format)}\n", content_type: 'text/plain'
+        render_landscape_text(exporter.text_for(format), exporter.filename(format),
+                              "#{landscape.system_name} containers")
       end
     end
 
@@ -45,12 +45,32 @@ module WoodsMap
         text, missing = diagram_text(repository, name)
         next render_text(:unprocessable_entity, missing) unless text
 
-        response.headers['Content-Disposition'] = %(inline; filename="#{diagram_filename(name)}")
-        render plain: "#{text}\n", content_type: 'text/plain'
+        render_landscape_text(text, diagram_filename(name), diagram_filename(name).delete_suffix('.mmd').tr('-', ' '))
       end
     end
 
     private
+
+    # The tab each `landscape/:diagram` text belongs to, for its focus URL.
+    DIAGRAM_TABS = { 'quadrant' => 'hotspots', 'sankey' => 'hotspots', 'treemap' => 'hotspots',
+                     'mindmap' => 'domains' }.freeze
+    private_constant :DIAGRAM_TABS
+
+    # Plain text on `.mmd` (and `.dsl`, `.c4`); the pull-request comment on `.md` (woods-map#76).
+    def render_landscape_text(text, filename, name)
+      return render_pr_comment(text, name) if pr_comment_request?
+
+      response.headers['Content-Disposition'] = %(inline; filename="#{filename}")
+      render plain: "#{text}\n", content_type: 'text/plain'
+    end
+
+    # The page a `.md` comment links: the Landscape tab that draws the diagram.
+    def mermaid_page_path
+      return super unless action_name == 'diagram'
+
+      name = params[:diagram].to_s
+      woods_map.landscape_path(tab: DIAGRAM_TABS.fetch(name, name))
+    end
 
     def diagram_text(repository, name)
       case name
