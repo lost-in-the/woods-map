@@ -10,12 +10,13 @@ module WoodsMap
     # @param identifier [String]
     # @param type [String, nil]
     # @param label [String, nil]
+    # @param since [String, nil] a ?since= selector the link keeps (E-8)
     # @return [ActiveSupport::SafeBuffer] a link to the unit, or its name when the type is unknown
-    def unit_link(identifier, type = nil, label: nil)
+    def unit_link(identifier, type = nil, label: nil, since: nil)
       type ||= Array(current_repository&.identifier_types(identifier)).first
       return ERB::Util.html_escape(label || identifier) unless type
 
-      link_to(label || identifier, woods_map.unit_path(type: type, identifier: identifier))
+      link_to(label || identifier, woods_map.unit_path(type: type, identifier: identifier, **{ since: since }.compact))
     end
 
     # A link to a line of the unit that owns a file, through the graph's file map.
@@ -49,9 +50,10 @@ module WoodsMap
     # @param tab [String] the tab key
     # @return [String] the URL of a tab
     def tab_path(page, tab)
-      return woods_map.unit_path(type: page.type, identifier: page.identifier) if tab == 'code'
+      since = current_since ? { since: current_since.selector } : {}
+      return woods_map.unit_path(type: page.type, identifier: page.identifier, **since) if tab == 'code'
 
-      woods_map.public_send("unit_#{tab}_path", type: page.type, identifier: page.identifier)
+      woods_map.public_send("unit_#{tab}_path", type: page.type, identifier: page.identifier, **since)
     end
 
     # @param page [WoodsMap::UnitPage]

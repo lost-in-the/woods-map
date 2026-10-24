@@ -1,0 +1,17 @@
+<%# Unknown (B8-Impact-Unknown) in range mode: every unknown record and the
+    coverage of each analysis, as Woods returned them (E-10). %>
+<% by_kind = rr.unknowns.group_by { |u| u.is_a?(Hash) ? u['kind'].to_s : u.to_s } %>
+<section class="sec" aria-labelledby="unk">
+  <header><h2 class="t2" id="unk">Unknowns <%= count_tag("#{rr.unknowns.size} in #{by_kind.size} #{'kind'.pluralize(by_kind.size)}") %><%= info_tip('What the report could not establish. A report never claims completeness unless Woods declares it (E-10).') %></h2></header>
+  <% if rr.unknowns.empty? %>
+    <%= render 'woods_map/components/empty_state', title: 'No unknowns recorded', text: (rr.complete? ? 'Woods declares this report complete.' : 'Woods recorded no unknown, but does not declare the report complete.') %>
+  <% else %>
+    <%= render 'woods_map/components/table', label: 'Unknowns', min_width: '640px', columns: [{ label: 'kind', width: '240px', cell_class: 'nw id' }, { label: 'records', width: '90px', cell_class: 'num' }, { label: 'detail' }],
+          rows: by_kind.map { |kind, list| { cells: [kind, list.size, impact_evidence(list.first.is_a?(Hash) ? list.first.except('kind') : list.first)] } } %>
+  <% end %>
+</section>
+<section class="sec" aria-labelledby="cov">
+  <header><h2 class="t2" id="cov">Coverage</h2></header>
+  <%= render 'woods_map/components/table', label: 'Coverage', min_width: '480px', columns: [{ label: 'analysis', width: '220px', cell_class: 'nw id' }, { label: 'coverage' }],
+        rows: rr.coverage.map { |key, value| { cells: [key.tr('_', ' '), value.to_s] } } %>
+</section>
