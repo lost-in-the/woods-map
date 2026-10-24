@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+- Correctness fixes across the unit and impact pages.
+  - **Unknown action:** a Passage or Lifecycle URL naming an action the unit does not have answers 404 with the unit's actions as links (plain text on `.mmd`), instead of silently showing the first action.
+  - **Impact by commit:** a SHA several retained generations recorded resolves (Woods: the commit's first capture as `from`, its last as `to`). A range whose endpoints are one generation says *Nothing changed*, and Woods no longer reads every unit to say so.
+  - **Impact at scale:** the range's Changed and Affected lists render pages of 200 and 300 with previous and next links, opening on the page that holds a focused unit; the per-change *reaches* lookup is indexed once.
+  - **Pre-change impact:** affected units are ordered nearest first, then by PageRank weight, so units nothing depends on (documentation that mentions the focus) no longer lead. Tests, the job rule and the Unknown tab now cover every unit within the depth, and unresolvable routes and volatile dependencies only the ones that name a unit in the radius, so the lens counts move with the depth. Each tab's tooltip says its scope.
+  - **Diagrams over budget:** the Mermaid text folds under a *Mermaid text* disclosure instead of filling the page, and the `.mmd` link (which answers 422 above the budget) is left out while the copy stays.
+  - **Graph Mermaid:** each unit is declared once, and the `focus` class the text applies is declared too.
+  - **Routes tab:** the tab, the section header and the table count the same routes, including route units the controller's metadata omits.
+  - **History tile:** churn says its window (`in 365d`); people counts the authors of the window from the commit table, or says *top N contributors* when only Woods' per-file list is available.
+  - The graph page no longer calls itself full-screen: it keeps the bar and crumbs, with the canvas filling the viewport below them.
+
 - The graph has one layout, the butterfly (D-30, closes woods-map#63). Radial and the clusters layout are removed from the Graph tab and `/woods/graph`; domain clusters stay on Landscape Domains and Components, whose rows now open the hub's depth-2 graph. No layout library is vendored.
   - **Labels:** the edges between the same two units share one path and one label (`has_many ×2`, `belongs_to, has_many`, `code_reference +1`), where the labels used to stack into each other.
   - **Bundles:** each edge turns at a trunk just outside its busier end's column, so a hub's edges bundle into one trunk instead of every edge in a gap sharing the midpoint. Overview mode draws the same routes.

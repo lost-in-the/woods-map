@@ -1,6 +1,6 @@
 <%# The Risks tab: findings of the rules that ran, then the registry with what each rule needs. %>
 <section class="sec" aria-labelledby="fd">
-  <header><h2 class="t2" id="fd">Findings <%= count_tag("#{v.findings.count { |f| f.severity == 'blocking' }} blocking, #{v.findings.count { |f| f.severity == 'note' }} #{'note'.pluralize(v.findings.count { |f| f.severity == 'note' })}") %><%= info_tip('blocking: fix before merge. note: mention in review. Only the rules that run on one generation fired; the registry below names what the others need.') %></h2></header>
+  <header><h2 class="t2" id="fd">Findings <%= count_tag("#{v.findings.count { |f| f.severity == 'blocking' }} blocking, #{v.findings.count { |f| f.severity == 'note' }} #{'note'.pluralize(v.findings.count { |f| f.severity == 'note' })}") %><%= info_tip('blocking: fix before merge. note: mention in review. The hub, bridge and cycle rules judge the focus, the template rule the focus and its direct dependents, and the job rule every unit within the depth. Only the rules that run on one generation fired; the registry below names what the others need.') %></h2></header>
   <% if v.findings.empty? %>
     <%= render 'woods_map/components/empty_state', title: 'No finding from the rules that ran', text: "#{v.rules.count { |x| x.result.is_a?(Integer) }} of #{v.rules.size} rules ran on gen #{@repository.generation_number}; the rest need a range or data the index does not publish yet." %>
   <% else %>

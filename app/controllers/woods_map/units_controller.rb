@@ -13,6 +13,7 @@ module WoodsMap
     include WoodsMap::UnitHistory
     include WoodsMap::GraphOverlays
     include WoodsMap::UnitLifecycle
+    include WoodsMap::UnknownAction
 
     LENS_COOKIE = 'woods_map_lens'
 
@@ -66,12 +67,10 @@ module WoodsMap
         end
 
         @passage = WoodsMap::Passage.new(@repository, @unit, action: params[:action_name])
-        @ladder_model = @passage.ladder_model
-        @ladder = @ladder_model && lifecycle_for(@ladder_model)
-        @ladder_event = ladder_event(@ladder)
-        next render_passage_mermaid if mermaid_request?
+        next render_unknown_action('passage', @passage.actions) if unknown_action?(@passage.actions)
 
-        render :passage
+        load_ladder
+        mermaid_request? ? render_passage_mermaid : render(:passage)
       end
     end
 
@@ -162,12 +161,21 @@ module WoodsMap
     # point (FR-6, woods-map#91).
     def entry_lifecycle
       @entry_lifecycle = WoodsMap::EntryLifecycle.new(@repository, @unit, action: params[:action_name])
+      return render_unknown_action('lifecycle', @entry_lifecycle.actions) if unknown_action?(@entry_lifecycle.actions)
+
       @view = WoodsMap::EntryLifecycle::VIEWS.find { |view| view == params[:view] } ||
               WoodsMap::EntryLifecycle::VIEWS.first
       return render_entry_lifecycle_mermaid if mermaid_request?
 
       @flags = WoodsMap::TrailFlags.new(@repository, @entry_lifecycle.steps)
       render :entry_lifecycle
+    end
+
+    # The Passage's callback ladder: the model the action saves and its event.
+    def load_ladder
+      @ladder_model = @passage.ladder_model
+      @ladder = @ladder_model && lifecycle_for(@ladder_model)
+      @ladder_event = ladder_event(@ladder)
     end
 
     # The ladder's event: ?event= when valid, else the one the action implies, else the first chain.

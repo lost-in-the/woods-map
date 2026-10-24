@@ -22,7 +22,7 @@ WoodsMap::Engine.routes.draw do
   get 'landscape(/:tab)', to: 'landscape#show', as: :landscape,
                           constraints: { tab: /context|containers|components|hotspots|domains|status/ }, format: false
 
-  # The full-screen graph (M5): a centre by identifier and type, never a path.
+  # The graph page (M5): a centre by identifier and type, never a path.
   get 'graph', to: 'graphs#show', as: :graph
   get 'graph/neighbourhood', to: 'neighbourhoods#show', as: :neighbourhood, defaults: { format: :json }
 

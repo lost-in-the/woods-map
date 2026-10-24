@@ -1,6 +1,6 @@
 <%# The Unknown tab: what the index reported it could not resolve, and what each layer proves (E-10). %>
 <section class="sec" aria-labelledby="un">
-  <header><h2 class="t2" id="un">Unknown <%= count_tag("#{v.unknowns.size}, reported, never dropped") %><%= info_tip('E-10: a report never claims completeness. Unresolved renders of the controllers in the radius, dynamic render targets and unresolved partials of their actions, unresolvable routes and volatile dependencies from the graph analysis.') %></h2></header>
+  <header><h2 class="t2" id="un">Unknown <%= count_tag("#{v.unknowns.size}, reported, never dropped") %><%= info_tip('E-10: a report never claims completeness. Unresolved renders of the controllers in the radius, dynamic render targets and unresolved partials of their actions, unresolvable routes and volatile dependencies from the graph analysis that name a unit within the depth.') %></h2></header>
   <% if v.unknowns.empty? %>
     <%= render 'woods_map/components/empty_state', title: 'The index reported nothing unresolved around the focus', text: 'Dynamic dispatch and ambiguous names inside method bodies are not recorded until reference spans land (W-1), so this list is the index\'s own, not a proof.' %>
   <% else %>

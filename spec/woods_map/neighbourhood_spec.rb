@@ -35,4 +35,13 @@ RSpec.describe WoodsMap::Neighbourhood do
     stub_const('WoodsMap::Neighbourhood::NODE_BUDGET', 1)
     expect(n).to be_over_budget
   end
+
+  it 'declares each unit once, the centre first, and the focus class it applies' do
+    text = neighbourhood(depth: 2).mermaid
+    declarations = text.lines.grep(/\A  n_\w+\[/).map { |line| line[/n_\w+/] }
+    expect(declarations).to eq(declarations.uniq)
+    expect(text.lines[1]).to include('User (model)')
+    expect(text.lines.grep(/-->/)).to all(match(/\A  n_\w+ -->\|\w+\| n_\w+\n?\z/))
+    expect(text).to include('classDef focus').and match(/class n_\w+ focus\z/)
+  end
 end

@@ -15,7 +15,7 @@
         <button class="tool" type="button" aria-label="Zoom in" data-action="graph#zoomIn">+</button>
         <button class="tool" type="button" aria-label="Zoom out" data-action="graph#zoomOut">−</button>
         <button class="tool" type="button" data-action="graph#fit">fit</button>
-        <%= render 'woods_map/components/mermaid_tools', text: pinned.graph_mermaid, name: 'trail pinned graph', url: mermaid_url %>
+        <%= render 'woods_map/components/mermaid_tools', text: pinned.graph_mermaid, name: 'trail pinned graph', url: mermaid_url, refusal: pinned.graph_refusal %>
         <button class="tool" type="button" aria-pressed="false" aria-controls="trail-graph-flowchart" data-graph-target="flowchart" data-action="graph#flowchart">flowchart</button>
       </span></div>
       <div class="gcanvas" tabindex="0" role="application" aria-roledescription="graph" aria-label="The pinned units and the edges between them, each labelled with its mechanism. Arrow keys move along the edges; the list below has the same edges." aria-describedby="trail-graph-status" data-graph-target="canvas"></div>

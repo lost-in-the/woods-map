@@ -76,4 +76,24 @@ RSpec.describe 'The controller Routes tab', type: :request do
     get '/woods/units/model/User/routes'
     expect(response).to redirect_to('/woods/units/model/User')
   end
+
+  # The controller's metadata declares one route; two more route units dispatch to it.
+  def declare_only_index
+    one = { 'index' => [{ 'verb' => 'GET', 'path' => '/users' }] }
+    allow_any_instance_of(WoodsMap::Repository).to receive(:unit).and_wrap_original do |original, *args, **options| # rubocop:disable RSpec/AnyInstance
+      unit = original.call(*args, **options)
+      args.first == 'UsersController' && unit ? unit.merge('metadata' => unit['metadata'].merge('routes' => one)) : unit
+    end
+  end
+
+  it 'counts the same routes on the tab, the section header and the table when route units outnumber the metadata' do
+    declare_only_index
+    get '/woods/units/controller/UsersController/routes'
+    page = html_response_document
+    tab = page.css('[role=tab], .tabs a').map(&:text).find { |text| text.start_with?('Routes') }
+    rows = page.css('section[aria-labelledby=routesh] tbody tr').size
+    expect(rows).to eq(3)
+    expect(tab).to eq('Routes 3')
+    expect(page.at_css('#routesh').text).to include('3')
+  end
 end
