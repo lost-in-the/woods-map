@@ -3,7 +3,7 @@
     freshness (Hash or nil), nav (Array of [label, href, current?]),
     search_path (String or nil), query (String or nil), label (landmark name). %>
 <% nav = local_assigns[:nav] || primary_nav %>
-<% fresh_class, fresh_words = freshness_words(local_assigns[:freshness].to_h['state'].to_s) %>
+<% fresh_class, fresh_words = freshness_words(local_assigns[:freshness].to_h['state'].to_s, local_assigns[:freshness]) %>
 <% fresh_detail = freshness_detail(local_assigns[:freshness]) %>
 <% bar_label = local_assigns.fetch(:label, 'Primary') %>
 <% palette_id = bar_label == 'Primary' ? 'wm-palette' : "wm-palette-#{bar_label.parameterize}" %>
@@ -16,7 +16,7 @@
   <nav aria-label="<%= local_assigns.fetch(:label, 'Primary') %>"><% nav.each do |label, href, current| %><a href="<%= href %>"<%= ' aria-current="page"'.html_safe if current %>><%= label %></a><% end %></nav>
   <span class="bar-fresh">
     <% if generation %>
-      <span class="why"<%= " title=\"#{ERB::Util.html_escape(fresh_detail)}\"".html_safe if fresh_detail %>><span class="<%= fresh_class %>">●</span><span class="w"> <%= fresh_words %></span></span>
+      <a class="why" href="<%= woods_map.root_path %>#freshness"<%= " title=\"#{ERB::Util.html_escape(fresh_detail)}\"".html_safe if fresh_detail %>><span class="<%= fresh_class %>">●</span><span class="w"> <%= fresh_words %></span><span class="sr-only"><%= ", #{fresh_detail}" if fresh_detail %></span></a>
       <span class="w">gen <b class="bright"><%= generation['generation'] %></b></span>
       <span class="w"><%= short_sha(generation['git_sha']) %></span>
     <% else %>

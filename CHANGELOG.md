@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+- Search and freshness fixes.
+  - **Code search** asks Woods to read up to every unit of the generation (`max_scan:`, when this Woods accepts it) instead of stopping at the MCP scan budget. An incomplete search now says why it stopped and how much it read, for example "stopped after reading 500 of 8000 units' source (scan budget)". It no longer claims to have searched every unit, the empty state no longer suggests code search from code search, and the info tip names the stop reasons it promises.
+  - **Name search** puts the exact name first, then exact short names (the last `::` segment, a table's name, a route's path), then prefixes, then other matches. It merges literal prefix, short-name, table and route searches so a broad query cannot push the exact name or its table off the page, in the same order on every generation.
+  - **Path search** names the units that own each file.
+  - **Freshness** runs Woods' quick check once per index and generation for 30 seconds instead of on every request. The bar says "no drift seen" when Woods' new coverage shows no drift in what it read, and links to a freshness row on the status page with the coverage, Woods' reasons and next steps in plain words.
 - Navigation and the files sheet at any size of index and any width.
   - **The file tree is no longer in every page.** The sheet fetches it the first time it opens, one response per generation that the browser keeps. On a generated index of 4,500 units the status page went from 1.75 MB to 11.5 KB.
   - The tree leaves out framework and gem source files.
