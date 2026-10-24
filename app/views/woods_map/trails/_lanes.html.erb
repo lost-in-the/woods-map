@@ -4,7 +4,7 @@
     Locals: lifecycle (LifecycleBuilder), board (TrailBoard), flags (TrailFlags). %>
 <% lanes = lifecycle.lanes %>
 <% min_width = ((((160 * lanes.size) + 60) / 20.0).ceil * 20).clamp(480, 1200) %>
-<div class="tblwrap" data-controller="cliff">
+<div class="tblwrap" role="region" aria-label="Lanes of <%= lifecycle.entry %>" tabindex="0" data-controller="cliff">
   <table class="tbl fixed trail-lanes <%= table_min_width_class("#{min_width}px") %>" aria-label="Lanes of <%= lifecycle.entry %>">
     <thead><tr><th width="48"><abbr title="step">#</abbr></th><% lanes.each do |lane| %><th><%= lane %></th><% end %></tr></thead>
     <tbody>
