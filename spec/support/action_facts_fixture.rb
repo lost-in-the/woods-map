@@ -25,7 +25,8 @@ module ActionFactsFixture
     repository = instance_double(WoodsMap::Repository, graph: graph, graph_analysis: {}, graph_node: nil,
                                                        flow_entry_points: nil,
                                                        flows_state: :absent,
-                                                       generation_key: ['action facts fixture', graph.object_id])
+                                                       generation_key: ['action facts fixture', graph.object_id],
+                                                       units_with: nil)
     allow(repository).to receive(:unit) do |identifier, type: nil|
       units.find { |unit| unit['identifier'] == identifier && (!type || unit['type'] == type) }
     end

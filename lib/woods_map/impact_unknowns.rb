@@ -25,9 +25,17 @@ module WoodsMap
 
     # Woods' render-target resolver publishes +{ name:, reason: }+ for a component render that names no
     # component (+render Ghost.new+), on controllers and components alike.
+    # Only the involved units the generation lists as having one are opened
+    # (woods#837); without that list, from an older writer, every involved
+    # unit is.
     # @return [Array<ImpactReview::Unknown>]
     def unresolved_renders
       units = @radius.involved.map { |id| [id, @radius.type_of(id)] }
+      listed = @repository.units_with(:unresolved_renders)
+      if listed
+        typed = listed.to_set { |row| [row['identifier'], row['type']] }
+        units = units.select { |unit| typed.include?(unit) }
+      end
       MEMO.fetch([@repository.generation_key, units]) { read_unresolved_renders(units) }
     end
 

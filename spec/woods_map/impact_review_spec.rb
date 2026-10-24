@@ -67,7 +67,7 @@ RSpec.describe WoodsMap::ImpactReview do
     end
     let(:repository) do
       instance_double(WoodsMap::Repository, graph: graph, graph_analysis: analysis, unit: nil, generation_number: 1,
-                                            generation_key: ['impact review spec'])
+                                            generation_key: ['impact review spec'], units_with: nil)
     end
 
     def scoped(depth)
