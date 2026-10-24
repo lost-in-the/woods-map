@@ -17,6 +17,8 @@ HTML. The text is byte for byte what the panel draws, plus a final newline.
 | State machine | `/woods/units/state_machine/:identifier/lifecycle.mmd` | — (a state machine unit's lifecycle is its state diagram) |
 | Graph neighbourhood | `/woods/units/:type/:identifier/graph.mmd` | `depth` = 1 or 2; `direction` = both, dependents or dependencies; `types[]`, `via[]` |
 | Passage | `/woods/units/:type/:identifier/passage.mmd` | `action_name` |
+| History | `/woods/units/:type/:identifier/history.mmd` | `view` = xychart (the `timeline` when omitted); `range` = 30d or 365d |
+| Cross-unit timeline | `/woods/history.mmd` | `units[]` = `type:identifier` (required); `range` |
 | Impact paths | `/woods/impact.mmd` | `focus` (required), `depth`, `types[]`, `via[]`, `show` |
 | ERD chunk | `/woods/erd.mmd` | `chunk` = 1…n; `by` = namespace or database; `columns` = keys or all |
 
