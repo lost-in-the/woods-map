@@ -9,12 +9,14 @@
     so. Locals: text (String, the Mermaid text), name (String, what the
     diagram shows, for the file name), url (String or nil, the .mmd route),
     key (String or nil: "y" when this is the copy the page's status bar
-    names), refused (Boolean: the panel draws nothing over its budget).
+    names), refused (Boolean: the panel draws nothing over its budget; its
+    .mmd route answers 422 then, so the link is left out and the copy stays).
     data-mermaid-name and data-mermaid-href let the Share menu list the page's
     diagrams with their absolute .mmd URLs and comments (D-25). %>
-<% href = local_assigns[:url] && public_url_for(local_assigns[:url]) %>
+<% url = local_assigns[:refused] ? nil : local_assigns[:url] %>
+<% href = url && public_url_for(url) %>
 <%= tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: text, action: 'copy#copy', needs_js: true, key: local_assigns[:key], mermaid_name: name, mermaid_href: href }.compact) %>
-<% if local_assigns[:url] %><%= link_to('⤓ .mmd', url, class: 'tool', rel: 'alternate', type: 'text/plain', download: WoodsMap::MermaidExport.filename(name), data: { mermaid_url: true }) %><% end %>
+<% if url %><%= link_to('⤓ .mmd', url, class: 'tool', rel: 'alternate', type: 'text/plain', download: WoodsMap::MermaidExport.filename(name), data: { mermaid_url: true }) %><% elsif local_assigns[:url] %><span class="lyr" title="The .mmd route answers 422 above the drawing budget; copy the text instead.">no .mmd over the budget</span><% end %>
 <% unless local_assigns[:refused] %>
   <% comment = pr_comment(text, name: name, url: local_assigns[:url]) %>
   <% if comment.body %><%= tag.button('⎘ copy for PR comment', class: 'tool', type: 'button', aria: { label: "copy for PR comment: #{name} as a GitHub pull-request comment, with a link to this view" }, data: { controller: 'copy', copy_text_value: comment.body, action: 'copy#copy', needs_js: true, pr_comment: true, mermaid_name: name, mermaid_href: href }.compact) %><% else %><%= tag.span(comment.short_refusal, class: 'lyr', data: { pr_comment_refusal: comment.refusal, mermaid_name: name, mermaid_href: href }.compact) %><% end %>

@@ -79,6 +79,59 @@ module WoodsMap
       parts.empty? ? '0' : parts.join(' ')
     end
 
+    # One page of a long list (records, the page and its neighbours).
+    ImpactPage = Struct.new(:records, :number, :pages, :total, :size, :param, keyword_init: true) do
+      # @return [Integer] the position of the page's last record
+      def last
+        [number * size, total].min
+      end
+
+      # @return [String] "201–400 of 3412"
+      def label
+        "#{((number - 1) * size) + 1}–#{last} of #{total}"
+      end
+
+      # @return [Array(Integer, String), nil] the previous page and its link text
+      def previous
+        [number - 1, "← previous #{size}"] if number > 1
+      end
+
+      # @return [Array(Integer, String), nil] the next page and its link text
+      def following
+        [number + 1, "next #{[size, total - last].min} →"] if number < pages
+      end
+    end
+
+    # One page of a long list, the page number read from +param+ (1-based,
+    # clamped), so a range of thousands of records renders a bounded page.
+    #
+    # @param records [Array]
+    # @param param [Symbol] the query parameter that carries the page
+    # @param size [Integer] records per page
+    # @param at [Integer, nil] a record position whose page is the default
+    # @return [ImpactPage]
+    def impact_page(records, param, size, at: nil)
+      pages = [(records.size + size - 1) / size, 1].max
+      requested = params[param].presence || (at && ((at / size) + 1))
+      number = requested.to_i.clamp(1, pages)
+      ImpactPage.new(records: records.slice((number - 1) * size, size) || [], number: number, pages: pages,
+                     total: records.size, size: size, param: param.to_s)
+    end
+
+    # "201–400 of 3412" with previous and next links that keep the rest of the query.
+    #
+    # @param page [ImpactPage]
+    # @param anchor [String] the section the links return to
+    # @return [ActiveSupport::SafeBuffer, nil] nil when everything fits on one page
+    def impact_pager(page, anchor)
+      return nil if page.pages <= 1
+
+      links = [page.previous, page.following].compact.map do |number, text|
+        link_to(text, "#{request.path}?#{request.query_parameters.merge(page.param => number).to_query}##{anchor}")
+      end
+      tag.p(safe_join([page.label, *links], ' · '), class: 'cap pager')
+    end
+
     private
 
     def impact_facts(value)

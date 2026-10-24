@@ -118,24 +118,28 @@ module WoodsMap
                                       depth: @depth, direction: @direction, types: @types, via: @via) || local_mermaid
     end
 
-    # The map's own flowchart text, for a Woods without the diagram builders.
+    # The map's own flowchart text: each unit declared once with its label,
+    # the centre first, then the edges by id; the centre carries the `focus`
+    # class, which the text declares.
     #
     # @return [String]
     def local_mermaid
-      lines = ['flowchart LR', "  #{mermaid_node(*@focus)}"]
+      lines = ['flowchart LR'] + mermaid_nodes.map { |node| "  #{mermaid_node(*node)}" }
       edges.each do |edge|
-        from = mermaid_node(edge.from, edge.from_type)
-        to = mermaid_node(edge.to, edge.to_type)
-        lines << "  #{from} -->|#{edge.via}| #{to}"
+        lines << "  #{node_id(edge.from, edge.from_type)} -->|#{edge.via}| #{node_id(edge.to, edge.to_type)}"
       end
-      lines << "  class #{node_id(*@focus)} focus"
-      lines.join("\n")
+      (lines + ['  classDef focus stroke-width:3px', "  class #{node_id(*@focus)} focus"]).join("\n")
     end
 
     private
 
     def node_id(identifier, type)
       "n_#{Digest::SHA256.hexdigest([type, identifier].to_json)[0, 16]}"
+    end
+
+    # The centre, then every other unit an edge names, each once.
+    def mermaid_nodes
+      ([@focus] + edges.flat_map { |edge| [[edge.from, edge.from_type], [edge.to, edge.to_type]] }).uniq
     end
 
     def mermaid_node(identifier, type)

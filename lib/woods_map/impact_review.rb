@@ -72,12 +72,12 @@ module WoodsMap
       end
     end
 
-    # @return [Array<TestRow>] the specs mapped to the focus, then to the direct dependents
+    # @return [Array<TestRow>] the specs mapped to the focus, then to the
+    #   direct dependents, then to the units further out within the depth
     def tests
       @tests ||= begin
         rows = {}
-        reaches = [[@radius.focus, 'the focus'], [@radius.direct.map(&:identifier), 'a direct dependent']]
-        reaches.each do |ids, reach|
+        test_reaches.each do |ids, reach|
           ids.each do |id|
             coverage_of(id).each do |spec|
               row = rows[spec] ||= TestRow.new(spec: spec, covers: [], reaches: reach, layer: 'test_coverage')
@@ -101,7 +101,10 @@ module WoodsMap
 
     # @return [Array<Unknown>] what the index reported it could not resolve around the radius
     def unknowns
-      @unknowns ||= unresolved_renders + @ivar_rule.unknowns + unresolvable_routes + volatile_dependencies
+      @unknowns ||= begin
+        radius = ImpactUnknowns.new(@repository, @radius, @analysis)
+        radius.unresolved_renders + @ivar_rule.unknowns + radius.unresolvable_routes + radius.volatile_dependencies
+      end
     end
 
     # @return [Array<Array(String, String, String)>] layer, true within, not proven
@@ -110,6 +113,14 @@ module WoodsMap
     end
 
     private
+
+    # The focus, the direct dependents, then each further distance within the depth.
+    def test_reaches
+      reaches = [[@radius.focus, 'the focus'], [@radius.direct.map(&:identifier), 'a direct dependent']]
+      reaches + @radius.transitive.group_by(&:distance).sort.map do |distance, units|
+        [units.map(&:identifier), "#{distance} hops away"]
+      end
+    end
 
     def coverage_of(identifier)
       Array(@graph.dig('reverse_via', identifier)).select { |e| e['via'] == 'test_coverage' }.pluck('source')
@@ -139,7 +150,7 @@ module WoodsMap
     end
 
     def job_findings
-      ids = (@radius.focus + @radius.direct.map(&:identifier)).select { |id| @radius.type_of(id) == 'job' }
+      ids = @radius.involved.uniq.select { |id| @radius.type_of(id) == 'job' }
       ids.filter_map do |id|
         job = @repository.unit(id, type: 'job')
         next unless job && %w[retry_on discard_on].all? { |key| Array(job.dig('metadata', key)).empty? }
@@ -147,36 +158,6 @@ module WoodsMap
         Finding.new(severity: 'note', text: 'A job with no retry or discard policy is in the radius', where: id,
                     evidence: 'declares no retry_on / discard_on', layer: 'job metadata',
                     rule: 'job without retry touched')
-      end
-    end
-
-    # Woods' render-target resolver publishes +{ name:, reason: }+ for a component render that names no
-    # component (+render Ghost.new+), on controllers and components alike.
-    def unresolved_renders
-      @radius.involved.flat_map do |id|
-        renders = Array(@repository.unit(id, type: @radius.type_of(id))&.dig('metadata', 'unresolved_renders'))
-        renders.grep(Hash).map do |render|
-          reason = render['reason'] && " (#{render['reason'].tr('_', ' ')})"
-          Unknown.new(kind: 'render by name', where: id, why: "render #{render['name']}#{reason}",
-                      resolves: 'a component class the index knows')
-        end
-      end
-    end
-
-    def unresolvable_routes
-      Array(@analysis['unresolvable_routes']).map do |route|
-        where = route.is_a?(Hash) ? route['route'] || route['identifier'] : route.to_s
-        Unknown.new(kind: 'unresolvable route', where: where,
-                    why: 'the route names no controller action the index knows',
-                    resolves: 'a resolvable controller#action')
-      end
-    end
-
-    def volatile_dependencies
-      Array(@analysis['volatile_dependencies']).map do |dep|
-        where = dep.is_a?(Hash) ? "#{dep['source']} → #{dep['target']}" : dep.to_s
-        Unknown.new(kind: 'volatile dependency', where: where, why: 'the edge comes and goes between extractions',
-                    resolves: 'a stable reference, or a re-extraction')
       end
     end
   end

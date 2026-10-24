@@ -5,8 +5,9 @@
     mermaid (String) with label (String, the diagram's accessible name).
     Mermaid text is drawn by Pele in the browser (D-21) and stays in the
     page as the no-JavaScript fallback and the copy source; refusal (String
-    or nil) keeps the text and says why nothing is drawn, such as a node
-    budget (R-4). A Mermaid panel carries its own copy tool and .mmd link
+    or nil) says why nothing is drawn, such as a node budget (R-4), and keeps
+    the text folded under a "Mermaid text" disclosure, as the toggle folds it
+    on a drawn panel. A Mermaid panel carries its own copy tool and .mmd link
     (components/mermaid_tools); name (String) names the file, the title by
     default; mermaid_url (String) is the panel's .mmd route (D-25); key ("y" or nil) marks
     the copy the status bar names; and
@@ -21,7 +22,11 @@
     <div class="dw hscroll" data-controller="cliff" data-diagram-target="scroller">
       <% if refusal %><p class="cap refusal"><%= refusal %></p><% else %><p class="cap refusal" role="status" data-diagram-target="message" hidden></p><% end %>
       <div class="pele-host" data-diagram-target="canvas" hidden></div>
-      <pre class="cmd bare" role="region" aria-label="Mermaid source" tabindex="0" data-controller="cliff" data-diagram-target="source"><%= mermaid %></pre>
+      <% if refusal %>
+        <details class="mmd-src"><summary>Mermaid text, <%= pluralize(mermaid.count("\n") + 1, 'line') %></summary><pre class="cmd bare" role="region" aria-label="Mermaid source" tabindex="0" data-controller="cliff"><%= mermaid %></pre></details>
+      <% else %>
+        <pre class="cmd bare" role="region" aria-label="Mermaid source" tabindex="0" data-controller="cliff" data-diagram-target="source"><%= mermaid %></pre>
+      <% end %>
     </div>
   <% else %>
     <div class="dw hscroll" data-controller="cliff"><%= body %></div>

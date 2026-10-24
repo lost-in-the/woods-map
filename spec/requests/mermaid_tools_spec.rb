@@ -46,4 +46,24 @@ RSpec.describe 'Mermaid tools on the diagram panels', type: :request do
     expect(response.body).to include('swimlane-beta')
     expect(response.body).not_to include('may not render on GitHub')
   end
+
+  describe 'a diagram over its budget' do
+    before { stub_const('WoodsMap::Neighbourhood::NODE_BUDGET', 2) }
+
+    it 'keeps the copy and leaves out the .mmd link, which would answer 422' do
+      get '/woods/units/model/User/graph'
+      tools = response.parsed_body.css('.dia .dh .tools')
+      expect([tools.css('[data-controller="copy"]').empty?, tools.css('a[data-mermaid-url]').size]).to eq([false, 0])
+      expect(tools.text).to include('no .mmd over the budget')
+      get '/woods/units/model/User/graph.mmd'
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it 'folds the Mermaid text under a disclosure instead of showing it' do
+      get '/woods/units/model/User/graph'
+      fold = response.parsed_body.at_css('.dia details.mmd-src')
+      expect(fold.at_css('summary').text).to start_with('Mermaid text, ')
+      expect(fold.at_css('pre.cmd').text).to start_with('flowchart LR')
+    end
+  end
 end

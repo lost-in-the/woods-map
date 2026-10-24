@@ -390,6 +390,11 @@ html.no-js .wm .amb-pop[hidden]{display:block}
    author that filters the timeline (woods-map#92) is a link, not a tooltip. */
 .wm .tbl td .who{max-width:100%}
 .wm a.who{cursor:pointer}
+/* A diagram over its budget (R-4) keeps its Mermaid text folded, as a drawn panel's toggle folds it. */
+.wm .dia .mmd-src{margin:var(--s3) 0 0}
+.wm .dia .mmd-src > summary{cursor:pointer;color:var(--link);font-family:var(--ff-ui);font-size:var(--fs-12);width:max-content}
+.wm .dia .mmd-src > summary:focus-visible{outline:2px solid var(--select);outline-offset:2px}
+.wm .dia .mmd-src > pre{margin:var(--s3) 0 0}
 
 /* Freshness: the bar's words link to the status page's reasons. */
 .wm .bar-fresh a.why{color:inherit;text-decoration:none}

@@ -3,7 +3,7 @@
 <% n = @neighbourhood %>
 <% here = ->(**opts) { woods_map.graph_path(centre: @centre['identifier'], type: @centre['type'], **opts.compact) } %>
 <%= render 'woods_map/shared/crumbs', crumbs: [['graph', woods_map.graph_path], [@centre['identifier'], nil]], trail: tag.span('', data: { trail_target: 'list' }) %>
-<%= render 'woods_map/shared/ident', title: @centre['identifier'], subtitle: "#{@centre['type'].tr('_', ' ')}, full-screen graph, gen #{@repository.generation_number}",
+<%= render 'woods_map/shared/ident', title: @centre['identifier'], subtitle: "#{@centre['type'].tr('_', ' ')}, graph page, gen #{@repository.generation_number}",
       controls: link_to('Open unit', woods_map.unit_path(type: @centre['type'], identifier: @centre['identifier']), class: 'btn') %>
 <%= render 'woods_map/graphs/explorer', identifier: @centre['identifier'], type: @centre['type'], n: n, page: true, blast: @blast,
       flows: @flows, flow: @flow, timeline: @timeline,
