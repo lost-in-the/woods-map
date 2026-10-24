@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- A hub's first impact view no longer opens every unit it reaches.
+  - **Render-by-name unknowns:** the Unknown tab opens only the reached units that Woods' graph lists as having unresolved renders (`unresolved_render_count`, woods#837), through `Repository#units_with`. A generation from an older Woods, or a Woods without the summary, still opens every reached unit.
+  - **Action templates:** the passages behind the unassigned-ivar rule find an action's templates through an index of the generation's view templates, built once per template list, instead of scanning every template for every action.
 - A retained range is compared once per process, with Woods' `ReportCache` (woods#835) when the installed Woods has one. The impact page's lenses and pages, the unit diff and `?since=` views of one range share one comparison. Woods keys it on the payloads the range resolves to, so `gen:N`, a commit SHA and `now` naming one pair share it, and a new publish or prune is a new key. On a Woods without the cache, each view still compares.
 
 - The Graph neighbourhood, the Schema ER and the Lifecycle sequence draw their Mermaid from Woods' own builders (`Woods::Diagrams`, woods#826) when the loaded Woods has them. The Index MCP server's `diagram` tool and `woods:diagram` answer from the same builders. The text is unchanged, byte for byte: `spec/woods_map/woods_diagrams_spec.rb` compares every unit, depth, direction, filter and event on the fixture and the 300-model index. A Woods without the builders keeps the map's own. An edge without a mechanism draws a plain arrow in both, never an empty label. The lanes and flowchart views, `?since=` marks, C4 views, the ERD, History and the Trail stay in the map.

@@ -147,6 +147,20 @@ module WoodsMap
       type ? nodes.find { |node| node['type'].to_s == type.to_s } : nodes.first
     end
 
+    # The typed units whose graph node summarises a fact (woods#837), so a
+    # page opens only the units that have something to report. Read from the
+    # generation's shared graph, once per generation.
+    #
+    # @param fact [Symbol] +:unresolved_renders+ or +:action_facts+
+    # @return [Array<Hash>, nil] +identifier+, +type+ and +count+ or +actions+;
+    #   nil when the generation's writer, or the loaded Woods, does not
+    #   summarise the fact, and the caller opens units instead
+    def units_with(fact)
+      snapshot.fetch([:units_with, fact.to_sym]) do
+        Woods::PublishedIndex::NodeFacts.call(graph, fact) if defined?(Woods::PublishedIndex::NodeFacts)
+      end
+    end
+
     # @return [Pathname] the index root this repository was opened at
     delegate :index_dir, to: :@index
 

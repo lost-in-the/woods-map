@@ -17,6 +17,40 @@ RSpec.describe WoodsMap::Repository do
     expect { described_class.open('/nonexistent/woods') { |_| nil } }.to raise_error(described_class::Unavailable)
   end
 
+  describe '#units_with (woods#837)' do
+    let(:graph) do
+      { 'nodes' => { 'WidgetsController' => { 'type' => 'controller', 'unresolved_render_count' => 2 },
+                     'Widget' => { 'type' => 'model' } },
+        'node_facts' => %w[fact_actions unresolved_render_count] }
+    end
+    let(:repository) { described_class.new(synthetic_published_index) }
+
+    before do
+      allow(Woods::MCP::IndexReader).to receive(:new).and_return(instance_double(Woods::MCP::IndexReader))
+      allow(repository).to receive(:graph).and_return(graph)
+    end
+
+    it "answers the generation's node summary from the shared graph, once per generation" do
+      skip 'needs a Woods that summarises node facts (woods#837)' unless defined?(Woods::PublishedIndex::NodeFacts)
+
+      rows = [{ 'identifier' => 'WidgetsController', 'type' => 'controller', 'count' => 2 }]
+      2.times { expect(repository.units_with(:unresolved_renders)).to eq(rows) }
+      expect(repository).to have_received(:graph).once
+    end
+
+    it 'answers nil for a generation whose writer does not summarise the fact' do
+      skip 'needs a Woods that summarises node facts (woods#837)' unless defined?(Woods::PublishedIndex::NodeFacts)
+
+      graph.delete('node_facts')
+      expect(repository.units_with(:unresolved_renders)).to be_nil
+    end
+
+    it 'answers nil with a Woods that does not publish the summaries' do
+      hide_const('Woods::PublishedIndex::NodeFacts')
+      expect(repository.units_with(:unresolved_renders)).to be_nil
+    end
+  end
+
   describe 'typed graph lookup' do
     let(:primary) { { 'type' => 'factory', 'file_path' => 'spec/factories/reports.rb' } }
     let(:variant) do
