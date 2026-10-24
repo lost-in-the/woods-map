@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- The Code tab's count says what it counts: `25 loc`, Woods' lines of code (neither blank nor a comment), where it said `25 lines` beside a code header of `37 lines` for the same file. The header now names both, `37 lines · 25 loc`, the loc explained on hover and focus.
 - Landscape Context and treemap (woods-map#5, docs/design/notes/landscape.md).
   - **Context (C4 level 1)** is its own tab at `/woods/landscape/context`. It shows the host's people (`config.landscape_actors`), the system, and the external systems the index records: mail delivery and object storage from the BehavioralProfile unit, and declared external consumers. The Pele diagram has its Mermaid at `/woods/landscape/context.mmd`. The Structurizr DSL and LikeC4 exports now carry the people and a system context view. The page names its limits: services the code calls are not published (woods#814).
   - **Where the code is** on Hotspots: a Pele treemap of lines of code by Packwerk package and unit type, from `graph_analysis.json` `package_sizes` (woods#810), or the application as one block from node `loc` without packages. Its Mermaid is at `/woods/landscape/treemap.mmd`, which answers 422 without source sizes.

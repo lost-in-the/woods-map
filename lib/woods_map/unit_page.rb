@@ -80,13 +80,22 @@ module WoodsMap
       TABS.fetch(type, DEFAULT_TABS)
     end
 
+    # Woods' lines of code: lines that are neither blank nor a comment, as
+    # its extractors count them (`metadata.loc`). The code view's header
+    # names the file's full line count beside it.
+    #
+    # @return [Integer, nil]
+    def loc
+      @metadata['loc']
+    end
+
     # The count each tab shows (C5: one count per tab).
     #
     # @param tab [String]
     # @return [String, Integer, nil]
     def tab_count(tab)
       case tab
-      when 'code' then @metadata['loc'] && "#{@metadata['loc']} lines"
+      when 'code' then loc && "#{loc} loc"
       when 'schema' then @metadata['column_count']
       when 'passage' then Array(@metadata['actions']).size.nonzero?
       when 'routes' then routes_count
