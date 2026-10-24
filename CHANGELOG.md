@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Author filter on the History tab, `/woods/history` and the graph's timeline (woods-map#92, design-study scenario 2 step 4). Every author name is a link that narrows the timeline to that author's commits with `?author=`, matched exactly against the generation's commit table (W-3) as git recorded the name, truncated per D-17 with the full name in the tooltip. The filtered History tab keeps every author in its people rail, links back to all authors, and offers the author's commits across the neighbourhood: `/woods/history` over the unit and the units that change with it. `/woods/history` and the graph's timeline list a window's authors when there are several. The strip, counts and exports follow the filter; a name no commit carries shows an empty state, never a guess.
 - M6 Trail (woods-map#8, C-1 to C-5): `/woods/trail` follows one entry (a job, a mailer action, a controller action or a model event such as `Post@create`) through Woods' flow and across each `perform_later` and mail delivery into the job or mailer that runs it, in lanes by unit type, with each mailer action's templates.
   - Flags from published facts, each naming its evidence: no `retry_on`/`discard_on` and no `rescue_from` (W-4), conditional callbacks, `if` without else, dynamic dispatch, cross-database edges, hubs, and template ivars the mailer action never assigns.
   - The board is its URL: entry, `pin[]=type:identifier`, `gen` and `hops`, token-free. A retained `gen` is read as the board was made.
