@@ -54,17 +54,23 @@
       </section>
       <section class="sec">
         <% sizes = h.code_sizes %>
-        <header><h2 class="t2">Where the code is <%= count_tag(sizes.any? ? "#{h.sized_by_package? ? "#{sizes.size} #{'package'.pluralize(sizes.size)}" : 'the application'} by lines of code, #{number_with_delimiter(sizes.values.sum { |types| types.values.sum })}" : 'no sizes published') %><%= info_tip('Lines of code (lines with anything but whitespace) of each distinct source file, from Woods\' source sizes (woods#810): by Packwerk package from graph_analysis.json package_sizes, otherwise the application as one block; within a block by unit type. Inlined concerns are not added.') %></h2></header>
+        <% what = WoodsMap::CodeSizes::METRICS[h.metric] %>
+        <header>
+          <h2 class="t2">Where the code is <%= count_tag(sizes.any? ? "#{h.sized_by_package? ? "#{sizes.size} #{'package'.pluralize(sizes.size)}" : 'the application'} by #{what}, #{number_with_delimiter(sizes.values.sum { |types| types.values.sum })}" : 'nothing to size by') %><%= info_tip('Sized by lines of code (lines with anything but whitespace, each distinct file once, from Woods\' source sizes, woods#810), by the number of application units, or by their summed PageRank × 1000; by Packwerk package when the generation has packages, otherwise the application as one block; within a block by unit type.') %></h2>
+          <span class="seg" role="group" aria-label="Size the treemap by"><% WoodsMap::CodeSizes::METRICS.each do |key, label| %><%= link_to(label.sub(' × 1000', ''), woods_map.landscape_path(tab: 'hotspots', size: (key == 'loc' ? nil : key)), 'aria-current': (h.metric == key ? 'true' : nil)) %><% end %></span>
+        </header>
         <% if sizes.any? %>
-          <%= render 'woods_map/components/diagram', title: 'Where the code is', facts: [h.sized_by_package? ? 'by package' : 'one block, no packages', 'then by unit type', 'size = loc'],
-                name: 'landscape treemap', mermaid_url: woods_map.landscape_diagram_mmd_path(diagram: 'treemap'), mermaid: h.treemap_mermaid,
-                label: "Treemap of lines of code: #{sizes.map { |block, types| "#{block} #{types.values.sum}" }.join(', ')}; the table below has each figure",
-                provenance: [h.sized_by_package? ? 'graph_analysis package_sizes' : 'graph node loc', "gen #{@repository.generation_number}"] %>
-          <%= render 'woods_map/components/table', label: 'Lines of code by block and type', min_width: '560px',
-                columns: [{ label: h.sized_by_package? ? 'package' : 'block', width: '30%' }, { label: 'loc', width: '14%' }, { label: 'by unit type' }],
+          <%= render 'woods_map/components/diagram', title: 'Where the code is', facts: [h.sized_by_package? ? 'by package' : 'one block, no packages', 'then by unit type', "size = #{what}"],
+                name: "landscape treemap #{h.metric}", mermaid_url: woods_map.landscape_diagram_mmd_path(diagram: 'treemap', size: (h.metric == 'loc' ? nil : h.metric)), mermaid: h.treemap_mermaid,
+                label: "Treemap by #{what}: #{sizes.map { |block, types| "#{block} #{types.values.sum}" }.join(', ')}; the table below has each figure",
+                provenance: [h.metric == 'loc' ? (h.sized_by_package? ? 'graph_analysis package_sizes' : 'graph node loc') : (h.metric == 'units' ? 'graph nodes with a container' : 'graph pagerank'), "gen #{@repository.generation_number}"] %>
+          <%= render 'woods_map/components/table', label: "#{what.capitalize} by block and type", min_width: '560px',
+                columns: [{ label: h.sized_by_package? ? 'package' : 'block', width: '30%' }, { label: what, width: '14%' }, { label: 'by unit type' }],
                 rows: sizes.map { |block, types| { cells: [tag.b(block), number_with_delimiter(types.values.sum), types.sort_by { |t, n| [-n, t] }.map { |t, n| "#{t.tr('_', ' ').pluralize} #{number_with_delimiter(n)}" }.join(', ')] } } %>
+        <% elsif h.metric == 'loc' %>
+          <%= render 'woods_map/components/empty_state', title: 'No source sizes in this generation', text: safe_join(['Woods publishes the lines of code of each application unit\'s file from ', link_to('woods#810', 'https://github.com/lost-in-the/woods/issues/810'), '. Extract again with a Woods that includes it, or size by unit count or PageRank.']) %>
         <% else %>
-          <%= render 'woods_map/components/empty_state', title: 'No source sizes in this generation', text: safe_join(['Woods publishes the lines of code of each application unit\'s file from ', link_to('woods#810', 'https://github.com/lost-in-the/woods/issues/810'), '. Extract again with a Woods that includes it.']) %>
+          <%= render 'woods_map/components/empty_state', title: 'No application units to size', text: 'This generation has no container attribution (W-9), which marks the application\'s own units.' %>
         <% end %>
       </section>
       <section class="sec">

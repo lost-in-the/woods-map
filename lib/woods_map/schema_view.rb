@@ -12,6 +12,16 @@ module WoodsMap
     # the text, rather than drawing a diagram nobody can read.
     TABLE_BUDGET = 40
 
+    # The Schema tab of a unit in one generation, its far tables read from the graph.
+    #
+    # @param repository [Repository]
+    # @param unit [Hash]
+    # @param table [Hash, nil]
+    # @return [SchemaView]
+    def self.for(repository, unit, table: nil)
+      new(unit, table: table, graph_analysis: repository.graph_analysis, tables: repository.model_tables)
+    end
+
     # @param unit [Hash] a model or database_table unit
     # @param table [Hash, nil] the database_table unit behind a model
     # @param graph_analysis [Hash]
@@ -26,6 +36,9 @@ module WoodsMap
       @table_metadata = (table || (unit['type'] == 'database_table' ? unit : nil))&.dig('metadata') || {}
       @analysis = graph_analysis
     end
+
+    # @return [SchemaClassDiagram] the class diagram of the same model
+    def class_diagram = @class_diagram ||= SchemaClassDiagram.new(@unit)
 
     # @return [String, nil]
     def table_name

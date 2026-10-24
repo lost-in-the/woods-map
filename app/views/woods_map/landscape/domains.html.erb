@@ -9,6 +9,11 @@
       <% elsif @clusters.empty? %>
         <%= render 'woods_map/components/empty_state', title: 'No domain clusters', text: 'No namespace of the application has enough units to seed a cluster.' %>
       <% else %>
+        <% mindmap = WoodsMap::DomainMindmap.new(@clusters, system_name: @landscape.system_name) %>
+        <%= render 'woods_map/components/diagram', title: 'Domain mindmap', facts: ["#{@clusters.size} #{'cluster'.pluralize(@clusters.size)}", "hub first, at most #{WoodsMap::DomainMindmap::MEMBERS} members each"],
+              name: 'landscape domains mindmap', mermaid_url: woods_map.landscape_diagram_mmd_path(diagram: 'mindmap'), mermaid: mindmap.mermaid, refusal: mindmap.refusal,
+              label: "Mindmap of #{@landscape.system_name}'s domain clusters and their members; the table below has every cluster",
+              provenance: ['graph_analysis domain_clusters', "gen #{@repository.generation_number}"] %>
         <%= render 'woods_map/components/table', label: 'Domain clusters', min_width: '760px', columns: [{ label: 'cluster', width: '18%' }, { label: 'hub', width: '24%' }, { label: 'units', width: '8%' }, { label: 'types' }, { label: 'entry points', width: '22%' }, { label: 'graph', width: '12%' }],
               rows: @clusters.map { |cluster|
                 hub_type = Array(cluster['typed_members']).find { |m| m['identifier'] == cluster['hub'] }&.dig('type')

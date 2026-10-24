@@ -47,9 +47,8 @@ module WoodsMap
 
     def schema
       with_unit do
-        @schema = WoodsMap::SchemaView.new(@unit, table: @page.table, graph_analysis: @repository.graph_analysis,
-                                                  tables: model_tables)
-        next render_tab_mermaid(@schema.mermaid, 'schema', refusal: @schema.refusal) if mermaid_request?
+        @schema = WoodsMap::SchemaView.for(@repository, @unit, table: @page.table)
+        next render_schema_mermaid if mermaid_request?
 
         render :schema
       end
@@ -185,13 +184,6 @@ module WoodsMap
 
     # concern name => the instance methods that concern defines, for the
     # concerns the unit inlines.
-    # model identifier => the table its graph node names
-    def model_tables
-      Hash(@repository.graph['nodes']).each_with_object({}) do |(identifier, node), tables|
-        tables[identifier] = node['table'] if node['type'] == 'model' && node['table']
-      end
-    end
-
     def concern_methods(unit)
       Array(unit.dig('metadata', 'inlined_concerns')).to_h do |name|
         concern = @repository.unit(name, type: 'concern')

@@ -76,7 +76,9 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
       [['flowchart', 'landscape containers', WoodsMap::LandscapeExport.new(landscape).mermaid],
        ['quadrantChart', 'hotspots quadrant', hotspots.quadrant_mermaid],
        ['sankey', 'hotspots forward flow', hotspots.sankey_mermaid],
-       ['flowchart', 'landscape context', WoodsMap::LandscapeContext.new(landscape, actors: context_actors).mermaid]] +
+       ['flowchart', 'landscape context', WoodsMap::LandscapeContext.new(landscape, actors: context_actors).mermaid],
+       ['mindmap', 'domains mindmap', WoodsMap::DomainMindmap.new(repository.graph_analysis['domain_clusters'],
+                                                                  system_name: 'Blog (main)').mermaid]] +
         component_diagrams + treemap_diagrams +
         dynamic_diagrams(repository, WoodsMap::DynamicView.new(repository, landscape: landscape))
     end
@@ -190,7 +192,8 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
   def model_diagrams(unit, analysis)
     lifecycle = WoodsMap::Lifecycle.new(unit)
     id = unit['identifier']
-    [['er', "schema #{id}", WoodsMap::SchemaView.new(unit, graph_analysis: analysis).mermaid]] +
+    [['er', "schema #{id}", WoodsMap::SchemaView.new(unit, graph_analysis: analysis).mermaid],
+     ['class', "class #{id}", WoodsMap::SchemaClassDiagram.new(unit).mermaid]] +
       lifecycle.chains.keys.flat_map do |event|
         [['sequence', "lifecycle #{id} #{event}", lifecycle.mermaid(event)],
          ['flowchart', "lifecycle flowchart #{id} #{event}", lifecycle.flowchart(event)],
@@ -238,7 +241,8 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
   it 'draws every generated text as the diagram type it declares' do
     list = diagrams
     expect(list.map(&:first).uniq).to contain_exactly('er', 'sequence', 'flowchart', 'swimlane', 'state', 'timeline',
-                                                      'xychart', 'quadrantChart', 'sankey', 'treemap')
+                                                      'xychart', 'quadrantChart', 'sankey', 'treemap', 'class',
+                                                      'mindmap')
     results = render_all(list)
     failures = list.filter_map do |type, name, _|
       r = results.fetch(name)

@@ -44,7 +44,7 @@ lib/woods_map/unit_facts.rb       # type-specific tiles from published unit meta
 lib/woods_map/{unit_page,code_view,composite_source,highlighter,marginalia,references,outline}.rb  # the unit page and Code tab
 lib/woods_map/{history_view,history_generations,commit_rows,commit_strip,generation_strip,commit_ledger,generation_facets,unit_co_changes,unit_paths,path_heat,history_mermaid,history_timeline,unit_diff,source_diff,repository_history}.rb  # M4 History: the tab, the strips by time and by generation, the generation ledger, facets moved, co-change, gutter heat, exports, /woods/history, the unit diff and Woods' unified source diff
 lib/woods_map/hover_card.rb      # B-3 hover cards: graph node, PageRank place and metadata.git of each linked unit
-lib/woods_map/{schema_view,lifecycle,neighbourhood}.rb  # the Schema, Lifecycle and Graph tabs
+lib/woods_map/{schema_view,schema_class_diagram,lifecycle,neighbourhood}.rb  # the Schema (ER and class diagram), Lifecycle and Graph tabs
 lib/woods_map/{lifecycle_chart,state_machine_view}.rb  # the Lifecycle flowchart and lanes; a model's published state machines
 lib/woods_map/dynamic_view.rb    # the C4 dynamic view (B-23): a model event or an action's passage grouped by W-9 container
 lib/woods_map/erd.rb             # /woods/erd: database_table units chunked at the ER budget, relations, schema findings (cached per generation)
@@ -53,7 +53,7 @@ lib/woods_map/routes_view.rb     # the controller Routes tab: declared routes jo
 lib/woods_map/permitted_attributes.rb  # permitted keys against the model's published columns, associations, attachments, rich text, writers
 lib/woods_map/partial_locals.rb  # locals each partial is passed (template partial_renders, W-7 renders) against its locals_read
 lib/woods_map/{neighbourhood_query,neighbourhood_response,graph_elements}.rb  # bounded JSON projection of existing traversal
-lib/woods_map/{landscape,landscape_context,container_relationships,landscape_export,hotspots,code_sizes,components}.rb  # the Landscape: C4 containers from metadata.container (W-9), its text exports, components by package/namespace/cluster, hotspots (quadrant, sankey), domains
+lib/woods_map/{landscape,landscape_context,landscape_services,landscape_status,container_relationships,landscape_export,hotspots,code_sizes,components,domain_mindmap}.rb  # the Landscape: C4 containers from metadata.container (W-9), its text exports, components by package/namespace/cluster, hotspots (quadrant, sankey), domains
 lib/woods_map/{graph_flow,graph_timeline,repository_flows}.rb  # the graph's flow overlay (W-13 membership and documents) and commit timeline (W-3)
 lib/woods_map/{blast_radius,impact_review}.rb  # the impact page's pre-change mode: reverse-edge propagation with paths; rules, tests, gaps, unknowns
 lib/woods_map/{impact_range,range_report,since}.rb  # Woods' range or saved report, its tabs, and ?since= evidence for unit pages (E-6 to E-8)
