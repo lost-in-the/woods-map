@@ -140,8 +140,13 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .filter.auto{width:auto}
 .wm .tbl.fixed{table-layout:fixed}
 .wm .tbl.fit{min-width:max-content}
-.wm .tbl.min-480{--tbl-min:480px} .wm .tbl.min-560{--tbl-min:560px} .wm .tbl.min-640{--tbl-min:640px} .wm .tbl.min-700{--tbl-min:700px} .wm .tbl.min-720{--tbl-min:720px} .wm .tbl.min-760{--tbl-min:760px}
-.wm .tbl.min-820{--tbl-min:820px} .wm .tbl.min-860{--tbl-min:860px} .wm .tbl.min-900{--tbl-min:900px} .wm .tbl.min-980{--tbl-min:980px}
+.wm .tbl.min-480{--tbl-min:480px} .wm .tbl.min-500{--tbl-min:500px} .wm .tbl.min-520{--tbl-min:520px} .wm .tbl.min-540{--tbl-min:540px} .wm .tbl.min-560{--tbl-min:560px} .wm .tbl.min-580{--tbl-min:580px}
+.wm .tbl.min-600{--tbl-min:600px} .wm .tbl.min-620{--tbl-min:620px} .wm .tbl.min-640{--tbl-min:640px} .wm .tbl.min-660{--tbl-min:660px} .wm .tbl.min-680{--tbl-min:680px} .wm .tbl.min-700{--tbl-min:700px}
+.wm .tbl.min-720{--tbl-min:720px} .wm .tbl.min-740{--tbl-min:740px} .wm .tbl.min-760{--tbl-min:760px} .wm .tbl.min-780{--tbl-min:780px} .wm .tbl.min-800{--tbl-min:800px} .wm .tbl.min-820{--tbl-min:820px}
+.wm .tbl.min-840{--tbl-min:840px} .wm .tbl.min-860{--tbl-min:860px} .wm .tbl.min-880{--tbl-min:880px} .wm .tbl.min-900{--tbl-min:900px} .wm .tbl.min-920{--tbl-min:920px} .wm .tbl.min-940{--tbl-min:940px}
+.wm .tbl.min-960{--tbl-min:960px} .wm .tbl.min-980{--tbl-min:980px} .wm .tbl.min-1000{--tbl-min:1000px} .wm .tbl.min-1020{--tbl-min:1020px} .wm .tbl.min-1040{--tbl-min:1040px} .wm .tbl.min-1060{--tbl-min:1060px}
+.wm .tbl.min-1080{--tbl-min:1080px} .wm .tbl.min-1100{--tbl-min:1100px} .wm .tbl.min-1120{--tbl-min:1120px} .wm .tbl.min-1140{--tbl-min:1140px} .wm .tbl.min-1160{--tbl-min:1160px} .wm .tbl.min-1180{--tbl-min:1180px}
+.wm .tbl.min-1200{--tbl-min:1200px}
 .wm .tree [data-level="0"]{--l:0} .wm .tree [data-level="1"]{--l:1} .wm .tree [data-level="2"]{--l:2} .wm .tree [data-level="3"]{--l:3} .wm .tree [data-level="4"]{--l:4} .wm .tree [data-level="5"]{--l:5} .wm .tree [data-level="6"]{--l:6} .wm .tree [data-level="7"]{--l:7} .wm .tree [data-level="8"]{--l:8} .wm .tree [data-level="9"]{--l:9} .wm .tree [data-level="10"]{--l:10} .wm .tree [data-level="11"]{--l:11} .wm .tree [data-level="12"]{--l:12} .wm .tree [data-level="13"]{--l:13} .wm .tree [data-level="14"]{--l:14} .wm .tree [data-level="15"]{--l:15} .wm .tree [data-level="16"]{--l:16} .wm .tree [data-level="17"]{--l:17} .wm .tree [data-level="18"]{--l:18} .wm .tree [data-level="19"]{--l:19} .wm .tree [data-level="20"]{--l:20} .wm .tree [data-level="21"]{--l:21} .wm .tree [data-level="22"]{--l:22} .wm .tree [data-level="23"]{--l:23} .wm .tree [data-level="24"]{--l:24}
 .wm .tree .deep{--l:24}
 .wm .st[data-depth="0"]{--d:0} .wm .st[data-depth="1"]{--d:1} .wm .st[data-depth="2"]{--d:2} .wm .st[data-depth="3"]{--d:3} .wm .st[data-depth="4"]{--d:4} .wm .st[data-depth="5"]{--d:5} .wm .st[data-depth="6"]{--d:6} .wm .st[data-depth="7"]{--d:7} .wm .st[data-depth="8"]{--d:8} .wm .st[data-depth="9"]{--d:9} .wm .st[data-depth="10"]{--d:10} .wm .st[data-depth="11"]{--d:11} .wm .st[data-depth="12"]{--d:12}
