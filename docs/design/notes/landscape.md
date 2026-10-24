@@ -3,10 +3,39 @@
 Scope: B-21, B-22 (by package, namespace or domain cluster), FR-6 exports, D-25.
 Relates to #5 (M3) and #7 (M5). Boards: [B8-Landscape](../boards/B8-Landscape.html)
 for Containers, Components and the group control, [B6-Overview](../boards/B6-Overview.html)
-for Hotspots. The Domains tab has no board; this note covers it.
+for Hotspots. B8-Landscape draws Context only as the first rung of the ladder; the
+Context tab and the Domains tab have no board of their own, so this note covers them.
 
-`/woods/landscape(/containers|components|hotspots|domains)` reads one pinned generation.
+`/woods/landscape(/context|containers|components|hotspots|domains)` reads one pinned
+generation; without a tab it opens Containers, as on the board.
 `Landscape` joins the primary bar, between Units and Graph.
+
+## Context (C4 level 1)
+
+The board's ladder names L1 as "people, 1 system, external systems". The tab draws
+exactly that, in the Containers tab's three columns:
+
+- **People** come only from the host's `config.landscape_actors` (`name`, `description`,
+  `uses`). The index does not know who uses the system. With none declared, the column
+  says how to declare them.
+- **The software system** is one box: the host's `config.system_name`, Rails from the
+  BehavioralProfile unit, the number of application units, and a link to Containers.
+- **External systems** are the ones Containers already draws: mail delivery and object
+  storage from the BehavioralProfile unit, and each declared `external_consumer` unit.
+
+Each person is linked to the system with their `uses` text, and the system to mail
+delivery and object storage. A declared consumer is linked to the system as *reads
+shared tables*. Each relationship names its source. The Pele diagram draws people as
+stadiums, the system as a box and externals as subroutines.
+
+**Limits, named on the page.**
+- People are host configuration.
+- The services the code calls aren't published. The Gemfile unit lists its runtime
+  gems (`default` and `production` groups), and the page counts them, but nothing says
+  which gems reach another system. The map keeps no gem-to-service table of its own;
+  the data is filed as [woods#814](https://github.com/lost-in-the/woods/issues/814).
+- Inbound callers other than declared table consumers, such as webhooks and API
+  clients, aren't recorded.
 
 ## Containers (C4 level 2)
 
@@ -43,14 +72,16 @@ name in `Content-Disposition`. A generation without W-9 answers 422.
 | Format | URL | Content |
 |---|---|---|
 | Mermaid | `/woods/landscape.mmd` | flowchart, the system as a subgraph |
-| Structurizr DSL | `/woods/landscape.dsl` | workspace, one container view, `Database` cylinder |
-| LikeC4 | `/woods/landscape.c4` | specification, model, `containers of app` view |
+| Structurizr DSL | `/woods/landscape.dsl` | workspace with the host's people; a `systemContext` view and a container view, `Database` cylinder |
+| LikeC4 | `/woods/landscape.c4` | specification, model with the host's people, `context` and `containers of app` views |
+| Mermaid | `/woods/landscape/context.mmd` | the Context flowchart |
 | Mermaid | `/woods/landscape/components.mmd?group=package\|namespace\|cluster` | the Components flowchart |
 | Mermaid | `/woods/landscape/quadrant.mmd` | the Hotspots quadrant |
 | Mermaid | `/woods/landscape/sankey.mmd` | the Hotspots forward flow |
+| Mermaid | `/woods/landscape/treemap.mmd` | the Hotspots treemap |
 
 A diagram the generation cannot draw answers 422 with the reason: no packages, no
-clusters, no commit counts, or no forward edge.
+clusters, no commit counts, no source sizes, or no forward edge.
 
 **Share menu.** Every Landscape tab has the Share menu: the token-free focus URL (tab and
 `group` included) and the tab's text exports as plain links, so the menu works without a
@@ -98,10 +129,13 @@ components (R-4), and the tables still list every one.
   Edges that run back up the layers stay in the matrix.
 - The structural-risk table.
 
-**Not built**
-- The LOC treemap. Woods publishes no size per unit, so a package's size can't be
-  summed without reading host files. That data is filed as
-  [woods#810](https://github.com/lost-in-the/woods/issues/810).
+- **Where the code is** (Pele `treemap`): lines of code by package, then by unit type.
+  With Packwerk packages it reads `graph_analysis.json` `package_sizes` (woods#810).
+  Without packages the application is one block, summed over the graph nodes' `loc`
+  with each distinct file once, the way Woods totals a package. A table under the
+  diagram has the same figures. A generation without source sizes shows an empty
+  state that links woods#810. The board's *by unit count* and *by PageRank* sizes are
+  not built; the treemap is sized by lines of code only.
 
 ## Domains
 
@@ -112,7 +146,7 @@ one block. Clusters are identifier-level, as Woods publishes them.
 
 ## Not built
 
-- Context (L1) and Status as separate tabs; Context sits inside Containers.
-- The treemap (woods#810).
+- Status as a separate tab; the global status bar and `/woods` carry it.
+- External systems the code calls (woods#814).
 - The board's *period* control on Hotspots. Commit counts are the generation's own
   git enrichment, with no window to choose.

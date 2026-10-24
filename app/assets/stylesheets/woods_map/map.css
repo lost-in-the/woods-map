@@ -370,6 +370,9 @@ html.no-js .wm .amb-pop[hidden]{display:block}
 .wm .gtimeline .scrub input[type=range]{width:min(100%,28ch);accent-color:var(--select)}
 .wm .gtimeline .scrub output{flex:1 1 30ch;min-width:0}
 .wm .gcommits summary{cursor:pointer;color:var(--link);font-size:var(--fs-12);margin-bottom:var(--s3)}
+/* The Context tab's limits (C4 level 1): what the index does not say, as a plain list. */
+.wm .landscape ul.limits{margin:0;padding-left:var(--s5);display:grid;gap:var(--s2);font-size:var(--fs-13);color:var(--text)}
+.wm .landscape ul.limits a{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--link) 55%,transparent);text-underline-offset:3px}
 /* The Trail (M6, notes/trail.md): entry and pin fields, the lanes' async rule, pin notes */
 .wm .trail-form{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);padding:var(--s3) var(--s4)}
 .wm .trail-form label{font-family:var(--ff-ui);font-size:var(--fs-11);color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
