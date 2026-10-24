@@ -4,6 +4,7 @@
 <div class="pad4">
   <dl class="det framed status-det">
     <dt>generation</dt><dd><%= @status['generation'] %> of <%= @status['generations'].max %>, <%= @status['generations'].size %> retained (<%= @status['generations'].join(', ') %>)</dd>
+    <dt>pinned</dt><dd><%= render 'woods_map/status/pins', retention: @retention, retained: @status['generations'] %></dd>
     <dt>HEAD at extraction</dt><dd><%= short_sha(@status['git_sha']) %>, <%= @status['git_branch'].presence || 'unknown branch' %>, <%= date_abbr(@status['extracted_at']) %></dd>
     <dt>extractors</dt><dd><%= @status['counts'].count { |_, n| n.to_i.positive? } %> types with units: <%= @status['counts'].select { |_, n| n.to_i.positive? }.sort_by { |_, n| -n.to_i }.map { |type, n| "#{type} #{n}" }.join(', ').presence || 'none' %></dd>
     <dt>payload</dt><dd><%= @status['total_units'] %> units, read through PublishedIndex, generation pinned per request</dd>

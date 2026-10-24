@@ -11,10 +11,6 @@ module WoodsMap
       missing: 'No saved impact report has this ID in this index. Saved reports live with the index that computed them.'
     }.freeze
 
-    # Shown after Woods' own resolution message when a selector names no retained payload.
-    RETENTION = 'A generation the index no longer retains cannot be compared; pinning a review base ' \
-                '(W-11, woods#761) is not available in this Woods.'
-
     # A saved report (E-6): the exact bytes `woods:impact` stored under the
     # index, read through Woods' store and independent of payload retention.
     #
@@ -54,6 +50,7 @@ module WoodsMap
     # @param from [String] retained endpoint selector
     # @param to [String] retained endpoint selector; now resolves once in Woods
     def initialize(index_dir, from:, to: 'now')
+      @index_dir = index_dir
       @state = :invalid
       return unless from.is_a?(String) && to.is_a?(String)
 
@@ -71,9 +68,10 @@ module WoodsMap
     end
 
     # @return [String, nil] safe explanation: Woods' resolution message names
-    #   retained generations only, never a path
+    #   retained generations only, never a path; for a generation no longer
+    #   retained it adds which generations are pinned (W-11)
     def message
-      return "#{@detail.chomp('.')}. #{RETENTION}" if @detail&.include?('retained')
+      return "#{@detail.chomp('.')}. #{Retention.read(@index_dir).fallback}" if @detail&.include?('retained')
 
       MESSAGES[state]
     end

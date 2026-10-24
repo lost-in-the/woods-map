@@ -8,6 +8,7 @@ module WoodsMap
       with_repository do |repository|
         @status = repository.status
         @freshness = repository.freshness
+        @retention = repository.retention
         @tree = WoodsMap::FileTree.for(repository)
       end
     end

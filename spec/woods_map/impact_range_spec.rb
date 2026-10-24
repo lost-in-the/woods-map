@@ -68,13 +68,27 @@ RSpec.describe WoodsMap::ImpactRange do
     end
   end
 
-  it 'passes on Woods\' resolution message, which names retained generations only, with the W-11 limit' do
-    error = Class.new(ArgumentError) { def self.name = 'Woods::Impact::ResolutionError' }
-    detail = 'Selector "gen:9" does not identify one retained payload; use gen:1, gen:2'
-    allow(backend).to receive(:compare).and_raise(error, detail)
-    message = described_class.new(FIXTURE_INDEX, from: 'gen:9').message
-    expect(message).to start_with('Selector "gen:9" does not identify one retained payload; use gen:1, gen:2. ')
-    expect(message).to include('W-11, woods#761')
+  describe 'an unretained selector' do
+    let(:detail) { 'Selector "gen:9" does not identify one retained payload; use gen:1, gen:2' }
+
+    before do
+      error = Class.new(ArgumentError) { def self.name = 'Woods::Impact::ResolutionError' }
+      allow(backend).to receive(:compare).and_raise(error, detail)
+    end
+
+    it 'passes on Woods\' resolution message, which names retained generations only' do
+      expect(described_class.new(FIXTURE_INDEX, from: 'gen:9').message).to start_with("#{detail}. ")
+    end
+
+    it 'adds the pinned generations (W-11)' do
+      allow(WoodsMap::Retention).to receive(:read).and_return(WoodsMap::Retention.new(:available, [1]))
+      expect(described_class.new(FIXTURE_INDEX, from: 'gen:9').message).to end_with('kept past retention: gen 1.')
+    end
+
+    it 'says how to pin a review base when nothing is pinned' do
+      allow(WoodsMap::Retention).to receive(:read).and_return(WoodsMap::Retention.new(:available, []))
+      expect(described_class.new(FIXTURE_INDEX, from: 'gen:9').message).to include('woods:pin[N]')
+    end
   end
 
   describe '.saved' do # rubocop:disable RSpec/MultipleMemoizedHelpers
