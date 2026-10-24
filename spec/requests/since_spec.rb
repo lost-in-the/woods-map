@@ -15,7 +15,44 @@ RSpec.describe '?since= highlighting from Woods\' range report', type: :request 
     get '/woods/units/model/User', params: { since: 'gen:1' }
     expect(WoodsMap::ImpactRange).to have_received(:new).with(anything, from: 'gen:1', to: 'now')
     banner = doc.at_css('.banner.mod').text.squish
-    expect(banner).to include('Modified since gen 1.', 'metadata keys: callbacks, loc', 'woods#802')
+    expect(banner).to include('Modified since gen 1.', 'metadata keys: callbacks, loc', 'source lines did not move')
+  end
+
+  describe 'the diff gutter' do
+    let(:lines) do
+      { 'hunks' => [{ 'before' => [25, 1], 'after' => [25, 1] }, { 'before' => [35, 2], 'after' => [34, 0] }],
+        'added_lines' => 1, 'removed_lines' => 3, 'coverage' => 'complete' }
+    end
+
+    before do
+      changes = range_report_changes.map { |c| c['identifier'] == 'User' ? c.merge('source_changes' => lines) : c }
+      stub_range_report(range_report_data.merge('changed' => changes))
+    end
+
+    it "marks the lines Woods' report records as changed and where lines were removed" do
+      get '/woods/units/model/User', params: { since: 'gen:1' }
+      expect(doc.css('.cv .row.row-chg').pluck('id')).to include('L2')
+      expect(doc.at_css('#L2 .ln').text).to eq('2, changed since gen 1')
+      removed = doc.at_css('.cv .row.row-rm')
+      expect([removed['id'],
+              removed.at_css('.ln')['title']]).to eq(['L11', '2 lines removed after this line since gen 1'])
+    end
+
+    it 'marks a note M when its own line changed and says so in the banner' do
+      get '/woods/units/model/User', params: { since: 'gen:1' }
+      expect(doc.at_css('#L2 .mg .M')).to be_present
+      expect(doc.at_css('#L2 .mg .sr-only').text).to start_with('its line changed since gen 1')
+      expect(doc.at_css('.banner.mod').text.squish).to include('Lines: 1 line added, 3 removed')
+    end
+
+    it 'marks no line when the report addresses another generation than the page' do
+      data = range_report_data
+      data['range']['to']['generation'] = 2
+      stub_range_report(data.merge('changed' => range_report_changes.map { |c| c.merge('source_changes' => lines) }))
+      get '/woods/units/model/User', params: { since: 'gen:1' }
+      expect(doc.css('.cv .row.row-rm')).to be_empty
+      expect(doc.at_css('.banner.mod').text.squish).to include('address gen 2, not gen 1')
+    end
   end
 
   it 'marks the notes that read a moved key and keeps since on the tabs' do
@@ -48,6 +85,15 @@ RSpec.describe '?since= highlighting from Woods\' range report', type: :request 
     get '/woods/units/model/User', params: { since: 'yesterday' }
     expect(doc.at_css('.banner.mod').text).to include('No comparison since yesterday.')
     expect(WoodsMap::ImpactRange).to have_received(:new).once
+  end
+
+  it 'marks the files of changed units in the file tree' do
+    get '/woods/units/model/User', params: { since: 'gen:1' }
+    tree = doc.at_css('.sheet nav.tree')
+    expect(tree.at_css('.th').text).to include('changed since gen 1')
+    marked = tree.css('a.f').select { |a| a.at_css('.M') }.pluck('data-path')
+    expect(marked).to include('app/models/user.rb')
+    expect(tree.at_css('a.f[data-path="app/models/micropost.rb"] .M')).to be_nil
   end
 
   it 'says on the ERD how many tables moved' do

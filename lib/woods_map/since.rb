@@ -1,13 +1,34 @@
 # frozen_string_literal: true
 
+require 'set'
+
 module WoodsMap
   # `?since=<generation>` on a unit page or the ERD (E-8): what Woods' range
   # report from that generation to now says about the units on the page. The
   # evidence is `Woods::Impact::Report.compare` through `WoodsMap::ImpactRange`
   # and nothing else; the map never diffs two payloads. A report says which
-  # facets and metadata keys moved, not which lines (woods#802), so the page
-  # marks what reads those keys and names the rest as a limit.
+  # facets and metadata keys moved and, for a modified source, which lines
+  # (`source_changes`, woods#802): the page marks those lines in the gutter
+  # and what reads a moved key in the margin.
   class Since
+    # The report's changed lines for one unit, in the current generation's
+    # annotated `source_code` (the report's `to` side is now). `changed`
+    # holds composite line numbers; `removed_after` maps a line to the count
+    # of lines removed just after it.
+    LineMarks = Struct.new(:changed, :removed_after, :added, :removed, :coverage, keyword_init: true) do
+      # @param number [Integer, nil] a composite line
+      # @return [Boolean]
+      def changed?(number)
+        changed.include?(number)
+      end
+
+      # @param number [Integer, nil]
+      # @return [Integer] lines removed right after it (0 when none)
+      def removed_count(number)
+        removed_after.fetch(number, 0)
+      end
+    end
+
     SELECTOR = /\A(?:gen:[1-9]\d{0,8}|[0-9a-f]{7,40})\z/i
 
     # What a marginal note or a page section reads, by metadata key.
@@ -89,12 +110,53 @@ module WoodsMap
       (KEYS.fetch(area) & keys).any?
     end
 
+    # Which lines of the unit's current source changed since the selector.
+    #
+    # @param identifier [String]
+    # @param type [String]
+    # @return [LineMarks, nil] nil when the report has no line ranges for the
+    #   unit, they are too large to compute, or its `now` is not the pinned
+    #   generation (the lines would address another source)
+    def line_marks(identifier, type)
+      changes = change(identifier, type)&.dig('source_changes')
+      return nil unless changes.is_a?(Hash) && current_generation?
+      return nil unless %w[complete truncated].include?(changes['coverage'])
+
+      marks = LineMarks.new(changed: Set.new, removed_after: {}, added: changes['added_lines'],
+                            removed: changes['removed_lines'], coverage: changes['coverage'])
+      Array(changes['hunks']).each { |hunk| mark(marks, hunk) }
+      marks
+    end
+
+    # @param identifier [String]
+    # @param type [String]
+    # @return [Hash, nil] the unit's `source_changes` as Woods recorded it
+    def source_changes(identifier, type)
+      change(identifier, type)&.dig('source_changes')
+    end
+
+    # @return [Boolean] whether the report's `now` is the generation this page reads
+    def current_generation?
+      !@report.nil? && to_generation == @repository.generation_number
+    end
+
     # @return [RangeReport::GraphBlast, nil] the emphasis for a graph canvas
     def graph_blast
       @report&.graph_blast
     end
 
     private
+
+    def mark(marks, hunk)
+      start, length = Array(hunk['after'])
+      return unless start.is_a?(Integer) && length.is_a?(Integer)
+
+      if length.positive?
+        start.upto(start + length - 1) { |number| marks.changed << number }
+      elsif start.positive?
+        marks.removed_after[start] = Array(hunk['before'])[1].to_i
+      end
+    end
 
     def changes
       @changes ||= Array(@report&.changed).index_by { |c| c.values_at('identifier', 'type') }
