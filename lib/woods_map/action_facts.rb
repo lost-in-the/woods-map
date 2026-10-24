@@ -79,6 +79,13 @@ module WoodsMap
       renders.filter_map { |fact| fact['partial'] }.uniq
     end
 
+    # @param path [String] a partial path the action renders, e.g. +users/_form+
+    # @return [Array<String>, nil] the locals keys the action passes it; nil when no render of it names locals
+    def partial_locals(path)
+      lists = renders.select { |fact| fact['partial'] == path && fact['locals'].is_a?(Array) }.pluck('locals')
+      lists.empty? ? nil : lists.flatten.map(&:to_s).uniq
+    end
+
     # @return [Array<Hash>] the renders that name no template: formats, heads, objects
     def other_renders
       renders.reject { |fact| fact['template'] || fact['partial'] }

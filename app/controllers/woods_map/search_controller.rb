@@ -4,6 +4,7 @@ module WoodsMap
   # Search over the pinned generation (B8-Search): the results page in name,
   # code or path mode, and the palette's grouped hits as JSON.
   class SearchController < ApplicationController
+    woods_map_rate_limit :search, only: %i[show palette]
     def show
       with_repository do |repository|
         @repository = repository
@@ -11,7 +12,7 @@ module WoodsMap
         @freshness = repository.freshness
         @results = WoodsMap::SearchResults.new(repository, params[:q], mode: params[:in].to_s,
                                                                        types: Array(params[:types]).presence)
-        @nav = [['Units', woods_map.units_path, false], ['Impact', woods_map.impact_path, false]]
+        @nav = primary_nav
         render :show
       end
     end

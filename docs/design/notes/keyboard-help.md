@@ -33,3 +33,13 @@ The open dialog had no incomplete axe checks.
 
 The first concurrent browser run failed one existing palette focus check;
 the complete isolated rerun passed all 341 examples.
+
+## The y copy key
+
+`y` copies what the page's status bar names, and nothing else:
+
+- **Schema and Lifecycle:** the diagram's Mermaid.
+- **Passage:** the passage as Mermaid.
+- **Impact page, every lens:** the focus URL, as the B8 Impact boards show (`y copy URL`).
+
+Each such page marks that one tool with `data-key="y"`. Before this, `y` activated the first copy tool in the document, which on unit pages was the breadcrumb's path tool. Two specs guard it: `spec/requests/copy_key_spec.rb` checks that each promise names its marked tool, and `spec/woods_map_copy_key_spec.rb` presses `y` in Chromium at 1440 and 390.

@@ -1,11 +1,13 @@
 <%# The unit page frame (C5): crumbs, title block, tabs, facts tiles.
-    Locals: page (UnitPage), tab (String), controls (HTML or nil), definition
+    Locals: page (UnitPage), tab (String), controls (HTML or nil), editor (true on the Code tab: the editor link slot), definition
     (Integer or nil: the file line of the definition, for the primary action),
     title and subtitle (Strings, the page's by default), tiles (Array of Hash
     with :eyebrow and rendered :rows, the page's tiles by default). %>
 <%= render 'woods_map/shared/crumbs', crumbs: page.crumbs.map { |label, kind| [label, kind == :current ? nil : (kind ? woods_map.units_path(anchor: "type-#{kind}") : woods_map.units_path)] }, path: page.path, trail: tag.span('', data: { trail_target: 'list' }) %>
-<% primary = local_assigns[:definition] ? link_to("Code at L#{local_assigns[:definition]}", "#{woods_map.unit_path(type: page.type, identifier: page.identifier)}#L#{local_assigns[:definition]}", class: 'btn primary') : nil %>
-<%= render 'woods_map/shared/ident', title: local_assigns.fetch(:title, page.identifier), subtitle: local_assigns.fetch(:subtitle, page.subtitle), controls: safe_join([local_assigns[:controls], primary].compact, ' ') %>
+<% primary = local_assigns[:definition] ? link_to("Code at L#{local_assigns[:definition]}", "#{woods_map.unit_path(type: page.type, identifier: page.identifier)}#L#{local_assigns[:definition]}", class: 'btn primary', data: (local_assigns[:editor] ? { settings_target: 'code' } : {})) : nil %>
+<%# On the Code tab the primary action becomes "In editor at L…" only when this browser names an editor (D-6, B-15); the settings controller shows it. %>
+<% if local_assigns[:editor] && page.path %><% primary = safe_join([primary, tag.a("In editor at L#{local_assigns[:definition] || 1}", class: 'btn primary', hidden: true, data: { settings_target: 'editor', file: page.path, line: local_assigns[:definition] || 1 })].compact) %><% end %>
+<%= render 'woods_map/shared/ident', title: local_assigns.fetch(:title, page.identifier), subtitle: local_assigns.fetch(:subtitle, page.subtitle), controls: safe_join([local_assigns[:controls], render('woods_map/shared/share'), primary].compact, ' ') %>
 <%= render 'woods_map/shared/tabs', tabs: unit_tabs(page, tab) %>
 <% tiles = local_assigns[:tiles] || page.tiles.map { |tile| { eyebrow: tile[:eyebrow], rows: tile[:rows].map { |label, value| [label, tile_value(value)] } } } %>
-<% if tiles.any? %><div style="margin:var(--s4) var(--s5) 0"><%= render 'woods_map/components/facts', tiles: tiles %></div><% end %>
+<% if tiles.any? %><div class="frame-facts"><%= render 'woods_map/components/facts', tiles: tiles %></div><% end %>
