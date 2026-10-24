@@ -7,7 +7,7 @@ relationship graphs, schema and history, and get change-impact reports with
 sharable focus URLs. It reads the published index only: no live database, no
 runtime reflection, no git subprocess at request time.
 
-Status: M1 Reading, M2 Passage, M4b Impact on the map (pre-change and range modes, saved reports, Flows from W-13, retention pins, `?since=`; a CI pull-request comment is out of scope), M3 Diagrams slices (the Pele renderer, Schema ER, Lifecycle sequence, flowchart and lanes, `/woods/erd`, Mermaid export and `.mmd` URLs), the Landscape (Containers from W-9 with Mermaid, Structurizr DSL and LikeC4 exports, Hotspots, Domains), M4 History (History tab, gutter heat, generation picker and unit diff, `/woods/history`), M5 Graph (neighbourhood endpoint, Graph tab canvas, full-screen page with the clusters layout), M6 Trail (`/woods/trail`), M7 Guide (off by default; no real-provider run yet) and M8 Staging landed. The design study, decision log, boards
+Status: M1 Reading, M2 Passage, M3 Diagrams, M4 History, M4b Impact (the map side; Woods owns `woods:impact` output), M6 Trail and M8 Staging are closed, and their pages landed. M5 Graph has landed (neighbourhood endpoint, Graph tab, full-screen page with clusters, flow overlay and commit timeline) and stays open on its layout decision (woods-map#63) and a timing run on testbed hardware. M7 Guide has landed, off by default, and stays open on a real-provider run. The design study, decision log, boards
 and milestone plan live in `docs/design/` and are the source of truth for
 scope; `docs/design/foundations/tokens.css` is the stylesheet the engine ships
 verbatim (a spec keeps the two copies identical).
@@ -37,18 +37,20 @@ mount the engine in a variant, run `woods:extract`, open `/woods`.
 ## Architecture (see docs/design/plan.md for what is still planned)
 
 ```
-lib/woods_map.rb                 # module, Configuration (boot_warning)
+lib/woods_map.rb                 # module and requires; configuration.rb (Configuration, boot_warning); version.rb
 lib/woods_map/engine.rb          # Rails::Engine, isolate_namespace WoodsMap, after_initialize warning
 lib/woods_map/repository.rb      # one pinned generation per request: units, graph, analysis, search (string keys), freshness
 lib/woods_map/unit_facts.rb       # type-specific tiles from published unit metadata
 lib/woods_map/{unit_page,code_view,composite_source,highlighter,marginalia,references,outline}.rb  # the unit page and Code tab
-lib/woods_map/{history_view,history_generations,commit_rows,commit_strip,generation_strip,commit_ledger,generation_facets,unit_co_changes,unit_paths,path_heat,history_mermaid,history_timeline,unit_diff,source_diff,repository_history}.rb  # M4 History: the tab, the strips by time and by generation, the generation ledger, facets moved, co-change, gutter heat, exports, /woods/history, the unit diff and Woods' unified source diff
+lib/woods_map/{span_validation,method_line,callers}.rb  # reference spans (W-1) checked, method-level link targets (W-6), the callers panel (B-13)
+lib/woods_map/{date_span,history_view,history_generations,commit_rows,commit_strip,generation_strip,commit_ledger,generation_facets,unit_co_changes,unit_paths,path_heat,history_mermaid,history_timeline,unit_diff,source_diff,repository_history}.rb  # M4 History: the tab, the strips by time and by generation, the generation ledger, facets moved, co-change, gutter heat, exports, /woods/history, the unit diff and Woods' unified source diff
 lib/woods_map/hover_card.rb      # B-3 hover cards: graph node, PageRank place and metadata.git of each linked unit
 lib/woods_map/{schema_view,schema_class_diagram,lifecycle,neighbourhood}.rb  # the Schema (ER and class diagram), Lifecycle and Graph tabs
 lib/woods_map/{lifecycle_chart,state_machine_view}.rb  # the Lifecycle flowchart and lanes; a model's published state machines
 lib/woods_map/dynamic_view.rb    # the C4 dynamic view (B-23): a model event or an action's passage grouped by W-9 container
-lib/woods_map/erd.rb             # /woods/erd: database_table units chunked at the ER budget, relations, schema findings (cached per generation)
-lib/woods_map/{passage,passage_filter}.rb  # the Passage tab: the resolved filter chain (W-8; declared scopes on older generations), templates by the view_render edge, the ladder's model and event
+lib/woods_map/{erd,erd_chunks,erd_diagram,erd_findings}.rb  # /woods/erd: database_table units chunked at the ER budget, the erDiagram text, relations, schema findings (cached per generation)
+lib/woods_map/mermaid_export.rb  # a diagram's Mermaid copy and `.mmd` download (D-25)
+lib/woods_map/{passage,passage_filter,passage_templates,action_facts,unassigned_ivar_rule}.rb  # the Passage tab: the resolved filter chain (W-8; declared scopes on older generations), templates by W-7 renders or the view_render edge, per-action facts (W-7), the advisory unassigned-ivar note, the ladder's model and event
 lib/woods_map/routes_view.rb     # the controller Routes tab: declared routes joined to route units, helpers, action sources, helper references
 lib/woods_map/permitted_attributes.rb  # permitted keys against the model's published columns, associations, attachments, rich text, writers
 lib/woods_map/partial_locals.rb  # locals each partial is passed (template partial_renders, W-7 renders) against its locals_read
@@ -68,18 +70,20 @@ lib/woods_map/guide.rb + guide/  # M7: status/backend (RubyLLM optional), action
 lib/woods_map/importmap.rb       # pins for vendored modules, the literal import map
 app/controllers/concerns/woods_map/authentication.rb  # token, cookie and loopback gate (D-4)
 app/controllers/concerns/woods_map/guide_page.rb      # what each page names for the guide (unit, graph centre, Trail board, impact)
+app/controllers/concerns/woods_map/  # also unit_history, unit_lifecycle, unit_mermaid, mermaid_text, method_links, since_param, author_filter, graph_overlays, guide_session, routed_identifier, raw_request_path, path_extension
 lib/woods_map/glyphs.rb          # the glyph vocabulary (D-20)
-app/controllers/woods_map/       # application (gate order, 403 panel, primary_nav), status, sessions, assets, guidelines, units (History tab in concerns/unit_history), search, impact, erd, graphs, neighbourhoods, history
-app/helpers/woods_map/           # asset URLs, date shorthand (D-15), short SHA; components (glyphs, chips, ⓘ, people)
+app/controllers/woods_map/       # application (gate order, 403 panel, primary_nav), status, sessions, assets, guidelines, units, files, search, impact, erd, graphs, neighbourhoods, history, landscape, trails, guide, guide_streams
+app/helpers/woods_map/           # application (asset URLs, date shorthand D-15, short SHA), components (glyphs, chips, ⓘ, people), units, impact, impact_flows, since, history, trail, guide
 app/assets/stylesheets/woods_map/ # tokens.css (verbatim from docs/design/foundations), fonts.css, map.css (engine-only rules)
-app/javascript/woods_map/        # Stimulus controllers: cliff, tooltip, rows, tree, sheet, copy, share, palette, peek, card, settings, trail, keys, help, diagram (Pele, D-21), graph (Cytoscape canvas, M5), pinboard (Trail notes, M6), brush (History span)
+app/javascript/woods_map/        # Stimulus controllers: cliff, tooltip, rows, tree, sheet, copy, share, palette, peek, card, settings, trail, keys, help, diagram (Pele, D-21), graph (Cytoscape canvas, M5), pinboard (Trail notes, M6), brush (History span), disambiguation (the ambiguous-name popover)
 app/views/woods_map/shared/      # the frame: bar, crumbs, ident, tabs, status, sheet
 app/views/woods_map/components/  # table, steps, detail, rail, tree, facts, legend, diagram, diff, banner, empty state
 app/views/woods_map/guidelines/  # the C1 to C5 boards rendered from the partials above
 app/views/woods_map/{units,search,impact,erd,history}/ # unit pages (Code, Routes, Passage, Schema, Lifecycle, Graph, History, peek, 404), search, impact lenses, the ERD, /woods/history and the commit strip
+app/views/woods_map/{files,graphs,trails,guide,status,sessions,refusals}/ # file ownership pages, the full-screen graph and explorer, the Trail board, the guide panel, status, the token form, refusal and 429 states
 app/views/woods_map/landscape/    # Context, Containers, Components, Hotspots and Domains tabs, the C4 box and ladder
 app/views/woods_map/graphs/       # the explorer partial shared by the Graph tab and /woods/graph, the page and its hub picker
-vendor/javascript/               # stimulus, pele, cytoscape (vendored); turbo, vis-timeline, highlight.js as milestones land them
+vendor/javascript/               # stimulus, pele (D-21) and cytoscape (M5), each with its licence; no Turbo (the guide streams with EventSource)
 vendor/fonts/                    # Inter (latin subsets) and the complete Fira Code, WOFF2 (D-12)
 docs/design/                     # design study, decisions, boards, foundations, plan
 ```
