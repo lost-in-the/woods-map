@@ -25,7 +25,7 @@ opens the file tree.
 | `/woods/units` | Units index, grouped by actual type with distinct typed counts | FR-3 | [M1 navigation note](notes/m1-indexed-navigation.md) | shared components; mounted acceptance separate |
 | search palette, `/woods/search` | Name, path and full-text code search, completeness | FR-2, B-12 | [B8-Search](boards/B8-Search.html) | final |
 | `/woods/units/model/Post` Code | Two lenses, outline, marginalia, peek, confidence marks, folds, concerns inlined | FR-3, FR-4, B-1, B-2, B-7 to B-11, B-15 | [B8-Code](boards/B8-Code.html) | final, amended by D-24: the view scrolls as one region ([woods-map#29](https://github.com/lost-in-the/woods-map/issues/29)) |
-| hover card on a reference | Type, path, PageRank, last author, churn in 100 ms | B-3 | — | **none** (tooltip component exists, C5) |
+| hover card on a reference | Type, path, PageRank, last author, churn in 100 ms | B-3 | [Hover card note](notes/hover-card.md) | prefetched with the page as inert templates, shown by the C5 tooltip on hover (100 ms) and focus |
 | disambiguation popover | Candidates with types and paths for an ambiguous name | FR-4, B-1 | — | **none** |
 | callers panel | Callers of the current method | B-13 | [B8-Code](boards/B8-Code.html) (margin "called from") | partial |
 | unit diff across generations | Unified source diff with metadata changes | B-14, FR-7 | [B8-Impact-Changed](boards/B8-Impact-Changed.html) (diff component) | partial, no unit-page entry |
@@ -33,7 +33,7 @@ opens the file tree.
 | Lifecycle tab | Sequence / flowchart / lanes, numbered steps, state machine | FR-6, B-19, B-23 | [B6-Lifecycle](boards/B6-Lifecycle.html) | final; C4-dynamic rendering (B-23) missing from the view control |
 | Graph tab | Neighbourhood, filters, depth, hubs | FR-5, A-1, A-2 | [B6-Graph](boards/B6-Graph.html) | final |
 | History tab | Commit strip, commits with description rows, co-change, people | FR-7, B-6, C-5 | [B6-History](boards/B6-History.html) | final; generation picker not drawn |
-| Controller: Routes tab | Routes, helpers, action sources | FR-3 | — | **none** |
+| Controller: Routes tab | Routes, helpers, action sources | FR-3 | [Routes tab note](notes/routes-tab.md) | routes as declared joined to route units, named-route helpers, action sources, unresolvable-route findings; helper references are controller-level until [woods#795](https://github.com/lost-in-the/woods/issues/795) |
 | Controller: Passage tab | Stages, filter matrix, callback ladder, mismatch flags, export | B-16 to B-20 | [B8-Passage](boards/B8-Passage.html) | final; the engine shows declared filter scopes (W-8 pending) and compares lexical template ivar mentions with W-7 assignments as advisory notes; missing action/template facts and truncated partial chains remain incomplete; permitted keys are matched to published model facts and unmatched ones stay unverified (woods#797), partial locals are a named limit (woods#798), see [note](notes/passage-mismatch-limits.md) |
 | Mailer: Passage and Templates | Mailer action passage, delivery, templates | B-17 | — | **none** (same component as the controller passage) |
 | Unit pages: job, mailer, view, concern, serializer, table | Type-specific facts tiles | B-4 | [Published facts note](notes/published-type-facts.md) | bounded published-metadata tiles |
@@ -68,7 +68,7 @@ opens the file tree.
 The undesigned items above, grouped by the milestone issue that will build
 them. Each is a comment on that issue, so the issue owns it.
 
-- **M1 · Reading (woods-map#34, carried over from #2)**: units index and indexed ownership now have a [bounded design note](notes/m1-indexed-navigation.md) under [#34](https://github.com/lost-in-the/woods-map/issues/34); remaining gaps include facts tiles for job, mailer, view, concern, serializer and table units; Routes tab; hover card; disambiguation popover; settings popover; keyboard help; Share menu contents.
+- **M1 · Reading (woods-map#34, carried over from #2)**: units index and indexed ownership now have a [bounded design note](notes/m1-indexed-navigation.md) under [#34](https://github.com/lost-in-the/woods-map/issues/34); the Routes tab has a [design note](notes/routes-tab.md); remaining gaps include facts tiles for job, mailer, view, concern, serializer and table units; the hover card has a [design note](notes/hover-card.md); disambiguation popover; settings popover; keyboard help; Share menu contents.
 - **M2 · Passage (woods-map#3)**: mailer passage with templates (reuse the controller passage).
 - **M4b · Impact (woods-map#4)**: Overview tab at v8; Graph tab; pre-change mode; `?since=` highlighting on Code, Graph, Lifecycle, Passage, ERD and timeline views.
 - **M3 · Diagrams (woods-map#5)**: Landscape Context L1, Components L3, Domains; C4-dynamic in the Lifecycle view control; the renderer decision (woods-map#25).

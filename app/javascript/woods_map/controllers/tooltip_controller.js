@@ -7,7 +7,8 @@ import { Controller } from "@hotwired/stimulus"
 //
 // Lives on the .wm root. Triggers are abbr, .info and .who elements with a
 // title (moved to data-tip so the native tooltip stays quiet) and anything
-// with data-tip; data-tip-html carries server-rendered markup with links.
+// with data-tip; data-tip-html carries server-rendered markup with links, and
+// data-tip-delay overrides the hover delay (hover cards open at 100 ms, B-3).
 const TRIGGERS = "abbr[title], .info[title], .who[title], .mg[title], .bar-fresh .why[title]"
 
 export default class extends Controller {
@@ -71,7 +72,8 @@ export default class extends Controller {
   schedule(trigger) {
     this.cancel()
     this.cancelClose()
-    this.timer = setTimeout(() => this.open(trigger), this.delayValue)
+    const delay = Number(trigger.dataset.tipDelay ?? this.delayValue)
+    this.timer = setTimeout(() => this.open(trigger), delay)
   }
 
   scheduleClose() {
