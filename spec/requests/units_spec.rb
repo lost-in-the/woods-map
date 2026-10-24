@@ -25,7 +25,7 @@ RSpec.describe 'Unit pages', type: :request do
 
     it 'shows the outline rail in chain order and the status bar keys' do
       expect(response.body).to include('lifecycle, create').and include('before_save downcase_email')
-      expect(response.body).to include('links: published typed-registry verified constants')
+      expect(response.body).to include('links: published reference spans; dashed static, dotted ambiguous')
     end
   end
 
