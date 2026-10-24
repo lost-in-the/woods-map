@@ -2,11 +2,13 @@
 
 require_relative '../support/synthetic_index'
 
-# Unit identifiers and file paths keep their extension in the URL. Rails reads
-# a format from a path extension whenever the Accept header is a browser's
-# catch-all, so before the fix `config/cable.yml` answered 500 (no YAML
-# template) and `app/javascript/application.js` rendered without the layout:
-# no stylesheet, no import map, a page that never starts.
+# Unit identifiers and file paths keep their extension in the URL. The routes
+# declare format: false, yet Rails reads a format from a path extension when
+# the request has no Accept header (curl, crawlers, the testbed smoke) or a
+# browser's catch-all one: before the fix `config/cable.yml` answered 500 (no
+# YAML template) and `app/javascript/application.js` rendered without the
+# layout, so no stylesheet, no import map, a page that never starts. The
+# no-Accept cases come from the rails-6.0 and rails-7.2 variant crawl (#81).
 RSpec.describe 'Pages for paths whose extension Rails knows as a format', type: :request do
   include WoodsMap::SyntheticIndex
 
@@ -61,6 +63,34 @@ RSpec.describe 'Pages for paths whose extension Rails knows as a format', type: 
 
   it 'keeps the 404 page HTML for a missing unit with such an extension' do
     get '/woods/units/config_file/config/missing.yml', headers: browser
+    expect(response).to have_http_status(:not_found)
+    expect(response.media_type).to eq('text/html')
+  end
+
+  describe 'without an Accept header' do
+    let(:no_accept) { { 'HTTP_ACCEPT' => '' } }
+
+    it 'renders the HTML not-found page for a unit whose identifier ends in .yml' do
+      get '/woods/units/config_file/config/missing.yml', headers: no_accept
+      expect(response).to have_http_status(:not_found)
+      expect(response.media_type).to eq('text/html')
+    end
+
+    it 'renders HTML for a tab of such a unit and for a file path ending in .json' do
+      get '/woods/units/i18n/missing.yml/history', headers: no_accept
+      expect(response.media_type).to eq('text/html')
+      get '/woods/files/config/missing.json', headers: no_accept
+      expect(response.media_type).to eq('text/html')
+    end
+
+    it 'renders a present unit as a full page' do
+      get '/woods/units/config_file/config/cable.yml', headers: no_accept
+      expect_full_page
+    end
+  end
+
+  it 'leaves a request with a specific Accept header to content negotiation' do
+    get '/woods/units/config_file/config/missing.yml', headers: { 'HTTP_ACCEPT' => 'text/html' }
     expect(response).to have_http_status(:not_found)
     expect(response.media_type).to eq('text/html')
   end
