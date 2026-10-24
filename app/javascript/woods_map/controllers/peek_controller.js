@@ -33,7 +33,8 @@ export default class extends Controller {
     const row = link.closest(".row")
     if (!row) return
     try {
-      const response = await fetch(`${link.getAttribute("href")}/peek`, { headers: { Accept: "text/html" } })
+      const response = await fetch(this.constructor.peekUrl(link.getAttribute("href")), { headers: { Accept: "text/html" } })
+      if (!response.ok) return
       const html = await response.text()
       const holder = document.createElement("div")
       holder.innerHTML = html
@@ -43,6 +44,15 @@ export default class extends Controller {
     } catch (_) {
       this.peek = null
     }
+  }
+
+  // The unit's peek route: a reference link may carry a line (#L48, a method
+  // link), which the peek opens at, or a query (?since=), which it drops.
+  static peekUrl(href) {
+    const url = new URL(href, window.location.href)
+    const line = /^#L(\d+)$/.exec(url.hash)
+    // A trailing slash belongs to the identifier (GET /); the route keeps it.
+    return `${url.pathname}/peek${line ? `?line=${line[1]}` : ""}`
   }
 
   close() {

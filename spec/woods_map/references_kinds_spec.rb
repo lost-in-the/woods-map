@@ -67,7 +67,8 @@ RSpec.describe WoodsMap::References do # rubocop:disable RSpec/MultipleMemoizedH
 
   it 'makes an ambiguous span a popover of every indexed candidate, never a link to one' do
     expect(summary(links[2])).to eq(kind: 'constant', confidence: 'ambiguous', method: 'deliver', popover: 'wm-amb-1')
-    ambiguity = references.ambiguities.sole
+    expect(references.ambiguities.size).to eq(1)
+    ambiguity = references.ambiguities.first
     expect([ambiguity.id, ambiguity.text, ambiguity.method]).to eq(%w[wm-amb-1 Notifier deliver])
     expect(ambiguity.candidates).to eq([
                                          { identifier: 'Admin::Notifier', type: 'service',
