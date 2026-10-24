@@ -1,0 +1,23 @@
+{
+  "Micropost": {
+    "model": [
+      "MicropostsController#create"
+    ]
+  },
+  "MicropostsController": {
+    "controller": [
+      "MicropostsController#create"
+    ]
+  },
+  "User": {
+    "model": [
+      "MicropostsController#create",
+      "UsersController#show"
+    ]
+  },
+  "UsersController": {
+    "controller": [
+      "UsersController#show"
+    ]
+  }
+}

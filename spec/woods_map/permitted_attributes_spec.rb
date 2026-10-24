@@ -50,4 +50,20 @@ RSpec.describe WoodsMap::PermittedAttributes do
     expect([attributes.model_name, attributes.model]).to eq(['Profile', nil])
     expect(attributes.keys.map(&:via)).to eq([nil])
   end
+
+  it 'flags a key the published attribute writers lack, once the model publishes them (woods#797)' do
+    model = synthetic_model('column_names' => %w[id name], 'attribute_writers' => %w[id name password])
+    entry = { 'method' => 'widget_params', 'model' => 'widget', 'permitted' => %w[name password nickname] }
+    attributes = described_class.new(action_repository([model]), entry)
+    expect(attributes).to be_writers_published
+    expect(attributes.keys.map { |key| [key.name, key.via] })
+      .to eq([%w[name column], ['password', 'attribute writer'], ['nickname', nil]])
+    expect([attributes.mismatches.map(&:name), attributes.unverified]).to eq([['nickname'], []])
+  end
+
+  it 'keeps unmatched keys unverified on an index without attribute writers' do
+    attributes = fixture_attributes('user', %w[password])
+    expect([attributes.writers_published?, attributes.mismatches, attributes.unverified.map(&:name)])
+      .to eq([false, [], ['password']])
+  end
 end

@@ -10,5 +10,6 @@
     <input class="filter" id="range-to" name="to" value="<%= Array(@range).last || 'now' %>" required>
     <button class="btn<%= ' primary' unless @range_report %>" type="submit">Compare range</button>
   </form>
+  <p>Retained: <%= safe_join(@repository.generations.map { |n| @repository.retention.pinned?(n) ? safe_join(["gen:#{n} ", layer_chip('pinned')]) : "gen:#{n}" }, ', ') %>. <%= @repository.retention.pins.any? ? 'Pinned generations are kept past retention until released.' : @repository.retention.fallback %></p>
   <p><%= link_to 'Open pre-change blast radius', woods_map.impact_path %></p>
 </section>

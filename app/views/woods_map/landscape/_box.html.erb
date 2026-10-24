@@ -1,0 +1,15 @@
+<%# One C4 element (B8-Landscape): stereotype, name, technology, what it holds,
+    the relationships leaving it. Locals: box (Landscape::Container), landscape. %>
+<% stereotype = box.kind == 'external' ? 'external' : (box.store? ? 'container, db' : 'container') %>
+<div class="c4box <%= box.kind %>">
+  <span class="st">«<%= stereotype %>»</span>
+  <b><%= box.name %></b>
+  <% if box.technology %><span class="tech"><%= box.technology %></span><% end %>
+  <% if box.counts.any? %>
+    <span class="cnts"><%= safe_join(box.counts.map { |type, n| link_to("#{n} #{type.tr('_', ' ').pluralize(n)}", "#{woods_map.units_path}#type-#{type}") }, ', ') %></span>
+  <% elsif box.description %>
+    <span class="tech"><%= box.description %></span>
+  <% end %>
+  <% out = landscape.outgoing(box) %>
+  <% if out.any? %><ul><% out.each do |r| %><li><span class="k" aria-hidden="true">→</span><span><%= landscape.name_of(r.to) %>, <%= r.mechanism %></span></li><% end %></ul><% end %>
+</div>

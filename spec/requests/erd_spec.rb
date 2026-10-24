@@ -18,7 +18,7 @@ RSpec.describe 'The ERD page', type: :request do
   it 'lists ERD in the global bar, current on this page only' do
     get '/woods/erd'
     expect(response.parsed_body.css('nav[aria-label="Primary"] a').map { |a| [a.text, a['aria-current']] })
-      .to eq([['Units', nil], ['Graph', nil], %w[ERD page], ['Impact', nil], ['History', nil]])
+      .to eq([['Units', nil], ['Landscape', nil], ['Graph', nil], %w[ERD page], ['Impact', nil], ['History', nil]])
     get '/woods/units/model/User'
     expect(response.parsed_body.at_css('nav[aria-label="Primary"] a[href="/woods/erd"]')['aria-current']).to be_nil
   end

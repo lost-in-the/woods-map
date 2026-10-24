@@ -69,6 +69,7 @@ function mount(id) {
   Object.assign(controller, {
     element: body, urlValue: "", hasUrlValue: true, unitUrlValue: "/woods/units/__type__/__identifier__/graph?depth=2",
     generationValue: 3, hasGenerationValue: true, cacheValue: `3|model|Post|${id}`, hasCacheValue: true, blastValue: [], hasBlastValue: true,
+    clustersValue: [], hasClustersValue: true, modeValue: "", hasModeValue: true,
     panelTarget: q(".dia.graph"), canvasTarget: q(".gcanvas"), hasCanvasTarget: true, factsTarget: q(".gfacts"), hasFactsTarget: true,
     statusTarget: q(".gstatus"), hasStatusTarget: true, messageTarget: q(".refusal"), hasMessageTarget: true,
     fallbackTarget: q(".fallback"), flowchartTarget: q(".tool"), hasFlowchartTarget: true,
@@ -98,6 +99,10 @@ function drawing(cytoscape) {
 
   const data = neighbourhood(300, 1000)
   const big = mount("big")
+  // What load() does while the request is in flight; the draw is timed from data in hand.
+  const warmStarted = performance.now()
+  big.warm(cytoscape)
+  const warmMs = performance.now() - warmStarted
   const opened = []
   big.open = (id) => opened.push(big.byId.get(id).identifier)
   const started = performance.now()
@@ -150,6 +155,18 @@ function drawing(cytoscape) {
   const tinted = { direct: blasted.cy.nodes(".br1").map((n) => n.id()), transitive: blasted.cy.nodes(".br2").map((n) => n.id()),
     facts: blasted.factsTarget.textContent }
 
+  // Domain clusters: the clusters layout boxes each published cluster's members; leaving it removes the boxes.
+  const clustered = mount("clustered")
+  clustered.clustersValue = [["Generated::Unit1", "controller", "Billing"], ["Generated::Unit2", "view_template", "Billing"],
+    ["Generated::Unit3", "job", "Shipping"]]
+  clustered.modeValue = "clusters"
+  clustered.draw(cytoscape, small)
+  const boxes = clustered.cy.nodes(".cluster").map((n) => n.data("label")).sort()
+  const boxed = clustered.cy.getElementById("n_1").parent().data("label")
+  clustered.layout({ currentTarget: clustered.layoutTargets[0] })
+  const unboxed = clustered.cy.nodes(".cluster").length === 0 && clustered.cy.getElementById("n_1").parent().empty()
+  const clusters = { boxes, boxed, unboxed }
+
   // The impact page's range emphasis (E-3, E-8): distance 0 is a unit the report records as changed.
   const ranged = mount("ranged")
   ranged.emphasisValue = "range"
@@ -175,8 +192,8 @@ function drawing(cytoscape) {
   const recentre = blasted.unitUrl({ type: "route", identifier: "GET /users/:id?x=1&y" })
 
   return {
-    restored, forgotten, tinted, ranges, recentre, loop,
-    ms: Number(big.element.dataset.graphRenderMs), wall, calibrationMs, timings: big.timings, radialMs, radialMoved,
+    restored, forgotten, tinted, ranges, recentre, clusters, loop,
+    ms: Number(big.element.dataset.graphRenderMs), wall, calibrationMs, warmMs, timings: big.timings, radialMs, radialMoved,
     drawn: big.element.dataset.graphDrawn === "true",
     nodes: big.cy.nodes().length, edges: big.cy.edges().length,
     panelVisible: !big.panelTarget.hidden, fallbackVisible: !big.fallbackTarget.hidden, layoutsVisible: !big.layoutsTarget.hidden,

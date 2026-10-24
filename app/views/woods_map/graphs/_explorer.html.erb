@@ -15,6 +15,7 @@
       emphasis           :range when blast holds a range report's changed (distance 0)
                          and affected units (E-3, E-8); the radius of this unit otherwise %>
 <% blast = local_assigns[:blast] %>
+<% clusters = Array(local_assigns[:clusters]) %>
 <% range = local_assigns[:emphasis] == :range %>
 <% blast_legend = range ? [['changed in this range', 0], ['affected directly', 1], ['affected transitively', 2]] : [['a change here reaches it directly', 1], ['transitively', 2]] %>
 <% page = local_assigns.fetch(:page, false) %>
@@ -26,7 +27,8 @@
      data-graph-url-value="<%= woods_map.neighbourhood_path(centre: identifier, type: type, depth: n.depth, direction: n.direction, **filters) %>"
      data-graph-unit-url-value="<%= unit_url %>"
      data-graph-generation-value="<%= @repository.generation_number %>"
-     data-graph-cache-value="<%= cache_key %>"<% if blast_units %>
+     data-graph-cache-value="<%= cache_key %>"<% if clusters.any? %>
+     data-graph-clusters-value="<%= clusters.to_json %>"<% if params[:group] == 'clusters' %> data-graph-mode-value="clusters"<% end %><% end %><% if blast_units %>
      data-graph-blast-value="<%= blast_units.to_json %>"<% end %><% if range %>
      data-graph-emphasis-value="range"<% end %>>
   <nav class="rail" aria-label="Graph filters">
@@ -50,7 +52,7 @@
       <div class="pad3"><button class="btn" type="submit">apply filters</button></div>
       <div data-graph-target="layouts" hidden>
         <div class="grp">layout</div>
-        <div class="pad1"><span class="seg" role="group" aria-label="Layout"><% %w[butterfly radial].each do |mode| %><button type="button" aria-pressed="<%= mode == 'butterfly' %>" data-layout="<%= mode %>" data-graph-target="layout" data-action="graph#layout"><%= mode %></button><% end %></span></div>
+        <div class="pad1"><span class="seg" role="group" aria-label="Layout"><% (%w[butterfly radial] + (clusters.any? ? %w[clusters] : [])).each do |mode| %><button type="button" aria-pressed="<%= mode == 'butterfly' %>" data-layout="<%= mode %>" data-graph-target="layout" data-action="graph#layout"><%= mode %></button><% end %></span></div>
         <p class="cap padx">Positions you drag are kept per generation in this browser. <button class="tool" type="button" data-action="graph#forget">reset positions</button></p>
       </div>
       <%= local_assigns[:rail_extra] %>

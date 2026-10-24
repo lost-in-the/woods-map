@@ -68,6 +68,14 @@ module WoodsMap
     # @return [String] cookie name holding the exchanged token digest.
     attr_accessor :cookie_name
 
+    # @return [String, nil] the application's name on the Landscape page and its
+    #   exports. The index does not record one; "Application" when unset.
+    attr_accessor :system_name
+
+    # @return [Array<Hash>] the people around the system on the Landscape page
+    #   (C4 level 1): each `{ name:, description:, uses: }`, declared by the host
+    #   because no index can know them. Empty by default.
+    attr_accessor :landscape_actors
     # @return [Proc, false, nil] the engine's Content-Security-Policy. Nil
     #   (the default) sends the engine's own strict policy on every engine
     #   response; a callable receives that policy (an
@@ -103,6 +111,8 @@ module WoodsMap
       @guide_enabled = false
       initialize_guide
       @cookie_name = 'woods_map_session'
+      @system_name = nil
+      @landscape_actors = []
       @content_security_policy = nil
       @rate_limit = 120
       @rate_limit_period = 60

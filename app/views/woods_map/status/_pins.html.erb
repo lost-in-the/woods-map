@@ -1,0 +1,15 @@
+<%# Woods' retention pins (W-11): generations kept past payload retention
+    until released. Locals: retention (WoodsMap::Retention), retained
+    (Array<Integer>, the published generations). %>
+<% case retention.state %>
+<% when :available %>
+  <% if retention.pins.empty? %>
+    none; retention may prune older generations, and <code>bin/rails woods:pin[N]</code> keeps one
+  <% else %>
+    <%= safe_join(retention.pins.map { |n| retained.include?(n) ? "gen #{n}" : safe_join(["gen #{n} ", layer_chip('payload missing')]) }, ', ') %>, kept past retention until <code>woods:unpin[N]</code>
+  <% end %>
+<% when :unreadable %>
+  <span class="mut">unknown: Woods could not read its pin state</span>
+<% else %>
+  <span class="mut">unknown: this Woods version cannot report pins</span>
+<% end %>
