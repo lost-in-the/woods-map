@@ -73,15 +73,21 @@ module WoodsMap
       tag.span(text, class: 'lyr')
     end
 
-    # The git author as recorded, truncated with the full value in the tooltip.
+    # The git author as recorded, truncated with the full value in the
+    # tooltip (D-17); with +href+, a link that filters the timeline to them
+    # (woods-map#92).
     #
     # @param name [String, nil]
     # @param email [String, nil]
+    # @param href [String, nil]
     # @return [ActiveSupport::SafeBuffer]
-    def who(name, email: nil)
+    def who(name, email: nil, href: nil)
       return tag.span('—', class: 'dim') if name.to_s.empty?
 
-      tag.span(name, class: 'who', title: [name, email].compact.join(', '))
+      title = [name, email].compact.join(', ')
+      return link_to(name, href, class: 'who', title: title) if href
+
+      tag.span(name, class: 'who', title: title)
     end
 
     # Chip kind => CSS class (D-11).

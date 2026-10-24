@@ -38,7 +38,8 @@ module WoodsMap
     #   week or day) or generation (bars per retained generation); `gen:` only
     #   the commits a generation first carried; `span:` only the days a drag
     #   picked ({DateSpan}); `all:` every commit in the window rather than
-    #   the latest {SHOWN}
+    #   the latest {SHOWN}; `author:` only the commits whose author, as git
+    #   recorded it, is exactly this name (woods-map#92)
     def initialize(repository, unit, now: Time.now.utc, **filters)
       @repository = repository
       @unit = unit
@@ -48,10 +49,14 @@ module WoodsMap
       @days = RANGES.fetch(filters[:range].to_s) { RANGES.fetch('365d') }
       @all = filters[:all] ? true : false
       read_filters(filters)
+      @author = filters[:author].to_s.presence
     end
 
     # @return [Range<Date>, nil] the days a drag picked on the strip
     attr_reader :span
+
+    # @return [String, nil] the author the commits are narrowed to
+    attr_reader :author
 
     # @return [String] commit or generation: what one bar of the strip is
     attr_reader :by
@@ -97,25 +102,14 @@ module WoodsMap
     def paths_label
       own = File.basename(paths.first.to_s)
       extra = paths.size - 1
-      if extra.positive?
-        "#{own} and #{extra} more #{extra == 1 ? 'file' : 'files'}"
-      else
-        own
-      end
+      extra.positive? ? "#{own} and #{extra} more #{'file'.pluralize(extra)}" : own
     end
 
-    # Commits inside the window, newest first.
+    # Commits inside the window, newest first, by {#author} when one is set.
     #
     # @return [Array<Commit>]
     def window_commits
-      @window_commits ||= if table?
-                            cutoff = @now - (@days * 86_400)
-                            rows = CommitRows.new(@repository, @table, ledger)
-                            @table.commits_for(*paths).select { |row| (time(row['date']) || cutoff) >= cutoff }
-                                  .map { |row| rows.build(row) }
-                          else
-                            CommitRows.fallback(@git)
-                          end
+      @window_commits ||= @author ? all_window_commits.select { |c| c.author == @author } : all_window_commits
     end
 
     # The rows the table shows: the selected bar's commits, or the latest
@@ -136,7 +130,7 @@ module WoodsMap
     def people
       return fallback_people unless table?
 
-      people = window_commits.group_by(&:author).map do |name, list|
+      people = all_window_commits.group_by(&:author).map do |name, list|
         Person.new(name: name, commits: list.size, last: list.first.date)
       end
       people.sort_by { |person| [-person.commits, person.name.to_s] }
@@ -184,6 +178,17 @@ module WoodsMap
 
     private
 
+    # Commits inside the window by every author, newest first.
+    def all_window_commits
+      @all_window_commits ||= table? ? table_window_commits : CommitRows.fallback(@git)
+    end
+
+    def table_window_commits
+      cutoff = @now - (@days * 86_400)
+      rows = CommitRows.new(@repository, @table, ledger)
+      @table.commits_for(*paths).select { |row| (time(row['date']) || cutoff) >= cutoff }.map { |row| rows.build(row) }
+    end
+
     def own_key
       [@unit['identifier'], @unit['type']]
     end
@@ -203,6 +208,10 @@ module WoodsMap
       Time.iso8601(value.to_s).utc
     rescue ArgumentError
       nil
+    end
+
+    def parse_generation(value)
+      value.to_i if value.to_s.match?(/\A[1-9][0-9]{0,8}\z/)
     end
 
     def parse_date(value)

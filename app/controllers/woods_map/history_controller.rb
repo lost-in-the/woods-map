@@ -6,12 +6,14 @@ module WoodsMap
   # touched two of them drawn as pairs. Units come as typed identifiers in
   # `units[]`; with none, the page offers the window's most-changed units.
   class HistoryController < ApplicationController
+    include AuthorFilter
+
     woods_map_rate_limit :history
 
     def show
       with_repository do |repository|
         @repository = repository
-        @timeline = WoodsMap::HistoryTimeline.new(repository, selection, days: days,
+        @timeline = WoodsMap::HistoryTimeline.new(repository, selection, days: days, author: author_param,
                                                                          span: WoodsMap::DateSpan.parse(params[:span]))
         next render_timeline_mermaid if mermaid_request?
 

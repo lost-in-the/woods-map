@@ -12,6 +12,7 @@ module WoodsMap
     include WoodsMap::RoutedIdentifier
     include WoodsMap::UnitHistory
     include WoodsMap::GraphOverlays
+    include WoodsMap::UnitLifecycle
 
     LENS_COOKIE = 'woods_map_lens'
 
@@ -88,17 +89,7 @@ module WoodsMap
     end
 
     def lifecycle
-      with_unit do
-        @lifecycle = lifecycle_for(@unit, dynamic: WoodsMap::DynamicView.new(@repository))
-        @event = params[:event] if WoodsMap::Lifecycle::EVENTS.include?(params[:event])
-        @event ||= @lifecycle.chains.keys.first || 'create'
-        @view = @lifecycle.views.find { |view| view == params[:view] } || WoodsMap::Lifecycle::VIEWS.first
-        @state_machines = []
-        @state_machines = WoodsMap::StateMachineView.for_model(@repository, @page.identifier) if @page.type == 'model'
-        next render_lifecycle_mermaid if mermaid_request?
-
-        render :lifecycle
-      end
+      with_unit { WoodsMap::EntryLifecycle.applies?(@page.type) ? entry_lifecycle : model_lifecycle }
     end
 
     def graph
@@ -155,9 +146,29 @@ module WoodsMap
       redirect_to woods_map.unit_path(type: params[:type], identifier: routed_identifiers.first)
     end
 
-    def lifecycle_for(unit, dynamic: nil)
-      WoodsMap::Lifecycle.new(unit, concern_methods: concern_methods(unit), dynamic: dynamic,
-                                    changed: current_since&.changed_members(unit))
+    # A model's (or state machine's) Lifecycle tab: its callback chains.
+    def model_lifecycle
+      @lifecycle = lifecycle_for(@unit, dynamic: WoodsMap::DynamicView.new(@repository))
+      @event = params[:event] if WoodsMap::Lifecycle::EVENTS.include?(params[:event])
+      @event ||= @lifecycle.chains.keys.first || 'create'
+      @view = @lifecycle.views.find { |view| view == params[:view] } || WoodsMap::Lifecycle::VIEWS.first
+      @state_machines = []
+      @state_machines = WoodsMap::StateMachineView.for_model(@repository, @page.identifier) if @page.type == 'model'
+      return render_lifecycle_mermaid if mermaid_request?
+
+      render :lifecycle
+    end
+
+    # A controller's, job's or mailer's Lifecycle tab: the flow of one entry
+    # point (FR-6, woods-map#91).
+    def entry_lifecycle
+      @entry_lifecycle = WoodsMap::EntryLifecycle.new(@repository, @unit, action: params[:action_name])
+      @view = WoodsMap::EntryLifecycle::VIEWS.find { |view| view == params[:view] } ||
+              WoodsMap::EntryLifecycle::VIEWS.first
+      return render_entry_lifecycle_mermaid if mermaid_request?
+
+      @flags = WoodsMap::TrailFlags.new(@repository, @entry_lifecycle.steps)
+      render :entry_lifecycle
     end
 
     # The ladder's event: ?event= when valid, else the one the action implies, else the first chain.
@@ -166,15 +177,6 @@ module WoodsMap
 
       requested = params[:event] if WoodsMap::Lifecycle::EVENTS.include?(params[:event])
       requested || @passage.ladder_event || ladder.chains.keys.first || 'create'
-    end
-
-    # concern name => the instance methods that concern defines, for the
-    # concerns the unit inlines.
-    def concern_methods(unit)
-      Array(unit.dig('metadata', 'inlined_concerns')).to_h do |name|
-        concern = @repository.unit(name, type: 'concern')
-        [name, Array(concern&.dig('metadata', 'instance_methods')).map(&:to_s)]
-      end
     end
   end
 end

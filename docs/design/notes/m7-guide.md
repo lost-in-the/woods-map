@@ -43,6 +43,7 @@ Scope: M7 ([woods-map#9](https://github.com/lost-in-the/woods-map/issues/9)), FR
 - An `EventSource` reads `tool`, `delta`, then one of `done`, `limited`, `cancelled` or `failed`, each carrying the turn and its rendered HTML.
 - Turbo is not vendored. Turbo Streams would add a library to keep the same order of events that one SSE stream already guarantees. A small Stimulus controller sets streamed text as text, and sets only the server's rendered HTML as HTML.
 - `connect-src 'self'` covers the stream. A turn streams once: EventSource's automatic reconnect gets the finished turn again instead of a second model run.
+- While an answer runs, `Guide::Heartbeat` writes an SSE comment line after `guide_heartbeat_seconds` (15) of quiet, under the same lock as the events, so proxies and CDNs do not time out a long model turn ([DEPLOYMENT.md §8](../../DEPLOYMENT.md#8-streaming-the-m7-guide-behind-proxies)). A failed heartbeat write stops the answer like a disconnect. A fallback for a stream that cannot open is [woods-map#101](https://github.com/lost-in-the/woods-map/issues/101) (needs-decision).
 - *Stop* marks the turn and closes the stream, and the server cancels the chat. Proxy settings are in the deployment guide.
 
 ## Budgets and persistence
