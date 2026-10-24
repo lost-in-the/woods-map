@@ -60,10 +60,6 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .keyboard-help section{margin-top:var(--s5)}
 .wm .keyboard-help dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--s2) var(--s4)}
 .wm .keyboard-help dd{margin:0;overflow-wrap:anywhere}
-/* The current rail item sits on --select-tint, where --dim misses AA in the light theme (4.23:1). */
-.wm .rail li[aria-current=true] .own{color:var(--mut)}
-/* The ERD rail numbers its chunks; the number sits on the same tint. */
-.wm .rail li[aria-current=true] .k{color:var(--mut)}
 /* The hover card on a reference (B-3), inside the one tooltip (D-16). */
 .wm .tip .hcard{min-width:220px}
 .wm .hcard .hch{display:flex;gap:var(--s2);align-items:baseline;margin-bottom:var(--s1)}
@@ -249,6 +245,13 @@ html.js .wm .guide .guide-nojs{display:none}
 .wm .legend i.gblast[data-distance="2"]{border-color:var(--mod)}
 /* Cytoscape's container rule, which it would otherwise inject as an inline <style> the policy refuses. */
 .wm .__________cytoscape_container{position:relative}
+/* The impact Graph tab and ?since= (E-3, E-8): a changed unit is filled with --mod, as the canvas draws it. */
+.wm .legend i.gblast[data-distance="0"]{background:color-mix(in srgb,var(--mod) 22%,var(--panel));border-color:var(--mod)}
+/* A row the focus URL selects (E-6): lit with the selection tint and a select rule. */
+.wm .tbl tbody tr.focus > td{background:var(--select-tint)}
+.wm .tbl tbody tr.focus > td:first-child{box-shadow:inset 3px 0 0 var(--select)}
+/* A table row ?since= marks changed (E-8): a --mod rule, the M chip in its first cell. */
+.wm .tbl tbody tr.chg > td:first-child{box-shadow:inset 3px 0 0 var(--mod)}
 /* History (M4, B6-History, notes/history.md): the commit strip is an SVG in viewBox units, bars
    neutral, the last four weeks hot (D-11), a selected bar in the selection colour, generation marks
    dashed in the modified hue. Axis labels are SVG text at percentage positions, so no style attribute

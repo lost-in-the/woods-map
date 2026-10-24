@@ -21,6 +21,7 @@ module WoodsMap
   class ApplicationController < ActionController::Base
     include WoodsMap::Authentication
     include WoodsMap::MermaidText
+    include WoodsMap::SinceParam
 
     protect_from_forgery with: :exception
     layout 'woods_map/application'

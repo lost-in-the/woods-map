@@ -26,6 +26,8 @@ WoodsMap::Engine.routes.draw do
   # The Mermaid text of a page's diagram as text/plain (D-25); see docs/design/notes/mermaid-text-urls.md.
   get 'impact.mmd', to: 'impact#show', as: :impact_mmd, defaults: { mmd: '1' }, format: false
   get 'impact', to: 'impact#show', as: :impact
+  # A saved report (E-6): the SHA-256 ID woods:impact printed, read through Woods' store.
+  get 'impacts/:id', to: 'impact#saved', as: :saved_impact, constraints: { id: /[0-9a-f]{64}/ }, format: false
 
   # The whole database by chunk (M3, B6-ERD): a chunk number, never a table name or path.
   get 'erd.mmd', to: 'erd#show', as: :erd_mmd, defaults: { mmd: '1' }, format: false
