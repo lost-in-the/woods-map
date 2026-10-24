@@ -68,6 +68,19 @@ RSpec.describe 'Links between unit pages', type: :request do
     end
   end
 
+  describe 'the peek a method-level link opens' do
+    it 'starts at the linked line and opens the unit there' do
+      get '/woods/units/controller/PagesController/peek?line=2'
+      expect(html_response_document.css('.ph span').map(&:text)).to include('app/controllers/pages_controller.rb:2')
+      expect(html_response_document.at_css('.ph a')['href']).to eq('/woods/units/controller/PagesController#L2')
+    end
+
+    it 'falls back to the definition for a line the file does not have' do
+      get '/woods/units/controller/PagesController/peek?line=99'
+      expect(html_response_document.css('.ph span').map(&:text)).to include('app/controllers/pages_controller.rb:1')
+    end
+  end
+
   describe 'the facts tiles' do
     before { get '/woods/units/controller/PagesController' }
 
