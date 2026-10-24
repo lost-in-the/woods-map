@@ -37,7 +37,9 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
       pins = %w[job:NotifySubscribersJob mailer:MailingListMailer model:Post model:User]
       pinned = WoodsMap::PinnedViews.new(repository, WoodsMap::TrailBoard.new(pins: pins).pins)
       entries = %w[NotifySubscribersJob Post@create Post#set_slug MailingListMailer#new_post]
-      entries.reject! { |entry| entry.include?('@') } unless WoodsMap::RepositoryAssembledFlows.capabilities[:model_events]
+      unless WoodsMap::RepositoryAssembledFlows.capabilities[:model_events]
+        entries.reject! { |entry| entry.include?('@') }
+      end
       entries.map do |entry|
         ['flowchart', "trail #{entry}", WoodsMap::LifecycleBuilder.new(repository, entry).mermaid]
       end + [['flowchart', 'trail pinned graph', pinned.graph_mermaid], ['er', 'trail pinned erd', pinned.erd_mermaid]]
