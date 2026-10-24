@@ -8,6 +8,17 @@ module WoodsMap
       parsed = response.parsed_body
       parsed.is_a?(String) ? Nokogiri::HTML(parsed) : parsed
     end
+
+    # No route answers the path: newer Rails raises the routing error out of
+    # the test session, Rails 6.0 answers 404.
+    #
+    # @param path [String]
+    def expect_no_route(path)
+      get path
+      expect(response).to have_http_status(:not_found)
+    rescue ActionController::RoutingError => e
+      expect(e.message).to include(path.split('?').first)
+    end
   end
 end
 
