@@ -1,0 +1,22 @@
+<%# ?since= on a unit page (E-8): what Woods' range report from that
+    generation to now records about this unit. Locals: page (UnitPage),
+    since (WoodsMap::Since). %>
+<% s = since %>
+<% range = s.available? ? "Woods' report, gen #{s.from_generation} → gen #{s.to_generation}" : nil %>
+<% report_link = s.available? ? link_to('open the report', woods_map.impact_path(from: "gen:#{s.from_generation}", to: 'now', focus: page.identifier, lens: 'changed')) : nil %>
+<% clear = link_to('clear', request.path) %>
+<div class="frame-facts">
+<% if !s.available? %>
+  <%= render 'woods_map/components/banner', severity: :mod, lead: "No comparison since #{s.selector}.", text: s.message, tools: clear %>
+<% elsif (change = s.change(page.identifier, page.type)) %>
+  <%= render 'woods_map/components/banner', severity: :mod, lead: "#{change['status'].capitalize} since gen #{s.from_generation}.",
+        text: safe_join(["Facets moved: #{Array(change['facets']).join(', ').presence || 'none'}; metadata keys: #{Array(change['metadata_keys']).join(', ').presence || 'none'}. ",
+                         'Notes and rows that read a key that moved are marked M; which lines changed is not in the report (woods#802). ', range, '.']),
+        tools: safe_join([report_link, clear], ' ') %>
+<% elsif (reach = s.reach(page.identifier, page.type)) %>
+  <%= render 'woods_map/components/banner', severity: :mod, lead: "Affected since gen #{s.from_generation}.",
+        text: "Unchanged itself, #{reach['distance']} #{'hop'.pluralize(reach['distance'].to_i)} from a changed unit. #{range}.", tools: safe_join([report_link, clear], ' ') %>
+<% else %>
+  <%= render 'woods_map/components/banner', lead: "Unchanged since gen #{s.from_generation}.", text: "#{range} records no change to this unit and does not reach it.", tools: safe_join([report_link, clear], ' ') %>
+<% end %>
+</div>

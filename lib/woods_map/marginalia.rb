@@ -7,7 +7,9 @@ module WoodsMap
   # count, includes their concern. Line matching is by the macro the line
   # starts with, the same reading the extractor's own analysers use.
   class Marginalia
-    Note = Struct.new(:text, :layer, :link, keyword_init: true)
+    # area names the metadata a note reads (a key of WoodsMap::Since::KEYS), so
+    # ?since= can mark notes whose metadata moved.
+    Note = Struct.new(:text, :layer, :link, :area, keyword_init: true)
 
     ASSOCIATION = /\A\s*(belongs_to|has_many|has_one|has_and_belongs_to_many)\s+:(\w+)/
     CALLBACK = /\A\s*((?:before|after|around)_\w+)\s+:(\w+)/
@@ -44,7 +46,7 @@ module WoodsMap
       return nil unless assoc
 
       text = association_text(macro, assoc)
-      Note.new(text: text, layer: 'model metadata', link: assoc['target'])
+      Note.new(text: text, layer: 'model metadata', link: assoc['target'], area: :associations)
     end
 
     def association_text(macro, assoc)
@@ -77,13 +79,13 @@ module WoodsMap
 
     def callback_note(type, filter)
       event = Lifecycle::EVENTS.find { |e| Lifecycle::ORDER[e].include?(type) && chain_position(e, filter) }
-      return Note.new(text: "#{type} #{filter}", layer: 'resolved chain') unless event
+      return Note.new(text: "#{type} #{filter}", layer: 'resolved chain', area: :callbacks) unless event
 
       position, step = chain_position(event, filter)
       total = @lifecycle.steps(event).size
       effects = step.effects.any? ? ", #{step.effects.join(', ')}" : ''
       Note.new(text: "chain #{position} of #{total} on #{event}#{effects}", layer: 'resolved chain',
-               link: step.side_effects&.dig('jobs_enqueued')&.first)
+               link: step.side_effects&.dig('jobs_enqueued')&.first, area: :callbacks)
     end
 
     def chain_position(event, filter)
@@ -93,13 +95,14 @@ module WoodsMap
 
     def validation_note
       @seen_validations += 1
-      Note.new(text: "validation #{@seen_validations} of #{@validation_count}", layer: 'model metadata')
+      Note.new(text: "validation #{@seen_validations} of #{@validation_count}", layer: 'model metadata',
+               area: :validations)
     end
 
     def include_note(name)
       inlined = Array(@metadata['inlined_concerns']).include?(name.split('::').last)
       Note.new(text: inlined ? "concern #{name}, inlined below" : "concern #{name}, not in the index",
-               layer: inlined ? 'resolved ancestors' : nil, link: name)
+               layer: inlined ? 'resolved ancestors' : nil, link: name, area: :concerns)
     end
   end
 end

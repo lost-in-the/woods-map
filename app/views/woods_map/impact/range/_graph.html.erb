@@ -1,0 +1,20 @@
+<%# Graph (E-3, E-8) in range mode: the Cytoscape explorer of the graph tab,
+    centred on the focused or first changed unit of the pinned generation,
+    with the units Woods' report records as changed filled and the units it
+    reached ringed by distance. Locals: rr (RangeReport), range_url. %>
+<% if @graph %>
+  <% hidden = { lens: 'graph', focus: params[:focus].presence }.merge(@saved_id ? {} : { from: Array(@range).first, to: Array(@range).last }).compact %>
+  <%= render 'woods_map/graphs/explorer', identifier: @graph_centre['identifier'], type: @graph_centre['type'], n: @graph, blast: rr.graph_blast, emphasis: :range, hidden: hidden,
+        link: ->(**opts) { range_url.call(**opts.slice(:direction, :depth, :types, :via).merge(lens: 'graph')) },
+        unit_url: woods_map.unit_graph_path(type: '__type__', identifier: '__identifier__', since: "gen:#{rr.from_generation}"),
+        rail_extra: tag.div('emphasis', class: 'grp') + tag.ol(safe_join([
+          tag.li(safe_join([tag.span('·', class: 'k'), tag.span("#{rr.emphasis.count { |e| e.distance.zero? }} changed, #{rr.emphasis.count { |e| e.distance.to_i.positive? }} affected in gen #{@repository.generation_number}")])),
+          tag.li(safe_join([tag.span('·', class: 'k'), tag.span(safe_join(['from Woods\' report, gen ', rr.from_generation.to_s, ' → gen ', rr.to_generation.to_s, ' ', layer_chip('W-12')]))]))
+        ])) %>
+<% else %>
+  <div class="body">
+    <div class="main inset">
+      <%= render 'woods_map/components/empty_state', title: 'No changed unit to centre on', text: "None of the report's changed units is in the generation this map reads (gen #{@repository.generation_number}): they were removed, or the report compares older payloads. The Changed tab lists them." %>
+    </div>
+  </div>
+<% end %>

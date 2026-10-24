@@ -245,3 +245,10 @@ html.js .wm .guide .guide-nojs{display:none}
 .wm .legend i.gblast[data-distance="2"]{border-color:var(--mod)}
 /* Cytoscape's container rule, which it would otherwise inject as an inline <style> the policy refuses. */
 .wm .__________cytoscape_container{position:relative}
+/* The impact Graph tab and ?since= (E-3, E-8): a changed unit is filled with --mod, as the canvas draws it. */
+.wm .legend i.gblast[data-distance="0"]{background:color-mix(in srgb,var(--mod) 22%,var(--panel));border-color:var(--mod)}
+/* A row the focus URL selects (E-6): lit with the selection tint and a select rule. */
+.wm .tbl tbody tr.focus > td{background:var(--select-tint)}
+.wm .tbl tbody tr.focus > td:first-child{box-shadow:inset 3px 0 0 var(--select)}
+/* A table row ?since= marks changed (E-8): a --mod rule, the M chip in its first cell. */
+.wm .tbl tbody tr.chg > td:first-child{box-shadow:inset 3px 0 0 var(--mod)}

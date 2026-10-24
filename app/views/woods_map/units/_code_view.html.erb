@@ -10,11 +10,12 @@
       <div class="fold"><%= row.fold == :concern ? '▾ ' : '' %><%= row.html.html_safe %> <span class="lyr"><%= row.fold == :concern ? 'not in the file' : 'schema header, not in the file' %></span></div>
     <% else %>
       <% note = row.note %>
-      <div class="row contents"<%= " id=\"L#{row.number}\"".html_safe if row.number %>>
+      <% moved = note&.area && current_since&.area_changed?(page.identifier, page.type, note.area) %>
+      <div class="row contents<%= ' row-chg' if moved %>"<%= " id=\"L#{row.number}\"".html_safe if row.number %>>
         <div class="heat"><i class="<%= heat %>"></i></div>
         <div class="ln<%= ' dim' if row.concern %>"><%= row.label %></div>
         <div class="src"><%= row.html.html_safe %></div>
-        <div class="mg"<%= " title=\"#{ERB::Util.html_escape(note.text)}\"".html_safe if note %>><% if note %><b><%= note.text %></b><% if note.layer %> <span class="lyr"><%= note.layer %></span><% end %><% end %></div>
+        <div class="mg"<%= " title=\"#{ERB::Util.html_escape(note.text)}\"".html_safe if note %>><% if note %><% if moved %><%= chip(:modified) %><span class="sr-only">its <%= note.area.to_s.tr('_', ' ') %> metadata changed since gen <%= current_since.from_generation %>: </span><% end %><b><%= note.text %></b><% if note.layer %> <span class="lyr"><%= note.layer %></span><% end %><% end %></div>
       </div>
     <% end %>
   <% end %>

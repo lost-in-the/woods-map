@@ -47,6 +47,13 @@ widths are the tiers of D-19.
 | Impact, Tests | [B8-Impact-Tests](../boards/B8-Impact-Tests.html) | [1440](impact-tests-1440.png) |
 | Impact, Unknown | [B8-Impact-Unknown](../boards/B8-Impact-Unknown.html) | [1440](impact-unknown-1440.png) |
 | Impact, a range without a report (W-12) | [B8-States](../boards/B8-States.html), *first run* panel's structure | [1440](impact-range-1440.png) |
+| Impact, range Overview (`/woods/impact?from=gen:1&to=now`, v8 of the v5 board) | [B8-Impact-Changed](../boards/B8-Impact-Changed.html) frame, [design note](../notes/impact-range.md) | [1440](impact-range-overview-1440.png), [960](impact-range-overview-960.png), [640](impact-range-overview-640.png), [390](impact-range-overview-390.png), [light](impact-range-overview-light-1440.png) |
+| Impact, range Changed with the focus row (`&lens=changed&focus=users/show.html.erb`) | [B8-Impact-Changed](../boards/B8-Impact-Changed.html) | [1440](impact-range-changed-focus-1440.png) |
+| Impact, range Graph: changed, direct and transitive emphasis | [design note](../notes/impact-range.md) | [1440](impact-range-graph-1440.png), [390](impact-range-graph-390.png), [light](impact-range-graph-light-1440.png) |
+| Impact, a saved report (`/woods/impacts/<id>`) | [design note](../notes/impact-range.md) | [1440](impact-saved-1440.png) |
+| Impact, pre-change Graph tab (`/woods/impact?focus=User&lens=graph`) | [design note](../notes/impact-range.md) | [1440](impact-graph-1440.png) |
+| `?since=gen:1` on Code, Graph, Lifecycle, Passage, ERD and a changed template | [design note](../notes/since.md) | [code](since-code-1440.png), [code 390](since-code-390.png), [graph](since-graph-1440.png), [lifecycle](since-lifecycle-1440.png), [passage](since-passage-1440.png), [ERD](since-erd-1440.png), [template](since-template-1440.png) |
+| `?since=gen:9`, a generation the index does not retain (W-11) | [design note](../notes/since.md) | [1440](since-unretained-1440.png) |
 | Guidelines at 960, 640 and 390 | the four-widths rows of C2, C3 and C5 | inside the C2 and C5 clips above; the whole page is too tall to keep as a PNG, regenerate it with the runner |
 
 Diagram panels are drawn by the vendored Pele in the browser (D-21) on the

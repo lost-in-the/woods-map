@@ -8,9 +8,20 @@
      render('woods_map/shared/share'),
      tag.button('⎘ copy focus URL', class: 'btn primary', type: 'button', data: { controller: 'copy', copy_text_value: focus_url, action: 'copy#copy', key: 'y' }, 'data-needs-js': '')
    ], ' ') %>
-<% counts = { 'changed' => r.focus.size, 'risks' => v.findings.size, 'flows' => 0, 'tests' => v.tests.size, 'unknown' => v.unknowns.size } %>
+<% counts = { 'changed' => r.focus.size, 'risks' => v.findings.size, 'flows' => 0, 'tests' => v.tests.size, 'graph' => r.affected.size, 'unknown' => v.unknowns.size } %>
 <% tabs = WoodsMap::ImpactController::LENSES.map { |lens| { label: lens.capitalize, count: counts[lens], href: impact_url.call(lens: lens), current: lens == @lens } } %>
 <%= render 'woods_map/impact/frame', title: 'Blast radius', subtitle: "#{r.focus.join(', ')}, depth #{r.depth}, gen #{@repository.generation_number}", controls: controls, tabs: tabs %>
+<% if @lens == 'graph' %>
+  <% if @graph %>
+    <%= render 'woods_map/graphs/explorer', identifier: @graph_centre['identifier'], type: @graph_centre['type'], n: @graph, blast: r,
+          hidden: { lens: 'graph', focus: r.focus.join(','), show: (r.show == 'all' ? nil : r.show) }.compact,
+          link: ->(**opts) { impact_url.call(**opts.slice(:direction, :depth, :types, :via).merge(lens: 'graph')) },
+          unit_url: woods_map.unit_graph_path(type: '__type__', identifier: '__identifier__'),
+          rail_extra: tag.div('blast radius', class: 'grp') + tag.ol(tag.li(safe_join([tag.span('·', class: 'k'), tag.span("#{r.affected.size} reached within depth #{r.depth} of #{r.focus.join(', ')}, gen #{@repository.generation_number}")]))) %>
+  <% else %>
+    <div class="body"><div class="main inset"><%= render 'woods_map/components/empty_state', title: 'No focus unit in this generation', text: "None of #{r.focus.join(', ')} is a unit of gen #{@repository.generation_number}." %></div></div>
+  <% end %>
+<% else %>
 <div class="body" data-controller="trail keys" data-trail-title-value="Blast radius of <%= r.focus.join(', ') %>">
   <%= render 'woods_map/components/rail', heading: @lens.capitalize, groups: [
         { label: 'focus', count: r.focus.size, items: r.focus.map { |id| { key: '·', text: unit_link(id, r.type_of(id)), own: safe_join([r.type_of(id).tr('_', ' '), (v.findings.count { |f| f.where == id }.positive? ? safe_join([', ', tag.span('⚑', class: 'flag'), " #{v.findings.count { |f| f.where == id }}"]) : nil)].compact) } } },
@@ -29,3 +40,4 @@
     <%= render 'woods_map/shared/status', items: ['static: one generation, no range', "reverse edges to depth #{r.depth}, #{r.reached.size} reached, #{r.affected.size} shown", "gen #{@repository.generation_number}"], keys: [[%w[1 2 3], 'depth'], [%w[y], 'copy URL'], [%w[/], 'search']] %>
   </div>
 </div>
+<% end %>

@@ -27,7 +27,7 @@ import { Controller } from "@hotwired/stimulus"
 // focus lights its edge on the canvas.
 export default class extends Controller {
   static targets = ["panel", "canvas", "facts", "status", "message", "fallback", "flowchart", "layouts", "layout", "list"]
-  static values = { url: String, unitUrl: String, label: String, generation: Number, cache: String, blast: Array }
+  static values = { url: String, unitUrl: String, label: String, generation: Number, cache: String, blast: Array, emphasis: String }
 
   static LAYOUT_KEY = "woods-map:graph-layout"
   static POSITIONS_KEY = "woods-map:graph-positions"
@@ -331,6 +331,8 @@ export default class extends Controller {
 
   stylesheet(font) {
     const t = this.tokens()
+    const mod = this.rgb(t.mod), panel = this.rgb(t.panel)
+    const changedFill = mod && panel ? this.mix(mod, panel, 0.22) : t.panel
     return [
       { selector: "node", style: {
         shape: "round-rectangle", width: "data(w)", height: "data(h)",
@@ -343,6 +345,7 @@ export default class extends Controller {
       { selector: "node.boundary", style: { "border-style": "dashed" } },
       { selector: "node.br1", style: { "border-color": t.hot, "border-width": 2.5 } },
       { selector: "node.br2", style: { "border-color": t.mod, "border-width": 2 } },
+      { selector: "node.chg", style: { "background-color": changedFill, "border-color": t.mod, "border-width": 2.5, color: t.bright } },
       { selector: "node.sel", style: { "border-color": t.select, "border-width": 3, "overlay-color": t.select, "overlay-opacity": 0.12, "overlay-padding": 4, color: t.bright } },
       { selector: "edge", style: {
         width: 1, "line-color": t.dim, "target-arrow-color": t.dim, "target-arrow-shape": "triangle", "arrow-scale": 0.8,
@@ -483,7 +486,9 @@ export default class extends Controller {
   }
 
   // Blast radius tint (E-9): units a change to this one reaches, from the
-  // page's WoodsMap::BlastRadius over the same generation.
+  // page's WoodsMap::BlastRadius over the same generation. On the impact
+  // page's range Graph tab (emphasis "range") distance 0 marks the units
+  // Woods' report records as changed, and the rest are what it reached (E-3).
   tint() {
     if (!this.cy || !this.hasBlastValue || !this.blastValue.length) return
     const distance = new Map(this.blastValue.map((unit) => [`${unit.type}\u0000${unit.identifier}`, unit.distance]))
@@ -492,9 +497,9 @@ export default class extends Controller {
       this.cy.nodes().forEach((node) => {
         const d = this.byId.get(node.id())
         const hops = d && distance.get(`${d.type}\u0000${d.identifier}`)
-        if (!hops) return
+        if (hops == null) return
         drawn += 1
-        node.addClass(hops === 1 ? "br1" : "br2")
+        node.addClass(hops === 0 ? "chg" : (hops === 1 ? "br1" : "br2"))
       })
     })
     this.blastDrawn = drawn
@@ -618,12 +623,20 @@ export default class extends Controller {
     const parts = [
       `${d.identifier}, ${d.type}${d.focus ? ", this unit" : ""}`,
       marks.length ? `${marks.join(", ")} (graph_analysis, per identifier)` : null,
-      this.cy.getElementById(id).hasClass("br1") ? "a change here reaches it directly" : (this.cy.getElementById(id).hasClass("br2") ? "a change here reaches it transitively" : null),
+      this.emphasisNote(this.cy.getElementById(id)),
       `${outgoing} ${outgoing === 1 ? "dependency" : "dependencies"} and ${incoming} ${incoming === 1 ? "dependent" : "dependents"} drawn`,
       extra,
       d.focus ? "arrows move along edges" : "Enter opens its graph"
     ]
     this.statusTarget.textContent = parts.filter(Boolean).join("; ")
+  }
+
+  emphasisNote(node) {
+    const range = this.hasEmphasisValue && this.emphasisValue === "range"
+    if (node.hasClass("chg")) return "changed in this range"
+    if (node.hasClass("br1")) return range ? "affected directly" : "a change here reaches it directly"
+    if (node.hasClass("br2")) return range ? "affected transitively" : "a change here reaches it transitively"
+    return null
   }
 
   open(id) {
@@ -659,7 +672,12 @@ export default class extends Controller {
     ]
     if (this.blastDrawn != null) {
       const total = this.blastValue.length
-      facts.push(`a change here reaches ${total} ${total === 1 ? "unit" : "units"}, ${this.blastDrawn} drawn`)
+      if (this.hasEmphasisValue && this.emphasisValue === "range") {
+        const changed = this.blastValue.filter((unit) => unit.distance === 0).length
+        facts.push(`${changed} changed and ${total - changed} affected in the report, ${this.blastDrawn} drawn`)
+      } else {
+        facts.push(`a change here reaches ${total} ${total === 1 ? "unit" : "units"}, ${this.blastDrawn} drawn`)
+      }
     }
     if (t.truncated) facts.push(`${t.omitted_nodes} more units and ${t.omitted_edges} edges hidden past the ${t.node_limit}-unit limit; dashed units have more`)
     const generation = this.payload.provenance?.generation
