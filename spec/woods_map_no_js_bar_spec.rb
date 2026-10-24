@@ -13,7 +13,7 @@ RSpec.describe 'The bar without JavaScript', type: :request do
 
     get '/woods/units/model/User'
     bar = html_response_document.at_css('header.bar').to_html
-    results = [1440, 960, 640, 390].to_h { |width| [width, bar_result(bar, width)] }
+    results = [1440, 960, 640, 390].index_with { |width| bar_result(bar, width) }
     results.each do |width, result|
       expect(result).to include('nav' => %w[Units Graph ERD Impact], 'search' => true, 'overflow' => false),
                         "at #{width}: #{result}"
