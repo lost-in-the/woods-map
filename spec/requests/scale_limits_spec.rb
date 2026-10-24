@@ -68,7 +68,8 @@ RSpec.describe 'Scale limits', type: :request do
       document = html_response_document
       panel = document.at_css('#graph-flowchart')
       expect(panel.at_css('pre[data-diagram-target=source]')).to be_nil
-      expect(panel.at_css('.dw .cap:not(.refusal)').text).to match(/Its Mermaid text, .+, is not carried in this page\./)
+      expect(panel.at_css('.dw .cap:not(.refusal)').text)
+        .to match(/Its Mermaid text, .+, is not carried in this page\./)
       expect(document.css('button[data-controller=copy][data-mermaid-name]:not([data-pr-comment])')).to be_empty
       expect(panel.at_css('a[data-mermaid-url]')['href']).to start_with('/woods/units/model/User/graph.mmd')
     end
