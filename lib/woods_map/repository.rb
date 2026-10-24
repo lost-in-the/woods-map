@@ -9,6 +9,8 @@ require_relative 'repository_history'
 require_relative 'repository_flows'
 require_relative 'repository_assembled_flows'
 require_relative 'retention'
+require_relative 'generation_snapshot'
+require_relative 'repository_files'
 
 module WoodsMap
   # One pinned generation per request.
@@ -22,6 +24,7 @@ module WoodsMap
     include RepositoryHistory
     include RepositoryFlows
     include RepositoryAssembledFlows
+    include RepositoryFiles
 
     # Raised when no published generation can be opened at the configured root.
     class Unavailable < StandardError; end
@@ -42,8 +45,8 @@ module WoodsMap
     def initialize(index)
       @index = index
       # The queries the published-index API does not expose (search, the raw
-      # graph, freshness) come from a reader pinned to the same payload.
-      @reader = Woods::MCP::IndexReader.new(index.payload_dir.to_s, auto_refresh: false)
+      # graph) come from a reader pinned to the same payload, shared with
+      # every request that pins this generation, beside what they derive.
       @units = {}
     end
 
@@ -68,8 +71,8 @@ module WoodsMap
 
     # @return [Array] cache identity of this index and its pinned generation
     def generation_key
-      [@index.index_dir.expand_path.to_s, @index.payload_dir.expand_path.to_s, generation_number,
-       manifest['extracted_at'], manifest['total_units']]
+      @generation_key ||= [@index.index_dir.expand_path.to_s, @index.payload_dir.expand_path.to_s, generation_number,
+                           manifest['extracted_at'], manifest['total_units']]
     end
 
     # What the bar shows on every page: the generation and the HEAD it was
@@ -90,7 +93,19 @@ module WoodsMap
     # @param type [String, nil]
     # @return [Array<Hash>] unit index entries
     def units(type: nil)
-      @index.units(type: type)
+      snapshot.fetch([:units, type&.to_s]) { @index.units(type: type) }
+    end
+
+    # Every typed identity of this generation, sorted and grouped by type:
+    # the units index, built once per generation.
+    #
+    # @return [Hash{String => Array<Hash>}] type => unit index entries
+    def unit_listing
+      snapshot.fetch(:unit_listing) do
+        units.uniq { |unit| unit.values_at('identifier', 'type') }
+             .sort_by { |unit| [unit['type'].to_s, unit['identifier'].to_s] }
+             .group_by { |unit| unit['type'].to_s }
+      end
     end
 
     # One unit, read once per request.
@@ -116,9 +131,11 @@ module WoodsMap
     #
     # @return [Hash{String => String}]
     def identifier_index
-      @identifier_index ||= nodes_by_identifier.each_with_object({}) do |(identifier, nodes), index|
-        type = nodes.first && nodes.first['type']
-        index[identifier] = type.to_s if type
+      snapshot.fetch(:identifier_index) do
+        nodes_by_identifier.each_with_object({}) do |(identifier, nodes), index|
+          type = nodes.first && nodes.first['type']
+          index[identifier] = type.to_s if type
+        end
       end
     end
 
@@ -135,21 +152,25 @@ module WoodsMap
 
     # @return [Hash{String => String}] model identifier => the table its graph node names
     def model_tables
-      @model_tables ||= Hash(graph['nodes']).each_with_object({}) do |(identifier, node), tables|
-        tables[identifier] = node['table'] if node['type'] == 'model' && node['table']
+      snapshot.fetch(:model_tables) do
+        Hash(graph['nodes']).each_with_object({}) do |(identifier, node), tables|
+          tables[identifier] = node['table'] if node['type'] == 'model' && node['table']
+        end
       end
     end
 
     # @return [Hash] the raw dependency graph (nodes, edges, reverse, reverse_via, pagerank, file_map)
     def graph
-      @graph ||= @reader.raw_graph_data
+      @graph ||= snapshot.fetch(:graph) { reader.raw_graph_data }
     end
 
     # @return [Hash] graph_analysis.json, or an empty hash when absent
     def graph_analysis
-      @graph_analysis ||= @reader.graph_analysis || {}
-    rescue StandardError
-      @graph_analysis = {}
+      snapshot.fetch(:graph_analysis) do
+        reader.graph_analysis || {}
+      rescue StandardError
+        {}
+      end
     end
 
     # The request flows a best-effort extraction could not assemble (W-14,
@@ -158,7 +179,9 @@ module WoodsMap
     #
     # @return [Array<Hash>]
     def flow_failures
-      @flow_failures ||= @reader.respond_to?(:flow_failures) ? Array(@reader.flow_failures).grep(Hash) : []
+      snapshot.fetch(:flow_failures) do
+        reader.respond_to?(:flow_failures) ? Array(reader.flow_failures).grep(Hash) : []
+      end
     end
 
     # Drift of the working tree against this generation, within a quarter
@@ -180,80 +203,19 @@ module WoodsMap
     # @return [Hash] 'results' rows with 'identifier', 'type', 'match_field' and 'file_path';
     #   'completeness', 'partial', 'note' and 'hint' as the reader reports them
     def search(query, **options)
-      response = @reader.search(query, **options).deep_stringify_keys
+      response = reader.search(query, **options).deep_stringify_keys
       response['results'] = Array(response['results']).map do |row|
         row.merge('file_path' => graph_node(row['identifier'], type: row['type'])&.dig('file_path'))
       end
       response
     end
 
-    # The dependency-graph file map restricted to permitted relative keys.
-    # No path is normalized or decoded here.
-    #
-    # @return [Hash{String => Array<String>}] exact path => identifiers
-    def file_map
-      @file_map ||= (graph['file_map'] || {}).select { |path, _| permitted_file_path?(path) }
-    end
-
-    # @param path [String] already Rails-decoded relative application path
-    # @return [Boolean] whether the key is safe for exact payload lookup
-    def permitted_file_path?(path)
-      path.is_a?(String) && path.present? && path.valid_encoding? &&
-        !path.match?(%r{\A(?:/|[a-z]:)|[\\\p{Cc}]}i) &&
-        path.split('/', -1).none? { |part| part.empty? || %w[. ..].include?(part) }
-    end
-
-    # All typed owners whose published primary or contributor path matches
-    # an admitted file-map key. Never infer ownership from an identifier alone.
-    #
-    # @param path [String] exact permitted file-map key
-    # @return [Array<Hash>] deterministic, distinct typed node facts
-    def file_owners(path)
-      file_map.key?(path) ? file_owners_by_path.fetch(path, []) : []
-    end
-
-    # @param path [String] exact permitted file-map key
-    # @return [Array<String>] membership without a matching typed owner
-    def unresolved_file_identifiers(path)
-      (Array(file_map[path]).uniq - file_owners(path).pluck('identifier')).sort
-    end
-
-    # Legacy first-owner lookup for existing source-line links. File
-    # navigation uses {#file_owners} and never selects one owner's page.
-    #
-    # @param path [String] exact permitted file-map key
-    # @return [Hash, nil] the first resolved typed owner
-    def file_owner(path)
-      file_owners(path).first
-    end
-
     private
 
-    # Index published ownership once per request, rather than scanning every
-    # node for each file in the tree. Only admitted exact keys enter it.
-    def file_owners_by_path
-      @file_owners_by_path ||= begin
-        owners = {}
-        nodes_by_identifier.each do |identifier, nodes|
-          nodes.each { |node| add_file_owner(owners, identifier, node) if node['type'].present? }
-        end
-        owners.transform_values { |members| members.sort.map(&:last) }
-      end
-    end
-
-    def add_file_owner(owners, identifier, node)
-      owner = node.merge('identifier' => identifier)
-      ([node['file_path']] + Array(node['source_paths'])).uniq.each do |path|
-        next unless file_map.key?(path)
-
-        (owners[path] ||= {})[[identifier, node['type']]] ||= owner
-      end
-    end
-
     # Woods publishes coexisting types as a flat variants array; older
-    # generations omit it. Build the lookup once for this pinned generation.
+    # generations omit it. Build the lookup once for each pinned generation.
     def nodes_by_identifier
-      @nodes_by_identifier ||= begin
+      snapshot.fetch(:nodes_by_identifier) do
         nodes = (graph['nodes'] || {}).transform_values { |node| [node] }
         Array(graph['variants']).grep(Hash).each do |record|
           next unless record['identifier']
@@ -262,6 +224,15 @@ module WoodsMap
         end
         nodes
       end
+    end
+
+    # This generation's shared reader and derived values, found on first use.
+    def snapshot
+      @snapshot ||= GenerationSnapshot.for(generation_key, @index.payload_dir)
+    end
+
+    def reader
+      snapshot.reader
     end
 
     def manifest_facts

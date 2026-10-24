@@ -16,13 +16,11 @@ module WoodsMap
 
     LENS_COOKIE = 'woods_map_lens'
 
-    # Every indexed typed identity, including units without a source file.
+    # Every indexed typed identity, including units without a source file:
+    # the first rows of each type, or with ?type= one type a page at a time.
     def index
       with_repository do |repository|
-        @unit_groups = repository.units.uniq { |unit| unit.values_at('identifier', 'type') }
-                                 .sort_by { |unit| [unit['type'].to_s, unit['identifier'].to_s] }
-                                 .group_by { |unit| unit['type'].to_s }
-        @unit_count = @unit_groups.values.sum(&:size)
+        @units_index = WoodsMap::UnitsIndex.new(repository.unit_listing, type: params[:type], page: params[:page])
         @tree = WoodsMap::FileTree.for(repository)
         @freshness = repository.freshness
         @nav = primary_nav(:units)

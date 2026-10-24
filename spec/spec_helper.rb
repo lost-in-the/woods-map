@@ -10,6 +10,7 @@ require_relative 'support/package_index'
 require_relative 'support/m3_exit_check'
 require_relative 'support/fake_guide_chat'
 require_relative 'support/woods_line_stats'
+require_relative 'support/index_double'
 
 RSpec::Matchers.define_negated_matcher :not_include, :include
 
@@ -17,6 +18,7 @@ FIXTURE_INDEX = File.expand_path('fixtures/index', __dir__)
 
 RSpec.configure do |config|
   config.include WoodsMap::HtmlResponse, type: :request
+  config.include WoodsMap::IndexDouble
   config.expect_with(:rspec) { |c| c.syntax = :expect }
   config.disable_monkey_patching!
   # Binds a port and drives the dummy host under Puma (M8); opt in with
@@ -29,6 +31,7 @@ RSpec.configure do |config|
     WoodsMap.reset_configuration!
     WoodsMap.configuration.index_dir = FIXTURE_INDEX
     WoodsMap::GenerationFacets.reset!
+    WoodsMap::GenerationSnapshot.reset!
   end
 
   # The token-less loopback mode requires a loopback Host (DNS rebinding,

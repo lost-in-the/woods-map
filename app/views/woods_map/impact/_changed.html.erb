@@ -10,14 +10,17 @@
   <% if r.affected.empty? %>
     <%= render 'woods_map/components/empty_state', title: 'Nothing depends on the focus within this depth', text: 'No reverse edge reaches another unit, or the filters hid every one. Raise the depth or show every type.' %>
   <% else %>
-    <% rows = r.affected.map do |a| %>
+    <% affected = WoodsMap::ListPage.new(r.affected, params[:page], per: WoodsMap::BlastRadius::LIST_PER_PAGE) %>
+    <% covering = v.tests.each_with_object(Hash.new { |h, k| h[k] = [] }) { |t, by| t.covers.each { |id| by[id] << t } } %>
+    <% rows = affected.items.map do |a| %>
       <% path = safe_join(a.path.map { |from, via, to| safe_join([unit_link(to, r.type_of(to)), ' ', tag.span(via, class: 'mut'), ' ', tag.span('←', class: 'ar'), ' ', unit_link(from, r.type_of(from))]) }, tag.br) %>
-      <% specs = v.tests.select { |t| t.covers.include?(a.identifier) } %>
+      <% specs = covering.fetch(a.identifier, []).uniq %>
       <% detail = tag.dl(safe_join([tag.dt('why affected'), tag.dd(path, class: 'p'), tag.dt('weight'), tag.dd(format('%.3f, %s', r.weight(a.identifier), r.notes(a.identifier).join(', ').presence || 'no analysis note')), tag.dt('covered by'), tag.dd(specs.any? ? safe_join(specs.map { |t| unit_link(t.spec, 'test_mapping') }, ', ') : 'no mapped test', class: 'p')]), class: 'det') %>
       <% { cells: [unit_link(a.identifier, a.type), a.type.tr('_', ' '), a.distance == 1 ? 'direct' : "#{a.distance} hops", a.via, unit_link(a.from, r.type_of(a.from)), format('%.3f', r.weight(a.identifier)), r.notes(a.identifier).join(', ').presence || empty_value], detail: detail } %>
     <% end %>
     <%= render 'woods_map/components/table', label: 'Affected units', min_width: '980px', grouped: true,
                columns: [{ label: 'unit', width: '240px', cell_class: 'id' }, { label: 'type', width: '110px', cell_class: 'nw mut' }, { label: 'distance', width: '90px', cell_class: 'nw' }, { label: 'via', width: '130px', cell_class: 'nw' }, { label: 'from', width: '180px' }, { label: 'weight', width: '80px', cell_class: 'num' }, { label: 'notes' }],
                rows: rows %>
+    <%= render 'woods_map/components/pager', list: affected, noun: 'affected units', anchor: 'aff' %>
   <% end %>
 </section>

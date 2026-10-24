@@ -10,7 +10,8 @@
     (components/mermaid_tools); name (String) names the file, the title by
     default; mermaid_url (String) is the panel's .mmd route (D-25); key ("y" or nil) marks
     the copy the status bar names; and
-    export: false leaves the tools out. %>
+    export: false leaves the tools out. Refused text larger than
+    MermaidExport::INLINE_BYTES stays at mermaid_url, which the panel links. %>
 <% mermaid = local_assigns[:mermaid] %>
 <% refusal = local_assigns[:refusal] %>
 <% drawn = mermaid && !refusal %>
@@ -21,7 +22,11 @@
     <div class="dw hscroll" data-controller="cliff" data-diagram-target="scroller">
       <% if refusal %><p class="cap refusal"><%= refusal %></p><% else %><p class="cap refusal" role="status" data-diagram-target="message" hidden></p><% end %>
       <div class="pele-host" data-diagram-target="canvas" hidden></div>
-      <pre class="cmd bare" role="region" aria-label="Mermaid source" tabindex="0" data-controller="cliff" data-diagram-target="source"><%= mermaid %></pre>
+      <% if refusal && WoodsMap::MermaidExport.linked?(mermaid, local_assigns[:mermaid_url]) %>
+        <p class="cap">The Mermaid text, <%= number_to_human_size(mermaid.bytesize) %>, is not carried in this page: <%= link_to('open it as text', local_assigns[:mermaid_url], rel: 'alternate', type: 'text/plain') %>.</p>
+      <% else %>
+        <pre class="cmd bare" role="region" aria-label="Mermaid source" tabindex="0" data-controller="cliff" data-diagram-target="source"><%= mermaid %></pre>
+      <% end %>
     </div>
   <% else %>
     <div class="dw hscroll" data-controller="cliff"><%= body %></div>

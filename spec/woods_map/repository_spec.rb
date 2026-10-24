@@ -25,7 +25,7 @@ RSpec.describe WoodsMap::Repository do
     let(:graph) { { 'nodes' => { 'Report' => primary }, 'variants' => [variant] } }
     let(:reader) { instance_double(Woods::MCP::IndexReader) }
     let(:repository) do
-      described_class.new(instance_double(Woods::PublishedIndex, payload_dir: Pathname.new('/synthetic/index')))
+      described_class.new(synthetic_published_index)
     end
 
     before do

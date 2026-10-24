@@ -11,6 +11,11 @@ module WoodsMap
     # except `swimlane-beta`.
     NEWER_THAN_GITHUB = %w[swimlane-beta usecase-beta agentflow-beta eventmodeling venn-beta ishikawa-beta
                            wardley-beta cynefin-beta treeView-beta].freeze
+    # Mermaid text larger than this stays at its .mmd URL rather than in the
+    # page: the copy tool fetches it, and a panel that does not draw it links
+    # to it. A large neighbourhood or blast radius otherwise carries
+    # megabytes of text, several times over, on every view.
+    INLINE_BYTES = 64 * 1024
 
     module_function
 
@@ -19,6 +24,13 @@ module WoodsMap
     def filename(name)
       base = name.to_s.gsub('::', '-').parameterize.first(80).delete_suffix('-')
       "#{base.presence || 'diagram'}.mmd"
+    end
+
+    # @param text [String] Mermaid text
+    # @param url [String, nil] the text's .mmd route
+    # @return [Boolean] whether the page links to the text instead of carrying it
+    def linked?(text, url)
+      url.present? && text.to_s.bytesize > INLINE_BYTES
     end
 
     # @param text [String] Mermaid text

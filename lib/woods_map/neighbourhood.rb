@@ -22,6 +22,8 @@ module WoodsMap
     # Flowchart node budget (R-4): above it the panel names the budget and
     # keeps the text, rather than drawing a diagram nobody can read.
     NODE_BUDGET = 150
+    # Rows one page of the list equivalent shows; the pager reaches the rest.
+    LIST_PER_PAGE = 300
 
     # @param repository [WoodsMap::Repository]
     # @param identifier [String]

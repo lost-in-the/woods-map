@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+- Pages stay usable on a large generation (measured on synthetic apps of about 4,600 and 10,300 units).
+  - **One reader per generation:** the index reader, the dependency graph and what the map derives from them (the typed node lookup, file ownership, the identifier index, the unit listings) are built once per published generation and shared by the requests that pin it (`WoodsMap::GenerationSnapshot`), where every request re-parsed the graph and re-read every unit index. Derived values are frozen.
+  - **Units index:** each type shows its first 100 units, by name, with its exact count and a link to `/woods/units?type=<type>`, which lists that type 500 a page.
+  - **Long lists page:** a graph's list equivalent (300 edges a page) and an impact's affected units (300 a page) carry a pager that keeps the page's query. The affected list looks up its covering tests once instead of once per row.
+  - **Large Mermaid text stays at its `.mmd` route:** a diagram over its budget whose text exceeds 64 KB links to the text instead of carrying it, and ⎘ copy fetches it from the route. A hub's depth-2 neighbourhood or blast radius no longer carries megabytes of text, three times over. The full-screen graph links its `.mmd` like the Graph tab.
+
 - The graph has one layout, the butterfly (D-30, closes woods-map#63). Radial and the clusters layout are removed from the Graph tab and `/woods/graph`; domain clusters stay on Landscape Domains and Components, whose rows now open the hub's depth-2 graph. No layout library is vendored.
   - **Labels:** the edges between the same two units share one path and one label (`has_many ×2`, `belongs_to, has_many`, `code_reference +1`), where the labels used to stack into each other.
   - **Bundles:** each edge turns at a trunk just outside its busier end's column, so a hub's edges bundle into one trunk instead of every edge in a gap sharing the midpoint. Overview mode draws the same routes.
