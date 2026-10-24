@@ -11,12 +11,29 @@ module WoodsMap
     # @param type [String, nil]
     # @param label [String, nil]
     # @param since [String, nil] a ?since= selector the link keeps (E-8)
-    # @return [ActiveSupport::SafeBuffer] a link to the unit, or its name when the type is unknown
-    def unit_link(identifier, type = nil, label: nil, since: nil)
+    # @param listed [Boolean] the caller took the unit from the generation's own listing
+    # @return [ActiveSupport::SafeBuffer] a link to the unit, or its name when the type is unknown or the
+    #   pinned generation holds no such typed unit
+    def unit_link(identifier, type = nil, label: nil, since: nil, listed: false)
       type ||= Array(current_repository&.identifier_types(identifier)).first
-      return ERB::Util.html_escape(label || identifier) unless type
+      return ERB::Util.html_escape(label || identifier) unless type && (listed || unit_indexed?(identifier, type))
 
       link_to(label || identifier, woods_map.unit_path(type: type, identifier: identifier, **{ since: since }.compact))
+    end
+
+    # Whether the request's generation holds the typed unit a link would open.
+    # A dependency can name what the index never extracted (a framework
+    # class, an engine's controller, a table no migration created) or a type
+    # it does not publish as units (`framework`, `view`); those stay text.
+    #
+    # @param identifier [String]
+    # @param type [String]
+    # @return [Boolean] true when no generation is in hand to ask
+    def unit_indexed?(identifier, type)
+      repository = current_repository
+      return true unless repository
+
+      !repository.graph_node(identifier, type: type).nil? || !repository.unit(identifier, type: type).nil?
     end
 
     # A link to a line of the unit that owns a file, through the graph's file map.

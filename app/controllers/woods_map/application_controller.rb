@@ -22,6 +22,7 @@ module WoodsMap
     include WoodsMap::Authentication
     include WoodsMap::MermaidText
     include WoodsMap::SinceParam
+    include WoodsMap::PathExtension
 
     protect_from_forgery with: :exception
     layout 'woods_map/application'

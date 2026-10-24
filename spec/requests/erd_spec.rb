@@ -40,7 +40,11 @@ RSpec.describe 'The ERD page', type: :request do
   end
 
   it 'refuses anything but a chunk number in the route' do
-    expect { get '/woods/erd/users' }.to raise_error(ActionController::RoutingError)
+    # The test session raises the routing error on newer Rails; Rails 6.0 answers 404.
+    get '/woods/erd/users'
+    expect(response).to have_http_status(:not_found)
+  rescue ActionController::RoutingError => e
+    expect(e.message).to include('/woods/erd/users')
   end
 
   describe 'on a 300-model index' do
