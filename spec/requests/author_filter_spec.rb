@@ -81,4 +81,9 @@ RSpec.describe 'Filtering timelines by author', type: :request do
     expect(rows.map { |tr| tr.at_css('.who')&.text }.uniq).to eq(['Leah Armstrong'])
     expect(doc.css('a').map(&:text)).to include('all authors')
   end
+
+  it "keeps the graph's author through the explorer's filter form" do
+    get '/woods/units/model/Micropost/graph', params: { author: 'Leah Armstrong' }
+    expect(doc.at_css('form input[type=hidden][name=author]')&.[]('value')).to eq('Leah Armstrong')
+  end
 end
