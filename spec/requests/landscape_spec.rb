@@ -39,18 +39,19 @@ RSpec.describe 'Landscape', type: :request do
       end
     end
 
-    it 'lists the published domain clusters and opens the graph grouped by them' do
+    it 'lists the published domain clusters and opens the graph of each hub at depth 2' do
       get '/woods/landscape/domains'
       table = html_response_document.at_css('table[aria-label="Domain clusters"]')
       expect(table.text).to include('Users', 'User')
-      expect(table.css('a').pluck('href')).to include(a_string_including('/woods/graph?centre=User', 'group=clusters'))
+      expect(table.css('a').pluck('href')).to include(a_string_including('/woods/graph?centre=User', 'depth=2'))
+      expect(table.css('a').pluck('href')).not_to include(a_string_including('group='))
     end
 
-    it 'gives the graph page the cluster of each member for its clusters layout' do
+    it 'gives the graph page one layout and no clusters layout (D-30)' do
       get '/woods/graph', params: { centre: 'User', type: 'model', group: 'clusters' }
       body = html_response_document.at_css('[data-controller~=graph]')
-      expect(JSON.parse(body['data-graph-clusters-value'])).to include(%w[User model Users])
-      expect(body['data-graph-mode-value']).to eq('clusters')
+      expect(body.to_h.keys).not_to include('data-graph-clusters-value', 'data-graph-mode-value')
+      expect(html_response_document.css('[data-layout]')).to be_empty
     end
   end
 

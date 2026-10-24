@@ -151,9 +151,10 @@ components (R-4), and the tables still list every one.
 ## Domains
 
 The list of `graph_analysis.json` `domain_clusters` (woods#799): hub, size, types and
-entry points. Each row opens `/woods/graph?group=clusters`. The graph's clusters layout
-draws each cluster as a compound box around its members, and unclustered units share
-one block. Clusters are identifier-level, as Woods publishes them.
+entry points. Each row opens its hub's graph at depth 2 (`/woods/graph`). Clusters are
+identifier-level, as Woods publishes them. The graph's clusters layout was removed by D-30
+([woods-map#63](https://github.com/lost-in-the/woods-map/issues/63)): its boxes were
+illegible at real sizes. Components grouped by cluster is the drawing of clusters.
 
 A Pele **mindmap** sits above the list. The system is at the root, each cluster on the
 first ring, and the cluster's members on the second, hub first. At most 8 members are

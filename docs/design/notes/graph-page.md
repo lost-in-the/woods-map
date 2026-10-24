@@ -1,8 +1,8 @@
 # Full-screen graph
 
 Scope: FR-5, A-2 to A-6 and E-9 tinting. Relates to #7.
-Layouts are decided in #63. The flow overlay (A-4) and the timeline (A-6) are on the
-Graph tab and on this page alike.
+The layout is the butterfly (D-30, #63). The flow overlay (A-4) and the timeline (A-6)
+are on the Graph tab and on this page alike.
 
 No board designs this page; B6-Graph designs only the Graph tab. The page reuses
 that tab's explorer unchanged:
@@ -45,17 +45,48 @@ explorer's depth. Units it reaches are drawn with a coloured border:
 - The status line announces the same.
 - The impact page stays the full report; the rail links to it.
 
+## Layout (D-30)
+
+One layout, computed by the graph controller; no layout library is vendored. dagre took
+8.8 s and fcose 2.0 s at 300 units on the comparison harness, dagre has no notion of the
+focus's direction, and fcose ships only as UMD. Radial and the clusters layout were removed:
+most of their drawings were illegible at real sizes.
+
+- **Columns.** This unit stands alone in the middle of the canvas. Dependents are on the
+  left and dependencies on the right, one column per signed traversal level. Units that
+  land in the focus's column (a dependency's other dependents) split above and below it,
+  past a clear row. Barycentre sweeps order each column.
+- **Lanes.** A tall column wraps into lanes, and odd lanes sit half a row lower. Two lanes
+  keep every edge clear of the units beside it. A column more than 1.25 row limits tall
+  takes a pair of lanes per two row limits.
+- **Edges.** An edge between columns runs orthogonally. It turns at a trunk just outside
+  the column of its busier end, the hub, so a hub's edges bundle into one trunk. The hubs
+  of a column side take turns at the distance, so trunks do not coincide.
+- **Labels.** The edges between the same two units share one path and one label: the
+  mechanism with `×n` when it repeats, or the first mechanisms and `+k`. The label sits on
+  the other end's own segment. When that end is shared too, it shows only while the edge is
+  lit (hover, selection, or a list row in focus).
+- **Fit.** The fitted view centres this unit, giving up at most a quarter of the plain fit
+  to do so. A neighbourhood with units on one side only takes the plain fit.
+- **Overview.** Below zoom 0.5, Cytoscape stops drawing names. Units are then drawn
+  without names, and edges without arrows, dashes or labels. A neighbourhood that fits
+  below that zoom starts in overview, as does one over 120 units or 150 edges, which also
+  draws with lighter renderer settings. Zooming in past 0.5 brings the detail back. The
+  status line and the list name every unit and edge regardless.
+
+The 300-unit fixture draws its first frame in about 130 to 160 ms on the harness
+(minimum to median of nine), against 122 to 147 ms before these changes.
+
 ## Position cache (A-3)
 
-Both layouts are deterministic, so revisiting a query never reshuffles. Units can be
+The layout is deterministic, so revisiting a query never reshuffles. Units can be
 dragged on both the tab and the page. A drag is kept in `localStorage` under a key
 made of:
 
 - the generation number;
 - the unit type and identifier;
 - the depth and direction;
-- the type and mechanism filters;
-- the layout.
+- the type and mechanism filters.
 
 At most 24 keys are kept; the oldest is dropped. A new generation starts from the
 computed layout. *Reset positions* forgets the current key. Every storage access
@@ -63,10 +94,9 @@ is in `try`/`catch`; without storage the page draws the same and keeps nothing.
 
 ## Domain clusters
 
-Domain clusters come from a Woods that publishes them (woods#799).
-With them, `group=clusters` and a *clusters* layout box each cluster's drawn members
-(see [landscape.md](landscape.md)). Without them, the rail links woods#799 and the page
-draws none. It never derives clusters from namespaces itself.
+Domain clusters (woods#799) are drawn on Landscape: the Domains tab with its mindmap, and
+Components grouped by cluster (see [landscape.md](landscape.md)). The rail points there.
+The graph no longer has a clusters layout (D-30).
 
 ## Flow overlay (A-4)
 
@@ -120,5 +150,5 @@ through the concern's own node only. Without a commit table, the section says wh
 | axe-core 4.14 on woods-testbed rails-8.0 after `woods:extract` | no violations at 1440, 960, 640 and 390, and in the light theme |
 
 The axe pages were the hub list, an unknown centre, `Post` at depth 2 with and
-without the tint, and the radial layout. The 300-unit timing is reported in the
-pull request; on the shared sandbox it is over the 500 ms target.
+without the tint, and the Graph tab at four widths and in the light theme. The
+300-unit timing is in the Layout section above.

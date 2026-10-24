@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+- The graph has one layout, the butterfly (D-30, closes woods-map#63). Radial and the clusters layout are removed from the Graph tab and `/woods/graph`; domain clusters stay on Landscape Domains and Components, whose rows now open the hub's depth-2 graph. No layout library is vendored.
+  - **Labels:** the edges between the same two units share one path and one label (`has_many ×2`, `belongs_to, has_many`, `code_reference +1`), where the labels used to stack into each other.
+  - **Bundles:** each edge turns at a trunk just outside its busier end's column, so a hub's edges bundle into one trunk instead of every edge in a gap sharing the midpoint. Overview mode draws the same routes.
+  - **Focus:** this unit stands alone in the middle of its column, filled with the selection hue, and the fit centres it.
+  - **Lanes:** wrapped columns stagger their lanes by half a row, so edges pass between units.
+  - **Overview:** starts whenever the fitted zoom is below 0.5, where names cannot be drawn, as well as above 120 units or 150 edges.
+  - Dragged positions saved under the old per-layout keys are not restored.
+
 - State machine transition callbacks per transition (woods#796).
   - The Lifecycle tab's transitions table gains before, around and after columns. Each callback sits on the transitions its literal scope admits, with its method linked to its line (W-2 method table) and the side effects Woods analysed (`after_failure` reads "on failure").
   - The state diagram, and its `.mmd` text, labels the transitions that carry callbacks.

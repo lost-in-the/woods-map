@@ -8,12 +8,13 @@ import { Controller } from "@hotwired/stimulus"
 // it with the vendored Cytoscape, and hides the flowchart behind a toggle. The
 // flowchart stays the no-JavaScript view and the Mermaid export (D-21).
 //
-// Layouts are computed here, not by a layout library: "butterfly" places the
+// One layout, computed here rather than by a layout library (D-30,
+// woods-map#63): the butterfly places this unit alone in the middle, the
 // dependents left and the dependencies right in columns by signed traversal
 // level, ordered by barycentre sweeps, which is linear in the elements and
-// adds almost nothing to the draw; "radial" runs Cytoscape's built-in
-// concentric layout with this unit at the centre and one ring per hop
-// (woods-map#7; the layout decision is woods-map#63).
+// adds almost nothing to the draw. Edges between columns run orthogonally;
+// each turns near its busier end, so a hub's edges share one trunk, and the
+// edges between the same two units share one path and one label.
 //
 // Colours are the tokens: each unit type's tint is a --g custom property set
 // in map.css on [data-gtype], read through a probe element, so the canvas, the
@@ -31,17 +32,16 @@ import { Controller } from "@hotwired/stimulus"
 // the set the guide panel sends as context; a "woods-map:graph-pick" event
 // carries the set and "woods-map:graph-pick-clear" empties it.
 export default class extends Controller {
-  static targets = ["panel", "canvas", "facts", "status", "message", "fallback", "flowchart", "layouts", "layout", "list", "play", "scrub", "scrubFrom", "scrubTo", "window"]
-  static values = { url: String, unitUrl: String, label: String, generation: Number, cache: String, blast: Array, emphasis: String, clusters: Array, mode: String, flow: Object, timeline: Array, pick: Boolean }
+  static targets = ["panel", "canvas", "facts", "status", "message", "fallback", "flowchart", "positions", "list", "play", "scrub", "scrubFrom", "scrubTo", "window"]
+  static values = { url: String, unitUrl: String, label: String, generation: Number, cache: String, blast: Array, emphasis: String, flow: Object, timeline: Array, pick: Boolean }
 
-  static LAYOUT_KEY = "woods-map:graph-layout"
   static POSITIONS_KEY = "woods-map:graph-positions"
   static POSITIONS_KEPT = 24
   static ASSOCIATIONS = new Set(["belongs_to", "has_many", "has_one", "has_and_belongs_to_many", "through", "polymorphic"])
   static TINT = 0.18
   static DETAILED_NODES = 120
   static DETAILED_EDGES = 150
-  static DETAIL_ZOOM = 0.7
+  static DETAIL_ZOOM = 0.5
 
   connect() {
     this.picked = new Map()
@@ -71,7 +71,7 @@ export default class extends Controller {
     if (!this.cy || !this.payload) return
     const palette = this.palette(this.payload.elements.nodes)
     this.cy.batch(() => {
-      this.units().forEach((node) => node.data("fill", palette.get(this.byId.get(node.id())?.type)))
+      this.cy.nodes().forEach((node) => node.data("fill", palette.get(this.byId.get(node.id())?.type)))
       this.cy.style(this.stylesheet(this.font()))
     })
   }
@@ -129,7 +129,7 @@ export default class extends Controller {
         elements.push({ group: "nodes", data: { id: `w${i}`, label: `w${i}\nwarm`, w: 80, h: 40, fill: "rgb(0, 0, 0)" }, position: { x: (i % 6) * 120, y: Math.floor(i / 6) * 60 }, classes: i % 2 ? "detail" : "" })
       }
       for (let i = 1; i < 24; i++) {
-        elements.push({ group: "edges", data: { id: `we${i}`, source: `w${i - 1}`, target: `w${i}`, label: "via", dy: 0, off: 20 }, classes: i % 2 ? "detail dep taxi lt" : "assoc" })
+        elements.push({ group: "edges", data: { id: `we${i}`, source: `w${i - 1}`, target: `w${i}`, label: "via", turn: -16, off: 20 }, classes: i % 2 ? "detail dep taxi lt" : "assoc" })
       }
       const cy = cytoscape({ container: host, elements, style: this.stylesheet(this.font()), layout: { name: "preset", fit: true }, pixelRatio: 1 })
       cy.renderer().render()
@@ -149,9 +149,7 @@ export default class extends Controller {
     this.payload = data
     this.panelTarget.hidden = false
     this.show(false)
-    if (this.hasLayoutsTarget) this.layoutsTarget.hidden = false
-    this.mode = this.hasModeValue && this.modeValue === "clusters" && this.clustersValue.length ? "clusters" : this.storedLayout()
-    this.pressLayout()
+    if (this.hasPositionsTarget) this.positionsTarget.hidden = false
 
     const nodes = data.elements.nodes
     const edges = data.elements.edges
@@ -186,29 +184,29 @@ export default class extends Controller {
     // Copies: Cytoscape keeps the object it is given and moves it with the node.
     for (const element of elements) element.position = { ...positions.get(element.data.id) }
 
-    // Overview mode (more than DETAILED_NODES units or DETAILED_EDGES edges):
-    // until the reader zooms in to DETAIL_ZOOM, units are drawn without
-    // labels and edges as straight haystack lines without arrows or names.
-    // At the fitted zoom of such a neighbourhood none of that is legible,
-    // and measuring and routing it is most of a cold draw. The status line
-    // and the list name every unit and edge regardless.
-    this.detailed = nodes.length <= this.constructor.DETAILED_NODES && edges.length <= this.constructor.DETAILED_EDGES
+    // Overview mode: below DETAIL_ZOOM, where Cytoscape stops drawing unit
+    // names (6px), units are drawn without names and edges without arrows,
+    // dashes or labels; zooming in past it brings them in. A neighbourhood
+    // that fits below that zoom starts in overview, and so does one past
+    // DETAILED_NODES units or DETAILED_EDGES edges, which also draws with
+    // the lighter renderer settings: measuring and drawing detail no one
+    // can read is most of a cold draw. The status line and the list name
+    // every unit and edge regardless.
+    const heavy = nodes.length > this.constructor.DETAILED_NODES || edges.length > this.constructor.DETAILED_EDGES
+    const fitted = this.constructor.view(this.constructor.extent(elements), [...positions.values()], positions.get(this.focusId) || { x: 0, y: 0 }, this.canvasTarget.clientWidth, this.canvasTarget.clientHeight)
+    this.detailed = !heavy && fitted.zoom >= this.constructor.DETAIL_ZOOM
     this.overview = !this.detailed
     const labelFont = { css: `${font.size - 1.5}px ${font.family}` }
+    const offset = (label) => (label ? Math.ceil(this.measure(label, labelFont) / 2) + 10 : 0)
     if (this.detailed) for (const element of elements) element.classes = `${element.classes} detail`.trim()
-    // Labels sit just above their line (end labels have no backing), and
-    // edges between the same two units, which share one orthogonal path,
-    // step their labels below it a line at a time.
-    const pairs = new Map()
+    const routes = this.constructor.routes(edges, positions, new Map(elements.map((e) => [e.data.id, e.data.w])), this.focusId)
     for (const edge of edges) {
       const d = edge.data
-      const pair = [d.source, d.target].sort().join(" ")
-      const nth = pairs.get(pair) || 0
-      pairs.set(pair, nth + 1)
+      const route = routes.get(d.id)
       elements.push({
         group: "edges",
-        data: { id: d.id, source: d.source, target: d.target, label: d.via, dy: (nth === 0 ? -0.75 : nth) * Math.round(font.size * 1.1), off: this.detailed ? Math.ceil(this.measure(d.via, labelFont) / 2) + 16 : 0 },
-        classes: [this.constructor.ASSOCIATIONS.has(d.via) ? "assoc" : "dep", this.detailed ? "detail" : "", this.edgeClasses(d.source, d.target)].join(" ").trim()
+        data: { id: d.id, source: d.source, target: d.target, via: d.via, label: route.label, turn: route.turn, off: this.detailed ? offset(route.label) : 0 },
+        classes: [this.constructor.ASSOCIATIONS.has(d.via) ? "assoc" : "dep", this.detailed ? "detail" : "", route.classes].join(" ").trim()
       })
     }
 
@@ -218,28 +216,27 @@ export default class extends Controller {
       container: this.canvasTarget,
       elements,
       style: this.stylesheet(font),
-      layout: { name: "preset", fit: true, padding: 21 },
+      layout: { name: "preset", fit: false },
       minZoom: 0.02,
       maxZoom: 1.6,
       userZoomingEnabled: false,
       boxSelectionEnabled: false,
       autoungrabify: false,
       autounselectify: true,
-      pixelRatio: this.overview ? 1 : "auto",
-      textureOnViewport: this.overview,
-      hideEdgesOnViewport: this.overview
+      pixelRatio: heavy ? 1 : "auto",
+      textureOnViewport: heavy,
+      hideEdgesOnViewport: heavy
     })
-    if (this.overview) {
-      this.cy.on("zoom", () => {
-        const detailed = this.cy.zoom() >= this.constructor.DETAIL_ZOOM
-        if (detailed === this.detailed) return
-        this.detailed = detailed
-        this.cy.batch(() => {
-          if (detailed) this.cy.edges().forEach((edge) => edge.data("off", Math.ceil(this.measure(edge.data("label"), labelFont) / 2) + 16))
-          this.cy.elements().toggleClass("detail", detailed)
-        })
+    this.cy.viewport(fitted)
+    this.cy.on("zoom", () => {
+      const detailed = this.cy.zoom() >= this.constructor.DETAIL_ZOOM
+      if (detailed === this.detailed) return
+      this.detailed = detailed
+      this.cy.batch(() => {
+        if (detailed) this.cy.edges().forEach((edge) => edge.data("off", offset(edge.data("label"))))
+        this.cy.elements().toggleClass("detail", detailed)
       })
-    }
+    })
     this.cy.on("tap", "node", (event) => {
       const pointer = event.originalEvent
       if (this.pickValue && pointer && (pointer.shiftKey || pointer.ctrlKey || pointer.metaKey)) this.togglePick(event.target.id())
@@ -248,7 +245,6 @@ export default class extends Controller {
     this.cy.on("mouseover", "node", (event) => { this.canvasTarget.style.cursor = "pointer"; this.light(event.target) })
     this.cy.on("mouseout", "node", () => { this.canvasTarget.style.cursor = ""; this.light(this.cy.nodes(".sel")) })
     this.cy.on("dragfree", "node", () => this.remember())
-    if (this.mode !== "butterfly") this.arrange()
     this.restore()
     this.tint()
     this.overlayFlow()
@@ -276,8 +272,11 @@ export default class extends Controller {
 
   // Columns by signed traversal level from the focus: a unit reached along an
   // outgoing edge sits one column right of the unit it was reached from, one
-  // reached along an incoming edge one column left. Rows follow discovery
-  // order, then two barycentre sweeps pull each unit toward its neighbours.
+  // reached along an incoming edge one column left. The focus stands alone
+  // in the middle of its column with a clear row above and below; units that
+  // land in its column too (a dependency's other dependents, a dependent's
+  // other dependencies) split above and below it. Rows follow discovery
+  // order, then barycentre sweeps pull each unit toward its neighbours.
   static butterfly(nodes, edges, focusId, elements = []) {
     const size = new Map(elements.filter((e) => e.group === "nodes").map((e) => [e.data.id, [e.data.w || 160, e.data.h || 44]]))
     const out = new Map()
@@ -294,13 +293,11 @@ export default class extends Controller {
       }
     }
     const column = new Map([[focusId, 0]])
-    const levels = new Map([[focusId, 0]])
     let frontier = [focusId]
     while (frontier.length) {
       const next = []
       for (const id of frontier) {
         const at = column.get(id)
-        for (const other of near.get(id) || []) if (!levels.has(other)) levels.set(other, levels.get(id) + 1)
         for (const target of out.get(id) || []) {
           if (!column.has(target)) { column.set(target, at + 1); next.push(target) }
         }
@@ -322,72 +319,182 @@ export default class extends Controller {
       columns.get(c).push(data.id)
     }
     const keys = [...columns.keys()].sort((a, b) => a - b)
-    const row = new Map()
-    const index = () => {
-      for (const c of keys) {
-        const ids = columns.get(c)
-        // The focus keeps the middle of its column; siblings stack around it.
-        if (c === 0) {
-          const others = ids.filter((id) => id !== focusId)
-          const half = Math.floor(others.length / 2)
-          ids.splice(0, ids.length, ...others.slice(0, half), focusId, ...others.slice(half))
-        }
-        ids.forEach((id, i) => row.set(id, i - (ids.length - 1) / 2))
+
+    // A tall column wraps into sub-columns (lanes), filled row by row with
+    // odd lanes half a row lower, so an edge from an outer lane passes
+    // between the units of the lane beside it instead of through them. Two
+    // lanes keep every edge clear, so a column takes two until it is 1.25
+    // row limits tall; past that it takes a pair of lanes per two row
+    // limits, rather than grow far taller than the canvas.
+    const gap = 200
+    const inner = 21
+    const pitch = Math.max(...[...size.values()].map(([, h]) => h), 44) + inner
+    const maxRows = Math.max(14, Math.round(Math.sqrt(nodes.length) * 2))
+    const lanes = (count) => (count <= maxRows ? 1 : (count <= 2.5 * maxRows ? 2 : 2 * Math.ceil(count / (2 * maxRows))))
+    const subs = new Map(keys.map((c) => [c, lanes(columns.get(c).length - (c === 0 ? 1 : 0))]))
+    const y = new Map()
+    const lane = new Map()
+    // The k-th unit of a run of rows, as an offset in rows from the first.
+    const at = (k, s) => Math.floor(k / s) + (s > 1 && (k % s) % 2 ? 0.5 : 0)
+    const place = (c) => {
+      const ids = columns.get(c)
+      const s = subs.get(c)
+      if (c !== 0) {
+        const last = at(ids.length - 1, s)
+        ids.forEach((id, i) => { y.set(id, (at(i, s) - last / 2) * pitch); lane.set(id, i % s) })
+        return
       }
+      const others = ids.filter((id) => id !== focusId)
+      const half = Math.floor(others.length / 2)
+      const above = others.slice(0, half)
+      const below = others.slice(half)
+      y.set(focusId, 0)
+      lane.set(focusId, -1)
+      above.forEach((id, i) => { const k = above.length - 1 - i; y.set(id, -(pitch + inner + at(k, s) * pitch)); lane.set(id, k % s) })
+      below.forEach((id, k) => { y.set(id, pitch + inner + at(k, s) * pitch); lane.set(id, k % s) })
+      ids.splice(0, ids.length, ...above, focusId, ...below)
     }
-    index()
-    const sweep = (order) => {
+    for (const c of keys) place(c)
+    const mean = (id, toward) => {
+      const linked = (near.get(id) || []).filter((other) => toward.includes(column.get(other)))
+      return linked.length ? linked.reduce((sum, other) => sum + y.get(other), 0) / linked.length : y.get(id)
+    }
+    const sweep = (order, both) => {
       for (const c of order) {
-        if (c === 0) continue
-        const ids = columns.get(c)
-        const toward = c > 0 ? c - 1 : c + 1
-        const centre = new Map(ids.map((id) => {
-          const linked = (near.get(id) || []).filter((other) => column.get(other) === toward)
-          const mean = linked.length ? linked.reduce((sum, other) => sum + row.get(other), 0) / linked.length : row.get(id)
-          return [id, mean]
-        }))
-        ids.sort((a, b) => centre.get(a) - centre.get(b) || row.get(a) - row.get(b))
-        ids.forEach((id, i) => row.set(id, i - (ids.length - 1) / 2))
+        if (!columns.has(c)) continue
+        const toward = c === 0 ? [-1, 1] : (both ? [c - 1, c + 1] : [c > 0 ? c - 1 : c + 1])
+        const ids = c === 0 ? columns.get(c).filter((id) => id !== focusId) : columns.get(c)
+        const centre = new Map(ids.map((id) => [id, mean(id, toward)]))
+        ids.sort((a, b) => centre.get(a) - centre.get(b) || y.get(a) - y.get(b))
+        if (c === 0) columns.set(0, [...ids, focusId])
+        place(c)
       }
     }
     const outward = keys.filter((c) => c !== 0).sort((a, b) => Math.abs(a) - Math.abs(b))
-    sweep(outward)
-    sweep(outward)
+    sweep(outward, false)
+    sweep([0], true)
+    sweep(outward, true)
+    sweep([...outward].reverse(), true)
+    sweep(outward, false)
 
-    // A tall column wraps into sub-columns, row by row, so the canvas keeps
-    // a readable aspect; the first sub-column is the one nearest the focus.
-    const gap = 190
-    const inner = 21
-    const maxRows = Math.max(12, Math.round(Math.sqrt(nodes.length) * 1.5))
+    // Columns are contiguous on each side of the focus, so each sits beside
+    // the previous one; the first sub-column is the one nearest the focus.
     const unit = new Map(keys.map((c) => [c, Math.max(...columns.get(c).map((id) => (size.get(id) || [160])[0]))]))
-    const subs = new Map(keys.map((c) => [c, Math.ceil(columns.get(c).length / maxRows)]))
     const w = (c) => (unit.has(c) ? subs.get(c) * unit.get(c) + (subs.get(c) - 1) * inner : 0)
-    // Columns are contiguous on each side of the focus, so each sits beside the previous one.
     const x = new Map([[0, 0]])
     for (const c of keys.filter((k) => k > 0)) x.set(c, x.get(c - 1) + w(c - 1) / 2 + gap + w(c) / 2)
     for (const c of keys.filter((k) => k < 0).reverse()) x.set(c, x.get(c + 1) - w(c + 1) / 2 - gap - w(c) / 2)
-    const pitch = Math.max(...[...size.values()].map(([, h]) => h), 44) + inner
     const positions = new Map()
+    // Each unit's column extent, for the edge routes' trunks.
+    positions.spans = new Map()
     for (const c of keys) {
-      const ids = columns.get(c)
-      const sub = subs.get(c)
-      const rows = Math.ceil(ids.length / sub)
       const step = unit.get(c) + inner
-      ids.forEach((id, i) => {
-        const j = i % sub
-        const left = x.get(c) - w(c) / 2 + unit.get(c) / 2
-        const cx = c < 0 ? x.get(c) + w(c) / 2 - unit.get(c) / 2 - j * step : left + j * step
-        positions.set(id, { x: cx, y: (Math.floor(i / sub) - (rows - 1) / 2) * pitch })
+      const span = [x.get(c) - w(c) / 2, x.get(c) + w(c) / 2]
+      for (const id of columns.get(c)) {
+        positions.spans.set(id, span)
+        const j = lane.get(id)
+        if (j < 0 || subs.get(c) === 1) { positions.set(id, { x: x.get(c), y: y.get(id) }); continue }
+        const offset = (j - (subs.get(c) - 1) / 2) * step
+        positions.set(id, { x: x.get(c) + (c < 0 ? -offset : offset), y: y.get(id) })
+      }
+    }
+    return positions
+  }
+
+  // Edge routes for the butterfly (D-30). Edges between the same two units
+  // share one path and one label that names every mechanism on it. An edge
+  // between columns turns near its busier end, the end with more partners
+  // on that side, so a hub's edges bundle into one trunk just outside the
+  // hub's column; the hubs of a column side take turns at the distance, so
+  // neighbouring trunks stay apart. The label sits on the other end's own segment, or, when that end
+  // is shared too, shows only while the edge is lit. Returns per edge id the
+  // classes, the label ("" on all but the first edge of a pair) and the
+  // taxi-turn in pixels (negative counts from the target).
+  static routes(edges, positions, widths, focusId) {
+    const BASE = 14
+    const STEP = 7
+    const SLOTS = 6
+    const pairs = new Map()
+    for (const { data } of edges) {
+      const key = data.source < data.target ? `${data.source} ${data.target}` : `${data.target} ${data.source}`
+      if (!pairs.has(key)) pairs.set(key, [])
+      pairs.get(key).push(data)
+    }
+    const at = (id) => positions.get(id) || { x: 0, y: 0 }
+    const span = (id) => positions.spans?.get(id) || [at(id).x, at(id).x]
+    const across = (a, b) => a !== b && at(a).x !== at(b).x
+    const side = (id, other) => `${id}${at(other).x < at(id).x ? "<" : ">"}`
+    const fan = new Map()
+    for (const [first] of pairs.values()) {
+      if (!across(first.source, first.target)) continue
+      for (const [id, other] of [[first.source, first.target], [first.target, first.source]]) fan.set(side(id, other), (fan.get(side(id, other)) || 0) + 1)
+    }
+    const centre = at(focusId).x
+    const hubOf = new Map()
+    const trunks = new Map()
+    for (const [key, [first]] of pairs) {
+      if (!across(first.source, first.target)) continue
+      const [a, b] = [first.source, first.target]
+      const fa = fan.get(side(a, b))
+      const fb = fan.get(side(b, a))
+      const inward = Math.abs(at(a).x - centre) <= Math.abs(at(b).x - centre)
+      const hub = fa > fb || (fa === fb && inward) ? a : b
+      const other = hub === a ? b : a
+      hubOf.set(key, hub)
+      const trunk = side(hub, other)
+      if (!trunks.has(trunk)) trunks.set(trunk, { x: at(hub).x, y: at(hub).y, hub, side: trunk.slice(-1) })
+    }
+    // Hubs on the same side of the same column take turns, top to bottom.
+    const slot = new Map()
+    const lines = new Map()
+    for (const [trunk, t] of trunks) {
+      const line = `${span(t.hub).join(" ")}${t.side}`
+      if (!lines.has(line)) lines.set(line, [])
+      lines.get(line).push([trunk, t.y])
+    }
+    for (const list of lines.values()) list.sort((p, q) => p[1] - q[1]).forEach(([trunk], i) => slot.set(trunk, i % SLOTS))
+
+    const routes = new Map()
+    for (const [key, group] of pairs) {
+      const label = this.pairLabel(group)
+      const [first] = group
+      if (!across(first.source, first.target)) {
+        group.forEach((data, i) => routes.set(data.id, { classes: "", label: i ? "" : label, turn: 0 }))
+        continue
+      }
+      const hub = hubOf.get(key)
+      const leaf = hub === first.source ? first.target : first.source
+      const space = Math.abs(at(hub).x - at(leaf).x) - ((widths.get(hub) || 0) + (widths.get(leaf) || 0)) / 2
+      // From the hub's border to its column's edge on the leaf's side, then the slot.
+      const edge = at(leaf).x < at(hub).x ? at(hub).x - (widths.get(hub) || 0) / 2 - span(hub)[0] : span(hub)[1] - at(hub).x - (widths.get(hub) || 0) / 2
+      const own = span(hub) === span(leaf)
+      const distance = own ? space / 2 : Math.max(10, Math.min(edge + BASE + slot.get(side(hub, leaf)) * STEP, space - 10))
+      const loud = fan.get(side(leaf, hub)) === 1
+      group.forEach((data, i) => {
+        const end = !loud ? "quiet" : (leaf === data.source ? "ls" : "lt")
+        routes.set(data.id, { classes: `taxi ${end}`, label: i ? "" : label, turn: hub === data.source ? distance : -distance })
       })
     }
-    positions.levels = levels
-    return positions
+    return routes
+  }
+
+  // One label for the edges between two units: the mechanism, with a count
+  // when it repeats, or the first mechanisms and how many more.
+  static pairLabel(group) {
+    const vias = [...new Set(group.map((data) => data.via))]
+    if (vias.length === 1) return group.length > 1 ? `${vias[0]} ×${group.length}` : vias[0]
+    const two = `${vias[0]}, ${vias[1]}`
+    if (vias.length === 2 && two.length <= 24) return two
+    return `${vias[0]} +${vias.length - 1}`
   }
 
   stylesheet(font) {
     const t = this.tokens()
     const mod = this.rgb(t.mod), panel = this.rgb(t.panel)
     const changedFill = mod && panel ? this.mix(mod, panel, 0.22) : t.panel
+    const select = this.rgb(t.select)
+    const focusFill = select && panel ? this.mix(select, panel, 0.24) : t.panel
+    const lift = -Math.round(font.size * 0.75)
     return [
       { selector: "node", style: {
         shape: "round-rectangle", width: "data(w)", height: "data(h)",
@@ -398,15 +505,12 @@ export default class extends Controller {
         color: t.text, "font-family": font.family, "font-size": font.size, "line-height": 1.5,
         "min-zoomed-font-size": 6
       } },
-      { selector: "node.focus", style: { "border-color": t.select, "border-width": 2, color: t.bright } },
+      // This unit: alone in the middle of its column, filled with the
+      // selection hue, a heavier ring and a bold name.
+      { selector: "node.focus", style: { "background-color": focusFill, "border-color": t.select, "border-width": 3, color: t.bright, "font-weight": "bold" } },
       { selector: "node.boundary", style: { "border-style": "dashed" } },
       { selector: "node.br1", style: { "border-color": t.hot, "border-width": 2.5 } },
       { selector: "node.br2", style: { "border-color": t.mod, "border-width": 2 } },
-      { selector: "node.cluster", style: {
-        shape: "round-rectangle", "background-color": t.panel, "background-opacity": 1, "border-color": t.rule2, "border-width": 1,
-        label: "data(label)", "text-valign": "top", "text-halign": "center", "text-margin-y": -4, color: t.mut,
-        "font-family": font.family, "font-size": font.size, padding: 13, events: "no"
-      } },
       { selector: "node.chg", style: { "background-color": changedFill, "border-color": t.mod, "border-width": 2.5, color: t.bright } },
       { selector: "node.tl", style: { "background-color": changedFill, "border-color": t.mod, "border-width": 2.5, color: t.bright } },
       { selector: "node.flow", style: { "border-color": t.link, "border-width": 2.5 } },
@@ -418,172 +522,41 @@ export default class extends Controller {
         "target-arrow-color": t.dim, "target-arrow-shape": "triangle", "arrow-scale": 0.8,
         "curve-style": "bezier", "font-family": font.family, "font-size": font.size - 1.5,
         color: t.mut, "text-background-color": t.bg, "text-background-opacity": 1, "text-background-padding": 2,
-        "min-zoomed-font-size": 8, label: "data(label)", "text-margin-y": "data(dy)"
+        "min-zoomed-font-size": 8, label: "data(label)"
       } },
       { selector: "edge.detail.dep", style: { "line-style": "dashed", "line-dash-pattern": [4, 3] } },
-      { selector: "edge.detail.taxi", style: { "curve-style": "taxi", "taxi-direction": "horizontal", "taxi-turn": "50%" } },
-      { selector: "edge.detail.ls", style: { label: "", "source-label": "data(label)", "source-text-offset": "data(off)", "source-text-margin-y": "data(dy)" } },
-      { selector: "edge.detail.lt", style: { label: "", "target-label": "data(label)", "target-text-offset": "data(off)", "target-text-margin-y": "data(dy)" } },
+      // A label sits on the outer unit's own segment (ls, lt), just above the
+      // line since end labels take no backing; where both ends are shared it
+      // shows mid-edge, backed, only while the edge is lit (quiet).
+      { selector: "edge.taxi", style: { "curve-style": "taxi", "taxi-direction": "horizontal", "taxi-turn": "data(turn)", "taxi-turn-min-distance": 4 } },
+      { selector: "edge.detail.ls", style: { label: "", "source-label": "data(label)", "source-text-offset": "data(off)", "source-text-margin-y": lift } },
+      { selector: "edge.detail.lt", style: { label: "", "target-label": "data(label)", "target-text-offset": "data(off)", "target-text-margin-y": lift } },
+      { selector: "edge.detail.quiet", style: { label: "" } },
       // A loop's step grows with its node: on the tallest (heaviest) nodes a
       // fixed 72px put the control points inside the node and Cytoscape
       // refused to draw the loop (a self redirect_to, seen at depth 1).
       { selector: "edge:loop", style: { "curve-style": "bezier", "target-arrow-shape": "triangle", "target-arrow-color": t.dim, "loop-direction": "-45deg", "loop-sweep": "-60deg", "control-point-step-size": (edge) => Math.max(72, Math.round(edge.source().height() * 2)) } },
       { selector: "edge.flow", style: { width: 2.5, "line-color": t.link, "target-arrow-color": t.link, "z-index": 9 } },
       { selector: "edge.flowcur", style: { width: 4, "line-color": t.link, "target-arrow-color": t.link, color: t.bright, "z-index": 11 } },
-      { selector: "edge.lit", style: { width: 2, "line-color": t.select, "target-arrow-color": t.select, color: t.bright, "z-index": 10 } }
+      { selector: "edge.lit", style: { width: 2, "line-color": t.select, "target-arrow-color": t.select, color: t.bright, "z-index": 10 } },
+      { selector: "edge.detail.quiet.lit", style: { label: "data(label)" } }
     ]
   }
 
-  // Butterfly edges that run between columns go orthogonal, as on B6-Graph,
-  // with the mechanism on the outer unit's own segment so labels never pile
-  // up at the turn; the rest (siblings in one column, the radial layout)
-  // stay curved with the label mid-edge.
-  edgeClasses(source, target) {
-    if (this.mode !== "butterfly") return ""
-    const positions = this.butterflyPositions
-    const a = positions.get(source)
-    const b = positions.get(target)
-    if (!a || !b || a.x === b.x) return ""
-    const centre = positions.get(this.focusId)?.x || 0
-    return Math.abs(a.x - centre) > Math.abs(b.x - centre) ? "taxi ls" : "taxi lt"
-  }
-
-  edgeStyle() {
-    this.cy.batch(() => {
-      this.cy.edges().forEach((edge) => {
-        const classes = this.edgeClasses(edge.source().id(), edge.target().id())
-        edge.toggleClass("taxi", classes.includes("taxi"))
-        edge.toggleClass("ls", classes.includes("ls"))
-        edge.toggleClass("lt", classes.includes("lt"))
-      })
-    })
-  }
-
-  // Cytoscape's built-in concentric layout: this unit at the centre, then
-  // the units one hop out, then two; heavier units (PageRank) come first. A
-  // hop with more units than a ring holds spills into the next ring out, so
-  // a large neighbourhood is a disc rather than one enormous circle.
-  radial() {
-    const levels = this.butterflyPositions.levels
-    const rank = (id) => this.byId.get(id)?.pagerank || 0
-    const byLevel = new Map()
-    this.cy.nodes().forEach((node) => {
-      const level = levels.has(node.id()) ? levels.get(node.id()) : Infinity
-      if (!byLevel.has(level)) byLevel.set(level, [])
-      byLevel.get(level).push(node.id())
-    })
-    const ring = new Map()
-    let index = 0
-    for (const level of [...byLevel.keys()].sort((a, b) => a - b)) {
-      const ids = byLevel.get(level).sort((a, b) => rank(b) - rank(a))
-      for (let start = 0; start < ids.length; index++) {
-        const capacity = index === 0 ? 1 : 10 + 8 * index
-        ids.slice(start, start + capacity).forEach((id) => ring.set(id, index))
-        start += capacity
-      }
-    }
-    const rings = index
-    this.cy.layout({
-      name: "concentric", animate: false, fit: true, padding: 21, avoidOverlap: true, minNodeSpacing: 13,
-      concentric: (node) => (rings - ring.get(node.id())) * 10000 + rank(node.id()) * 999,
-      levelWidth: () => 1000
-    }).run()
-  }
-
-  // Domain clusters (woods#799): each published cluster a compound box of
-  // the units drawn here, packed in rows by size; units in no cluster share
-  // one box-less block at the end. Identifier-level, as Woods publishes them.
-  grouped() {
-    if (!this.cy || !this.hasClustersValue) return
-    const byKey = new Map(this.clustersValue.map(([identifier, type, name]) => [`${type}\u0000${identifier}`, name]))
-    const blocks = new Map()
-    this.units().forEach((node) => {
-      const d = this.byId.get(node.id())
-      const name = d ? byKey.get(`${d.type}\u0000${d.identifier}`) : null
-      const key = name || ""
-      if (!blocks.has(key)) blocks.set(key, [])
-      blocks.get(key).push(node)
-    })
-    const order = [...blocks.keys()].sort((a, b) => (a === "") - (b === "") || blocks.get(b).length - blocks.get(a).length || a.localeCompare(b))
-    const cellW = Math.max(...this.units().map((n) => n.data("w"))) + 21
-    const cellH = Math.max(...this.units().map((n) => n.data("h"))) + 21
-    const rowWidth = Math.max(4, Math.ceil(Math.sqrt(this.units().length) * 1.6)) * cellW
-    let x = 0
-    let y = 0
-    let rowHeight = 0
-    this.cy.batch(() => {
-      for (const key of order) {
-        const nodes = blocks.get(key)
-        const cols = Math.ceil(Math.sqrt(nodes.length))
-        const width = cols * cellW + 34
-        const height = Math.ceil(nodes.length / cols) * cellH + 55
-        if (x > 0 && x + width > rowWidth) { x = 0; y += rowHeight + 34; rowHeight = 0 }
-        const parent = key ? this.cy.add({ group: "nodes", data: { id: `cluster:${key}`, label: key, w: 1, h: 1, fill: "rgb(0, 0, 0)" }, classes: "cluster" }) : null
-        nodes.sort((a, b) => String(this.byId.get(a.id())?.identifier).localeCompare(String(this.byId.get(b.id())?.identifier)))
-        nodes.forEach((node, i) => {
-          if (parent) node.move({ parent: parent.id() })
-          node.position({ x: x + 17 + (i % cols) * cellW + cellW / 2, y: y + 38 + Math.floor(i / cols) * cellH + cellH / 2 })
-        })
-        x += width + 34
-        rowHeight = Math.max(rowHeight, height)
-      }
-    })
-    this.cy.fit(undefined, 21)
-  }
-
-  // The drawn units, without the clusters layout's boxes.
-  units() {
-    return this.cy.nodes().not(".cluster")
-  }
-
-  ungroup() {
-    if (!this.cy) return
-    const parents = this.cy.nodes(".cluster")
-    if (parents.empty()) return
-    this.cy.batch(() => {
-      parents.children().move({ parent: null })
-      parents.remove()
-    })
-  }
-
-  butterflyLayout() {
-    const positions = this.butterflyPositions
-    this.cy.nodes().positions((node) => ({ ...positions.get(node.id()) }))
-    this.cy.fit(undefined, 21)
-  }
-
-  layout(event) {
-    const mode = event.currentTarget.dataset.layout
-    if (!this.cy || mode === this.mode) return
-    this.mode = mode
-    try { window.localStorage.setItem(this.constructor.LAYOUT_KEY, mode) } catch (_error) { /* storage is a convenience */ }
-    this.pressLayout()
-    this.arrange()
-  }
-
-  arrange() {
-    this.ungroup()
-    if (this.mode === "radial") this.radial()
-    else if (this.mode === "clusters") this.grouped()
-    else this.butterflyLayout()
-    this.edgeStyle()
-    this.restore()
-  }
-
   // Layout stability (A-3): positions the reader dragged are kept in this
-  // browser per generation, query and layout, so a revisit does not
-  // reshuffle; a new generation starts from the computed layout again. The
-  // layouts themselves are deterministic. Storage is a convenience: every
+  // browser per generation and query, so a revisit does not reshuffle; a
+  // new generation starts from the computed layout again, which is itself
+  // deterministic. Storage is a convenience: every
   // read and write may fail and the page draws the same without it.
   positionsKey() {
-    return this.hasCacheValue && this.cacheValue ? `${this.constructor.POSITIONS_KEY}:${this.cacheValue}|${this.mode}` : null
+    return this.hasCacheValue && this.cacheValue ? `${this.constructor.POSITIONS_KEY}:${this.cacheValue}` : null
   }
 
   remember() {
     const key = this.positionsKey()
     if (!key || !this.cy) return
     const positions = {}
-    this.units().forEach((node) => { const p = node.position(); positions[node.id()] = [Math.round(p.x), Math.round(p.y)] })
+    this.cy.nodes().forEach((node) => { const p = node.position(); positions[node.id()] = [Math.round(p.x), Math.round(p.y)] })
     try {
       const storage = window.localStorage
       const index = JSON.parse(storage.getItem(this.constructor.POSITIONS_KEY) || "[]").filter((k) => k !== key)
@@ -600,9 +573,9 @@ export default class extends Controller {
     if (!key || !this.cy) return false
     let positions = null
     try { positions = JSON.parse(window.localStorage.getItem(key) || "null") } catch (_error) { return false }
-    if (!positions || !this.units().every((node) => Array.isArray(positions[node.id()]))) return false
-    this.units().positions((node) => ({ x: positions[node.id()][0], y: positions[node.id()][1] }))
-    this.cy.fit(undefined, 21)
+    if (!positions || !this.cy.nodes().every((node) => Array.isArray(positions[node.id()]))) return false
+    this.cy.nodes().positions((node) => ({ x: positions[node.id()][0], y: positions[node.id()][1] }))
+    this.fit()
     this.element.dataset.graphPositions = "restored"
     return true
   }
@@ -611,7 +584,10 @@ export default class extends Controller {
     const key = this.positionsKey()
     try { if (key) window.localStorage.removeItem(key) } catch (_error) { /* storage is a convenience */ }
     delete this.element.dataset.graphPositions
-    if (this.cy) this.arrange()
+    if (!this.cy) return
+    const positions = this.butterflyPositions
+    this.cy.nodes().positions((node) => ({ ...positions.get(node.id()) }))
+    this.fit()
   }
 
   // Blast radius tint (E-9): units a change to this one reaches, from the
@@ -757,21 +733,50 @@ tintWindow(from, to) {
   this.windowTarget.textContent = `${span}: ${drawn} ${drawn === 1 ? "unit" : "units"} drawn changed`
 }
 
-  storedLayout() {
-    try {
-      const stored = window.localStorage.getItem(this.constructor.LAYOUT_KEY)
-      if (stored === "clusters" && this.hasClustersValue && this.clustersValue.length) return "clusters"
-      return stored === "radial" ? "radial" : "butterfly"
-    } catch (_error) {
-      return "butterfly"
+  fit() {
+    if (!this.cy) return
+    const focus = this.cy.getElementById(this.focusId)
+    if (!focus.nonempty()) { this.cy.fit(undefined, 21); return }
+    const box = this.cy.nodes().boundingBox({ includeLabels: false, includeOverlays: false })
+    this.cy.viewport(this.constructor.view(box, this.cy.nodes().map((node) => node.position()), focus.position(), this.cy.width(), this.cy.height()))
+  }
+
+  // The fitted view with this unit in the middle of the canvas. The zoom
+  // takes the extent symmetrically around the focus, but gives up at most
+  // a quarter of the plain fit for it; the focus then moves toward the
+  // middle as far as keeps every unit in view. A neighbourhood with units
+  // on one side only has no middle to keep, and takes the plain fit.
+  static view(box, points, focus, width, height) {
+    const pad = 21
+    const room = [Math.max(1, width - 2 * pad), Math.max(1, height - 2 * pad)]
+    const clamp = (zoom) => Math.min(1.6, Math.max(0.02, zoom))
+    const plain = clamp(Math.min(room[0] / Math.max(1, box.x2 - box.x1), room[1] / Math.max(1, box.y2 - box.y1)))
+    const half = [Math.max(focus.x - box.x1, box.x2 - focus.x, 1), Math.max(focus.y - box.y1, box.y2 - focus.y, 1)]
+    const centred = clamp(Math.min(room[0] / (2 * half[0]), room[1] / (2 * half[1])))
+    const sides = points.some((p) => p.x < focus.x) && points.some((p) => p.x > focus.x)
+    const zoom = sides ? Math.max(centred, 0.75 * plain) : plain
+    const pan = (size, at, low, high) => {
+      const ideal = size / 2 - zoom * at
+      const most = pad - zoom * low
+      const least = size - pad - zoom * high
+      return least <= most ? Math.min(most, Math.max(least, ideal)) : ideal
     }
+    return { zoom, pan: { x: pan(width, focus.x, box.x1, box.x2), y: pan(height, focus.y, box.y1, box.y2) } }
   }
 
-  pressLayout() {
-    this.layoutTargets.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.layout === this.mode)))
+  // The extent of the units about to be drawn, from their positions and sizes.
+  static extent(elements) {
+    const box = { x1: Infinity, y1: Infinity, x2: -Infinity, y2: -Infinity }
+    for (const { group, data, position } of elements) {
+      if (group !== "nodes" || !position) continue
+      box.x1 = Math.min(box.x1, position.x - data.w / 2)
+      box.x2 = Math.max(box.x2, position.x + data.w / 2)
+      box.y1 = Math.min(box.y1, position.y - data.h / 2)
+      box.y2 = Math.max(box.y2, position.y + data.h / 2)
+    }
+    return Number.isFinite(box.x1) ? box : { x1: 0, y1: 0, x2: 1, y2: 1 }
   }
 
-  fit() { this.cy?.fit(undefined, 21) }
   zoomIn() { this.zoom(1.25) }
   zoomOut() { this.zoom(0.8) }
 
@@ -843,7 +848,7 @@ tintWindow(from, to) {
       })
       return pick
     }
-    const pick = best(from.neighborhood().nodes().not(".cluster")) || best(this.units().not(from))
+    const pick = best(from.neighborhood().nodes()) || best(this.cy.nodes().not(from))
     return pick ? pick.id() : null
   }
 
@@ -1002,7 +1007,7 @@ tintWindow(from, to) {
     this.cy?.destroy()
     this.cy = null
     this.panelTarget.hidden = true
-    if (this.hasLayoutsTarget) this.layoutsTarget.hidden = true
+    if (this.hasPositionsTarget) this.positionsTarget.hidden = true
     this.fallbackTarget.hidden = false
     this.element.dataset.graphError = "error"
     if (this.hasMessageTarget) {

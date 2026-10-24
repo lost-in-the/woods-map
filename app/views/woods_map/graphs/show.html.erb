@@ -1,13 +1,13 @@
 <% content_for :title, "#{@centre['identifier']} · Graph · Woods Map" %>
 <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
 <% n = @neighbourhood %>
-<% here = ->(**opts) { woods_map.graph_path(centre: @centre['identifier'], type: @centre['type'], **{ group: params[:group].presence }.merge(opts).compact) } %>
+<% here = ->(**opts) { woods_map.graph_path(centre: @centre['identifier'], type: @centre['type'], **opts.compact) } %>
 <%= render 'woods_map/shared/crumbs', crumbs: [['graph', woods_map.graph_path], [@centre['identifier'], nil]], trail: tag.span('', data: { trail_target: 'list' }) %>
 <%= render 'woods_map/shared/ident', title: @centre['identifier'], subtitle: "#{@centre['type'].tr('_', ' ')}, full-screen graph, gen #{@repository.generation_number}",
       controls: link_to('Open unit', woods_map.unit_path(type: @centre['type'], identifier: @centre['identifier']), class: 'btn') %>
-<%= render 'woods_map/graphs/explorer', identifier: @centre['identifier'], type: @centre['type'], n: n, page: true, blast: @blast, clusters: @clusters,
+<%= render 'woods_map/graphs/explorer', identifier: @centre['identifier'], type: @centre['type'], n: n, page: true, blast: @blast,
       flows: @flows, flow: @flow, timeline: @timeline,
       link: here,
-      unit_url: woods_map.graph_path(centre: '__identifier__', type: '__type__', depth: n.depth, direction: n.direction, blast: (@blast ? '1' : nil), group: params[:group].presence),
-      rail_extra: safe_join([tag.div('clusters', class: 'grp'),
-                             tag.p(@clusters.any? ? safe_join(["#{@clusters.map(&:last).uniq.size} domain clusters from graph_analysis.json; the clusters layout groups the units drawn here. ", link_to('Domains', woods_map.landscape_path(tab: 'domains'))]) : safe_join(['This generation publishes no domain clusters (', link_to('woods#799', 'https://github.com/lost-in-the/woods/issues/799'), '); the graph draws none rather than guess from namespaces.']), class: 'cap padx')]) %>
+      unit_url: woods_map.graph_path(centre: '__identifier__', type: '__type__', depth: n.depth, direction: n.direction, blast: (@blast ? '1' : nil)),
+      rail_extra: safe_join([tag.div('domains', class: 'grp'),
+                             tag.p(safe_join(['The published domain clusters are on Landscape: ', link_to('Domains', woods_map.landscape_path(tab: 'domains')), ' and ', link_to('Components by cluster', woods_map.landscape_path(tab: 'components', group: 'cluster')), '.']), class: 'cap padx')]) %>

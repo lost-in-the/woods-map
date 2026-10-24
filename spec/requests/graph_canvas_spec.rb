@@ -37,7 +37,7 @@ RSpec.describe 'Graph tab canvas', type: :request do
     fallback = html.at_css('#graph-flowchart[data-graph-target=fallback]')
     expect(fallback['hidden']).to be_nil
     expect(fallback.at_css('[data-controller~=diagram] pre').text).to start_with('flowchart LR')
-    expect(html.at_css('[data-graph-target=layouts]')['hidden']).not_to be_nil
+    expect(html.at_css('[data-graph-target=positions]')['hidden']).not_to be_nil
   end
 
   it 'keys the legend swatches by unit type for the token tints' do
