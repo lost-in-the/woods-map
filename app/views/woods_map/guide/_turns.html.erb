@@ -1,0 +1,5 @@
+<%# The conversation's turns, or the empty note when it has none: the
+    panel's thread, and what opening an earlier conversation puts there.
+    Locals: turns (Array<Hash>), about (String, nil: the page's unit). %>
+<% if turns.empty? %><p class="cap empty" data-guide-target="empty">Ask about <%= about || 'this application' %>, or pick an action above. Answers cite units from gen <%= current_repository&.generation_number %>; names the index does not know stay plain.</p><% end %>
+<% turns.each do |turn| %><%= render 'woods_map/guide/asked', turn: turn %><%= render 'woods_map/guide/answer', turn: turn %><% end %>

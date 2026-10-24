@@ -59,7 +59,7 @@ opens the file tree.
 | pre-change mode | Blast radius from a unit or method, no range | E-9 | — ([Impact range note](notes/impact-range.md), [Impact Flows note](notes/impact-flows.md)) | no board of its own: the impact frame with a focus title, built from the Changed, Risks, Tests and Unknown boards, with the Flows and Graph tabs per the notes |
 | Share menu | Focus URL and Mermaid (D-25) | E-6, E-7 | [Share menu note](notes/share-menu.md) | the token-free focus URL, and for each diagram panel its Mermaid copy and stable `.mmd` link, on unit and impact pages; settled by D-25 ([woods-map#57](https://github.com/lost-in-the/woods-map/issues/57)); Markdown and JSON stay with Woods |
 | Trail board | Pinned units, lanes, flags, board state, export | C-1 to C-5 | [Trail note](notes/trail.md) | `/woods/trail`: lanes across async hops, flags, pinboard with per-browser notes, graph and ERD of pinned, co-change, the Share menu's URL and Mermaid (D-25); no server-side save |
-| Guide panel | Context chips, actions, tool cards, streamed answer, budget | FR-8 | [B8-Guide](boards/B8-Guide.html), [M7 note](notes/m7-guide.md) | final; chat history list not drawn; the engine streams with EventSource and no Turbo |
+| Guide panel | Context chips, actions, tool cards, streamed answer, budget | FR-8 | [B8-Guide](boards/B8-Guide.html), [M7 note](notes/m7-guide.md) | final; the history list, graph units as context, draft an issue and the Trail hand-off (pin, open as investigation, explain this investigation) have no board of their own ([M7 note](notes/m7-guide.md)); the engine streams with EventSource and no Turbo |
 | settings | Editor URL scheme, lens, wrap and font size, per browser | B-15, D-6 | [Settings note](notes/settings.md) | modal from the code-view header; wrap opt-in in the one scroll region (D-24); *In editor at L…* only with a configured editor |
 | keyboard help | `?` overlay listing every page's keys | NFR-3 | [Keyboard help note](notes/keyboard-help.md) | contextual modal and keyboard coverage |
 | four widths | 1280 / 960 / 640 / 390 | D-19 | C1 to C5, [B8-Widths](boards/B8-Widths.html) | final |
@@ -76,8 +76,8 @@ them. Each is a comment on that issue, so the issue owns it.
 - **M3 · Diagrams (woods-map#5)**: Landscape Context L1 (partial) as its own tab; the LOC treemap ([woods#810](https://github.com/lost-in-the/woods/issues/810)). The flowchart and lanes views follow the [lifecycle views note](notes/lifecycle-views.md); Domains follow the [Landscape note](notes/landscape.md).
 - **M4 · History (woods-map#6)**: built from the [History note](notes/history.md): `/woods/history`, the generation picker and the unit diff entry; line counts and hunks from [woods#804](https://github.com/lost-in-the/woods/issues/804), the unified diff and facets moved from [woods#802](https://github.com/lost-in-the/woods/issues/802).
 - **M5 · Graph (woods-map#7)**: [neighbourhood JSON contract](notes/neighbourhood-json.md); the Graph tab's Cytoscape canvas, layouts pending [woods-map#63](https://github.com/lost-in-the/woods-map/issues/63); the [full-screen graph](notes/graph-page.md) with the clusters layout, the flow overlay (A-4) and the commit timeline (A-6).
-- **M6 · Trail (woods-map#8)**: built from the [Trail note](notes/trail.md); "Explain this investigation" waits on the guide (#9).
-- **M7 · Guide (woods-map#9)**: chat history, pin and "open as investigation" handoff.
+- **M6 · Trail (woods-map#8)**: built from the [Trail note](notes/trail.md); "Explain this investigation" is the guide's action on the board.
+- **M7 · Guide (woods-map#9)**: a real provider run.
 
 ## Consistency rules checked across boards
 

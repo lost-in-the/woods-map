@@ -27,6 +27,12 @@ RSpec.describe WoodsMap::Guide::Answer do
       .and include('<code>@user</code>')
   end
 
+  it 'lists the units it cites, typed, in the order it first names them, once each' do
+    answer = described_class.new('NotifySubscribersJob runs after Post#publish!; Post again, GhostJob never.',
+                                 identifiers: identifiers, link: link)
+    expect(answer.cited).to eq([%w[NotifySubscribersJob job], %w[Post model]])
+  end
+
   it 'strips raw HTML and Markdown link targets so nothing else becomes a link' do
     out = html('<script>alert(1)</script><img src=x onerror=alert(1)> [click](https://evil.example) ' \
                '![i](x.png) <b>Post</b>')

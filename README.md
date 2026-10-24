@@ -71,11 +71,17 @@ WoodsMap.configure do |config|
   # Limits: guide_tool_calls (12 per answer), guide_turns (10), guide_seconds (120),
   # guide_token_budget (60_000 per browser session). Conversations are written
   # under <index_dir>/explorer/chats unless guide_chats_dir says otherwise.
+  # Index MCP servers kept alive: guide_mcp_servers (2 per process; 0 starts one
+  # per answer), guide_mcp_idle_seconds (600), guide_mcp_wait_seconds (10).
 end
 ```
 
-By default the guide starts `bundle exec woods-mcp <index_dir>` over stdio for
-each answer (`config.guide_mcp_command` overrides the command). Its action
+By default the guide runs `bundle exec woods-mcp <index_dir>` over stdio
+(`config.guide_mcp_command` overrides the command). It keeps up to
+`guide_mcp_servers` of those processes alive per Ruby process and lends one to
+each answer, so only the first answer pays the start-up (about 2 s). A new
+generation, an answer that fails or is stopped, and an idle server past
+`guide_mcp_idle_seconds` each stop the server; the rest stop at exit. Its action
 prompts live in `lib/woods_map/guide/prompts/`. A host overrides one with
 `config/woods_map/prompts/<action>.md`. The panel streams with server-sent
 events, so proxies must not buffer `/woods/guide/questions/*/stream`.
