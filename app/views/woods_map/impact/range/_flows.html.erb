@@ -1,11 +1,13 @@
-<%# Flows (B6-Impact-Flows) in range mode: the retained flow evidence
-    Woods recorded. Without the inverted flow index (W-13) it is partial. %>
-<section class="sec" aria-labelledby="flw">
-  <header><h2 class="t2" id="flw">Flows <%= count_tag(rr.flows.size) %><%= info_tip("Entry points whose retained flow documents pass through a changed unit. Coverage: #{rr.coverage['flows'] || 'not recorded'}. A per-unit inverted flow index is W-13 (woods#763).") %></h2></header>
+<%# Flows (B6-Impact-Flows) in range mode: the entry points Woods' report
+    records through the changes (computed from the inverted flow membership,
+    W-13), with each flow's steps when it belongs to the pinned generation.
+    Locals: rr, range_url. %>
+<% coverage = rr.coverage['flows'] || 'not recorded' %>
+<section class="sec" aria-labelledby="flw" data-controller="rows">
+  <header><h2 class="t2" id="flw">Flows <%= count_tag(rr.flows.size) %><%= info_tip("Entry points whose retained flow documents pass through a changed unit, as Woods' report records them from the inverted flow membership (W-13). Coverage: #{coverage}. Steps are drawn from the pinned generation's flow document; flows of another generation keep their route and changed units only.") %></h2><% if rr.flows.any? %><button class="tool goto" type="button" data-action="rows#expandAll" data-needs-js>expand all</button><% end %></header>
   <% if rr.flows.empty? %>
-    <%= render 'woods_map/components/empty_state', title: 'No flow evidence recorded', text: "Woods recorded no retained flow through the changes (coverage: #{rr.coverage['flows'] || 'not recorded'}). Flows are precomputed per action only when the host enables them, and the per-unit inverted index is W-13 (woods#763); this is not a conclusive zero." %>
+    <%= render 'woods_map/components/empty_state', title: 'No flow evidence recorded', text: "Woods recorded no retained flow through the changes (coverage: #{coverage}). Flows are precomputed per action only when the host enables precompute_flows, and membership is bounded by each document's depth; the Unknown tab says why when Woods could not read them. This is not a conclusive zero." %>
   <% else %>
-    <%= render 'woods_map/components/table', label: 'Flows', min_width: '720px', columns: [{ label: 'entry point', cell_class: 'id' }, { label: 'route', width: '220px', cell_class: 'nw' }, { label: 'changed steps', width: '240px' }, { label: 'endpoint', width: '120px', cell_class: 'nw' }],
-          rows: rr.flows.first(200).map { |f| { cells: [f['entry_point'].to_s, f['route'] ? "#{f.dig('route', 'verb')} #{f.dig('route', 'path')}" : empty_value, Array(f['changed_steps']).map { |s| s['identifier'] }.join(', ').presence || empty_value, impact_context(f)] } } %>
+    <%= render 'woods_map/impact/flow_table', flows: @flows, focus: rr.focus %>
   <% end %>
 </section>

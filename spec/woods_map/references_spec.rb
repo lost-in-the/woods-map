@@ -41,7 +41,7 @@ RSpec.describe WoodsMap::References do
 
   { 'line' => [0, -1, 2, 1.0, '1', nil, true, 10**100], 'column' => [-1, 24, 1.5, '13', nil, 10**100],
     'length' => [0, -1, 1000, 6.0, '6', nil], 'kind' => ['method', nil],
-    'confidence' => ['static', 'runtime', nil], 'target' => ['', [], nil],
+    'confidence' => ['runtime', nil], 'target' => ['', [], nil],
     'target_type' => ['', {}, nil] }.each do |key, values|
     values.each do |value|
       it "rejects #{key}=#{value.inspect}" do

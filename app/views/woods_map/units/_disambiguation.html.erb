@@ -1,0 +1,15 @@
+<%# The disambiguation popovers (FR-4, B-1): one per ambiguous reference in
+    the code view, listing every candidate the index published with its type
+    and path. The map never picks one. Hidden until its reference button
+    opens it; without JavaScript the list stays in the page after the code.
+    Locals: ambiguities (Array of References::Ambiguity). %>
+<% ambiguities.each do |ambiguity| %>
+  <div class="amb-pop" id="<%= ambiguity.id %>" role="dialog" aria-label="Candidates for <%= ambiguity.text %>" data-disambiguation-target="popover" hidden>
+    <p class="cap"><b class="id"><%= ambiguity.text %><%= ".#{ambiguity.method}" if ambiguity.method %></b> names <%= ambiguity.candidates.size %> units; the index cannot tell which one runs.</p>
+    <ul>
+      <% ambiguity.candidates.each do |candidate| %>
+        <li><%= link_to candidate[:identifier], woods_map.unit_path(type: candidate[:type], identifier: candidate[:identifier]), class: 'id' %> <span class="lyr"><%= candidate[:type].tr('_', ' ') %></span><% if candidate[:path] %> <span class="dim"><%= candidate[:path] %></span><% end %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

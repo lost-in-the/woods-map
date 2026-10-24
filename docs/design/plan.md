@@ -77,14 +77,14 @@ Run this before a milestone issue is opened and again before it closes.
 | W-5 model lifecycle entries | [woods#755](https://github.com/lost-in-the/woods/issues/755) |
 | W-6 method-level span targets | [woods#756](https://github.com/lost-in-the/woods/issues/756) |
 | W-7 per-action facts | [woods#757](https://github.com/lost-in-the/woods/issues/757) |
-| W-8 filter applicability | [woods#758](https://github.com/lost-in-the/woods/issues/758) |
+| W-8 filter applicability (merged via [woods#800](https://github.com/lost-in-the/woods/pull/800); the Passage filter matrix consumes it) | [woods#758](https://github.com/lost-in-the/woods/issues/758) |
 | W-9 container attribution | [woods#759](https://github.com/lost-in-the/woods/issues/759) |
 | W-10 facet diff | [woods#760](https://github.com/lost-in-the/woods/issues/760) |
 | W-11 generation pin | [woods#761](https://github.com/lost-in-the/woods/issues/761) |
 | W-12 impact report | [woods#762](https://github.com/lost-in-the/woods/issues/762) |
 | W-13 inverted flow index | [woods#763](https://github.com/lost-in-the/woods/issues/763) |
-| Model attribute writers for the permitted-param flag (B-18) | [woods#797](https://github.com/lost-in-the/woods/issues/797), [design note](notes/passage-mismatch-limits.md) |
-| Partial locals passed and read for the partial-local flag (B-18) | [woods#798](https://github.com/lost-in-the/woods/issues/798), [design note](notes/passage-mismatch-limits.md) |
+| Model attribute writers for the permitted-param flag (B-18) | [woods#797](https://github.com/lost-in-the/woods/issues/797), published by [woods#806](https://github.com/lost-in-the/woods/pull/806), [design note](notes/passage-mismatch-limits.md) |
+| Partial locals passed and read for the partial-local flag (B-18) | [woods#798](https://github.com/lost-in-the/woods/issues/798), published by [woods#806](https://github.com/lost-in-the/woods/pull/806), [design note](notes/passage-mismatch-limits.md) |
 | W-14 best-effort flows | [woods#764](https://github.com/lost-in-the/woods/issues/764) |
 | M4 History: History tab from the commit table (strip, commits with detail blocks, people, co-change), per-file gutter heat, generation picker and unit diff from Woods' report, `/woods/history` timeline, timeline and XY exports | [woods-map#6](https://github.com/lost-in-the/woods-map/issues/6), [note](notes/history.md) |
 | Commit table line counts and hunks (B6-History `+6 −1`, *hunks*) | [woods#804](https://github.com/lost-in-the/woods/issues/804) |
@@ -95,6 +95,7 @@ Run this before a milestone issue is opened and again before it closes.
 | M1 to M8 | woods-map#2 to #10 as listed in the milestone table |
 | M1 follow-up: the undesigned reading pieces (units index, file view, Routes tab, type tiles, hover card, disambiguation, settings, keyboard help, share menu) | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34) |
 | Controller Routes tab (FR-3); helper- and action-level references need [woods#795](https://github.com/lost-in-the/woods/issues/795) | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/routes-tab.md) |
+| Code navigation: disambiguation popover (FR-4, B-1), method-level links, callers panel (B-13) and outline from the method table (B-8), on Woods W-1/W-2/W-6 ([woods#751](https://github.com/lost-in-the/woods/issues/751), [woods#752](https://github.com/lost-in-the/woods/issues/752), [woods#756](https://github.com/lost-in-the/woods/issues/756)) | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/code-navigation.md) |
 | Hover card on a reference (B-3), prefetched with the Code tab | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/hover-card.md) |
 | Reading settings (B-15, D-6): lens, wrap, font size and editor link per browser | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/settings.md) |
 | Share menu (E-6, E-7): focus URL and the page's Mermaid, per D-25 | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/share-menu.md), [woods-map#57](https://github.com/lost-in-the/woods-map/issues/57) |
@@ -114,6 +115,7 @@ Run this before a milestone issue is opened and again before it closes.
 | Passage and impact coverage: unresolved render targets and partials stay incomplete (M2 B-17, B-18; M4b E-5) | [woods-map#47](https://github.com/lost-in-the/woods-map/issues/47), fixed by [woods-map#51](https://github.com/lost-in-the/woods-map/pull/51) |
 | M4b range mode: Overview (v8 of the v5 board), Changed, Risks, Flows, Tests, Graph and Unknown tabs over Woods' schema 1 report, saved reports at `/woods/impacts/<id>`, and the pre-change Graph tab | [woods-map#4](https://github.com/lost-in-the/woods-map/issues/4), [note](notes/impact-range.md) |
 | M4b `?since=<generation>` on Code, Graph, Lifecycle, Passage and ERD from Woods' range report only; unretained generations say so (W-11) | [woods-map#4](https://github.com/lost-in-the/woods-map/issues/4), [note](notes/since.md), [woods#761](https://github.com/lost-in-the/woods/issues/761) |
+| M4b Flows tab from Woods' inverted flow membership (W-13) with the pinned generation's steps, and retention pins (W-11) on status, pickers and fallbacks, through the published-index readers | [woods-map#4](https://github.com/lost-in-the/woods-map/issues/4), [note](notes/impact-flows.md), [woods#805](https://github.com/lost-in-the/woods/pull/805) |
 | M4b exit criterion re-scoped to the map side; the CI pull-request comment is out of scope (Woods owns `woods:impact` output, D-1, D-25) | [woods-map#4](https://github.com/lost-in-the/woods-map/issues/4), [screenshots](screenshots/README.md) |
 | Woods Map data: changed line ranges per modified unit, for the `?since=` diff gutter | [woods#802](https://github.com/lost-in-the/woods/issues/802) |
 | D-24 Code view scrolls as one region, not a line at a time (settled, amends B8-Code) | [woods-map#29](https://github.com/lost-in-the/woods-map/issues/29) |

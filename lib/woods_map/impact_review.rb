@@ -24,7 +24,7 @@ module WoodsMap
       ['callback side effect changed', 'note', 'callbacks.side_effects, both generations', 'resolved chain',
        'a range'],
       ['filter chain changed', 'note', 'filters.applies_to, both generations', 'resolved chain',
-       'W-8 and a range'],
+       'a range'],
       ['foreign key dropped', 'blocking', 'foreign_keys, both generations', 'model metadata', 'a range']
     ].freeze
 

@@ -1,0 +1,21 @@
+<%# The Flows tab's table (B6-Impact-Flows): one row per entry point whose
+    precomputed flow document passes through a changed unit, its steps behind
+    the row's toggle. Rows through a focused unit open, else the first.
+    Locals: flows (WoodsMap::ImpactFlows), focus (Array<String> identifiers). %>
+<% open_ids = Array(local_assigns[:focus]) %>
+<% rows = flows.rows.each_with_index.map do |row, i| %>
+  <% lit = open_ids.any? && row.changed.any? { |identifier, _type| open_ids.include?(identifier) } %>
+  <% detail = if row.steps
+                safe_join([render('woods_map/components/steps', steps: flow_step_items(row)),
+                           (row.steps_state == :truncated ? tag.p("First #{WoodsMap::ImpactFlows::STEP_LIMIT} steps of the document; the rest are in the published flow.", class: 'mut') : nil)].compact)
+              elsif row.steps_state == :historical
+                tag.p("This flow belongs to gen #{row.generation}; its steps are in that payload, and this page reads gen #{@repository.generation_number}. Historical steps have no current-source links.", class: 'mut')
+              else
+                tag.p('Woods lists this entry point but its flow document could not be read in this generation.', class: 'mut')
+              end %>
+  <% { id: "flow-#{i + 1}", open: lit || (open_ids.empty? && i.zero?), current: lit, classes: (lit ? 'focus' : nil), detail: detail,
+       cells: [flow_entry(row), flow_changed(row), (row.steps ? "#{row.changed_steps} of #{row.steps.count { |s| !s.cycle }}" : tag.span('not read', class: 'mut')), flow_layer(row)] } %>
+<% end %>
+<%= render 'woods_map/components/table', label: 'Flows', min_width: '760px', grouped: true,
+      columns: [{ label: 'entry point', cell_class: 'id' }, { label: 'through', width: '240px' }, { label: 'changed steps', width: '120px', cell_class: 'nw' }, { label: 'layer', width: '200px', cell_class: 'nw mut' }],
+      rows: rows, caption: (flows.truncated? ? "first #{flows.rows.size} of #{flows.total} entry points" : nil) %>

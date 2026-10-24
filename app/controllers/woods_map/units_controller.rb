@@ -7,6 +7,7 @@ module WoodsMap
   # lock covers the whole response; the identifier and the type come from the
   # URL, never a path.
   class UnitsController < ApplicationController
+    include WoodsMap::MethodLinks
     include WoodsMap::UnitMermaid
     include WoodsMap::UnitHistory
 
@@ -31,10 +32,12 @@ module WoodsMap
 
       with_unit do
         @lifecycle = lifecycle_for(@unit)
-        @code = code_view(@unit, lens, @lifecycle)
+        @callers = WoodsMap::Callers.for(@repository).by_method(@unit['identifier'], @unit['type'])
+        @code = code_view(@unit, lens, @lifecycle, callers: @callers)
         @heat = @repository.git_commits && WoodsMap::PathHeat.new(@repository.git_commits)
         @concern_paths = WoodsMap::UnitPaths.concern_files(@repository, @unit)
-        @outline = WoodsMap::Outline.new(@unit, lifecycle: @lifecycle, concern_methods: concern_methods(@unit))
+        @outline = WoodsMap::Outline.new(@unit, lifecycle: @lifecycle, concern_methods: concern_methods(@unit),
+                                                method_href: method_href(@unit), callers: @callers)
         @cards = WoodsMap::HoverCard.for(@repository, @code.linked_targets)
         render :show
       end
@@ -154,14 +157,6 @@ module WoodsMap
     def redirect_to_remembered_lens
       cookies[LENS_COOKIE] = { value: params[:lens], expires: 1.year.from_now, same_site: :lax }
       redirect_to woods_map.unit_path(type: params[:type], identifier: params[:identifier])
-    end
-
-    def code_view(unit, lens, lifecycle)
-      WoodsMap::CodeView.new(unit, lens: lens, references: WoodsMap::References.new(@repository, unit),
-                                   marginalia: WoodsMap::Marginalia.new(unit, lifecycle: lifecycle, table: @page.table),
-                                   unit_path: lambda { |identifier, type|
-                                     woods_map.unit_path(type: type, identifier: identifier)
-                                   })
     end
 
     def lifecycle_for(unit, dynamic: nil)
