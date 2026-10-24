@@ -49,7 +49,7 @@ printed the same steps the check reads.
    application's.
    - Woods now looks for the method in the inlined concerns as well. It names the concern
      in `defined_in` and expands the callback there (`Taggable#normalize_tags`).
-   - The fix is in the Woods PR for this close-out. Before it, the entry Lifecycle of
+   - The fix is [woods#823](https://github.com/lost-in-the/woods/pull/823). Before it, the entry Lifecycle of
      `PostsController#create` counted `normalize_tags` as "callbacks the model does not
      define".
 2. **The ER's far table was guessed from the class name** (map).
