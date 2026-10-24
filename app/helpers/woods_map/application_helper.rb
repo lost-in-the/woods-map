@@ -42,7 +42,7 @@ module WoodsMap
     # @return [String]
     def focus_url
       query = request.query_parameters.except('token')
-      "#{request.base_url}#{request.path}#{"?#{query.to_query}" if query.any?}"
+      "#{request.base_url}#{raw_request_path}#{"?#{query.to_query}" if query.any?}"
     end
 
     # A relative date in git's shorthand with the long form in the tooltip

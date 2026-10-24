@@ -53,7 +53,7 @@ module WoodsMap
 
     # A tab's Mermaid text; a refused one names the page that lists everything.
     def render_tab_mermaid(text, what, refusal: nil)
-      page = request.base_url + request.path.delete_suffix('.mmd')
+      page = request.base_url + raw_request_path.delete_suffix('.mmd')
       page += "?#{request.query_string}" if request.query_string.present?
       render_mermaid(text, name: "#{@page.identifier} #{what}", refusal: refusal, page: page)
     end

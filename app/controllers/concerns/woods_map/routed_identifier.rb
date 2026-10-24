@@ -18,7 +18,7 @@ module WoodsMap
     def routed_identifiers
       identifier = params[:identifier].to_s
       suffix = action_name == 'show' ? '' : "/#{action_name}#{'.mmd' if mermaid_request?}"
-      path = request.original_fullpath.split('?', 2).first
+      path = raw_request_path
       slashed = path.end_with?("/#{suffix}") && !identifier.end_with?('/')
       slashed ? ["#{identifier}/", identifier] : [identifier]
     end

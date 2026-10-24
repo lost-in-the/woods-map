@@ -4,7 +4,7 @@
 <% s = since %>
 <% range = s.available? ? "Woods' report, gen #{s.from_generation} → gen #{s.to_generation}" : nil %>
 <% report_link = s.available? ? link_to('open the report', woods_map.impact_path(from: "gen:#{s.from_generation}", to: 'now', focus: page.identifier, lens: 'changed')) : nil %>
-<% clear = link_to('clear', request.path) %>
+<% clear = link_to('clear', raw_request_path) %>
 <div class="frame-facts">
 <% if !s.available? %>
   <%= render 'woods_map/components/banner', severity: :mod, lead: "No comparison since #{s.selector}.", text: s.message, tools: clear %>
