@@ -220,6 +220,155 @@ RSpec.describe 'Guide', type: :request do
       end
     end
 
+    describe 'the history list' do
+      def answered(question)
+        ask(question: question)
+        get response.parsed_body['stream']
+      end
+
+      def history_list
+        get '/woods/guide/conversations'
+        Nokogiri::HTML(response.parsed_body['html'])
+      end
+
+      def two_conversations
+        answered('What is User?')
+        delete '/woods/guide/conversation'
+        answered('And Post?')
+      end
+
+      it 'lists this session\'s conversations, the current one first' do
+        two_conversations
+        list = history_list
+        expect(list.css('.hrow b').map(&:text)).to eq(['And Post?', 'What is User?'])
+        expect(list.at_css('.hrow.cur[aria-current=true]').text).to include('current').and include('1 question')
+      end
+
+      it 'opens an earlier conversation, linked against the generation, and keeps it current on the next page' do
+        two_conversations
+        post "/woods/guide/conversations/#{history_list.at_css('button.hrow')['data-guide-id-param']}"
+        thread = Nokogiri::HTML(response.parsed_body['html'])
+        expect(thread.text).to include('What is User?').and(not_include('And Post?'))
+        expect(thread.at_css('.text a[href="/woods/units/model/User"]')).not_to be_nil
+        get '/woods/units/model/User'
+        expect(html_response_document.at_css('#wm-guide .thread').text).to include('What is User?')
+      end
+
+      it 'says there is nothing yet, and offers the history button in the panel header' do
+        expect(history_list.text).to include('No conversations yet in this browser session')
+        get '/woods/units/model/User'
+        toggle = html_response_document.at_css('#wm-guide .gh button[aria-controls=wm-guide-history]')
+        expect(toggle.text).to eq('history')
+        expect(html_response_document.at_css('#wm-guide-history[hidden]')).not_to be_nil
+      end
+
+      it 'refuses an unknown conversation' do
+        post '/woods/guide/conversations/0123456789abcdef'
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it 'refuses to switch while an answer is pending' do
+        two_conversations
+        earlier = history_list.at_css('button.hrow')['data-guide-id-param']
+        ask(question: 'still pending')
+        post "/woods/guide/conversations/#{earlier}"
+        expect(response).to have_http_status(:conflict)
+        expect(response.parsed_body['message']).to include('Stop it first')
+      end
+    end
+
+    describe 'drafting an issue from an answer' do
+      let(:prompts) { [] }
+      let(:source) do
+        WoodsMap.configuration.guide_chat_factory = lambda {
+          WoodsMap::FakeGuideChat.new([{ text: "# Notify without retry\n\nUser has many Posts." }]).tap { |c| prompts << c }
+        }
+        ask
+        id = response.parsed_body['id']
+        get response.parsed_body['stream']
+        id
+      end
+
+      def draft
+        ask(action_key: 'draft_issue', question: '', source: source)
+        get response.parsed_body['stream']
+        events.last.last
+      end
+
+      it 'offers copy and draft-an-issue under a finished answer' do
+        id = source
+        get '/woods/units/model/User'
+        tools = html_response_document.at_css("#wm-guide .answer[data-turn='#{id}'] .answer-tools")
+        expect(tools.css('button').map(&:text)).to eq(['⎘ copy', 'draft an issue'])
+        expect(tools.at_css('[data-guide-source-param]')['data-guide-source-param']).to eq(id)
+      end
+
+      it 'drafts from that answer, which the prompt carries' do
+        expect(draft).to include('kind' => 'issue', 'source' => source)
+        user = prompts.last.messages.select { |message| message.role == :user }.last
+        expect(user.content).to include('Draft an issue').and include('# Notify without retry')
+      end
+
+      it 'offers the draft as text to copy only, and posts nothing' do
+        draft
+        get '/woods/units/model/User'
+        issue = html_response_document.css('#wm-guide .answer.issue').last
+        expect(issue.at_css('.who').text).to include('issue draft')
+        expect(issue.css('.answer-tools button').map(&:text)).to eq(['⎘ copy issue'])
+        expect(issue.at_css('.answer-tools').text).to include('the map posts nothing')
+      end
+
+      it 'refuses a draft without a finished answer of this conversation' do
+        ask(action_key: 'draft_issue', question: '')
+        expect(response.parsed_body['message']).to eq('Pick a finished answer to draft the issue from.')
+        ask
+        ask(action_key: 'draft_issue', question: '', source: response.parsed_body['id'])
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+
+    describe 'units selected on a graph' do
+      it 'offers the graph actions on the Graph tab, the selection one waiting for a selection' do
+        get '/woods/units/model/User/graph'
+        expect(action_labels).to eq(['explain this unit', 'summarise blast radius', 'explain the selected units'])
+        expect(panel.at_css('[data-guide-key-param=explain_selection]')['disabled']).not_to be_nil
+        expect(html_response_document.at_css('[data-controller~=graph]')['data-graph-pick-value']).to eq('true')
+      end
+
+      it 'offers them on the full-screen graph, with its centre as context' do
+        get '/woods/graph?centre=User&type=model'
+        expect(action_labels).to include('explain the selected units')
+        expect(panel.at_css('.ctx').text).to include('User')
+      end
+
+      it 'sends the selected units the generation has, typed, and drops the rest' do
+        prompts = []
+        WoodsMap.configuration.guide_chat_factory = lambda {
+          WoodsMap::FakeGuideChat.new([{ text: 'ok' }]).tap { |chat| prompts << chat }
+        }
+        ask(action_key: 'explain_selection', question: '',
+            context: { page: 'graph', type: 'model', identifier: 'User',
+                       nodes: ['model:Micropost', 'model:Ghost', 'controller:Micropost', 'nonsense'] })
+        expect(response.parsed_body['html']).to include('(User, 1 graph unit)')
+        get response.parsed_body['stream']
+        prompt = prompts.last.messages.first.content
+        expect(prompt).to include('- units selected on the graph: Micropost (model)')
+        expect(prompt).not_to include('Ghost')
+      end
+
+      it 'refuses the selection action with nothing selected' do
+        ask(action_key: 'explain_selection', question: '',
+            context: { page: 'graph', type: 'model', identifier: 'User' })
+        expect(response.parsed_body['message']).to start_with('Select units on the graph first')
+      end
+
+      it 'leaves picking off while the guide is off' do
+        WoodsMap.configuration.guide_enabled = false
+        get '/woods/units/model/User/graph'
+        expect(html_response_document.at_css('[data-controller~=graph]')['data-graph-pick-value']).to be_nil
+      end
+    end
+
     it 'rate-limits questions like the other expensive endpoints' do
       WoodsMap.configuration.rate_limit = 1
       ask

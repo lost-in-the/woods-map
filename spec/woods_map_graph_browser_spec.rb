@@ -129,6 +129,14 @@ RSpec.describe WoodsMap do
     expect(timeline['oneText']).to eq('bbbbbbb, 2026-10-01, two: 1 unit drawn changed')
   end
 
+  it 'adds units to the guide context with Space and Shift+click, opens on a plain click, and clears (M7)' do
+    pick = drawing['pick']
+    expect(pick['events']).to eq([['model:Post'], %w[model:Post concern:Generated::Unit4], []])
+    expect(pick['classes']).to eq(%w[n_0 n_4])
+    expect(pick['status']).to include("added to the guide's context, 2 units selected")
+    expect(pick).to include('openedOnTap' => true, 'cleared' => 0, 'offHandled' => false, 'offEvents' => 0)
+  end
+
   it 'encodes a re-centring identifier as a query value on the full-screen page' do
     expect(drawing['recentre']).to eq('/woods/graph?centre=GET%20%2Fusers%2F%3Aid%3Fx%3D1%26y&type=route&depth=2')
   end

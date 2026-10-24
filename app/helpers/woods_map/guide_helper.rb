@@ -53,10 +53,11 @@ module WoodsMap
     end
 
     # @param turn [Hash]
-    # @return [String] "guide, 4 tool calls, 2.8 s"
+    # @return [String] "guide, 4 tool calls, 2.8 s" or "guide, issue draft, 1 tool call, 2.1 s"
     def guide_who(turn)
       calls = Array(turn['tool_calls']).size
-      ['guide', ("#{calls} tool #{calls == 1 ? 'call' : 'calls'}" if calls.positive?),
+      draft = 'issue draft' if turn['kind'] == 'issue'
+      ['guide', draft, ("#{calls} tool #{calls == 1 ? 'call' : 'calls'}" if calls.positive?),
        ("#{turn['elapsed']} s" if turn['elapsed'])].compact.join(', ')
     end
   end

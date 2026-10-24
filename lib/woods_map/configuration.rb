@@ -44,6 +44,18 @@ module WoodsMap
     # @return [String, nil] bearer token for {#guide_mcp_url}
     attr_accessor :guide_mcp_token
 
+    # @return [Integer] Index MCP servers the guide keeps alive in this
+    #   process at most, shared by answers one at a time (D-7). 0 starts one
+    #   per answer and stops it when the answer ends.
+    attr_accessor :guide_mcp_servers
+
+    # @return [Numeric] seconds an idle Index MCP server is kept
+    attr_accessor :guide_mcp_idle_seconds
+
+    # @return [Numeric] seconds an answer waits for a free server when all
+    #   {#guide_mcp_servers} are busy
+    attr_accessor :guide_mcp_wait_seconds
+
     # @return [Integer] tokens one browser session may spend, all answers together
     attr_accessor :guide_token_budget
 
@@ -176,6 +188,9 @@ module WoodsMap
       @guide_mcp_command = nil
       @guide_mcp_url = nil
       @guide_mcp_token = nil
+      @guide_mcp_servers = 2
+      @guide_mcp_idle_seconds = 600
+      @guide_mcp_wait_seconds = 10
       @guide_token_budget = 60_000
       @guide_tool_calls = 12
       @guide_turns = 10

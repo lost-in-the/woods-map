@@ -37,7 +37,7 @@ module WoodsMap
     helper_method :woods_map_config, :current_repository, :woods_map, :primary_nav, :guide_page_values
 
     # Page kinds the guide offers actions for, by unit tab.
-    GUIDE_TABS = { 'show' => 'code', 'lifecycle' => 'lifecycle', 'passage' => 'passage' }.freeze
+    GUIDE_TABS = { 'show' => 'code', 'lifecycle' => 'lifecycle', 'passage' => 'passage', 'graph' => 'graph' }.freeze
 
     # Count the named actions against the per-client budget of a group.
     # Named apart from Rails 7.2's `rate_limit`, which the floor lacks.
@@ -97,8 +97,9 @@ module WoodsMap
       end
     end
 
-    # What this page names for the guide (M7): its kind and the unit, the
-    # action, the impact focus or range. The guide rebuilds the context from
+    # What this page names for the guide (M7): its kind and the unit (the
+    # full-screen graph's centre included), the action, the impact focus or
+    # range. Units selected on a graph are added by the browser. The guide rebuilds the context from
     # these against the pinned generation.
     #
     # @return [Hash{String => String}]
@@ -106,6 +107,8 @@ module WoodsMap
       if @page
         { 'page' => GUIDE_TABS.fetch(@tab.to_s, 'unit'), 'type' => @page.type, 'identifier' => @page.identifier,
           'action_name' => @passage&.action }.compact
+      elsif @centre
+        { 'page' => 'graph', 'type' => @centre['type'], 'identifier' => @centre['identifier'] }
       elsif @range
         { 'page' => 'range', 'from' => @range.first, 'to' => @range.last }
       elsif @radius.present?

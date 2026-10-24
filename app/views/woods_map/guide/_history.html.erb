@@ -1,0 +1,21 @@
+<%# The history list (notes/m7-guide.md): this browser session's
+    conversations, the current one first, then the earlier ones newest first.
+    Opening one makes it current; the one left joins the list. Locals:
+    conversations (Array<Hash> from Store#conversations). %>
+<% if conversations.empty? %>
+  <p class="cap empty">No conversations yet in this browser session. <i>new</i> keeps the conversation it leaves here, up to <%= WoodsMap::Guide::Store::HISTORY %>.</p>
+<% else %>
+  <ul class="hist" aria-label="Conversations in this browser session">
+    <% conversations.each do |conversation| %>
+      <% meta = capture do %><%= pluralize(conversation['turns'], 'question') %><% if conversation['summary'].present? %>, <%= conversation['summary'] %><% end %>, <%= date_abbr(conversation['updated_at'] || conversation['started_at']) %><% end %>
+      <li>
+        <% if conversation['current'] %>
+          <div class="hrow cur" aria-current="true"><b><%= conversation['title'].presence || 'untitled' %></b><span class="mut">current, <%= meta %></span></div>
+        <% else %>
+          <button class="hrow" type="button" data-action="guide#resume" data-guide-id-param="<%= conversation['id'] %>"><b><%= conversation['title'].presence || 'untitled' %></b><span class="mut"><%= meta %></span></button>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+  <p class="cap">Kept with this browser session's guide spend, under the index (F-4); the newest <%= WoodsMap::Guide::Store::HISTORY %> stay.</p>
+<% end %>

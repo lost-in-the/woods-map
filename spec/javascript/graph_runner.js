@@ -53,7 +53,7 @@ function neighbourhood(units, edgeCount) {
   }
 }
 
-function mount(id) {
+function mount(id, extra = {}) {
   const body = document.createElement("div")
   body.id = id
   body.innerHTML = `
@@ -74,8 +74,8 @@ function mount(id) {
     statusTarget: q(".gstatus"), hasStatusTarget: true, messageTarget: q(".refusal"), hasMessageTarget: true,
     fallbackTarget: q(".fallback"), flowchartTarget: q(".tool"), hasFlowchartTarget: true,
     layoutsTarget: q("[data-graph-target=layouts]"), hasLayoutsTarget: true, layoutTargets: Array.from(body.querySelectorAll("[data-layout]")),
-    listTarget: q(".list"), hasListTarget: true
-  })
+    listTarget: q(".list"), hasListTarget: true, pickValue: false, hasPickValue: true
+  }, extra)
   controller.connect()
   return controller
 }
@@ -217,12 +217,37 @@ timeline.oneText = timed.windowTarget.textContent
 timed.clearWindow()
 timeline.cleared = timed.cy.nodes(".tl").length
 
+  // Guide context (M7): Space and Shift+click add a unit to the set the guide panel sends;
+  // a clear event empties it; without the guide neither key picks.
+  const picks = []
+  const onPick = (event) => picks.push(event.detail.units.map((unit) => `${unit.type}:${unit.identifier}`))
+  document.addEventListener("woods-map:graph-pick", onPick)
+  const picking = mount("picking", { pickValue: true })
+  picking.draw(cytoscape, small)
+  picking.open = () => { picking.openedOnTap = true }
+  picking.canvasTarget.focus()
+  press(picking.canvasTarget, " ")
+  picking.cy.getElementById("n_4").emit({ type: "tap", originalEvent: { shiftKey: true } })
+  const pickedClasses = picking.cy.nodes(".pick").map((n) => n.id()).sort()
+  const pickStatus = picking.statusTarget.textContent
+  picking.cy.getElementById("n_4").emit({ type: "tap", originalEvent: { shiftKey: false } })
+  document.dispatchEvent(new CustomEvent("woods-map:graph-pick-clear"))
+  const pick = { events: picks.slice(), classes: pickedClasses, status: pickStatus, openedOnTap: picking.openedOnTap === true,
+    cleared: picking.cy.nodes(".pick").length }
+  const off = mount("not-picking")
+  off.draw(cytoscape, small)
+  off.canvasTarget.focus()
+  pick.offHandled = press(off.canvasTarget, " ")
+  pick.offEvents = picks.length - pick.events.length
+  document.removeEventListener("woods-map:graph-pick", onPick)
+  picking.disconnect()
+
   // On the full-screen page a node re-centres the page: the identifier is a query value.
   blasted.unitUrlValue = "/woods/graph?centre=__identifier__&type=__type__&depth=2"
   const recentre = blasted.unitUrl({ type: "route", identifier: "GET /users/:id?x=1&y" })
 
   return {
-    restored, forgotten, tinted, ranges, recentre, clusters, flow, timeline,
+    restored, forgotten, tinted, ranges, recentre, clusters, flow, timeline, pick,
     ms: Number(big.element.dataset.graphRenderMs), wall, calibrationMs, warmMs, timings: big.timings, radialMs, radialMoved,
     drawn: big.element.dataset.graphDrawn === "true",
     nodes: big.cy.nodes().length, edges: big.cy.edges().length,

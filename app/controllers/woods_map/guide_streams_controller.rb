@@ -43,7 +43,7 @@ module WoodsMap
     end
 
     def answer(store, turn)
-      session = WoodsMap::Guide.open_session(woods_map_config)
+      session = WoodsMap::Guide.open_session(woods_map_config, generation_key: generation_key)
       budget = WoodsMap::Guide::Budget.new(woods_map_config, tokens_spent: store.tokens)
       WoodsMap::Guide::Runner.new(store: store, turn: turn, session: session, emit: method(:emit), budget: budget).run
     rescue StandardError => e
@@ -54,6 +54,14 @@ module WoodsMap
         record['error'] = "#{e.class.name.split('::').last}: #{e.message}".slice(0, 300)
       end
       emit('failed', failed || turn)
+    end
+
+    # The generation the answer reads, so a pooled Index MCP server of an
+    # older generation is not reused.
+    def generation_key
+      WoodsMap::Repository.open(&:generation_key)
+    rescue WoodsMap::Repository::Unavailable
+      nil
     end
 
     def replay(turn)

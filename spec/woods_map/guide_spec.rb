@@ -54,6 +54,18 @@ RSpec.describe WoodsMap::Guide do
       expect(described_class.prompt(nil, context: 'CTX', question: 'Free?')).to eq("CTX\n\nQuestion: Free?\n")
     end
 
+    it 'offers the graph actions, the selection one only on graphs, and draft-issue under answers only' do
+      expect(described_class.for(:graph, type: 'model')).to eq(%w[explain_unit blast_radius explain_selection])
+      expect(described_class.for(:code, type: 'model')).not_to include('explain_selection', 'draft_issue')
+      expect(described_class.known?('draft_issue')).to be(true)
+    end
+
+    it 'puts the earlier answer into the draft-issue prompt, in one pass' do
+      prompt = described_class.prompt('draft_issue', context: 'CTX {{answer}}', question: '',
+                                                     answer: 'Post has {{question}}')
+      expect(prompt).to start_with('CTX {{answer}}').and include('Post has {{question}}').and include('Open questions')
+    end
+
     it 'uses the host override when one exists' do
       Dir.mktmpdir do |root|
         FileUtils.mkdir_p(File.join(root, 'config/woods_map/prompts'))
@@ -67,6 +79,53 @@ RSpec.describe WoodsMap::Guide do
   describe WoodsMap::Guide::Store do
     it 'refuses ids it did not issue, so a cookie never names a path' do
       expect { described_class.new('/tmp', '../../etc/passwd') }.to raise_error(WoodsMap::Guide::Store::InvalidId)
+    end
+
+    def finished(store, question)
+      turn = store.add_turn('question' => question, 'context' => { 'summary' => 'Post' })
+      store.update_turn(turn['id']) { |record| record['state'] = 'done' }
+      turn
+    end
+
+    it 'keeps the conversation "new" leaves as history, newest first, the current one listed first' do
+      Dir.mktmpdir do |dir|
+        store = described_class.new(dir, described_class.generate_id)
+        finished(store, 'What is Post?')
+        first = store.conversation
+        store.reset!
+        finished(store, 'What is User?')
+        expect(store.conversations.map { |c| [c['title'], c['current']] })
+          .to eq([['What is User?', true], ['What is Post?', false]])
+        expect(store.conversations.last).to include('id' => first, 'turns' => 1, 'summary' => 'Post')
+      end
+    end
+
+    it 'opens an earlier conversation and keeps the one it leaves' do
+      Dir.mktmpdir do |dir|
+        store = described_class.new(dir, described_class.generate_id)
+        finished(store, 'What is Post?')
+        first = store.conversation
+        store.reset!
+        finished(store, 'What is User?')
+        expect(store.open!(first)).to be(true)
+        expect(store.turns.map { |turn| turn['question'] }).to eq(['What is Post?'])
+        expect(store.conversations.map { |c| c['title'] }).to eq(['What is Post?', 'What is User?'])
+        expect([store.open!('0123456789abcdef'), store.open!('../x')]).to eq([false, false])
+      end
+    end
+
+    it 'refuses to switch while an answer is pending, and keeps at most HISTORY conversations' do
+      Dir.mktmpdir do |dir|
+        store = described_class.new(dir, described_class.generate_id)
+        (described_class::HISTORY + 3).times do |n|
+          finished(store, "Question #{n}")
+          store.reset!
+        end
+        expect(store.conversations.size).to eq(described_class::HISTORY)
+        expect(store.conversations.first['title']).to eq("Question #{described_class::HISTORY + 2}")
+        store.add_turn('question' => 'pending')
+        expect { store.open!(store.conversations.last['id']) }.to raise_error(described_class::Busy)
+      end
     end
 
     it 'claims a pending turn once' do

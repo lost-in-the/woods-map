@@ -1,0 +1,14 @@
+<%# Under a finished answer (B8-Guide): copy its Markdown, or draft an issue
+    from it. An issue draft offers its text to copy and says that the map
+    posts nothing. Pin and open-as-investigation wait for Trail (M6).
+    The guide controller builds the same row for an answer that just
+    streamed. Locals: turn (Hash). %>
+<div class="answer-tools">
+  <% if turn['kind'] == 'issue' %>
+    <button class="tool" type="button" data-controller="copy" data-copy-text-value="<%= turn['answer'] %>" data-action="copy#copy">⎘ copy issue</button>
+    <span class="cap">Paste it into your tracker; the map posts nothing.</span>
+  <% else %>
+    <button class="tool" type="button" data-controller="copy" data-copy-text-value="<%= turn['answer'] %>" data-action="copy#copy">⎘ copy</button>
+    <button class="tool" type="button" data-action="guide#draftIssue" data-guide-source-param="<%= turn['id'] %>">draft an issue</button>
+  <% end %>
+</div>

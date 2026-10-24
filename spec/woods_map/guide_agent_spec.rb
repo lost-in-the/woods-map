@@ -73,24 +73,78 @@ RSpec.describe WoodsMap::Guide do
   let(:chats) { Dir.mktmpdir('woods-map-chats') }
   let(:requests) { WoodsMap::FakeCompletions.requests }
   let(:events) { [] }
-  let(:record) do
+  let(:record) { answer.first }
+
+  # One answer through the real stack: the final turn record and the session
+  # it used, so a spec can look at the server it borrowed.
+  def answer(generation_key: ['fixture', 1], api_base: "http://127.0.0.1:#{WoodsMap::FakeCompletions.port}/v1")
     RubyLLM.configure do |config|
       config.openai_api_key = 'test-key'
-      config.openai_api_base = "http://127.0.0.1:#{WoodsMap::FakeCompletions.port}/v1"
+      config.openai_api_base = api_base
     end
     config = WoodsMap.configuration
     config.guide_chat_options = { model: 'fake-model', provider: :openai, protocol: :chat_completions,
                                   assume_model_exists: true }
     store = WoodsMap::Guide::Store.new(chats, WoodsMap::Guide::Store.generate_id)
     turn = store.claim(store.add_turn('question' => 'What is User?', 'prompt' => 'What is User?')['id'])
-    WoodsMap::Guide::Runner.new(store: store, turn: turn, session: described_class.open_session(config),
-                                emit: ->(event, payload) { events << [event, payload] },
-                                budget: WoodsMap::Guide::Budget.new(config, tokens_spent: 0)).run
+    session = described_class.open_session(config, generation_key: generation_key)
+    [WoodsMap::Guide::Runner.new(store: store, turn: turn, session: session,
+                                 emit: ->(event, payload) { events << [event, payload] },
+                                 budget: WoodsMap::Guide::Budget.new(config, tokens_spent: 0)).run,
+     session.servers.first]
+  end
+
+  # The stdio server process behind a borrowed Index MCP server, if running.
+  def process_of(server)
+    server.instance_variable_get(:@client)&.instance_variable_get(:@transport)&.instance_variable_get(:@process)
+  end
+
+  def seconds
+    started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    yield
+    Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
   end
 
   after do
+    described_class.shutdown_servers(force: true)
     FileUtils.rm_rf(chats)
     requests.clear
+  end
+
+  describe 'the Index MCP server pool' do
+    it 'keeps one woods-mcp process across the answers of a generation' do
+      first, server = answer
+      process = process_of(server)
+      second = nil
+      elapsed = seconds { second = answer }
+      expect([first['state'], second.first['state']]).to eq(%w[done done])
+      expect(second.last).to be(server)
+      expect(process_of(server)).to be(process).and be_alive
+      expect(elapsed).to be < 1.5
+    end
+
+    it 'starts a new process for a new generation and stops the old one' do
+      _, old_server = answer
+      process = process_of(old_server)
+      record, server = answer(generation_key: ['fixture', 2])
+      expect(record['state']).to eq('done')
+      expect(server).not_to be(old_server)
+      expect(process.join(5)).not_to be_nil
+      expect(described_class.server_pool.stats).to eq(alive: 1, busy: 0, idle: 1)
+    end
+
+    it 'stops every process at shutdown' do
+      _, server = answer
+      described_class.shutdown_servers(force: true)
+      expect(process_of(server)).to be_nil
+    end
+
+    it 'stops the server after an answer that failed rather than reusing it' do
+      record, server = answer(api_base: 'http://127.0.0.1:9/v1')
+      expect(record['state']).to eq('failed')
+      expect(described_class.server_pool.stats).to eq(alive: 0, busy: 0, idle: 0)
+      expect(process_of(server)).to be_nil
+    end
   end
 
   it 'exposes exactly the read-only allow-list of the Index MCP server' do

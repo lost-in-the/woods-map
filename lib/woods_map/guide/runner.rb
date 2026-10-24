@@ -41,8 +41,12 @@ module WoodsMap
       # @return [Hash] the final turn record
       def run
         converse
+        @clean = true
         finish('done', answer: final_text)
       rescue Budget::Exceeded => e
+        # Limits are checked between steps and before a call runs, so no
+        # request is left in flight on the server.
+        @clean = true
         finish('limited', limit: { 'kind' => e.kind.to_s, 'message' => e.message })
       rescue Disconnected, CancelledByUser
         @chat.cancel if @chat.respond_to?(:cancel)
@@ -50,7 +54,9 @@ module WoodsMap
       rescue StandardError => e
         finish('failed', error: "#{e.class.name.split('::').last}: #{e.message}".slice(0, 300))
       ensure
-        @session.close
+        # A clean answer hands its Index MCP server back for the next one;
+        # any other end stops it.
+        @session.close(reuse: @clean == true)
       end
 
       # @return [WoodsMap::Guide::Budget]

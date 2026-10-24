@@ -2,12 +2,12 @@
     and the limit or error that ended it. A pending turn resumes its stream.
     Locals: turn (Hash). %>
 <% state = turn['state'].to_s %>
-<div class="msg answer" data-guide-target="answer" data-state="<%= state %>"<% if state == 'pending' %> data-stream="<%= woods_map.guide_stream_path(id: turn['id']) %>" data-cancel="<%= woods_map.guide_cancel_path(id: turn['id']) %>"<% end %>>
+<div class="msg answer<%= ' issue' if turn['kind'] == 'issue' %>" data-guide-target="answer" data-state="<%= state %>" data-turn="<%= turn['id'] %>"<% if state == 'pending' %> data-stream="<%= woods_map.guide_stream_path(id: turn['id']) %>" data-cancel="<%= woods_map.guide_cancel_path(id: turn['id']) %>"<% end %>>
   <span class="who"><%= guide_who(turn) %></span>
   <div class="calls"><% Array(turn['tool_calls']).each do |call| %><%= render 'woods_map/guide/call', call: call %><% end %></div>
   <div class="text"><% if %w[done limited cancelled].include?(state) %><%= guide_answer_html(turn) %><% elsif state == 'running' %><p class="dim">Answering in another tab or request.</p><% end %></div>
   <% if turn['limit'] %><div class="finding note limit"><b>Limit reached.</b> <%= turn.dig('limit', 'message') %></div><% end %>
   <% if state == 'cancelled' %><div class="finding note">Stopped.</div><% end %>
   <% if state == 'failed' %><div class="finding risk"><b>The guide could not answer.</b> <%= turn['error'] %></div><% end %>
-  <% if %w[done limited].include?(state) && turn['answer'].present? %><div class="answer-tools"><button class="tool" type="button" data-controller="copy" data-copy-text-value="<%= turn['answer'] %>" data-action="copy#copy">⎘ copy</button></div><% end %>
+  <% if %w[done limited].include?(state) && turn['answer'].present? %><%= render 'woods_map/guide/answer_tools', turn: turn %><% end %>
 </div>

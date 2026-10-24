@@ -25,12 +25,16 @@ WoodsMap::Engine.routes.draw do
   get 'graph', to: 'graphs#show', as: :graph
   get 'graph/neighbourhood', to: 'neighbourhoods#show', as: :neighbourhood, defaults: { format: :json }
 
-  # The guide (M7): ask, stream an answer as server-sent events, stop it, start over.
+  # The guide (M7): ask, stream an answer as server-sent events, stop it, start over, reopen an earlier one.
   post 'guide/questions', to: 'guide#create', as: :guide_questions, defaults: { format: :json }
   get 'guide/questions/:id/stream', to: 'guide_streams#show', as: :guide_stream, constraints: { id: /[0-9a-f]{16}/ }
   post 'guide/questions/:id/cancel', to: 'guide#cancel', as: :guide_cancel, constraints: { id: /[0-9a-f]{16}/ },
                                      defaults: { format: :json }
   delete 'guide/conversation', to: 'guide#destroy', as: :guide_conversation, defaults: { format: :json }
+  # The session's conversations (history) and opening an earlier one.
+  get 'guide/conversations', to: 'guide#history', as: :guide_history, defaults: { format: :json }
+  post 'guide/conversations/:id', to: 'guide#resume', as: :guide_resume, constraints: { id: /[0-9a-f]{16}/ },
+                                  defaults: { format: :json }
 
   # The impact page (M4b): a focus set with no range is the blast radius; a range delegates to Woods' report (W-12).
   # The Mermaid text of a page's diagram as text/plain (D-25); see docs/design/notes/mermaid-text-urls.md.

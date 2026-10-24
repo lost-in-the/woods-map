@@ -6,17 +6,30 @@ import { Controller } from "@hotwired/stimulus"
 // as calls start and end, text as it streams, then the finished answer the
 // server rendered (links only to known identifiers). No Turbo and no cable;
 // the policy's connect-src 'self' covers the stream. Text from the stream is
-// set as text; only the server's rendered answers are set as HTML.
+// set as text; only the server's rendered answers, history list and
+// conversations are set as HTML.
+//
+// Context the browser adds: selected code lines (the rows' L<n> ids) and the
+// units a graph controller hands over in a "woods-map:graph-pick" event
+// (Shift+click or Space on the canvas). Under each finished answer: copy, and
+// "draft an issue", an action on that answer whose draft is text to copy;
+// the map posts nothing.
 const FINISHED = ["done", "limited", "cancelled", "failed"]
+const MAX_NODES = 20
 
 export default class extends Controller {
   static targets = ["panel", "toggle", "thread", "empty", "form", "input", "submit", "stop", "reset",
-    "calls", "tokens", "lines", "linesField", "needsLines", "answer", "exhausted"]
+    "calls", "tokens", "lines", "linesField", "needsLines", "answer", "exhausted",
+    "history", "historyToggle", "historyList", "nodes", "nodesFields", "needsNodes"]
 
   connect() {
     if (!this.hasPanelTarget) return
     this.onSelection = () => this.selectionChanged()
     document.addEventListener("selectionchange", this.onSelection)
+    this.onPick = (event) => this.pick(event.detail?.units || [])
+    document.addEventListener("woods-map:graph-pick", this.onPick)
+    this.nodes = []
+    if (this.hasExhaustedTarget) this.exhaust()
     this.linesFromHash()
     if (this.remembered()) this.open(false)
     const pending = this.answerTargets.find((answer) => answer.dataset.stream)
@@ -25,6 +38,7 @@ export default class extends Controller {
 
   disconnect() {
     document.removeEventListener("selectionchange", this.onSelection)
+    document.removeEventListener("woods-map:graph-pick", this.onPick)
     this.source?.close()
   }
 
@@ -51,9 +65,15 @@ export default class extends Controller {
     this.remember(false)
   }
 
-  // Escape inside the panel closes it.
+  // Escape inside the panel closes the history list, else the panel.
   keydown(event) {
-    if (event.key === "Escape" && !this.panelTarget.hidden && this.panelTarget.contains(event.target)) this.close()
+    if (event.key !== "Escape" || this.panelTarget.hidden || !this.panelTarget.contains(event.target)) return
+    if (this.hasHistoryTarget && !this.historyTarget.hidden) {
+      event.stopPropagation()
+      this.closeHistory()
+    } else {
+      this.close()
+    }
   }
 
   submitOnEnter(event) {
@@ -76,9 +96,17 @@ export default class extends Controller {
     this.send(event.params.key)
   }
 
-  async send(actionKey) {
+  // An action on one answer: the server drafts an issue from it as a new
+  // answer, offered for copying only.
+  draftIssue(event) {
+    if (this.busy || this.exhausted) return
+    this.send("draft_issue", { source: event.params.source })
+  }
+
+  async send(actionKey, extra = {}) {
     const body = new FormData(this.formTarget)
     if (actionKey) body.set("action_key", actionKey)
+    for (const [name, value] of Object.entries(extra)) body.set(name, value)
     this.setBusy(true)
     try {
       const response = await fetch(this.panelTarget.dataset.askUrl, {
@@ -94,6 +122,7 @@ export default class extends Controller {
       }
       this.inputTarget.value = ""
       if (this.hasEmptyTarget) this.emptyTarget.remove()
+      if (this.hasHistoryTarget && !this.historyTarget.hidden) this.closeHistory(false)
       this.threadTarget.insertAdjacentHTML("beforeend", data.html)
       const answer = this.answerShell()
       this.threadTarget.appendChild(answer)
@@ -177,6 +206,9 @@ export default class extends Controller {
     } else {
       text.querySelector(".live")?.classList.remove("cursor")
     }
+    if (turn.id) answer.dataset.turn = turn.id
+    if (turn.kind === "issue") answer.classList.add("issue")
+    if ((state === "done" || state === "limited") && turn.answer) this.answerTools(answer, turn)
     if (state === "limited" && turn.limit) this.finding(answer, "note limit", "Limit reached.", turn.limit.message)
     if (state === "cancelled") this.finding(answer, "note", "Stopped.", "")
     if (state === "failed") this.finding(answer, "risk", "The guide could not answer.", turn.error || turn.message || "")
@@ -207,7 +239,129 @@ export default class extends Controller {
     } catch (_) { return }
     this.threadTarget.replaceChildren()
     this.calls(0)
+    if (this.hasHistoryTarget && !this.historyTarget.hidden) this.closeHistory(false)
     this.inputTarget.focus()
+  }
+
+  // The row under a finished answer, as the server renders it on the next
+  // page: copy the Markdown, and draft an issue from it (or, for a draft,
+  // copy the issue and say the map posts nothing).
+  answerTools(answer, turn) {
+    answer.querySelector(".answer-tools")?.remove()
+    const tools = document.createElement("div")
+    tools.className = "answer-tools"
+    const button = (label, attributes) => {
+      const element = document.createElement("button")
+      element.className = "tool"
+      element.type = "button"
+      element.textContent = label
+      for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, value)
+      tools.appendChild(element)
+      return element
+    }
+    const copy = { "data-controller": "copy", "data-copy-text-value": turn.answer, "data-action": "copy#copy" }
+    if (turn.kind === "issue") {
+      button("⎘ copy issue", copy)
+      const note = document.createElement("span")
+      note.className = "cap"
+      note.textContent = "Paste it into your tracker; the map posts nothing."
+      tools.appendChild(note)
+    } else {
+      button("⎘ copy", copy)
+      const draft = button("draft an issue", { "data-action": "guide#draftIssue", "data-guide-source-param": turn.id || "" })
+      if (this.exhausted) draft.disabled = true
+    }
+    answer.appendChild(tools)
+  }
+
+  // The history list: this browser session's conversations, in place of the
+  // thread. Opening one makes it current.
+  async history() {
+    if (!this.hasHistoryTarget) return
+    if (!this.historyTarget.hidden) { this.closeHistory(); return }
+    this.historyTarget.hidden = false
+    this.threadTarget.hidden = true
+    this.historyToggleTarget.setAttribute("aria-expanded", "true")
+    try {
+      const response = await fetch(this.panelTarget.dataset.historyUrl, { credentials: "same-origin", headers: { Accept: "application/json" } })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.message || `HTTP ${response.status}`)
+      this.historyListTarget.innerHTML = data.html
+    } catch (_) {
+      const note = document.createElement("p")
+      note.className = "cap"
+      note.textContent = "The conversations could not be loaded."
+      this.historyListTarget.replaceChildren(note)
+    }
+    const first = this.historyListTarget.querySelector("button.hrow") || this.historyTarget.querySelector(".hh .tool")
+    first?.focus()
+  }
+
+  closeHistory(focus = true) {
+    if (!this.hasHistoryTarget) return
+    this.historyTarget.hidden = true
+    this.threadTarget.hidden = false
+    this.historyToggleTarget.setAttribute("aria-expanded", "false")
+    if (focus) this.historyToggleTarget.focus()
+  }
+
+  async resume(event) {
+    if (this.busy) { this.note("Stop the answer before opening another conversation."); return }
+    const id = event.params.id
+    if (!/^[0-9a-f]{16}$/.test(id || "")) return
+    try {
+      const response = await fetch(`${this.panelTarget.dataset.historyUrl}/${id}`, {
+        method: "POST", credentials: "same-origin",
+        headers: { Accept: "application/json", "X-CSRF-Token": this.csrfToken() }
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) { this.note(data.message || "That conversation could not be opened."); return }
+      this.threadTarget.innerHTML = data.html
+      this.calls(0)
+      this.closeHistory(false)
+      this.threadTarget.focus()
+      this.scroll()
+    } catch (_) {
+      this.note("The guide could not be reached.")
+    }
+  }
+
+  // Units selected on a graph (graph controller, "woods-map:graph-pick"):
+  // a chip names them and hidden fields send them as type:identifier; the
+  // server keeps only the ones the generation has.
+  pick(units) {
+    this.nodes = units.slice(0, MAX_NODES)
+    if (this.hasNodesFieldsTarget) {
+      this.nodesFieldsTarget.replaceChildren(...this.nodes.map((unit) => {
+        const input = document.createElement("input")
+        input.type = "hidden"
+        input.name = "context[nodes][]"
+        input.value = `${unit.type}:${unit.identifier}`
+        return input
+      }))
+    }
+    if (this.hasNodesTarget) {
+      if (this.nodes.length === 0) {
+        this.nodesTarget.hidden = true
+        this.nodesTarget.replaceChildren()
+      } else {
+        const names = this.nodes.slice(0, 3).map((unit) => unit.identifier).join(", ") + (this.nodes.length > 3 ? ` +${this.nodes.length - 3}` : "")
+        const bold = document.createElement("b")
+        bold.textContent = names
+        const clear = document.createElement("button")
+        clear.className = "tool"
+        clear.type = "button"
+        clear.textContent = "clear"
+        clear.setAttribute("aria-label", "Clear the units selected on the graph")
+        clear.addEventListener("click", () => document.dispatchEvent(new CustomEvent("woods-map:graph-pick-clear")))
+        this.nodesTarget.replaceChildren(bold, " selected ", clear)
+        this.nodesTarget.hidden = false
+      }
+    }
+    for (const button of this.needsNodesTargets) {
+      button.disabled = this.exhausted || this.busy || this.nodes.length === 0
+      if (this.nodes.length > 0) button.removeAttribute("title")
+    }
   }
 
   // Selected code lines become context: the rows carry id="L<n>".
@@ -249,7 +403,8 @@ export default class extends Controller {
     this.submitTarget.disabled = busy
     this.stopTarget.hidden = !busy
     this.panelTarget.querySelectorAll(".acts .btn").forEach((button) => {
-      button.disabled = busy || (this.needsLinesTargets.includes(button) && this.linesFieldTarget.value === "")
+      button.disabled = busy || (this.needsLinesTargets.includes(button) && this.linesFieldTarget.value === "") ||
+        (this.needsNodesTargets.includes(button) && this.nodes.length === 0)
     })
   }
 
@@ -258,7 +413,7 @@ export default class extends Controller {
     this.inputTarget.disabled = true
     this.submitTarget.disabled = true
     this.stopTarget.hidden = true
-    this.panelTarget.querySelectorAll(".acts .btn").forEach((button) => { button.disabled = true })
+    this.panelTarget.querySelectorAll(".acts .btn, [data-action~='guide#draftIssue']").forEach((button) => { button.disabled = true })
   }
 
   calls(count) {
