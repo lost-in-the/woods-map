@@ -34,7 +34,6 @@ RSpec.describe 'Reading settings in Chromium', type: :request do
     root = File.expand_path('..', __dir__)
     styles = %w[tokens.css map.css].map { |name| File.read(File.join(root, 'app/assets/stylesheets/woods_map', name)) }
     get '/woods/units/model/User', params: { lens: 'written' }
-    follow_redirect!
     controller = File.read(File.join(root, 'app/javascript/woods_map/controllers/settings_controller.js'))
     data = JSON.generate(html: html_response_document.at_css('main').inner_html, styles: styles.join("\n"),
                          controller: controller).gsub('</', '<\\/')

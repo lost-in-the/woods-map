@@ -36,13 +36,22 @@ RSpec.describe 'Entry lifecycle', type: :request do
     expect(operations(html, 'NotifySubscribersJob#perform').first).to include('neither retried nor discarded')
   end
 
-  it 'picks a mailer action and a controller action, the first by default and for an unknown one' do
+  it 'picks a mailer action and a controller action, the first by default' do
     mailer = page_for('/woods/units/mailer/MailingListMailer/lifecycle')
     expect(mailer.css('[aria-label=action] a[aria-current]').map(&:text)).to eq(['new_post'])
-    controller = page_for('/woods/units/controller/UsersController/lifecycle', action_name: 'nope')
+    controller = page_for('/woods/units/controller/UsersController/lifecycle')
     first = controller.css('[aria-label=action] a').first
     expect(first['aria-current']).to eq('true')
     expect(controller.css('[aria-label=action] a').pluck('href'))
+      .to include('/woods/units/controller/UsersController/lifecycle?action_name=create')
+  end
+
+  it 'answers an unknown action with 404 and the actions the unit has, never another action' do
+    get '/woods/units/controller/UsersController/lifecycle', params: { action_name: 'nope' }
+    expect(response).to have_http_status(:not_found)
+    page = html_response_document
+    expect(page.at_css('.empty-state h2').text).to eq('No action nope on UsersController')
+    expect(page.css('.empty-state a').pluck('href'))
       .to include('/woods/units/controller/UsersController/lifecycle?action_name=create')
   end
 

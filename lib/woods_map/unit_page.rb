@@ -132,7 +132,7 @@ module WoodsMap
     private
 
     def routes_count
-      Array(@metadata['routes']).sum { |_, list| Array(list).size }.nonzero?
+      RoutesView.count_for(@repository, @unit).nonzero?
     end
 
     def lifecycle_count
@@ -174,17 +174,7 @@ module WoodsMap
     end
 
     def history_tile
-      git = @metadata['git']
-      return nil unless git
-
-      { eyebrow: 'History', rows: [
-        ['last', { who: git['last_author'], date: git['last_modified'] }],
-        ['churn',
-         { text: "#{git['commit_count']} #{'commit'.pluralize(git['commit_count'].to_i)}",
-           hot: git['change_frequency'].to_s == 'hot' }],
-        ['people', "#{Array(git['contributors']).size} #{'contributor'.pluralize(Array(git['contributors']).size)}"],
-        ['frequency', git['change_frequency'].to_s]
-      ] }
+      HistoryTile.new(@repository, @unit).tile
     end
   end
 end

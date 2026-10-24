@@ -1,11 +1,11 @@
 <% content_for :title, 'Graph · Woods Map' %>
 <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
 <%= render 'woods_map/shared/crumbs', crumbs: [['graph', nil]], trail: tag.span('', data: { trail_target: 'list' }) %>
-<%= render 'woods_map/shared/ident', title: 'Graph', subtitle: "full-screen neighbourhood, gen #{@repository.generation_number}" %>
+<%= render 'woods_map/shared/ident', title: 'Graph', subtitle: "graph page, gen #{@repository.generation_number}" %>
 <div class="body" data-controller="trail">
   <div class="main inset">
     <%= render 'woods_map/components/empty_state', title: @missing ? "No unit named #{@missing} in gen #{@repository.generation_number}" : 'Pick a centre',
-          text: 'The full-screen graph draws the neighbourhood of one unit, with room for depth two and the blast radius of a change to it. Start from a hub below, or open any unit and choose its Graph tab.' %>
+          text: 'The graph page draws the neighbourhood of one unit, with room for depth two and the blast radius of a change to it. Start from a hub below, or open any unit and choose its Graph tab.' %>
     <section class="sec">
       <header><h2 class="t2">Hubs <%= count_tag(hubs.size) %><%= info_tip('The units with the most dependents, from graph_analysis.json (per identifier). Each opens the full-screen graph centred on it.') %></h2></header>
       <%= render 'woods_map/components/table', label: 'Hubs', min_width: '480px', columns: [{ label: 'unit', width: '55%' }, { label: 'type', width: '25%' }, { label: 'dependents' }],

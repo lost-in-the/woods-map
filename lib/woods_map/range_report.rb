@@ -14,6 +14,8 @@ module WoodsMap
     Emphasis = Struct.new(:identifier, :type, :distance, keyword_init: true)
 
     LENSES = %w[overview changed risks flows tests graph unknown].freeze
+    # Records per page of the Changed lens's long lists.
+    PAGE = { 'changed' => 200, 'affected' => 300 }.freeze
 
     # @param data [Hash] the unchanged report (`WoodsMap::ImpactRange#data`)
     # @param repository [WoodsMap::Repository] the pinned current generation
@@ -97,10 +99,18 @@ module WoodsMap
     # @param root [Hash] a changed record
     # @return [Array<Hash>] affected records whose witness paths start at it
     def reached_from(root)
-      identity = root.values_at('identifier', 'type')
-      affected.select do |record|
-        Array(record['paths']).any? { |path| path['root']&.values_at('identifier', 'type') == identity }
-      end
+      reached_index.fetch(root.values_at('identifier', 'type'), [])
+    end
+
+    # @return [Boolean] both endpoints are one generation: nothing can have changed
+    def same_payload?
+      !from_generation.nil? && from_generation == to_generation
+    end
+
+    # @return [Integer, nil] the 0-based position of the first focused changed
+    #   record, so a focus URL opens the page that shows it
+    def first_focused_change
+      changed.index { |record| focused?(record) }
     end
 
     # @return [Hash, nil] the unit the Graph tab centres on: the first focused
@@ -122,6 +132,16 @@ module WoodsMap
                         .map { |a| Emphasis.new(identifier: a['identifier'], type: a['type'], distance: a['distance']) }
       (changes + reached).uniq { |e| [e.identifier, e.type] }
     end
+
+    # Root identity => the affected records whose witness paths start there,
+    # built once instead of a scan of every affected record per change.
+    def reached_index
+      @reached_index ||= affected.each_with_object({}) do |record, index|
+        roots = Array(record['paths']).filter_map { |path| path['root']&.values_at('identifier', 'type') }
+        roots.uniq.each { |root| (index[root] ||= []) << record }
+      end
+    end
+    private :reached_index
 
     # The emphasis in the shape the graph explorer reads (`blast.affected`).
     GraphBlast = Struct.new(:affected)

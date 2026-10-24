@@ -119,7 +119,7 @@ module WoodsMap
 
     def load_frame(repository)
       @freshness = repository.freshness
-      @tree = WoodsMap::FileTree.for(repository)
+      @files_sheet = true
       @nav = primary_nav(:landscape)
       @landscape = landscape_for(repository)
       @export = WoodsMap::LandscapeExport.new(@landscape, generation: repository.generation_number,

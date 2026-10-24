@@ -13,6 +13,7 @@ module WoodsMap
     include WoodsMap::UnitHistory
     include WoodsMap::GraphOverlays
     include WoodsMap::UnitLifecycle
+    include WoodsMap::UnknownAction
 
     LENS_COOKIE = 'woods_map_lens'
 
@@ -21,7 +22,7 @@ module WoodsMap
     def index
       with_repository do |repository|
         @units_index = WoodsMap::UnitsIndex.new(repository.unit_listing, type: params[:type], page: params[:page])
-        @tree = WoodsMap::FileTree.for(repository)
+        @files_sheet = true
         @freshness = repository.freshness
         @nav = primary_nav(:units)
         render :index
@@ -29,8 +30,7 @@ module WoodsMap
     end
 
     def show
-      return redirect_to_remembered_lens if params[:lens].present?
-
+      remember_lens
       with_unit do
         @lifecycle = lifecycle_for(@unit)
         @callers = WoodsMap::Callers.for(@repository).by_method(@unit['identifier'], @unit['type'])
@@ -64,12 +64,10 @@ module WoodsMap
         end
 
         @passage = WoodsMap::Passage.new(@repository, @unit, action: params[:action_name])
-        @ladder_model = @passage.ladder_model
-        @ladder = @ladder_model && lifecycle_for(@ladder_model)
-        @ladder_event = ladder_event(@ladder)
-        next render_passage_mermaid if mermaid_request?
+        next render_unknown_action('passage', @passage.actions) if unknown_action?(@passage.actions)
 
-        render :passage
+        load_ladder
+        mermaid_request? ? render_passage_mermaid : render(:passage)
       end
     end
 
@@ -128,20 +126,28 @@ module WoodsMap
         @page = WoodsMap::UnitPage.new(repository, @unit)
         @definition = WoodsMap::CompositeSource.new(@unit).definition_line
         unless mermaid_request?
-          @tree = WoodsMap::FileTree.for(repository)
+          @files_sheet = true
           @freshness = repository.freshness
         end
         yield
       end
     end
 
+    # A `?lens=` the page names wins and is remembered for the bare URL (D-6),
+    # so a shared link shows the lens it names; anything else falls back to
+    # the remembered lens, then to as written.
     def lens
-      cookies[LENS_COOKIE].presence || 'written'
+      requested_lens || WoodsMap::CodeView::LENSES.find { |name| name == cookies[LENS_COOKIE] } || 'written'
     end
 
-    def redirect_to_remembered_lens
-      cookies[LENS_COOKIE] = { value: params[:lens], expires: 1.year.from_now, same_site: :lax }
-      redirect_to woods_map.unit_path(type: params[:type], identifier: routed_identifiers.first)
+    def requested_lens
+      WoodsMap::CodeView::LENSES.find { |name| name == params[:lens] }
+    end
+
+    def remember_lens
+      return unless requested_lens
+
+      cookies[LENS_COOKIE] = { value: requested_lens, expires: 1.year.from_now, same_site: :lax }
     end
 
     # A model's (or state machine's) Lifecycle tab: its callback chains.
@@ -160,12 +166,21 @@ module WoodsMap
     # point (FR-6, woods-map#91).
     def entry_lifecycle
       @entry_lifecycle = WoodsMap::EntryLifecycle.new(@repository, @unit, action: params[:action_name])
+      return render_unknown_action('lifecycle', @entry_lifecycle.actions) if unknown_action?(@entry_lifecycle.actions)
+
       @view = WoodsMap::EntryLifecycle::VIEWS.find { |view| view == params[:view] } ||
               WoodsMap::EntryLifecycle::VIEWS.first
       return render_entry_lifecycle_mermaid if mermaid_request?
 
       @flags = WoodsMap::TrailFlags.new(@repository, @entry_lifecycle.steps)
       render :entry_lifecycle
+    end
+
+    # The Passage's callback ladder: the model the action saves and its event.
+    def load_ladder
+      @ladder_model = @passage.ladder_model
+      @ladder = @ladder_model && lifecycle_for(@ladder_model)
+      @ladder_event = ladder_event(@ladder)
     end
 
     # The ladder's event: ?event= when valid, else the one the action implies, else the first chain.

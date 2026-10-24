@@ -74,7 +74,7 @@ module WoodsMap
     def notes(identifier)
       notes = []
       hub = Array(@analysis['hubs']).find { |h| h['identifier'] == identifier }
-      notes << "hub, #{hub['dependent_count']} dependents" if hub
+      notes << "hub, #{hub['dependent_count']} dependents by identifier" if hub
       notes << 'in a cycle' if Array(@analysis['cycles']).any? { |cycle| cycle.include?(identifier) }
       rank = @graph.dig('pagerank', identifier)
       notes << "weight #{format('%.3f', rank)}" if rank
@@ -111,24 +111,28 @@ module WoodsMap
       "#{node_count} units is over the flowchart budget of #{NODE_BUDGET}; narrow the types or mechanisms to draw it"
     end
 
-    # Mermaid flowchart text for the filtered edges.
+    # Mermaid flowchart text for the filtered edges: each unit declared once
+    # with its label, the centre first, then the edges by id; the centre
+    # carries the `focus` class, which the text declares.
     #
     # @return [String]
     def mermaid
-      lines = ['flowchart LR', "  #{mermaid_node(*@focus)}"]
+      lines = ['flowchart LR'] + mermaid_nodes.map { |node| "  #{mermaid_node(*node)}" }
       edges.each do |edge|
-        from = mermaid_node(edge.from, edge.from_type)
-        to = mermaid_node(edge.to, edge.to_type)
-        lines << "  #{from} -->|#{edge.via}| #{to}"
+        lines << "  #{node_id(edge.from, edge.from_type)} -->|#{edge.via}| #{node_id(edge.to, edge.to_type)}"
       end
-      lines << "  class #{node_id(*@focus)} focus"
-      lines.join("\n")
+      (lines + ['  classDef focus stroke-width:3px', "  class #{node_id(*@focus)} focus"]).join("\n")
     end
 
     private
 
     def node_id(identifier, type)
       "n_#{Digest::SHA256.hexdigest([type, identifier].to_json)[0, 16]}"
+    end
+
+    # The centre, then every other unit an edge names, each once.
+    def mermaid_nodes
+      ([@focus] + edges.flat_map { |edge| [[edge.from, edge.from_type], [edge.to, edge.to_type]] }).uniq
     end
 
     def mermaid_node(identifier, type)

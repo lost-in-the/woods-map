@@ -24,10 +24,10 @@ RSpec.describe WoodsMap::GenerationMemo do
     owner = action_owner
     owner['metadata']['unresolved_renders'] = [{ 'name' => 'Ghost', 'reason' => 'constant_missing' }]
     repository = action_repository([owner])
-    allow(WoodsMap::UnresolvedRenders).to receive(:read).and_call_original
+    expect_any_instance_of(WoodsMap::ImpactUnknowns) # rubocop:disable RSpec/AnyInstance -- each review builds its own
+      .to receive(:read_unresolved_renders).once.and_call_original
     first = action_review(repository, owner['identifier']).unknowns.map(&:why)
     expect(action_review(repository, owner['identifier']).unknowns.map(&:why)).to eq(first)
     expect(first).to eq(['render Ghost (constant missing)'])
-    expect(WoodsMap::UnresolvedRenders).to have_received(:read).once
   end
 end

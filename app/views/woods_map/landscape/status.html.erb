@@ -6,7 +6,7 @@
     <section class="sec">
       <header><h2 class="t2">What this generation publishes <%= count_tag("#{s.available} of #{s.items.size}") %><%= info_tip('Each fact the Landscape reads, whether gen ' + @repository.generation_number.to_s + ' publishes it, the Woods work that does, and what the tabs draw from it. A missing fact is a limit the tabs name, never something the map derives.') %></h2></header>
       <%= render 'woods_map/components/table', label: 'Landscape data', min_width: '760px',
-            columns: [{ label: 'fact', width: '22%' }, { label: 'state', width: '96px' }, { label: 'here', width: '24%' }, { label: 'from', width: '16%' }, { label: 'draws' }],
+            columns: [{ label: 'fact', width: '22%' }, { label: 'state', width: '128px' }, { label: 'here', width: '24%' }, { label: 'from', width: '16%' }, { label: 'draws' }],
             rows: s.items.map { |i| { cells: [tag.b(i.name), i.available ? chip(:fresh, 'published') : chip(:note, 'absent'), i.detail, tag.span(i.source, class: 'dim'), i.draws] } } %>
       <p class="cap">The index's own state, freshness and retained generations are on the <%= link_to 'status page', woods_map.root_path %>.</p>
     </section>

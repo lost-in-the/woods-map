@@ -33,6 +33,8 @@ RSpec.configure do |config|
     WoodsMap::GenerationFacets.reset!
     WoodsMap::GenerationSnapshot.reset!
     WoodsMap::GenerationMemo.reset_all!
+    # Specs stub a repository's graph under the fixture's generation key.
+    WoodsMap::TreesController.reset!
   end
 
   # The token-less loopback mode requires a loopback Host (DNS rebinding,

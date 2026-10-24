@@ -15,8 +15,9 @@ token system, needs a v8 pass; **partial** = part of the page exists;
 ## Page map
 
 Global bar: Units, Landscape, Graph, ERD, Impact, History, Trail; search palette on
-every page; Guide panel docks on the right; `☰ files` in the breadcrumb band
-opens the file tree.
+every page; Guide panel docks on the right; ☰ in the bar (every width) and `☰ files`
+in the breadcrumb band open the files sheet, which fetches the tree once per
+generation and carries the primary nav below 960 ([files sheet note](notes/files-sheet.md)).
 
 | Route | Page | Requirements | Board | State |
 |---|---|---|---|---|

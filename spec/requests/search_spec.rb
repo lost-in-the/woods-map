@@ -34,4 +34,37 @@ RSpec.describe 'Search', type: :request do
     expect(tables['items'].first).to include('identifier' => 'table:users', 'type' => 'database_table')
     expect(json['complete']).to be(true)
   end
+
+  # A code search that stopped at the scan budget says so, names how
+  # much it read, and never claims to have searched every unit.
+  it 'says why an empty code search stopped instead of claiming it searched everything' do
+    partial = { 'results' => [], 'partial' => true,
+                'scan' => { 'scanned_units' => 500, 'candidate_units' => 8_000 },
+                'completeness' => { 'status' => 'partial', 'reason' => 'scan_budget' } }
+    allow_any_instance_of(WoodsMap::Repository).to receive(:search).and_return(partial) # rubocop:disable RSpec/AnyInstance
+    get '/woods/search', params: { q: 'deliver_later', in: 'code' }
+    text = html_response_document.at_css('main').text.gsub(/\s+/, ' ')
+
+    expect(text).to include("stopped after reading 500 of 8000 units' source (scan budget), " \
+                            'so a match may still exist')
+    expect(text).not_to include('Searched the source of all')
+    expect(text).not_to include('code search for full text')
+    expect(text).to include('Try name search or path search.')
+  end
+
+  # A path result names the units that own the file.
+  it 'links each path result to the units that own the file' do
+    get '/woods/search', params: { q: 'app/models/user.rb', in: 'path' }
+    row = html_response_document.css('table[aria-label="Search results"] tbody tr').first
+
+    expect(row.at_css('a[href="/woods/units/model/User"]')).to be_present
+    expect(row.text).to include('model')
+  end
+
+  # The exact name leads the name results.
+  it 'puts the exact name first in name search' do
+    get '/woods/search', params: { q: 'user', in: 'name' }
+    first = html_response_document.at_css('table[aria-label="Search results"] tbody tr a[href^="/woods/units/"]')
+    expect(first['href']).to eq('/woods/units/model/User')
+  end
 end

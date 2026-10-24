@@ -12,7 +12,7 @@ module WoodsMap
 
         @owners = repository.file_owners(@file_path)
         @unresolved = repository.unresolved_file_identifiers(@file_path)
-        @tree = WoodsMap::FileTree.for(repository)
+        @files_sheet = true
         @freshness = repository.freshness
         render :show
       end

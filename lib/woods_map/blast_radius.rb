@@ -51,10 +51,16 @@ module WoodsMap
       @graph.dig('pagerank', identifier).to_f
     end
 
+    # Distinct typed units with an edge to this one in the generation's
+    # graph (`reverse_via` records carry the source's type). It is not the
+    # count graph_analysis gives a hub, which Woods takes per identifier when
+    # it analyses the graph; {#notes} labels that one as such.
+    #
     # @param identifier [String]
-    # @return [Integer] how many units depend on it
+    # @return [Integer] typed units that depend on it
     def dependent_count(identifier)
-      Array(@graph.dig('reverse_via', identifier)).pluck('source').uniq.size
+      Array(@graph.dig('reverse_via', identifier))
+        .map { |record| [record['source'], record['source_type'] || type_of(record['source'].to_s)] }.uniq.size
     end
 
     # @return [Array<Affected>] every unit within reach, breadth first, before the filters
@@ -62,9 +68,14 @@ module WoodsMap
       @reached ||= collect
     end
 
+    # Nearest first; within a distance by PageRank weight, heaviest first, so
+    # units nothing depends on (documentation that mentions the focus) sink
+    # below the ones a change would ripple through; then by type and name.
+    #
     # @return [Array<Affected>] after the type, mechanism and show filters
     def affected
-      reached.select { |a| keep?(a) }
+      @affected ||= reached.select { |a| keep?(a) }
+                           .sort_by { |a| [a.distance, -weight(a.identifier), a.type, a.identifier] }
     end
 
     # @return [Array<Affected>] one edge away from the focus
@@ -83,10 +94,11 @@ module WoodsMap
     end
 
     # @param identifier [String]
-    # @return [Array<String>] notes from the analysis: hub, cycle, bridge
+    # @return [Array<String>] notes from the analysis: hub, cycle, bridge.
+    #   A hub's count is graph_analysis', per identifier, and says so.
     def notes(identifier)
       notes = []
-      notes << "hub, #{hubs[identifier]} dependents" if hubs.key?(identifier)
+      notes << "hub, #{hubs[identifier]} dependents by identifier" if hubs.key?(identifier)
       notes << 'in a cycle' if cycles.include?(identifier)
       notes << 'bridge' if bridges.include?(identifier)
       notes
@@ -123,6 +135,7 @@ module WoodsMap
       lines = ['flowchart LR']
       involved.uniq.each { |id| lines << "  #{node_id(id)}[\"#{id}\"]" }
       affected.each { |a| lines << "  #{node_id(a.from)} -- #{a.via} --> #{node_id(a.identifier)}" }
+      lines << '  classDef focus stroke-width:3px' if focus.any?
       focus.each { |id| lines << "  class #{node_id(id)} focus" }
       lines.join("\n")
     end

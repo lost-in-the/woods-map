@@ -9,4 +9,4 @@
       link: ->(**opts) { woods_map.unit_graph_path(type: @page.type, identifier: @page.identifier, **opts.except(:blast).merge(since).compact) },
       unit_url: woods_map.unit_graph_path(type: '__type__', identifier: '__identifier__', depth: n.depth, direction: n.direction, **since),
       mermaid_url: woods_map.unit_graph_mmd_path(type: @page.type, identifier: @page.identifier, direction: n.direction, depth: n.depth, types: params[:types].presence, via: params[:via].presence),
-      rail_extra: tag.div('full screen', class: 'grp') + tag.ol(tag.li(safe_join([tag.span('·', class: 'k'), tag.span(safe_join([link_to('full-screen graph', woods_map.graph_path(centre: @page.identifier, type: @page.type, depth: n.depth, direction: n.direction)), ' ', tag.span('blast radius tint, more room', class: 'own')]))]))) %>
+      rail_extra: tag.div('own page', class: 'grp') + tag.ol(tag.li(safe_join([tag.span('·', class: 'k'), tag.span(safe_join([link_to('graph page', woods_map.graph_path(centre: @page.identifier, type: @page.type, depth: n.depth, direction: n.direction)), ' ', tag.span('blast radius tint, more room', class: 'own')]))]))) %>

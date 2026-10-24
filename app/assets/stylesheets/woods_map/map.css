@@ -390,3 +390,47 @@ html.no-js .wm .amb-pop[hidden]{display:block}
    author that filters the timeline (woods-map#92) is a link, not a tooltip. */
 .wm .tbl td .who{max-width:100%}
 .wm a.who{cursor:pointer}
+/* A diagram over its budget (R-4) keeps its Mermaid text folded, as a drawn panel's toggle folds it. */
+.wm .dia .mmd-src{margin:var(--s3) 0 0}
+.wm .dia .mmd-src > summary{cursor:pointer;color:var(--link);font-family:var(--ff-ui);font-size:var(--fs-12);width:max-content}
+.wm .dia .mmd-src > summary:focus-visible{outline:2px solid var(--select);outline-offset:2px}
+.wm .dia .mmd-src > pre{margin:var(--s3) 0 0}
+
+/* Freshness: the bar's words link to the status page's reasons. */
+.wm .bar-fresh a.why{color:inherit;text-decoration:none}
+.wm .bar-fresh a.why:hover .w{text-decoration:underline}
+.wm .fresh-list{margin:var(--s1) 0 var(--s2);padding-left:var(--s5);list-style:disc}
+/* Navigation at every width (M10, B4 to B9). ☰ opens the files sheet at every width,
+   with a 32px hit area. The sheet's header stays put while the nav, files and sections
+   scroll beneath it, and the tree's filter stays at the top of that scroll. Below 960 the
+   sheet carries the primary nav the bar hides. Below 640 the bar keeps a usable search
+   field. The status bar wraps instead of clipping. */
+.wm .bar .menu-toggle{display:inline-flex;align-items:center;justify-content:center;min-width:32px;min-height:32px;padding:0}
+.wm .sheet{overflow:hidden}
+.wm .sheet .sheet-scroll{flex:1;min-height:0;overflow:auto}
+.wm .sheet .tree .filter{position:sticky;top:0;z-index:1;background:var(--panel)}
+.wm .sheet .tree-status{margin:0;padding:0 var(--s4);color:var(--mut);font-size:var(--fs-12)}
+.wm .sheet .tree-status:empty{display:none}
+.wm .sheet-nav{display:none}
+.wm .sheet-nav ul{list-style:none;margin:0;padding:var(--s3) var(--s4);display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);border-bottom:1px solid var(--rule);font-family:var(--ff-ui);font-weight:500}
+.wm .sheet-nav a{display:inline-block;padding:var(--s1) 0;color:var(--mut)}
+.wm .sheet-nav a[aria-current]{color:var(--bright)}
+@container wm (max-width:959px){ .wm .sheet-nav{display:block} }
+@container wm (max-width:639px){
+  .wm .bar{gap:var(--s4)}
+  .wm .bar .bar-search{width:auto;flex:1 1 120px;justify-content:flex-start;padding:0 var(--s3)}
+  .wm .bar .bar-search .q{display:block}
+  .wm .status{flex-wrap:wrap;height:auto;min-height:32px;row-gap:var(--s1);column-gap:var(--s4);padding-block:var(--s2);white-space:normal}
+}
+/* The peek (B16) starts after the gutters, so it is at most the code region's width less
+   the gutters and its right margin, and it sticks just after the gutters, not under them. */
+.wm .cvwrap .cv .peek{left:52px;max-width:calc(100cqw - 52px - var(--s4))}
+@container wm (max-width:639px){ .wm .cvwrap .cv .peek{left:68px;max-width:calc(100cqw - 68px - var(--s4))} }
+/* The cross-unit timeline below 640 (N7): the lane names take at most two fifths of the
+   width and end in an ellipsis, so the plot keeps the rest and every dot is on screen. */
+@container wm (max-width:639px){
+  .wm .tl{grid-template-columns:minmax(0,40%) minmax(0,1fr);overflow-x:visible}
+  .wm .tl-names{min-width:0}
+  .wm .tl-names li{display:block;line-height:var(--s6);overflow:hidden;text-overflow:ellipsis}
+  .wm .tl-plot{min-width:0}
+}

@@ -158,7 +158,9 @@ module WoodsMap
       return [] unless analysis.key?('hubs')
 
       hub = Array(analysis['hubs']).find { |h| h['identifier'] == identity.first }
-      hub ? [flag(identity, :hub, "a hub, #{hub['dependent_count']} dependents", 'graph_analysis hubs')] : []
+      return [] unless hub
+
+      [flag(identity, :hub, "a hub, #{hub['dependent_count']} dependents by identifier", 'graph_analysis hubs')]
     end
 
     def primary_type(identifier)

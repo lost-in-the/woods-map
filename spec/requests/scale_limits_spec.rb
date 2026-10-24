@@ -71,7 +71,7 @@ RSpec.describe 'Scale limits', type: :request do
       expect(panel.at_css('.dw .cap:not(.refusal)').text)
         .to match(/Its Mermaid text, .+, is not carried in this page\./)
       expect(document.css('button[data-controller=copy][data-mermaid-name]:not([data-pr-comment])')).to be_empty
-      expect(panel.at_css('a[data-mermaid-url]')['href']).to start_with('/woods/units/model/User/graph.mmd')
+      expect(panel.at_css('.lyr').text).to eq('no .mmd over the budget')
     end
 
     it 'copies an unbudgeted diagram from its .mmd route' do
@@ -85,7 +85,7 @@ RSpec.describe 'Scale limits', type: :request do
   it 'still carries Mermaid text under the budget' do
     stub_const('WoodsMap::Neighbourhood::NODE_BUDGET', 0)
     get '/woods/units/model/User/graph'
-    source = html_response_document.at_css('#graph-flowchart pre[data-diagram-target=source]')
+    source = html_response_document.at_css('#graph-flowchart details.mmd-src pre')
     expect(source.text).to start_with('flowchart')
   end
 end

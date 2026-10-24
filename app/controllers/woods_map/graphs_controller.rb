@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 module WoodsMap
-  # The full-screen graph (M5, notes/graph-page.md): the Graph tab's explorer
-  # with the whole page for the canvas, centred on a typed unit named by
+  # The graph page (M5, notes/graph-page.md): the Graph tab's explorer with
+  # the canvas filling the viewport below the bar and crumbs (not the
+  # browser's full-screen mode), centred on a typed unit named by
   # identifier and type, with the blast radius of a change to it tinted on
   # request. Without a centre it offers the hubs as starting points.
   class GraphsController < ApplicationController
@@ -27,7 +28,7 @@ module WoodsMap
 
     def load_frame(repository)
       @freshness = repository.freshness
-      @tree = WoodsMap::FileTree.for(repository)
+      @files_sheet = true
       @nav = primary_nav(:graph)
     end
 

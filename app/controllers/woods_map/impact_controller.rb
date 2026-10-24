@@ -42,7 +42,7 @@ module WoodsMap
     def load_frame(repository)
       @repository = repository
       @freshness = repository.freshness
-      @tree = WoodsMap::FileTree.for(repository)
+      @files_sheet = true
       @nav = primary_nav(:impact)
       @lens = LENSES.include?(params[:lens]) ? params[:lens] : 'changed'
     end
