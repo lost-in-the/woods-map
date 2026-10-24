@@ -6,6 +6,8 @@ module WoodsMap
   # identifier and type, with the blast radius of a change to it tinted on
   # request. Without a centre it offers the hubs as starting points.
   class GraphsController < ApplicationController
+    include WoodsMap::GraphOverlays
+
     HUBS_SHOWN = 24
 
     def show
@@ -16,6 +18,8 @@ module WoodsMap
 
         @neighbourhood = neighbourhood(repository)
         @blast = blast(repository) if params[:blast] == '1'
+        @clusters = clusters(repository)
+        load_graph_overlays(repository, @neighbourhood, @centre['identifier'], @centre['type'])
         render :show
       end
     end
@@ -51,6 +55,14 @@ module WoodsMap
     # to the explorer's depth, the impact page's own model.
     def blast(repository)
       WoodsMap::BlastRadius.new(repository, focus: @centre['identifier'], depth: @neighbourhood.depth)
+    end
+
+    # The published domain clusters (woods#799) as [identifier, type, cluster]
+    # for the canvas's clusters layout; identifier-level like the analysis.
+    def clusters(repository)
+      Array(repository.graph_analysis['domain_clusters']).flat_map do |cluster|
+        Array(cluster['typed_members']).map { |member| [member['identifier'], member['type'], cluster['name']] }
+      end
     end
 
     helper_method def hubs

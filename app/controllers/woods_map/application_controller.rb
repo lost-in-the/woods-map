@@ -69,12 +69,10 @@ module WoodsMap
     #   :history, :trail
     # @return [Array<Array(String, String, Boolean)>] label, href, current?
     def primary_nav(current = nil)
-      [['Units', woods_map.units_path], ['Graph', woods_map.graph_path], ['ERD', woods_map.erd_path],
-       ['Impact', woods_map.impact_path], ['History', woods_map.history_path],
-       ['Trail', woods_map.trail_path]].map do |label, href|
-        [label, href,
-         label.casecmp?(current.to_s)]
-      end
+      pages = [['Units', woods_map.units_path], ['Landscape', woods_map.landscape_path],
+               ['Graph', woods_map.graph_path], ['ERD', woods_map.erd_path], ['Impact', woods_map.impact_path],
+               ['History', woods_map.history_path], ['Trail', woods_map.trail_path]]
+      pages.map { |label, href| [label, href, label.casecmp?(current.to_s)] }
     end
 
     # @return [WoodsMap::Configuration]

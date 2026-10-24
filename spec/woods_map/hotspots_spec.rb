@@ -1,0 +1,58 @@
+# frozen_string_literal: true
+
+RSpec.describe WoodsMap::Hotspots do
+  def hotspots(&block)
+    WoodsMap::Repository.open(FIXTURE_INDEX) { |repository| block.call(described_class.new(repository)) }
+  end
+
+  it 'reads hubs, bridges and cycles from graph_analysis.json' do
+    hotspots do |h|
+      expect(h).to be_analysed
+      expect(h.hubs).to all(include('identifier'))
+      expect(h.risks.map(&:kind).uniq - ['bridge', 'cycle', 'uncovered hub', 'orphans', 'undeclared edge']).to be_empty
+    end
+  end
+
+  it 'counts edges between layers, leaving out test and migration bookkeeping' do
+    hotspots do |h|
+      coupling = h.coupling
+      expect(coupling.keys - WoodsMap::Hotspots::LAYERS).to be_empty
+      expect(coupling.values.flat_map(&:values)).to all(be >= 0)
+    end
+  end
+
+  it 'ranks units by commits weighed against dependents when the nodes carry commit counts' do
+    hotspots do |h|
+      expect(h.churn?).to be(true)
+      scores = h.churn.map { |row| row[:commits] * (row[:dependents] + 1) }
+      expect(scores).to eq(scores.sort.reverse)
+    end
+  end
+
+  it 'draws churn against dependents as a quadrant chart, the most changed and depended upon top right' do
+    hotspots do |h|
+      text = h.quadrant_mermaid
+      expect(text).to start_with('quadrantChart').and include('quadrant-1 Review carefully')
+      points = text.lines.grep(/: \[/).map { |line| line[/\[(.*)\]/, 1].split(', ').map(&:to_f) }
+      expect(points).not_to be_empty
+      expect(points.flatten).to all(be_between(0.02, 0.98))
+      expect(text).not_to include('::')
+    end
+  end
+
+  it 'has no quadrant without commit counts' do
+    hotspots do |h|
+      allow(h).to receive(:churn).and_return([])
+      expect(h.quadrant_mermaid).to be_nil
+    end
+  end
+
+  it 'draws only the forward layering as a sankey, so the flow has no cycle' do
+    hotspots do |h|
+      flow = h.forward_flow
+      order = WoodsMap::Hotspots::LAYERS.map { |layer| layer.tr('_', ' ').pluralize }
+      expect(flow).to all(satisfy { |from, to, count| order.index(to) > order.index(from) && count.positive? })
+      expect(h.sankey_mermaid).to start_with("sankey-beta\n\n") if flow.any?
+    end
+  end
+end

@@ -23,13 +23,37 @@ steps table and the same panel tools.
   validation, in the transaction, after commit, and another process. Empty
   lanes are left out. Validation also runs inside the save's transaction. It
   has its own lane because it can stop the chain before any write.
-- **Budgets (R-4).** The flowchart and the lanes count nodes against
+- **Budgets (R-4).** The flowchart, the lanes and the C4 dynamic view count nodes against
   `Lifecycle::FLOWCHART_BUDGET` (150, the neighbourhood's budget). The
   sequence keeps `SEQUENCE_BUDGET`.
 
-**C4-dynamic (B-23)** is not offered. It needs container attribution from
-W-9 ([woods#759](https://github.com/lost-in-the/woods/issues/759)), and no
-board designs it. The rail names it as a limit.
+**C4 dynamic (B-23)** (`?view=dynamic`, key `k`) is offered when the
+generation publishes container attribution (W-9,
+[woods#759](https://github.com/lost-in-the/woods/issues/759)). Without it the
+view control keeps three views and the rail names W-9 as the limit. No board
+designs it, so this note records what it shows (`WoodsMap::DynamicView`):
+
+- A `flowchart LR` in C4 notation. Each container is a subgraph labelled
+  with its name and technology, as on the Landscape page. Each arrow names
+  its mechanism, and asynchronous arrows are dashed.
+- The model event's chain runs in "the process that saves" the model. The
+  index cannot say whether that is the web process or the job runner, and
+  the rail says so.
+- The transaction steps lead to the write in the model's database, drawn as
+  a cylinder `table · INSERT|UPDATE|DELETE`. The commit callbacks follow the
+  write.
+- Each job or mailer a step hands work to sits in the container W-9
+  attributes it to. A mailer also reaches Mail delivery.
+- A controller's Passage draws the same view under "Across containers":
+  - the request, the before filters, the action, the templates and the
+    response, all in the web process;
+  - when the callback ladder applies, the save of its model branches off the
+    action.
+
+  The index does not say which outcome renders, so the save is not ordered
+  against the render. A mailer passage has no such panel.
+- `DynamicView::BUDGET` (150 nodes) is the budget. Both texts have `.mmd`
+  URLs: `lifecycle.mmd?view=dynamic` and `passage.mmd?view=dynamic`.
 
 ## State diagrams
 

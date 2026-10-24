@@ -1,0 +1,63 @@
+{
+  "entry_point": "UsersController#show",
+  "generated_at": "2026-10-18T00:00:00Z",
+  "max_depth": 3,
+  "route": {
+    "path": "/users/:id",
+    "verb": "GET"
+  },
+  "steps": [
+    {
+      "file_path": "app/controllers/users_controller.rb",
+      "operations": [
+        {
+          "file": null,
+          "line": null,
+          "method": "verify_authenticity_token",
+          "target": null,
+          "type": "call"
+        },
+        {
+          "file": "app/controllers/users_controller.rb",
+          "line": 12,
+          "method": "find",
+          "target": "User",
+          "type": "call"
+        },
+        {
+          "condition": "@user.activated?",
+          "else_ops": [
+            {
+              "file": "app/controllers/users_controller.rb",
+              "line": 16,
+              "render_method": "redirect_to",
+              "status_code": 302,
+              "type": "response"
+            }
+          ],
+          "file": "app/controllers/users_controller.rb",
+          "kind": "if",
+          "line": 13,
+          "then_ops": [
+            {
+              "file": "app/controllers/users_controller.rb",
+              "line": 14,
+              "render_method": "render",
+              "status_code": 200,
+              "type": "response"
+            }
+          ],
+          "type": "conditional"
+        }
+      ],
+      "type": "controller",
+      "unit": "UsersController#show"
+    },
+    {
+      "file_path": "app/models/user.rb",
+      "operations": [],
+      "type": "model",
+      "unit": "User"
+    }
+  ]
+}

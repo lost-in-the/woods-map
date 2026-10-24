@@ -122,7 +122,7 @@ module WoodsMap
     private
 
     def build
-      capabilities = RepositoryFlows.capabilities
+      capabilities = RepositoryAssembledFlows.capabilities
       unless capabilities[:mail_deliveries]
         @limits['this Woods does not follow mail deliveries into the mailer (woods#755)'] += 1
       end

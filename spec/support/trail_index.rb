@@ -153,7 +153,7 @@ module TrailIndex
   # Skip an example the bundled Woods cannot answer yet (woods#755), so the
   # suite stays green against Woods main until the flow additions land.
   def require_woods(*capabilities)
-    missing = capabilities.reject { |name| WoodsMap::RepositoryFlows.capabilities.fetch(name) }
+    missing = capabilities.reject { |name| WoodsMap::RepositoryAssembledFlows.capabilities.fetch(name) }
     skip "needs Woods #{missing.join(', ')} (woods#755)" if missing.any?
   end
 
@@ -163,13 +163,13 @@ module TrailIndex
       trail_index(trail_root)
       WoodsMap.configuration.index_dir = trail_root
       WoodsMap::FileTree.reset!
-      WoodsMap::RepositoryFlows.reset!
+      WoodsMap::RepositoryAssembledFlows.reset!
       WoodsMap::Erd.reset!
     end
     group.after do
       WoodsMap.configuration.index_dir = FIXTURE_INDEX
       WoodsMap::FileTree.reset!
-      WoodsMap::RepositoryFlows.reset!
+      WoodsMap::RepositoryAssembledFlows.reset!
       WoodsMap::Erd.reset!
       FileUtils.remove_entry(trail_root)
     end

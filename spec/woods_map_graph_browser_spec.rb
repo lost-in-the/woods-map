@@ -62,9 +62,10 @@ RSpec.describe WoodsMap do
   delegate :drawing, to: :GraphBrowserRun
 
   it 'draws every element of a 300-unit neighbourhood and times the first frame' do
-    warn format('graph canvas, 300 units / 1000 edges: first draw %<ms>.1f ms (%<timings>s); radial layout ' \
-                '%<radial>.1f ms; calibration loop (5e7 iterations) %<calibration>.1f ms',
-                ms: drawing['ms'], radial: drawing['radialMs'], calibration: drawing['calibrationMs'],
+    warn format('graph canvas, 300 units / 1000 edges: first draw %<ms>.1f ms (%<timings>s) after a %<warm>.1f ms ' \
+                'warm-up; radial layout %<radial>.1f ms; calibration loop (5e7 iterations) %<calibration>.1f ms',
+                ms: drawing['ms'], warm: drawing['warmMs'], radial: drawing['radialMs'],
+                calibration: drawing['calibrationMs'],
                 timings: drawing['timings'].map { |key, value| "#{key} #{value.round}" }.join(', '))
     expect(drawing).to include('drawn' => true, 'nodes' => 300, 'edges' => 1000, 'panelVisible' => true,
                                'fallbackVisible' => false, 'layoutsVisible' => true, 'canvases' => be_positive)
@@ -104,9 +105,28 @@ RSpec.describe WoodsMap do
     expect(drawing.dig('tinted', 'facts')).to include('a change here reaches 3 units, 2 drawn')
   end
 
+  it 'boxes the units of each published domain cluster in the clusters layout, and unboxes them after (woods#799)' do
+    expect(drawing['clusters']).to eq('boxes' => %w[Billing Shipping], 'boxed' => 'Billing', 'unboxed' => true)
+  end
+
   it 'fills the units a range report records as changed and names them in the facts' do
     expect(drawing['ranges']).to include('changed' => ['n_1'], 'direct' => ['n_2'])
     expect(drawing.dig('ranges', 'facts')).to include('1 changed and 1 affected in the report, 2 drawn')
+  end
+
+  it 'outlines the drawn steps of a flow and the edge between them, and plays it from the first step (A-4)' do
+    flow = drawing['flow']
+    expect([flow['nodes'], flow['edges'], flow['current']]).to eq([flow['expected'], [flow['edge']], [flow['source']]])
+    expect(flow['status']).to include('flow PostsController#create, step 1 of 3')
+    expect(flow['facts']).to include('flow PostsController#create, 2 of 3 steps drawn')
+    expect(flow['stopped']).to be(true)
+  end
+
+  it 'fills the units a window of commits touched, narrows to one commit and clears (A-6)' do
+    timeline = drawing['timeline']
+    expect(timeline).to include('shown' => true, 'window' => %w[n_0 n_1], 'one' => ['n_0'], 'cleared' => 0)
+    expect(timeline['windowText']).to eq('2 commits, 2026-09-01 to 2026-10-01: 2 units drawn changed')
+    expect(timeline['oneText']).to eq('bbbbbbb, 2026-10-01, two: 1 unit drawn changed')
   end
 
   it 'encodes a re-centring identifier as a query value on the full-screen page' do

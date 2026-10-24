@@ -69,6 +69,7 @@ function mount(id) {
   Object.assign(controller, {
     element: body, urlValue: "", hasUrlValue: true, unitUrlValue: "/woods/units/__type__/__identifier__/graph?depth=2",
     generationValue: 3, hasGenerationValue: true, cacheValue: `3|model|Post|${id}`, hasCacheValue: true, blastValue: [], hasBlastValue: true,
+    clustersValue: [], hasClustersValue: true, modeValue: "", hasModeValue: true,
     panelTarget: q(".dia.graph"), canvasTarget: q(".gcanvas"), hasCanvasTarget: true, factsTarget: q(".gfacts"), hasFactsTarget: true,
     statusTarget: q(".gstatus"), hasStatusTarget: true, messageTarget: q(".refusal"), hasMessageTarget: true,
     fallbackTarget: q(".fallback"), flowchartTarget: q(".tool"), hasFlowchartTarget: true,
@@ -98,6 +99,10 @@ function drawing(cytoscape) {
 
   const data = neighbourhood(300, 1000)
   const big = mount("big")
+  // What load() does while the request is in flight; the draw is timed from data in hand.
+  const warmStarted = performance.now()
+  big.warm(cytoscape)
+  const warmMs = performance.now() - warmStarted
   const opened = []
   big.open = (id) => opened.push(big.byId.get(id).identifier)
   const started = performance.now()
@@ -150,6 +155,18 @@ function drawing(cytoscape) {
   const tinted = { direct: blasted.cy.nodes(".br1").map((n) => n.id()), transitive: blasted.cy.nodes(".br2").map((n) => n.id()),
     facts: blasted.factsTarget.textContent }
 
+  // Domain clusters: the clusters layout boxes each published cluster's members; leaving it removes the boxes.
+  const clustered = mount("clustered")
+  clustered.clustersValue = [["Generated::Unit1", "controller", "Billing"], ["Generated::Unit2", "view_template", "Billing"],
+    ["Generated::Unit3", "job", "Shipping"]]
+  clustered.modeValue = "clusters"
+  clustered.draw(cytoscape, small)
+  const boxes = clustered.cy.nodes(".cluster").map((n) => n.data("label")).sort()
+  const boxed = clustered.cy.getElementById("n_1").parent().data("label")
+  clustered.layout({ currentTarget: clustered.layoutTargets[0] })
+  const unboxed = clustered.cy.nodes(".cluster").length === 0 && clustered.cy.getElementById("n_1").parent().empty()
+  const clusters = { boxes, boxed, unboxed }
+
   // The impact page's range emphasis (E-3, E-8): distance 0 is a unit the report records as changed.
   const ranged = mount("ranged")
   ranged.emphasisValue = "range"
@@ -160,13 +177,53 @@ function drawing(cytoscape) {
   const ranges = { changed: ranged.cy.nodes(".chg").map((n) => n.id()), direct: ranged.cy.nodes(".br1").map((n) => n.id()),
     facts: ranged.factsTarget.textContent }
 
+// Flow overlay (A-4): the drawn steps and the edge between them are outlined; a step the
+// neighbourhood does not draw is left to the page's list; play lights the first step at once.
+const flowed = mount("flowed")
+const ident = (id) => { const d = small.elements.nodes.find((n) => n.data.id === id).data; return [d.identifier, d.type] }
+const e0 = small.elements.edges[0].data
+const [from, to] = [ident(e0.source), ident(e0.target)]
+flowed.flowValue = { entry_point: "PostsController#create", total: 3, steps: [
+  { position: 1, identifier: from[0], type: from[1], from: null, to: null },
+  { position: 2, identifier: to[0], type: to[1], from, to },
+  { position: 3, identifier: "Elsewhere", type: "model", from: null, to: null }] }
+flowed.hasFlowValue = true
+flowed.draw(cytoscape, small)
+flowed.playFlow()
+const flow = { nodes: flowed.cy.nodes(".flow").map((n) => n.id()).sort(), edges: flowed.cy.edges(".flow").map((e) => e.id()),
+  expected: [e0.source, e0.target].sort(), edge: e0.id, source: e0.source, current: flowed.cy.nodes(".flowcur").map((n) => n.id()),
+  status: flowed.statusTarget.textContent, facts: flowed.factsTarget.textContent }
+flowed.stopFlow()
+flow.stopped = flowed.cy.elements(".flowcur").length === 0
+
+// Timeline (A-6): a window of commits fills the units they touched; a single commit narrows it; clear empties it.
+const timed = mount("timed")
+const scrub = document.createElement("div")
+scrub.hidden = true
+scrub.innerHTML = '<input type="range" min="0" max="1" value="0"><input type="range" min="0" max="1" value="1"><output></output>'
+timed.element.appendChild(scrub)
+Object.assign(timed, { scrubTarget: scrub, hasScrubTarget: true, scrubFromTarget: scrub.children[0], scrubToTarget: scrub.children[1],
+  windowTarget: scrub.children[2], hasTimelineValue: true, timelineValue: [
+    { sha: "aaaaaaa", date: "2026-09-01", message: "one", units: [{ identifier: "Generated::Unit1", type: "controller" }] },
+    { sha: "bbbbbbb", date: "2026-10-01", message: "two", units: [{ identifier: "Post", type: "model" }, { identifier: "Elsewhere", type: "model" }] }] })
+timed.draw(cytoscape, small)
+const timeline = { shown: !scrub.hidden }
+timed.scrub()
+timeline.window = timed.cy.nodes(".tl").map((n) => n.id()).sort()
+timeline.windowText = timed.windowTarget.textContent
+timed.pickCommit({ currentTarget: { dataset: { commit: "1" } } })
+timeline.one = timed.cy.nodes(".tl").map((n) => n.id())
+timeline.oneText = timed.windowTarget.textContent
+timed.clearWindow()
+timeline.cleared = timed.cy.nodes(".tl").length
+
   // On the full-screen page a node re-centres the page: the identifier is a query value.
   blasted.unitUrlValue = "/woods/graph?centre=__identifier__&type=__type__&depth=2"
   const recentre = blasted.unitUrl({ type: "route", identifier: "GET /users/:id?x=1&y" })
 
   return {
-    restored, forgotten, tinted, ranges, recentre,
-    ms: Number(big.element.dataset.graphRenderMs), wall, calibrationMs, timings: big.timings, radialMs, radialMoved,
+    restored, forgotten, tinted, ranges, recentre, clusters, flow, timeline,
+    ms: Number(big.element.dataset.graphRenderMs), wall, calibrationMs, warmMs, timings: big.timings, radialMs, radialMoved,
     drawn: big.element.dataset.graphDrawn === "true",
     nodes: big.cy.nodes().length, edges: big.cy.edges().length,
     panelVisible: !big.panelTarget.hidden, fallbackVisible: !big.fallbackTarget.hidden, layoutsVisible: !big.layoutsTarget.hidden,

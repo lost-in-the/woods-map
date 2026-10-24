@@ -21,8 +21,8 @@ The frame is the B8 Impact frame:
 The rail lists the changed units (M, + or −), the first affected units and three limits:
 
 - which lines changed: woods#802;
-- flows not inverted: W-13, woods#763;
-- no pinned review base: W-11, woods#761.
+- flow coverage as Woods reports it, from the inverted membership (W-13);
+- the base generation's retention: pinned, or the `woods:pin[N]` that keeps it (W-11; see [Impact Flows and retention pins](impact-flows.md)).
 
 Per D-25 there is no *Markdown for PR* button and no Markdown or JSON anywhere on the page. The report's Markdown belongs to Woods (`woods:impact`); a CI pull-request comment built from it is out of the map's scope.
 
@@ -72,6 +72,6 @@ The pre-change page also gains the Graph tab. It centres on the first focus unit
 ## Limits
 
 - **Changed lines, hunks and the LINES column** wait on woods#802. The map never diffs two payloads.
-- **Flows** are partial without the inverted index, W-13 (woods#763). W-10 (woods#760) is not on Woods main. The facets the report already carries are shown as Woods computed them, and the report's `snapshot_facets` coverage says how they were bound.
-- **Retention:** a `from` the index no longer retains gets Woods' resolution message, which names the retained generations, plus the W-11 limit (woods#761).
+- **Flows** come from Woods' inverted membership (W-13); the Flows tab draws the pinned generation's steps ([Impact Flows](impact-flows.md)). The facets the report carries (W-10) are shown as Woods computed them, and the report's `snapshot_facets` coverage says how they were bound.
+- **Retention:** a `from` the index no longer retains gets Woods' resolution message, which names the retained generations, plus the pinned generations or how to pin a review base (W-11).
 - **Saved reports** live with the index that computed them. The map shows a missing ID as missing, not as empty.

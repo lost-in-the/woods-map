@@ -1,0 +1,23 @@
+<%# The Landscape frame (B8-Landscape, B6-Overview): crumbs, the system's title
+    block with the board's group control on Components, the Share menu with the
+    diagrams' text exports (D-25), the tabs. Locals: crumb (String). %>
+<% l = @landscape %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<%= render 'woods_map/shared/crumbs', crumbs: [['landscape', woods_map.landscape_path], [crumb, nil]], trail: tag.span('', data: { trail_target: 'list' }) %>
+<% subtitle = [l.rails, "#{l.unit_count} #{'unit'.pluralize(l.unit_count)}", "#{l.processes.size} #{'process'.pluralize(l.processes.size)}", "#{l.stores.size} #{'store'.pluralize(l.stores.size)}", "#{l.externals.size} external #{'system'.pluralize(l.externals.size)}"].compact.join(', ') %>
+<% group = if @tab == 'components'
+             safe_join([tag.span('group', class: 'mut'),
+                        tag.span(safe_join(WoodsMap::Components::GROUPS.map { |key, label| link_to(label, woods_map.landscape_path(tab: 'components', group: key), 'aria-current': (@components.group == key ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'Group components by')], ' ')
+           end %>
+<% texts = { 'containers' => (l.attributed? ? WoodsMap::LandscapeExport::FORMATS.map { |format, (ext, name)| ["⤓ #{name} .#{ext}", "#{request.base_url}#{woods_map.public_send(:"landscape_#{ext}_path")}"] } : []),
+             'components' => (@components.limit ? [] : [['⤓ components .mmd', "#{request.base_url}#{woods_map.landscape_diagram_mmd_path(diagram: 'components', group: @components.group)}"]]),
+             'hotspots' => [(@hotspots.churn? ? ['⤓ quadrant .mmd', "#{request.base_url}#{woods_map.landscape_diagram_mmd_path(diagram: 'quadrant')}"] : nil),
+                            (@hotspots.forward_flow.any? ? ['⤓ sankey .mmd', "#{request.base_url}#{woods_map.landscape_diagram_mmd_path(diagram: 'sankey')}"] : nil)].compact }.fetch(@tab, []) %>
+<%= render 'woods_map/shared/ident', title: l.system_name, subtitle: subtitle,
+      controls: safe_join([group, render('woods_map/shared/share', texts: texts), link_to('Open graph', woods_map.graph_path, class: 'btn primary')].compact, ' ') %>
+<%= render 'woods_map/shared/tabs', label: 'Landscape tabs', tabs: [
+      { label: 'Containers', count: 'L2', href: woods_map.landscape_path(tab: 'containers'), current: @tab == 'containers' },
+      { label: 'Components', count: 'L3', href: woods_map.landscape_path(tab: 'components'), current: @tab == 'components' },
+      { label: 'Hotspots', count: @hotspots.risks.size, href: woods_map.landscape_path(tab: 'hotspots'), current: @tab == 'hotspots' },
+      { label: 'Domains', count: @clusters.size, href: woods_map.landscape_path(tab: 'domains'), current: @tab == 'domains' }
+    ] %>

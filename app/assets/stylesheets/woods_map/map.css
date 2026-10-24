@@ -15,8 +15,8 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .tree [data-tree-target="row"][hidden] { display:none!important; }
 /* Inline links: a cue besides colour (D-22, WCAG 1.4.1, axe link-in-text-block). Standalone
    links stay bare; a link sitting among other text gets a faint underline in its own hue. */
-.wm .crumbs a,.wm .empty-state a,.wm .cap a,.wm .lead a,.wm .det dd a,.wm .facts dd a,.wm .banner .txt a,.wm .legend a,.wm .st a,.wm .mg a,.wm .rail li a,.wm .tip a,.wm .finding a,.wm .status a,.wm .psg .rows a,.wm .sec > header .t2 a,.wm .tbl tr.bnd a,.wm .guide .msg .text a,.wm .trail-lanes td a{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--link) 55%,transparent);text-underline-offset:3px}
-.wm .crumbs a:hover,.wm .empty-state a:hover,.wm .cap a:hover,.wm .lead a:hover,.wm .det dd a:hover,.wm .facts dd a:hover,.wm .banner .txt a:hover,.wm .legend a:hover,.wm .st a:hover,.wm .mg a:hover,.wm .rail li a:hover,.wm .tip a:hover,.wm .finding a:hover,.wm .status a:hover,.wm .psg .rows a:hover,.wm .sec > header .t2 a:hover,.wm .tbl tr.bnd a:hover,.wm .guide .msg .text a:hover,.wm .trail-lanes td a:hover{text-decoration-color:var(--link)}
+.wm .crumbs a,.wm .empty-state a,.wm .cap a,.wm .lead a,.wm .det dd a,.wm .facts dd a,.wm .banner .txt a,.wm .legend a,.wm .st a,.wm .mg a,.wm .rail li a,.wm .tip a,.wm .finding a,.wm .status a,.wm .psg .rows a,.wm .sec > header .t2 a,.wm .tbl tr.bnd a,.wm .guide .msg .text a,.wm .matrix .mut a,.wm .trail-lanes td a{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--link) 55%,transparent);text-underline-offset:3px}
+.wm .crumbs a:hover,.wm .empty-state a:hover,.wm .cap a:hover,.wm .lead a:hover,.wm .det dd a:hover,.wm .facts dd a:hover,.wm .banner .txt a:hover,.wm .legend a:hover,.wm .st a:hover,.wm .mg a:hover,.wm .rail li a:hover,.wm .tip a:hover,.wm .finding a:hover,.wm .status a:hover,.wm .psg .rows a:hover,.wm .sec > header .t2 a:hover,.wm .tbl tr.bnd a:hover,.wm .guide .msg .text a:hover,.wm .matrix .mut a:hover,.wm .trail-lanes td a:hover{text-decoration-color:var(--link)}
 /* Native explanation controls retain the inline glyph styling; tabs use the existing scroll cliff. */
 .wm button.info{font-size:inherit;line-height:inherit;padding:0;border:0;background:none}
 .wm .page-tabs .tab{flex-shrink:0;white-space:nowrap}
@@ -245,6 +245,32 @@ html.js .wm .guide .guide-nojs{display:none}
 .wm .legend i.gblast[data-distance="2"]{border-color:var(--mod)}
 /* Cytoscape's container rule, which it would otherwise inject as an inline <style> the policy refuses. */
 .wm .__________cytoscape_container{position:relative}
+/* Filter matrix owners (B8-Passage): muted, regular weight, like the board's owner line */
+.wm .matrix td.id .mut a{font-weight:inherit}
+
+/* The Landscape's C4 container level (B8-Landscape): people, the system with its containers, external
+   systems; then the L1 to L4 ladder. Tokens only; the selection bar marks the web process as on the board. */
+.wm .c4grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,3fr) minmax(0,1fr);gap:var(--s4);align-items:start}
+.wm .c4col,.wm .c4sys{display:flex;flex-direction:column;gap:var(--s3);min-width:0}
+.wm .c4sys{border:1px solid var(--rule2);border-radius:var(--r-ctl);padding:var(--s4);background:var(--panel)}
+.wm .c4boxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:var(--s3)}
+.wm .c4box{display:flex;flex-direction:column;gap:var(--s1);border:1px solid var(--rule2);border-radius:var(--r-ctl);padding:var(--s3) var(--s4);background:var(--bg);font-size:var(--fs-12);min-width:0}
+.wm .c4box.web{box-shadow:inset 3px 0 0 var(--select)}
+.wm .c4box .st{font-family:var(--ff-ui);font-size:var(--fs-11);color:var(--mut)}
+.wm .c4box b{font-family:var(--ff-ui);font-size:var(--fs-13);color:var(--bright);overflow-wrap:anywhere}
+.wm .c4box .tech{color:var(--mut);overflow-wrap:anywhere}
+.wm .c4box .cnts{overflow-wrap:anywhere}
+.wm .c4box ul{list-style:none;margin:var(--s1) 0 0;padding:0}
+.wm .c4box li{display:flex;gap:var(--s2)}
+.wm .c4box li .k{color:var(--dim)}
+.wm .c4ladder{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:var(--s5);border:1px solid var(--rule2);border-radius:var(--r-ctl);font-size:var(--fs-12)}
+.wm .c4ladder > *{display:flex;flex-direction:column;gap:var(--s1);padding:var(--s3) var(--s4);border-right:1px solid var(--rule);color:var(--mut);text-decoration:none;min-width:0}
+.wm .c4ladder > *:last-child{border-right:0}
+.wm .c4ladder b{font-family:var(--ff-ui);color:var(--text)}
+.wm .c4ladder [aria-current]{background:var(--select-tint);box-shadow:inset 0 -2px 0 var(--select)}
+.wm .c4ladder a:hover b{color:var(--link)}
+@container wm (max-width:959px){ .wm .c4grid{grid-template-columns:minmax(0,1fr)} .wm .c4ladder{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@container wm (max-width:639px){ .wm .c4ladder{grid-template-columns:minmax(0,1fr)} }
 /* The impact Graph tab and ?since= (E-3, E-8): a changed unit is filled with --mod, as the canvas draws it. */
 .wm .legend i.gblast[data-distance="0"]{background:color-mix(in srgb,var(--mod) 22%,var(--panel));border-color:var(--mod)}
 /* A row the focus URL selects (E-6): lit with the selection tint and a select rule. */
@@ -281,6 +307,30 @@ html.js .wm .guide .guide-nojs{display:none}
 .wm .tl-svg a:focus-visible{outline:2px solid var(--select)}
 .wm .pick-units fieldset{border:0;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(28ch,1fr));gap:var(--s2) var(--s5)}
 .wm .pick-units .f{display:flex;gap:var(--s2);align-items:center;font-family:var(--ff-data);font-size:var(--fs-12)}
+
+/* Code references by confidence (W-1): a static link is dashed, an ambiguous
+   reference is a button with a dotted rule that opens its candidates. */
+.wm .cv .src a.const.static{border-bottom:1px dashed var(--dim)}
+.wm .cv .src button.amb{font:inherit;color:var(--const);background:none;border:0;border-bottom:1px dotted var(--hot);padding:0;margin:0;cursor:pointer;line-height:inherit}
+.wm .cv .src button.amb:hover,.wm .cv .src button.amb[aria-expanded=true]{color:var(--select);border-bottom-color:var(--select)}
+/* The disambiguation popover (FR-4, B-1); without JavaScript the lists follow the code. */
+.wm .amb-pop{z-index:4;font-family:var(--ff-ui);font-size:var(--fs-12);color:var(--text);background:var(--panel);border:1px solid var(--rule2);border-radius:var(--r-ctl);padding:var(--s3) var(--s4);max-width:min(460px,calc(100vw - 32px));box-shadow:0 2px 8px rgba(0,0,0,.35);margin:var(--s3) var(--s5)}
+html.js .wm .amb-pop{position:fixed;margin:0}
+html.no-js .wm .amb-pop[hidden]{display:block}
+.wm .amb-pop .cap{margin:0 0 var(--s2)}
+.wm .amb-pop ul{list-style:none;margin:0;padding:0;display:grid;gap:var(--s2)}
+.wm .amb-pop li{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:baseline}
+.wm .amb-pop li .dim{font-family:var(--ff-data);overflow-wrap:anywhere}
+/* The graph's flow overlay (A-4) and timeline (A-6): a flow step is outlined in the link colour, a unit
+   a commit in the window touched is filled with --mod as the range tint draws it; the scrubber's two range
+   inputs sit on one line and wrap at narrow widths. */
+.wm .legend i.gflow{background:var(--panel);border:2px solid var(--link)}
+.wm .legend i.gtl{background:color-mix(in srgb,var(--mod) 22%,var(--panel));border:2px solid var(--mod)}
+.wm .rail ol.flows a[aria-current]{color:var(--bright);font-weight:600}
+.wm .gtimeline .scrub{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3) var(--s5);margin:0 0 var(--s4)}
+.wm .gtimeline .scrub input[type=range]{width:min(100%,28ch);accent-color:var(--select)}
+.wm .gtimeline .scrub output{flex:1 1 30ch;min-width:0}
+.wm .gcommits summary{cursor:pointer;color:var(--link);font-size:var(--fs-12);margin-bottom:var(--s3)}
 /* The Trail (M6, notes/trail.md): entry and pin fields, the lanes' async rule, pin notes */
 .wm .trail-form{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);padding:var(--s3) var(--s4)}
 .wm .trail-form label{font-family:var(--ff-ui);font-size:var(--fs-11);color:var(--dim);letter-spacing:.06em;text-transform:uppercase}

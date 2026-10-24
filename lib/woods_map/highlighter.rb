@@ -86,6 +86,9 @@ module WoodsMap
     # Consumes syntax-token bytes once, cutting tokens at validated link
     # boundaries. Each anchor and its syntax spans close within this row.
     class LineRenderer
+      KIND_WORDS = { 'constant' => 'constant reference', 'association' => 'association',
+                     'callback_method' => 'callback method', 'scope' => 'scope' }.freeze
+
       # @param tokens [Array<Array(String, String)>] CSS/value pairs
       # @param links [Array<WoodsMap::References::Link>] sorted, disjoint row intervals
       # @param unit_path [#call, nil] request-context identifier, type => URL
@@ -102,7 +105,7 @@ module WoodsMap
         out = +''
         @links.each do |link|
           out << take(link.column - @column)
-          out << anchor(link) << take(link.length) << '</a>'
+          out << opening(link) << take(link.length) << (link.popover ? '</button>' : '</a>')
         end
         out << take(@length - @column)
       end
@@ -123,13 +126,40 @@ module WoodsMap
         out
       end
 
-      def anchor(link)
-        attributes = {
-          'href' => @unit_path.call(link.identifier, link.type), 'class' => 'const',
-          'data-target' => link.identifier, 'data-type' => link.type, 'data-kind' => link.kind,
-          'aria-label' => "#{link.identifier} (#{link.type}), verified constant reference"
-        }
-        "<a #{attributes.map { |name, value| "#{name}=\"#{escape(value.to_s)}\"" }.join(' ')}>"
+      # An ambiguous span is a button for its candidates popover; every other
+      # span links to its target, or to the method line it names.
+      def opening(link)
+        return open_tag('button', ambiguous_attributes(link)) if link.popover
+
+        href = @unit_path.call(link.identifier, link.type)
+        href = "#{href}#L#{link.line}" if link.line
+        open_tag('a', 'href' => href, 'class' => link.confidence == 'static' ? 'const static' : 'const',
+                      'data-target' => link.identifier, 'data-type' => link.type, 'data-kind' => link.kind,
+                      'data-confidence' => link.confidence, 'data-method' => link.method,
+                      'aria-label' => label(link))
+      end
+
+      def ambiguous_attributes(link)
+        { 'type' => 'button', 'class' => 'const amb', 'aria-haspopup' => 'dialog', 'aria-expanded' => 'false',
+          'aria-controls' => link.popover, 'data-action' => 'disambiguation#toggle', 'data-kind' => link.kind,
+          'data-confidence' => 'ambiguous',
+          'aria-label' => "#{link.text}, ambiguous reference: choose among its candidates" }
+      end
+
+      def label(link)
+        subject = link.method ? "#{link.identifier}.#{link.method}" : link.identifier
+        where = link.line ? ", line #{link.line}" : ''
+        "#{subject} (#{link.type}#{where}), #{evidence(link)}"
+      end
+
+      def evidence(link)
+        return 'static reference, not verified at runtime' if link.confidence == 'static'
+
+        "verified #{KIND_WORDS.fetch(link.kind, 'reference')}"
+      end
+
+      def open_tag(name, attributes)
+        "<#{name} #{attributes.compact.map { |key, value| "#{key}=\"#{escape(value.to_s)}\"" }.join(' ')}>"
       end
 
       def escape(value)

@@ -1,8 +1,8 @@
 # Full-screen graph
 
-Scope: FR-5, A-2, A-3, A-5 and E-9 tinting. Relates to #7.
-Layouts are decided in #63. Domain clusters wait on woods#799.
-The flow overlay (A-4) and the timeline (A-6) remain separate.
+Scope: FR-5, A-2 to A-6 and E-9 tinting. Relates to #7.
+Layouts are decided in #63. The flow overlay (A-4) and the timeline (A-6) are on the
+Graph tab and on this page alike.
 
 No board designs this page; B6-Graph designs only the Graph tab. The page reuses
 that tab's explorer unchanged:
@@ -61,18 +61,55 @@ At most 24 keys are kept; the oldest is dropped. A new generation starts from th
 computed layout. *Reset positions* forgets the current key. Every storage access
 is in `try`/`catch`; without storage the page draws the same and keeps nothing.
 
+## Domain clusters
+
+Domain clusters come from a Woods that publishes them (woods#799).
+With them, `group=clusters` and a *clusters* layout box each cluster's drawn members
+(see [landscape.md](landscape.md)). Without them, the rail links woods#799 and the page
+draws none. It never derives clusters from namespaces itself.
+
+## Flow overlay (A-4)
+
+The rail's *flows* group lists the precomputed flows that expanded a step of the
+centre. It reads `PublishedIndex#flow_entry_points` over `flows/by_unit.json` (W-13,
+[woods#805](https://github.com/lost-in-the/woods/pull/805)). Each entry links the
+same view with `?flow=`, and the filter form, depth and direction links keep it.
+
+`GraphFlow` maps the selected document's steps onto what the explorer draws:
+
+- A controller step (`PostsController#create`) is drawn as its controller's unit.
+  Every other step is drawn as its own typed unit.
+- A move from one step's unit to the next is matched to a drawn edge between them,
+  in either direction. Two steps on the same unit need no edge.
+- The canvas outlines the matched units and edges in the link colour. *Play the flow*
+  lights them one step at a time, and the status line names each step. With reduced
+  motion, the whole path is lit at once and named in one line.
+- The side list, *Flow ⟨entry⟩*, has every step in document order. It shows the
+  operation count, whether the canvas draws the step's unit at this depth, and the edge
+  that reached it. A step with no graph edge from the step before is marked there.
+  Nothing is drawn that the graph does not have.
+
+The rail says why no flow is listed: none expands this unit (each flow stops at
+its own depth), the generation publishes none (`precompute_flows` is off), the
+artifacts are unreadable, or this Woods has no W-13 readers. Membership is bounded
+flow evidence. It does not show that a request takes the path.
+
+## Timeline (A-6)
+
+`GraphTimeline` lists the commits in the generation's commit table (W-3) that touched
+a drawn unit's `file_path` or `source_paths`, newest first. It keeps at most 80 and
+says how many it left out. With a script, two range inputs pick a window of commits,
+oldest first, and the units its commits touched are filled with `--mod`. A *tint*
+button on each row narrows the window to that commit. Without a script, the commit
+list names the drawn units each commit touched. A unit's inlined concerns count
+through the concern's own node only. Without a commit table, the section says why.
+
 ## Not built
 
-**Domain clusters.** The index publishes no clusters:
-
-- `GraphAnalyzer#domain_clusters` runs only behind the MCP tool;
-- `package` is empty without Packwerk.
-
-The rail says clusters are not available and links woods#799; the page draws none.
-It does not derive clusters from namespaces itself.
-
-**Flow overlay (A-4) and timeline (A-6).** Both need the flow index (W-13) and the
-History work (M4). They stay on #7.
+- The timeline as vis-timeline. As on `/woods/history`, no unmodified ESM build fits
+  the no-build rule, so the window is two native range inputs.
+- Operations inside a flow step, drawn on the canvas. The side list counts them; the
+  unit's own pages read them.
 
 ## Validation
 

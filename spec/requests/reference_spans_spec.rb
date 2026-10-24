@@ -96,7 +96,7 @@ RSpec.describe 'Published reference spans', type: :request do
   it 'leaves normal link activation to the browser and keeps the published-only legend' do
     get '/woods/units/model/Caller'
     expect(source_links.first.attribute_nodes.map(&:name)).not_to include('role', 'tabindex', 'data-action', 'onclick')
-    expect(response.body).to include('links: published typed-registry verified constants')
+    expect(response.body).to include('links: published reference spans; dashed static, dotted ambiguous')
     expect(response.body).not_to include('unmarked: runtime-verified', '○ static reference')
   end
 

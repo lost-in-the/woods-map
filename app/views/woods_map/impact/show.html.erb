@@ -8,7 +8,7 @@
      render('woods_map/shared/share'),
      tag.button('⎘ copy focus URL', class: 'btn primary', type: 'button', data: { controller: 'copy', copy_text_value: focus_url, action: 'copy#copy', key: 'y' }, 'data-needs-js': '')
    ], ' ') %>
-<% counts = { 'changed' => r.focus.size, 'risks' => v.findings.size, 'flows' => 0, 'tests' => v.tests.size, 'graph' => r.affected.size, 'unknown' => v.unknowns.size } %>
+<% counts = { 'changed' => r.focus.size, 'risks' => v.findings.size, 'flows' => (@flows&.state == :available ? @flows.total : nil), 'tests' => v.tests.size, 'graph' => r.affected.size, 'unknown' => v.unknowns.size } %>
 <% tabs = WoodsMap::ImpactController::LENSES.map { |lens| { label: lens.capitalize, count: counts[lens], href: impact_url.call(lens: lens), current: lens == @lens } } %>
 <%= render 'woods_map/impact/frame', title: 'Blast radius', subtitle: "#{r.focus.join(', ')}, depth #{r.depth}, gen #{@repository.generation_number}", controls: controls, tabs: tabs %>
 <% if @lens == 'graph' %>
@@ -28,7 +28,7 @@
         { label: 'affected', count: r.direct.size, items: r.direct.first(8).map { |a| { key: '·', text: unit_link(a.identifier, a.type), own: a.via } } + (r.direct.size > 8 ? [{ key: '·', text: "+#{r.direct.size - 8} more" }] : []) },
         { label: 'limits', count: 3, items: [
           { key: '·', text: 'no range: one generation', own: layer_chip('woods:impact is W-12, woods#762') },
-          { key: '·', text: 'flows not inverted', own: layer_chip('W-13, woods#763') },
+          flow_limit(@flows&.state),
           { key: '·', text: 'nothing here proves a path ran', own: layer_chip('static') }
         ] }
       ] %>
