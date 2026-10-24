@@ -160,12 +160,22 @@ function drawing(cytoscape) {
   const ranges = { changed: ranged.cy.nodes(".chg").map((n) => n.id()), direct: ranged.cy.nodes(".br1").map((n) => n.id()),
     facts: ranged.factsTarget.textContent }
 
+  // A self edge on the heaviest, so tallest, unit (a controller that redirects to itself):
+  // Cytoscape refused the loop while its step was a fixed 72px.
+  const selfish = neighbourhood(6, 6)
+  Object.assign(selfish.elements.nodes[0].data, { pagerank: 1, identifier: "PasswordResetsController", label: "PasswordResetsController", type: "controller" })
+  selfish.elements.edges.push({ data: { id: "e_self", source: "n_0", target: "n_0", via: "redirect_to", depth: 1, through: null, cross_database: null } })
+  const looped = mount("looped")
+  looped.draw(cytoscape, selfish)
+  looped.cy.renderer().render()
+  const loop = { height: looped.cy.getElementById("n_0").height(), wide: looped.cy.getElementById("n_0").width() > 150, refused: looped.cy.getElementById("e_self")._private.rscratch.badLine === true }
+
   // On the full-screen page a node re-centres the page: the identifier is a query value.
   blasted.unitUrlValue = "/woods/graph?centre=__identifier__&type=__type__&depth=2"
   const recentre = blasted.unitUrl({ type: "route", identifier: "GET /users/:id?x=1&y" })
 
   return {
-    restored, forgotten, tinted, ranges, recentre,
+    restored, forgotten, tinted, ranges, recentre, loop,
     ms: Number(big.element.dataset.graphRenderMs), wall, calibrationMs, timings: big.timings, radialMs, radialMoved,
     drawn: big.element.dataset.graphDrawn === "true",
     nodes: big.cy.nodes().length, edges: big.cy.edges().length,

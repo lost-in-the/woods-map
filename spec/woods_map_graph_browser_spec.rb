@@ -109,6 +109,10 @@ RSpec.describe WoodsMap do
     expect(drawing.dig('ranges', 'facts')).to include('1 changed and 1 affected in the report, 2 drawn')
   end
 
+  it 'draws the loop of a self edge on the tallest, widest unit' do
+    expect(drawing['loop']).to eq('height' => 56, 'wide' => true, 'refused' => false)
+  end
+
   it 'encodes a re-centring identifier as a query value on the full-screen page' do
     expect(drawing['recentre']).to eq('/woods/graph?centre=GET%20%2Fusers%2F%3Aid%3Fx%3D1%26y&type=route&depth=2')
   end

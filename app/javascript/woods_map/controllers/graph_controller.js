@@ -358,7 +358,10 @@ export default class extends Controller {
       { selector: "edge.named", style: { label: "data(label)", "text-margin-y": "data(dy)" } },
       { selector: "edge.named.ls", style: { label: "", "source-label": "data(label)", "source-text-offset": "data(off)", "source-text-margin-y": "data(dy)" } },
       { selector: "edge.named.lt", style: { label: "", "target-label": "data(label)", "target-text-offset": "data(off)", "target-text-margin-y": "data(dy)" } },
-      { selector: "edge:loop", style: { "curve-style": "bezier", "loop-direction": "-45deg", "loop-sweep": "-60deg", "control-point-step-size": 72 } },
+      // A loop's step grows with its node: on the tallest (heaviest) nodes a
+      // fixed 72px put the control points inside the node and Cytoscape
+      // refused to draw the loop (a self redirect_to, seen at depth 1).
+      { selector: "edge:loop", style: { "curve-style": "bezier", "loop-direction": "-45deg", "loop-sweep": "-60deg", "control-point-step-size": (edge) => Math.max(72, Math.round(edge.source().height() * 2)) } },
       { selector: "edge.lit", style: { width: 2, "line-color": t.select, "target-arrow-color": t.select, color: t.bright, "z-index": 10 } }
     ]
   }
