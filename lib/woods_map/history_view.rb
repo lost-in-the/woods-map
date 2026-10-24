@@ -160,7 +160,7 @@ module WoodsMap
       list = []
       list << table_limit unless table?
       if table?
-        list << 'line counts and hunks are not in this commit table (woods#804)' unless @table.line_stats?
+        list << 'line counts and hunks are not in this commit table (woods#804)' unless @table.try(:line_stats?)
         if ledger.generations.size >= 2 && !facets.available?
           list << 'facets moved need Woods::Impact::UnitDiff (woods#802)'
         end
