@@ -35,6 +35,14 @@ module WoodsMap
       safe_join(preloads + sheets, "\n")
     end
 
+    # The request's path as the client sent it (see RawRequestPath): Rails
+    # normalizes request.path, dropping the slash that ends an identifier.
+    #
+    # @return [String]
+    def raw_request_path
+      request.original_fullpath.split('?', 2).first
+    end
+
     # The focus URL of this page (E-6): its absolute address with the query
     # it was opened with, less any `token` (D-4 exchanges it for a cookie, and
     # a shared link must never carry it).

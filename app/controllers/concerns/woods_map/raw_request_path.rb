@@ -6,12 +6,9 @@ module WoodsMap
   # one dropped. A unit whose identifier ends in "/" (the root route,
   # `GET /`) lives at `…/GET%20/` and its tabs at `…/GET%20//graph`, so
   # every link back to the current page builds from this path instead.
+  # Views have the same method from ApplicationHelper.
   module RawRequestPath
     extend ActiveSupport::Concern
-
-    included do
-      helper_method :raw_request_path
-    end
 
     private
 
