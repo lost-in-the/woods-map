@@ -3,7 +3,7 @@
 <%= render 'woods_map/shared/crumbs', crumbs: [['graph', nil]], trail: tag.span('', data: { trail_target: 'list' }) %>
 <%= render 'woods_map/shared/ident', title: 'Graph', subtitle: "full-screen neighbourhood, gen #{@repository.generation_number}" %>
 <div class="body" data-controller="trail">
-  <div class="main" style="margin-left:var(--s5)">
+  <div class="main inset">
     <%= render 'woods_map/components/empty_state', title: @missing ? "No unit named #{@missing} in gen #{@repository.generation_number}" : 'Pick a centre',
           text: 'The full-screen graph draws the neighbourhood of one unit, with room for depth two and the blast radius of a change to it. Start from a hub below, or open any unit and choose its Graph tab.' %>
     <section class="sec">

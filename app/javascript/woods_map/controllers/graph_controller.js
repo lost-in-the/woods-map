@@ -97,7 +97,18 @@ export default class extends Controller {
   // A cold Cytoscape spends most of a first draw compiling its own code. One
   // small graph drawn off screen with the page's stylesheet, in both of its
   // modes, takes that cost while the neighbourhood is still on the network.
+  // Cytoscape injects a <style> for its container unless an element with this
+  // id exists; the policy (M8) refuses inline style elements, so map.css
+  // carries the rule and an inert marker stands in for the injected sheet.
+  guardStylesheet() {
+    if (document.getElementById("__________cytoscape_stylesheet")) return
+    const marker = document.createElement("meta")
+    marker.id = "__________cytoscape_stylesheet"
+    document.head.appendChild(marker)
+  }
+
   warm(cytoscape) {
+    this.guardStylesheet()
     try {
       const host = document.createElement("div")
       host.setAttribute("aria-hidden", "true")
@@ -191,6 +202,7 @@ export default class extends Controller {
     }
 
     this.cy?.destroy()
+    this.guardStylesheet()
     this.cy = cytoscape({
       container: this.canvasTarget,
       elements,

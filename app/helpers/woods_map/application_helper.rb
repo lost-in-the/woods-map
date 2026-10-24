@@ -35,6 +35,16 @@ module WoodsMap
       safe_join(preloads + sheets, "\n")
     end
 
+    # The focus URL of this page (E-6): its absolute address with the query
+    # it was opened with, less any `token` (D-4 exchanges it for a cookie, and
+    # a shared link must never carry it).
+    #
+    # @return [String]
+    def focus_url
+      query = request.query_parameters.except('token')
+      "#{request.base_url}#{request.path}#{"?#{query.to_query}" if query.any?}"
+    end
+
     # A relative date in git's shorthand with the long form in the tooltip
     # (D-15): `<abbr class="date" title="3 days ago, 2026-10-13">3d</abbr>`.
     #

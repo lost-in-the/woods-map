@@ -7,6 +7,8 @@ module WoodsMap
   # lock covers the whole response; the identifier and the type come from the
   # URL, never a path.
   class UnitsController < ApplicationController
+    include WoodsMap::UnitMermaid
+
     LENS_COOKIE = 'woods_map_lens'
 
     # Every indexed typed identity, including units without a source file.
@@ -38,6 +40,8 @@ module WoodsMap
     def schema
       with_unit do
         @schema = WoodsMap::SchemaView.new(@unit, table: @page.table, graph_analysis: @repository.graph_analysis)
+        next render_tab_mermaid(@schema.mermaid, 'schema', refusal: @schema.refusal) if mermaid_request?
+
         render :schema
       end
     end
@@ -47,10 +51,14 @@ module WoodsMap
     def passage
       with_unit do
         unless @page.tabs.include?('passage')
+          next render_text(:not_found, "A #{@page.type.tr('_', ' ')} has no passage.") if mermaid_request?
+
           next redirect_to(woods_map.unit_path(type: @page.type, identifier: @page.identifier))
         end
 
         @passage = WoodsMap::Passage.new(@repository, @unit, action: params[:action_name])
+        next render_tab_mermaid(@passage.mermaid, "#{@passage.action} passage") if mermaid_request?
+
         @ladder_model = @passage.ladder_model
         @ladder = @ladder_model && lifecycle_for(@ladder_model)
         @ladder_event = ladder_event(@ladder)
@@ -76,6 +84,11 @@ module WoodsMap
         @lifecycle = lifecycle_for(@unit)
         @event = params[:event] if WoodsMap::Lifecycle::EVENTS.include?(params[:event])
         @event ||= @lifecycle.chains.keys.first || 'create'
+        @view = WoodsMap::Lifecycle::VIEWS.include?(params[:view]) ? params[:view] : WoodsMap::Lifecycle::VIEWS.first
+        @state_machines = []
+        @state_machines = WoodsMap::StateMachineView.for_model(@repository, @page.identifier) if @page.type == 'model'
+        next render_lifecycle_mermaid if mermaid_request?
+
         render :lifecycle
       end
     end
@@ -88,6 +101,8 @@ module WoodsMap
           direction: params[:direction].to_s, depth: params.fetch(:depth, 1),
           filters: { types: params[:types], via: params[:via] }
         )
+        next render_graph_mermaid if mermaid_request?
+
         render :graph
       end
     end
@@ -120,8 +135,10 @@ module WoodsMap
 
         @page = WoodsMap::UnitPage.new(repository, @unit)
         @definition = WoodsMap::CompositeSource.new(@unit).definition_line
-        @tree = WoodsMap::FileTree.for(repository)
-        @freshness = repository.freshness
+        unless mermaid_request?
+          @tree = WoodsMap::FileTree.for(repository)
+          @freshness = repository.freshness
+        end
         yield
       end
     end
@@ -129,6 +146,8 @@ module WoodsMap
     def render_missing_unit
       @identifier = params[:identifier].to_s
       @type = params[:type].to_s
+      return render_text(:not_found, "No #{@type.tr('_', ' ')} named #{@identifier}.") if mermaid_request?
+
       render 'woods_map/units/missing', status: :not_found
     end
 

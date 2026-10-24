@@ -103,6 +103,17 @@ module WoodsMap
       Array(nodes_by_identifier[identifier]).filter_map { |node| node['type']&.to_s }.uniq
     end
 
+    # Every identifier of this generation with the type of its primary node:
+    # the set the guide may link (design study, section 11).
+    #
+    # @return [Hash{String => String}]
+    def identifier_index
+      @identifier_index ||= nodes_by_identifier.each_with_object({}) do |(identifier, nodes), index|
+        type = nodes.first && nodes.first['type']
+        index[identifier] = type.to_s if type
+      end
+    end
+
     # @param identifier [String]
     # @param type [String, nil] the unit type; nil selects the primary node
     # @return [Hash, nil] the matching graph node, or nil when that typed unit is absent

@@ -1,5 +1,21 @@
 import { Controller } from "@hotwired/stimulus"
 
+// The engine's Content-Security-Policy (M8) refuses style attributes, and
+// Pele writes its theme variables and geometry into them. Pele hands its SVG
+// text to this hook instead of innerHTML: the text is parsed inert with each
+// style attribute renamed, so the parser applies none, and each one is then
+// set through the CSSOM, which the policy allows. Pele escapes every quote in
+// text and attribute values, so ` style="` occurs only as an attribute.
+function cssomSvg(svg) {
+  const template = document.createElement("template")
+  template.innerHTML = svg.replace(/\sstyle="/g, ' data-pele-style="')
+  for (const node of template.content.querySelectorAll("[data-pele-style]")) {
+    node.style.cssText = node.getAttribute("data-pele-style")
+    node.removeAttribute("data-pele-style")
+  }
+  return template.content
+}
+
 // Draws a diagram panel's Mermaid text with Pele (D-21). The text stays in
 // the page: without JavaScript, or when Pele refuses the text, the panel
 // shows it as it did before; once drawn, "Mermaid text" swaps back to it.
@@ -11,9 +27,14 @@ export default class extends Controller {
 
   async connect() {
     try {
-      const { mount } = await import("pele")
+      const { mount, parse } = await import("pele")
       if (document.fonts) await document.fonts.ready
       if (!this.element.isConnected) return
+
+      // A text Pele refuses (too long, a syntax it does not know) is refused
+      // here, before mount: Pele's own error line is styled through an
+      // attribute the policy (M8) would refuse and report.
+      parse(this.sourceTarget.textContent)
 
       // Natural width, never wrapped to the panel or scaled down: the body
       // scrolls sideways (C4). The text size is the --dia-fs token.
@@ -25,6 +46,10 @@ export default class extends Controller {
         autoDirection: false,
         maxWidth: Infinity,
         fontSize,
+        // No zoom controls: they are styled through attributes the policy refuses,
+        // and the panel already scrolls sideways at natural width (C4).
+        zoom: false,
+        sanitize: cssomSvg,
         onError: (error) => this.fail(error)
       })
       if (this.mounted.error) return this.fail(this.mounted.error)

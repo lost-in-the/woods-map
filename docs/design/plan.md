@@ -23,7 +23,7 @@ testbed suite in `woods-testbed`.
 | M4 · History | woods-map | History tab hunk cards, gutter heat, neighbourhood timeline, snapshot picker, unit diff across retained generations | Co-change query answers design-study scenario 2 step 3 from the commit table | [woods-map#6](https://github.com/lost-in-the/woods-map/issues/6) |
 | M5 · Graph | woods-map | [Bounded neighbourhood endpoint](notes/neighbourhood-json.md), Cytoscape component, Graph tab, full-screen graph page, blast radius, butterfly layout | 300-node neighbourhood renders under 500 ms on the testbed; keyboard list equivalent | [woods-map#7](https://github.com/lost-in-the/woods-map/issues/7) |
 | M6 · Trail | woods-map | LifecycleBuilder across async hops, lanes, flags, board state, export | Design-study scenario 2 reproducible end to end from one URL | [woods-map#8](https://github.com/lost-in-the/woods-map/issues/8) |
-| M7 · Guide | woods-map | RubyLLM agent, MCP attachment over stdio, SSE streaming into Turbo Streams, seven actions, budgets | All actions produce linked answers on the testbed with one provider; disabled by default; unavailable below Ruby 3.2 with a clear message | [woods-map#9](https://github.com/lost-in-the/woods-map/issues/9) |
+| M7 · Guide | woods-map | RubyLLM agent, MCP attachment over stdio, SSE streaming (EventSource, no Turbo; see the M7 note), the actions of #9, budgets | All actions produce linked answers on the testbed with one provider; disabled by default; unavailable below Ruby 3.2 with a clear message | [woods-map#9](https://github.com/lost-in-the/woods-map/issues/9) |
 | M8 · Staging | woods-map + woods | Threat-model document, CSP, rate limits, deployment guide beside `MCP_HTTP_TRANSPORT.md` | Non-loopback boot refuses without a token; origin guard tests | [woods-map#10](https://github.com/lost-in-the/woods-map/issues/10) |
 | T · Testbed suite | woods-testbed | Blog scenario (Post, Comment, Tag, NotifySubscribersJob, MailingListMailer, templates, one deliberate unassigned instance variable) in rails-8.0, mirrored in rails-6.0; the map mounted in every variant; smoke scripts under `scripts/` | Both scenarios run unchanged against every variant | [woods-testbed#38](https://github.com/lost-in-the/woods-testbed/issues/38) |
 
@@ -83,6 +83,8 @@ Run this before a milestone issue is opened and again before it closes.
 | W-11 generation pin | [woods#761](https://github.com/lost-in-the/woods/issues/761) |
 | W-12 impact report | [woods#762](https://github.com/lost-in-the/woods/issues/762) |
 | W-13 inverted flow index | [woods#763](https://github.com/lost-in-the/woods/issues/763) |
+| Model attribute writers for the permitted-param flag (B-18) | [woods#797](https://github.com/lost-in-the/woods/issues/797), [design note](notes/passage-mismatch-limits.md) |
+| Partial locals passed and read for the partial-local flag (B-18) | [woods#798](https://github.com/lost-in-the/woods/issues/798), [design note](notes/passage-mismatch-limits.md) |
 | W-14 best-effort flows | [woods#764](https://github.com/lost-in-the/woods/issues/764) |
 | Engine scaffold (the M1 skeleton: gem, Engine, Repository, authentication, states, token sheet served) | [woods-map#11](https://github.com/lost-in-the/woods-map/pull/11) |
 | Bounded M1 units index and indexed file ownership (FR-3, B-5); other M1 follow-ups remain separate | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [design note](notes/m1-indexed-navigation.md) |
@@ -91,6 +93,8 @@ Run this before a milestone issue is opened and again before it closes.
 | M1 follow-up: the undesigned reading pieces (units index, file view, Routes tab, type tiles, hover card, disambiguation, settings, keyboard help, share menu) | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34) |
 | Controller Routes tab (FR-3); helper- and action-level references need [woods#795](https://github.com/lost-in-the/woods/issues/795) | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/routes-tab.md) |
 | Hover card on a reference (B-3), prefetched with the Code tab | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/hover-card.md) |
+| Reading settings (B-15, D-6): lens, wrap, font size and editor link per browser | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/settings.md) |
+| Share menu (E-6, E-7): focus URL and the page's Mermaid, per D-25 | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/share-menu.md), [woods-map#57](https://github.com/lost-in-the/woods-map/issues/57) |
 | Type-specific facts tiles (B-4); other M1 follow-ups remain separate | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/published-type-facts.md) |
 | Design system epic (tokens, fonts, components, responsive tiers) | [woods-map#23](https://github.com/lost-in-the/woods-map/issues/23) |
 | D-22 Inline links need a cue besides colour (settled, amends D-11) | [woods-map#26](https://github.com/lost-in-the/woods-map/issues/26) |
@@ -100,8 +104,17 @@ Run this before a milestone issue is opened and again before it closes.
 | M5 full-screen graph page: blast tint, position cache, hubs ([design note](notes/graph-page.md)) | [woods-map#7](https://github.com/lost-in-the/woods-map/issues/7) |
 | Woods Map data: domain clusters in `graph_analysis.json` (M5 full-screen graph) | [woods#799](https://github.com/lost-in-the/woods/issues/799) |
 | M5 Graph tab layouts without fcose or dagre: a computed butterfly and Cytoscape's concentric radial (needs-decision) | [woods-map#63](https://github.com/lost-in-the/woods-map/issues/63) |
+| M3 Mermaid export: copy and a `.mmd` link from every diagram's tools; each diagram's text is served as `text/plain` from a stable `.mmd` URL (constraint 3, D-25). Structurizr DSL and LikeC4 wait on W-9 | [woods-map#5](https://github.com/lost-in-the/woods-map/issues/5) |
+| M3 Lifecycle views: flowchart and lanes beside the sequence, state diagrams for published state machines (FR-6, B-19, R-4); C4-dynamic (B-23) waits on W-9 | [woods-map#5](https://github.com/lost-in-the/woods-map/issues/5), [note](notes/lifecycle-views.md) |
+| State machine transition callbacks as structured entries (Lifecycle per-transition columns) | [woods#796](https://github.com/lost-in-the/woods/issues/796) |
+| M3 `/woods/erd`: the whole database by chunk (namespace or database, at most 40 tables each, R-4) with schema findings, verified on a generated 300-model index; ERD in the global bar | [woods-map#5](https://github.com/lost-in-the/woods-map/issues/5) |
 | Passage and impact coverage: unresolved render targets and partials stay incomplete (M2 B-17, B-18; M4b E-5) | [woods-map#47](https://github.com/lost-in-the/woods-map/issues/47), fixed by [woods-map#51](https://github.com/lost-in-the/woods-map/pull/51) |
 | D-24 Code view scrolls as one region, not a line at a time (settled, amends B8-Code) | [woods-map#29](https://github.com/lost-in-the/woods-map/issues/29) |
+| M7 guide: RubyLLM agent over the Index MCP server (stdio, D-7), SSE panel, eight actions, budgets; a real provider run, history and the Trail handoff remain on #9 | [woods-map#9](https://github.com/lost-in-the/woods-map/issues/9), [note](notes/m7-guide.md) |
+| D-25 Share menu: focus URL and Mermaid only, no Markdown or JSON (settled) | [woods-map#57](https://github.com/lost-in-the/woods-map/issues/57) |
+| M8 first slice: CSP, rate limits, origin guard and loopback Host, tested under Puma; the threat model and deployment guide follow on #10 | [woods-map#10](https://github.com/lost-in-the/woods-map/issues/10), [note](notes/m8-staging.md) |
+| M8 open choices: the 429 state, the loopback Host rule, no style attributes (needs-decision) | [woods-map#59](https://github.com/lost-in-the/woods-map/issues/59) |
+| M8 threat model and deployment guide beside Woods' `MCP_HTTP_TRANSPORT.md` | [woods-map#10](https://github.com/lost-in-the/woods-map/issues/10), [THREAT_MODEL.md](../THREAT_MODEL.md), [DEPLOYMENT.md](../DEPLOYMENT.md) |
 | D-10 Source of truth for visual tokens | [woods-map#12](https://github.com/lost-in-the/woods-map/issues/12) |
 | D-11 Colour meaning | [woods-map#13](https://github.com/lost-in-the/woods-map/issues/13) |
 | D-12 Typefaces | [woods-map#14](https://github.com/lost-in-the/woods-map/issues/14) |

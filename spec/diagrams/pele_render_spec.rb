@@ -2,6 +2,7 @@
 
 require 'json'
 require 'open3'
+require_relative '../support/large_schema_index'
 
 # The headless render spec (mermaid-diagram-types.md, constraint 4): every
 # Mermaid text the map generates from the fixture index is drawn with the
@@ -20,13 +21,20 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
   end
 
   def diagrams
+    unit_diagrams + landscape_diagrams + [FIXTURE_INDEX,
+                                          WoodsMap::LargeSchemaIndex.path].each_with_index.flat_map do |dir, i|
+      WoodsMap::Repository.open(dir) { |repository| erd_diagrams(repository, i.zero? ? 'fixture' : '300') }
+    end
+  end
+
+  def unit_diagrams
     WoodsMap::Repository.open(FIXTURE_INDEX) do |repository|
       analysis = repository.graph_analysis
       full = ->(type) { repository.units(type: type).map { |e| repository.unit(e['identifier'], type: e['type']) } }
-      full.call('model').flat_map { |unit| model_diagrams(unit, analysis) } +
+      full.call('model').flat_map { |unit| model_diagrams(unit, analysis) + state_diagrams(repository, unit) } +
         repository.units.flat_map { |entry| graph_diagrams(repository, entry) } +
         %w[controller mailer].flat_map { |type| full.call(type) }.flat_map { |unit| passage_diagrams(repository, unit) }
-    end + landscape_diagrams
+    end
   end
 
   # The container diagram, from the fixture as a Woods with container attribution writes it.
@@ -37,11 +45,30 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
     end
   end
 
+  # Every chunk of the ERD, both groupings and both column modes; the
+  # 300-model index exercises chunks at the table budget.
+  def erd_diagrams(repository, index)
+    erd = WoodsMap::Erd.build(repository)
+    WoodsMap::Erd::GROUPINGS.product(WoodsMap::Erd::COLUMN_MODES).flat_map do |by, columns|
+      erd.chunks(by).map { |c| ['er', "erd #{index} #{by} #{columns} #{c.number}", erd.mermaid(c, columns: columns)] }
+    end
+  end
+
   def model_diagrams(unit, analysis)
     lifecycle = WoodsMap::Lifecycle.new(unit)
     id = unit['identifier']
     [['er', "schema #{id}", WoodsMap::SchemaView.new(unit, graph_analysis: analysis).mermaid]] +
-      lifecycle.chains.keys.map { |event| ['sequence', "lifecycle #{id} #{event}", lifecycle.mermaid(event)] }
+      lifecycle.chains.keys.flat_map do |event|
+        [['sequence', "lifecycle #{id} #{event}", lifecycle.mermaid(event)],
+         ['flowchart', "lifecycle flowchart #{id} #{event}", lifecycle.flowchart(event)],
+         ['swimlane', "lifecycle lanes #{id} #{event}", lifecycle.lanes(event)]]
+      end
+  end
+
+  def state_diagrams(repository, unit)
+    WoodsMap::StateMachineView.for_model(repository, unit['identifier']).map do |machine|
+      ['state', "state #{machine.identifier}", machine.mermaid]
+    end
   end
 
   def graph_diagrams(repository, unit)
@@ -77,7 +104,7 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
 
   it 'draws every generated text as the diagram type it declares' do
     list = diagrams
-    expect(list.map(&:first).uniq).to contain_exactly('er', 'sequence', 'flowchart')
+    expect(list.map(&:first).uniq).to contain_exactly('er', 'sequence', 'flowchart', 'swimlane', 'state')
     results = render_all(list)
     failures = list.filter_map do |type, name, _|
       r = results.fetch(name)

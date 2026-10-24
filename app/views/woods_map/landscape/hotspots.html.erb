@@ -27,7 +27,7 @@
         <header><h2 class="t2">Coupling between layers <%= count_tag('edges, from row to column') %><%= info_tip('Published typed edges between unit types, leaving out test coverage, route exercise, documentation and migration bookkeeping.') %></h2></header>
         <% if coupling.any? %>
           <% columns = WoodsMap::Hotspots::LAYERS.select { |to| coupling.values.any? { |row| row[to].positive? } } %>
-          <%= render 'woods_map/components/table', label: 'Coupling between layers', min_width: "#{180 + (columns.size * 110)}px",
+          <%= render 'woods_map/components/table', label: 'Coupling between layers', min_width: "#{((180 + (columns.size * 110)) / 20.0).ceil.clamp(24, 60) * 20}px",
                 columns: [{ label: 'from', width: '180px' }] + columns.map { |to| { label: to.tr('_', ' ').pluralize } },
                 rows: coupling.map { |from, row| { cells: [tag.b(from.tr('_', ' ').pluralize)] + columns.map { |to| row[to].positive? ? row[to].to_s : WoodsMap::Glyphs[:none] } } } %>
         <% else %>
