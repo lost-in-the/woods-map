@@ -75,7 +75,7 @@
           <button class="tool" type="button" aria-label="Zoom in" data-action="graph#zoomIn">+</button>
           <button class="tool" type="button" aria-label="Zoom out" data-action="graph#zoomOut">−</button>
           <button class="tool" type="button" data-action="graph#fit">fit</button>
-          <%= render 'woods_map/components/mermaid_tools', text: n.mermaid, name: "#{identifier} neighbourhood depth #{n.depth}", url: local_assigns[:mermaid_url] %>
+          <%= render 'woods_map/components/mermaid_tools', text: n.mermaid, name: "#{identifier} neighbourhood depth #{n.depth}", url: local_assigns[:mermaid_url], refused: n.refusal.present? %>
           <button class="tool" type="button" aria-pressed="false" aria-controls="graph-flowchart" data-graph-target="flowchart" data-action="graph#flowchart">flowchart</button>
         </span></div>
         <div class="gcanvas" tabindex="0" role="application" aria-roledescription="graph" aria-label="<%= graph_label %>" aria-describedby="graph-status" data-graph-target="canvas"></div>

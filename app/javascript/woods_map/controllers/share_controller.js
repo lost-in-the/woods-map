@@ -4,7 +4,8 @@ import { Controller } from "@hotwired/stimulus"
 // on the summary opens it, Escape or a click outside closes it and focus
 // returns to the summary. On opening, the focus URL gains the line the
 // address targets (#L…), and each diagram export on the page gets a copy of
-// its Mermaid text and a link to its stable .mmd URL (D-25).
+// its Mermaid text, a link to its stable .mmd URL (D-25) and a copy of it as a
+// GitHub pull-request comment, or the reason a comment cannot hold it (#76).
 export default class extends Controller {
   static targets = ["url", "copyUrl", "diagrams"]
 
@@ -35,29 +36,29 @@ export default class extends Controller {
   }
 
   // One row per diagram export on the page (components/mermaid_tools): copy
-  // its Mermaid text, and link its stable .mmd URL when the page has one.
+  // its Mermaid text, link its stable .mmd URL when the page has one, and copy
+  // it for a pull-request comment, or say why a comment cannot hold it.
   fillDiagrams() {
     const list = this.diagramsTarget
-    list.querySelectorAll("button, a").forEach((node) => node.remove())
+    list.querySelectorAll("button, a, .lyr").forEach((node) => node.remove())
+    const key = (tool) => `${tool.dataset.mermaidName}\u0000${tool.dataset.mermaidHref || ""}`
+    const outside = (tool) => !this.element.contains(tool)
+    const comments = new Map()
+    for (const tool of document.querySelectorAll("[data-pr-comment], [data-pr-comment-refusal]")) {
+      if (outside(tool) && !comments.has(key(tool))) comments.set(key(tool), tool)
+    }
     // One row per distinct text: the Graph tab's canvas and its flowchart fallback export the same diagram.
     const seen = new Set()
-    const tools = [...document.querySelectorAll("[data-mermaid-name][data-copy-text-value]")].filter((tool) => {
-      const key = `${tool.dataset.copyTextValue}\u0000${tool.dataset.mermaidHref || ""}`
-      if (this.element.contains(tool) || seen.has(key)) return false
-      seen.add(key)
+    // A text over the inline budget is not in the page: its tool copies from its .mmd route.
+    const tools = [...document.querySelectorAll("[data-mermaid-name][data-copy-text-value]:not([data-pr-comment]), [data-mermaid-name][data-copy-url-value]")].filter((tool) => {
+      const text = `${tool.dataset.copyTextValue || tool.dataset.copyUrlValue}\u0000${tool.dataset.mermaidHref || ""}`
+      if (!outside(tool) || seen.has(text)) return false
+      seen.add(text)
       return true
     })
     for (const tool of tools) {
       const title = tool.dataset.mermaidName
-      const button = document.createElement("button")
-      button.type = "button"
-      button.className = "tool"
-      button.textContent = `⎘ ${title}`
-      button.setAttribute("aria-label", `Copy the Mermaid text of ${title}`)
-      button.dataset.controller = "copy"
-      button.dataset.copyTextValue = tool.dataset.copyTextValue
-      button.dataset.action = "copy#copy"
-      list.appendChild(button)
+      list.appendChild(this.copyButton(`⎘ ${title}`, `Copy the Mermaid text of ${title}`, tool.dataset.copyTextValue, tool.dataset.copyUrlValue))
       if (tool.dataset.mermaidHref) {
         const link = document.createElement("a")
         link.className = "tool"
@@ -67,7 +68,29 @@ export default class extends Controller {
         link.setAttribute("aria-label", `${title} as Mermaid text, ${tool.dataset.mermaidHref}`)
         list.appendChild(link)
       }
+      const comment = comments.get(key(tool))
+      if (comment?.dataset.prComment !== undefined) {
+        list.appendChild(this.copyButton("⎘ for PR comment", `for PR comment: copy ${title} as a GitHub pull-request comment`, comment.dataset.copyTextValue))
+      } else if (comment) {
+        const note = document.createElement("span")
+        note.className = "lyr"
+        note.textContent = `${title}: ${comment.dataset.prCommentRefusal}`
+        list.appendChild(note)
+      }
     }
     list.hidden = tools.length === 0
+  }
+
+  copyButton(text, label, value, url) {
+    const button = document.createElement("button")
+    button.type = "button"
+    button.className = "tool"
+    button.textContent = text
+    button.setAttribute("aria-label", label)
+    button.dataset.controller = "copy"
+    if (url) button.dataset.copyUrlValue = url
+    else button.dataset.copyTextValue = value
+    button.dataset.action = "copy#copy"
+    return button
   }
 }
