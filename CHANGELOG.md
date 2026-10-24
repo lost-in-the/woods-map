@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Routes tab: *Reached by a route helper* shows each helper a referencing unit calls and the action it reaches, linked to that action's Passage, from the unit's `route_helper_references` (woods#795). On a generation extracted before them the column reads *not in this generation* and the controller-level limit stays named.
 - Graph flow overlay and timeline (woods-map#7, A-4, A-6, docs/design/notes/graph-page.md). Both appear on the Graph tab and on `/woods/graph`.
   - **Flows:** the rail lists the precomputed flows that expanded a step of the centre (Woods W-13, `flows/by_unit.json`). `?flow=` lays one over the canvas: each step's unit, and the drawn edge between consecutive steps, are outlined in the link colour. *Play the flow* lights the steps in order; with reduced motion the whole path is lit at once.
   - A side list gives every step with its operation count, whether the canvas draws it, and the edge that reached it. Steps with no graph edge are marked, never invented.

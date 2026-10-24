@@ -36,8 +36,13 @@ module WoodsMap
       end
     end
 
-    # One unit reaching the controller through a route helper.
-    Reference = Struct.new(:source, :source_type, :via, keyword_init: true)
+    # One unit reaching the controller through a route helper. +uses+ are the
+    # helpers it calls for this controller by this mechanism, from its
+    # `route_helper_references` (woods#795); nil when its generation predates them.
+    Reference = Struct.new(:source, :source_type, :via, :uses, keyword_init: true)
+
+    # One route helper a unit calls: the helper as written and the action it reaches.
+    Use = Struct.new(:helper, :action, :verb, :path, keyword_init: true)
 
     # @param repository [WoodsMap::Repository]
     # @param unit [Hash] the controller unit
@@ -85,6 +90,7 @@ module WoodsMap
         end
         refs.uniq { |ref| [ref.source, ref.source_type, ref.via] }
             .sort_by { |ref| [NAVIGATION.index(ref.via), ref.source.to_s] }
+            .each { |ref| ref.uses = uses_for(ref) }
       end
     end
 
@@ -95,13 +101,28 @@ module WoodsMap
 
     # @return [Array<String>] what this tab cannot show from the index
     def limits
-      limits = ['helper references name the controller, not the helper or action (woods#795)']
+      limits = []
+      if references.any? { |ref| ref.uses.nil? }
+        limits << 'helper references name the controller, not the helper or action (woods#795)'
+      end
       missing = @routes.count { |route| route.unit.nil? }
       limits << "#{missing} #{'route'.pluralize(missing)} without a route unit in this generation" if missing.positive?
       limits
     end
 
     private
+
+    # The helpers a referencing unit publishes for this controller and mechanism.
+    def uses_for(ref)
+      published = @repository.unit(ref.source, type: ref.source_type.to_s)&.dig('metadata', 'route_helper_references')
+      return nil unless published.is_a?(Array)
+
+      mine = published.select { |entry| entry['controller'] == @identifier && entry['via'].to_s == ref.via }
+      uses = mine.map do |entry|
+        Use.new(helper: entry['helper'], action: entry['action'], verb: entry['verb'], path: entry['path'])
+      end
+      uses.sort_by { |use| [use.helper.to_s, use.action.to_s] }
+    end
 
     def build_routes
       declared = Array(@metadata['routes']).flat_map do |action, list|
