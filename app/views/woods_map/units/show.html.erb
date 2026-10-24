@@ -10,7 +10,7 @@
   <% groups = [{ label: 'nothing to outline', count: '', items: [{ key: '·', text: 'the index records no members for this unit' }] }] if groups.empty? %>
   <%= render 'woods_map/components/rail', heading: 'Outline, as Rails runs it', groups: groups %>
   <div class="main">
-    <%= render 'woods_map/units/code_view', code: @code, page: @page %>
+    <%= render 'woods_map/units/code_view', code: @code, page: @page, heat: @heat, concern_paths: @concern_paths %>
     <% @cards.each do |card| %><template data-card-target="card" data-href="<%= woods_map.unit_path(type: card.type, identifier: card.identifier) %>"><%= render 'woods_map/units/card', card: card %></template><% end %>
     <%= render 'woods_map/units/settings', page: @page, lens: @code.lens %>
     <%= render 'woods_map/shared/status', items: ['links: published typed-registry verified constants', "heat strip: #{@page.unit.dig('metadata', 'git', 'change_frequency') || 'unknown'} churn, per unit until W-3", "gen #{@repository.generation_number}"], keys: [[%w[?], 'keyboard help'], [%w[p], 'peek'], [%w[/], 'search']] %>
