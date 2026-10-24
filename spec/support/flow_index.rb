@@ -43,11 +43,24 @@ module WoodsMap
         at_exit { FileUtils.remove_entry(dir) if File.directory?(dir) }
         FileUtils.cp_r(File.join(FIXTURE_INDEX, '.'), dir)
         flows = File.join(dir, 'payloads', 'gen-1', 'flows')
+        FileUtils.rm_rf(flows)
         FileUtils.mkdir_p(flows)
         File.write(File.join(flows, 'flow_index.json'),
                    JSON.generate(ENTRY => 'flows/MicropostsController_create.json'))
         File.write(File.join(flows, 'MicropostsController_create.json'), JSON.generate(DOCUMENT))
         File.write(File.join(flows, 'by_unit.json'), JSON.generate(INVERSE))
+        dir
+      end
+    end
+
+    # @return [String] the fixture index with no flow family, as a generation
+    #   extracted with `precompute_flows` off is published
+    def bare_path
+      @bare_path ||= begin
+        dir = Dir.mktmpdir('woods-map-no-flows')
+        at_exit { FileUtils.remove_entry(dir) if File.directory?(dir) }
+        FileUtils.cp_r(File.join(FIXTURE_INDEX, '.'), dir)
+        FileUtils.rm_rf(File.join(dir, 'payloads', 'gen-1', 'flows'))
         dir
       end
     end

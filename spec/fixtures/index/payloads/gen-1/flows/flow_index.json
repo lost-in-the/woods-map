@@ -1,0 +1,4 @@
+{
+  "MicropostsController#create": "flows/MicropostsController_create.json",
+  "UsersController#show": "flows/UsersController_show.json"
+}

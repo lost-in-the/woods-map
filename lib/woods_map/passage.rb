@@ -3,30 +3,16 @@
 module WoodsMap
   # The data passage of one controller or mailer action (B8-Passage): what the
   # index publishes of request → filters → action → templates → response.
-  # Filter scopes are shown as declared; the resolved chain and owner (W-8)
-  # is named as a limit, never derived here. With W-7's per-action facts the
-  # passage knows what the action and its filters assign and render, and
-  # notes template ivar mentions with no assignment recorded in those bodies.
+  # Filters follow the resolved chain Woods publishes (W-8, woods#758): the
+  # actions each applies to, its owner and whether an if/unless condition
+  # still decides it. On a generation without it the passage falls back to
+  # the declared only/except and names the resolved chain as a limit; it never
+  # derives the chain itself. With W-7's per-action facts the passage knows
+  # what the action and its filters assign and render, and notes template ivar
+  # mentions with no assignment recorded in those bodies.
   class Passage
-    # One application filter with its declared scope.
-    Filter = Struct.new(:kind, :name, :only, :except, :file, :line, keyword_init: true) do
-      # @return [String] the declared scope as Rails reads it
-      def scope
-        return "only: #{only.join(', ')}" if only
-        return "except: #{except.join(', ')}" if except
-
-        'every action'
-      end
-
-      # @param action [String]
-      # @return [Boolean] whether the declared only/except names the action
-      def declared_for?(action)
-        return only.include?(action) if only
-        return except.exclude?(action) if except
-
-        true
-      end
-    end
+    # One application filter (see {PassageFilter}).
+    Filter = PassageFilter
 
     # A template ivar mention with no assignment recorded in the action or its filters.
     Flag = Struct.new(:ivar, :template, keyword_init: true)
@@ -83,12 +69,20 @@ module WoodsMap
         (facts&.line && { 'owner' => identifier, 'file' => facts.file, 'line' => facts.line })
     end
 
-    # @return [Array<Filter>] the application's filters in declared order; framework ones are counted, not listed
+    # @return [Array<Filter>] the application's filters in chain order; framework ones are counted, not listed
     def filters
       @filters ||= raw_filters.reject { |f| framework?(f) }.map do |f|
         Filter.new(kind: f['kind'] || f['type'].to_s.sub('_action', ''), name: f['filter'].to_s,
-                   only: f['only'], except: f['except'], file: f['file'], line: f['line'])
+                   only: f['only'], except: f['except'], if_condition: f['if'], unless_condition: f['unless'],
+                   file: f['file'], line: f['line'], owner: f['owner'], applies_to: f['applies_to'],
+                   applicability: f['applicability'])
       end
+    end
+
+    # @return [Boolean] whether every filter carries the resolved chain (W-8); false on an older
+    #   generation, where the passage shows declared scopes and names the limit
+    def resolved?
+      raw_filters.any? && raw_filters.all? { |f| f['applies_to'].is_a?(Array) }
     end
 
     # @return [Integer] filters the framework adds (engines, CSRF, origin), hidden from the passage
@@ -97,9 +91,10 @@ module WoodsMap
     end
 
     # @param for_action [String]
-    # @return [Array<Filter>] the filters whose declared scope names the action
+    # @return [Array<Filter>] the filters that apply to the action, in chain order: the published
+    #   applies_to (W-8), else the declared scope
     def filters_for(for_action = action)
-      filters.select { |f| f.declared_for?(for_action) }
+      filters.select { |f| f.applies?(for_action) }
     end
 
     # @return [Array<String>] path parameters named by the action's routes
@@ -118,6 +113,11 @@ module WoodsMap
     # @return [Array<PermittedAttributes>] each permitted-params method set against its model's published facts
     def permitted_attributes
       @permitted_attributes ||= permitted.map { |entry| PermittedAttributes.new(@repository, entry) }
+    end
+
+    # @return [WoodsMap::PartialLocals] the locals each partial here is passed, set against what it reads
+    def partial_locals
+      @partial_locals ||= PartialLocals.new(@repository, templates, "#{identifier}##{action}")
     end
 
     # @return [Array<PassageTemplates::Template>] the action's templates (depth 0) and their partial chain

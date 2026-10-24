@@ -59,6 +59,7 @@ RSpec.describe 'Graph overlays', type: :request do
   end
 
   it 'names why a generation without flows lists none' do
+    WoodsMap.configuration.index_dir = WoodsMap::FlowIndex.bare_path
     html = page_for('/woods/units/model/User/graph')
     text = html.at_css('nav.rail').text
     expect(text).to include(WoodsMap::FlowIndex.readers? ? 'publishes no flows' : 'woods#805')

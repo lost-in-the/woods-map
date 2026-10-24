@@ -7,6 +7,7 @@ require 'woods/mcp/index_reader'
 require 'woods/source_inputs/status'
 require_relative 'repository_history'
 require_relative 'repository_flows'
+require_relative 'retention'
 
 module WoodsMap
   # One pinned generation per request.

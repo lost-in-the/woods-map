@@ -52,18 +52,17 @@ RSpec.describe WoodsMap::GraphFlow do
     skip 'this Woods has no flow readers (W-13, woods#805)' unless WoodsMap::FlowIndex.readers?
 
     WoodsMap::Repository.open(WoodsMap::FlowIndex.path) do |repository|
-      expect(repository.flow_state).to eq(:available)
       expect(%w[User Relationship].map { |id| repository.flow_entry_points(id, type: 'model') })
         .to eq([[WoodsMap::FlowIndex::ENTRY], []])
+      expect(repository.flows_state).to eq(:available)
       expect(repository.flow_document(WoodsMap::FlowIndex::ENTRY)['steps'].size).to eq(4)
       expect(repository.flow_document('UsersController#index')).to be_nil
     end
   end
 
   it 'names why a generation cannot list flows' do
-    WoodsMap::Repository.open(FIXTURE_INDEX) do |repository|
+    WoodsMap::Repository.open(WoodsMap::FlowIndex.bare_path) do |repository|
       expected = WoodsMap::FlowIndex.readers? ? :absent : :unsupported
-      expect(repository.flow_state).to eq(expected)
       expect(described_class.entries(repository, 'User', 'model')).to eq(state: expected, entries: [])
     end
   end

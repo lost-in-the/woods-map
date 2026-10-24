@@ -12,6 +12,7 @@
   - **Hotspots:** a churn × dependents quadrant and a forward-flow sankey between layers, drawn by Pele. The LOC treemap waits on woods#810.
   - **Share menu** on every tab: the focus URL and the tab's text exports as plain links. The new diagram texts are at `/woods/landscape/components.mmd?group=`, `/quadrant.mmd` and `/sankey.mmd`; a diagram the generation cannot draw answers 422.
 
+- Passage filters follow Woods' resolved chain (W-8, woods#800; B-16, woods-map#3). The filter matrix is drawn in chain order with each filter's owner, linked when the index holds it and marked `←` for a concern, and the filter stages count the filters that apply and list the skipped ones. A filter with an `if`/`unless` condition is marked conditional: Woods does not evaluate the condition, so its ✓ means it can run. On a generation extracted before W-8 the page keeps the declared `only`/`except` scopes and names the resolved chain as a limit.
 - M7 guide (woods-map#9, FR-8). `config.guide_enabled` (off by default) docks a guide panel beside every framed page (B8-Guide). The panel is a RubyLLM 2.1 agent over the Woods Index MCP server: stdio to `woods-mcp` (D-7) or a deployed `woods-mcp-http`, with the twelve read-only tools only.
   - Eight page-aware actions, as overridable prompt templates, plus free questions, seeded with a server-built context: generation, unit, selected lines, action, impact focus or range.
   - Answers stream over server-sent events, with tool cards as calls start and end, and finish as Markdown rendered with links only to known identifiers.

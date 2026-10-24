@@ -15,7 +15,7 @@ Scope: E-8 ([woods-map#4](https://github.com/lost-in-the/woods-map/issues/4)), o
 | Changed | *Modified, added or removed since gen N.* Names the facets and metadata keys that moved, and says which lines changed is not in the report (woods#802). |
 | Affected | *Affected since gen N.* The unit is unchanged itself and sits *k* hops from a change. |
 | Unchanged | *Unchanged since gen N.* No change and not reached. |
-| No comparison | Woods' resolution message, which names the retained generations, with the W-11 limit (woods#761). |
+| No comparison | Woods' resolution message, which names the retained generations, then the pinned generations (W-11), or how to pin a review base when none is. |
 
 Each banner has *open the report* (the range page focused on this unit) and *clear*. The page's tabs keep `since`.
 

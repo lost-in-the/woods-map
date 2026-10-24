@@ -1,60 +1,63 @@
 # frozen_string_literal: true
 
 module WoodsMap
-  # The flow reads of {Repository} (A-4): which precomputed flows a typed unit
-  # takes part in (Woods W-13, `flows/by_unit.json`) and one flow document,
-  # both from the pinned generation through `Woods::PublishedIndex`. Mixed
-  # into Repository, which supplies `@index`.
+  # The flow and retention reads of {Repository}: Woods' inverted flow
+  # membership (W-13) and the precomputed flow documents of the pinned
+  # generation, and the index's retention pins (W-11). Mixed into Repository,
+  # which supplies `@index`.
+  #
+  # Flow artifacts are optional. Woods answers nil when the generation
+  # publishes none ("cannot say"), never an empty list; {#flows_state} keeps
+  # that distinction, and an artifact Woods refuses as corrupt reads as
+  # :unreadable rather than as no flows.
   module RepositoryFlows
-    # Entry points whose flow documents expanded a step of this typed unit.
-    #
     # @param identifier [String]
     # @param type [String]
-    # @return [Array<String>, nil] sorted entry points; nil when the
-    #   generation cannot say ({#flow_state} names why)
+    # @return [Array<String>, nil] entry points whose flow documents expanded
+    #   the typed unit; nil when the generation cannot say
     def flow_entry_points(identifier, type:)
-      return nil unless flow_state == :available
+      return nil unless flow_readers?
 
-      @flow_entry_points ||= {}
-      @flow_entry_points.fetch([identifier, type]) do
-        @flow_entry_points[[identifier, type]] = Array(@index.flow_entry_points(identifier, type: type))
-      end
+      entries = @index.flow_entry_points(identifier.to_s, type: type.to_s)
+      @flows_state ||= entries.nil? ? :absent : :available
+      entries
     rescue StandardError
-      @flow_state = :unreadable
+      @flows_state = :unreadable
       nil
     end
 
-    # One precomputed flow document, as Woods publishes it (string keys).
-    #
-    # @param entry_point [String] e.g. `PostsController#create`
-    # @return [Hash, nil] nil when the generation does not list it or cannot be read
+    # @param entry_point [String] a flow index key, e.g. `UsersController#show`
+    # @return [Hash, nil] the published document; nil when not listed or unreadable
     def flow_document(entry_point)
-      return nil unless flow_state == :available
+      return nil unless flow_readers?
 
-      @index.flow_document(entry_point.to_s)
+      @flow_documents ||= {}
+      return @flow_documents[entry_point] if @flow_documents.key?(entry_point)
+
+      @flow_documents[entry_point] = @index.flow_document(entry_point.to_s)
     rescue StandardError
-      nil
+      @flows_state = :unreadable
+      @flow_documents[entry_point] = nil
     end
 
-    # Why {#flow_entry_points} answers what it does.
-    #
-    # @return [Symbol] :available, :absent (no flow inverse: flows were not
-    #   precomputed, or an older Woods wrote them), :unreadable (Woods refused
-    #   the artifact) or :unsupported (this Woods has no flow readers, W-13)
-    def flow_state
-      @flow_state ||= if !@index.respond_to?(:flow_entry_points) then :unsupported
-                      elsif probe_flow_inverse.nil? then :absent
-                      else :available
-                      end
-    rescue StandardError
-      :unreadable
+    # @return [Symbol] :unsupported (no flow readers in this Woods), :unknown
+    #   (nothing asked yet), :absent (no inverse published), :available or
+    #   :unreadable
+    def flows_state
+      return :unsupported unless flow_readers?
+
+      @flows_state || :unknown
+    end
+
+    # @return [WoodsMap::Retention] the index's retention pins, read once
+    def retention
+      @retention ||= Retention.read(@index.index_dir)
     end
 
     private
 
-    # Any lookup reads the whole inverse once; nil when none is published.
-    def probe_flow_inverse
-      @index.flow_entry_points('', type: '')
+    def flow_readers?
+      @index.respond_to?(:flow_entry_points) && @index.respond_to?(:flow_document)
     end
   end
 end

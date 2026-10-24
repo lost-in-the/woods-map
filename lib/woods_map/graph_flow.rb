@@ -22,10 +22,10 @@ module WoodsMap
     # @param repository [Repository]
     # @param identifier [String]
     # @param type [String]
-    # @return [Hash] :state (Repository#flow_state) and :entries (Array<String>)
+    # @return [Hash] :state (Repository#flows_state, read after the lookup) and :entries (Array<String>)
     def self.entries(repository, identifier, type)
       entries = repository.flow_entry_points(identifier, type: type)
-      { state: repository.flow_state, entries: Array(entries) }
+      { state: repository.flows_state, entries: Array(entries) }
     end
 
     # @param repository [Repository]

@@ -20,8 +20,11 @@ module WoodsMap
     # @param references [WoodsMap::References]
     # @param marginalia [WoodsMap::Marginalia]
     # @param unit_path [#call] identifier, type => URL
-    def initialize(unit, lens:, references:, marginalia:, unit_path:)
+    # @param callers [Hash{String, nil => Array<Callers::Call>}] calls into this unit by method (B-13)
+    def initialize(unit, lens:, references:, marginalia:, unit_path:, callers: {}) # rubocop:disable Metrics/ParameterLists
       @unit = unit
+      @callers = callers
+      @definitions = definition_lines
       @lens = LENSES.include?(lens.to_s) ? lens.to_s : 'effective'
       @composite = CompositeSource.new(unit)
       @references = references
@@ -42,6 +45,12 @@ module WoodsMap
       @linked_targets || []
     end
 
+    # @return [Array<References::Ambiguity>] ambiguous references the rows link, for their popovers
+    def ambiguities
+      rows
+      @references.ambiguities
+    end
+
     # @return [Integer] lines in the file itself
     def line_count
       @composite.file_lines.size
@@ -54,12 +63,16 @@ module WoodsMap
 
     def written_rows
       links = @references.by_source_line(@composite.file_lines)
-      @linked_targets = links.sort.flat_map { |_, list| list.map { |link| [link.identifier, link.type] } }.uniq
+      @linked_targets = links.sort.flat_map do |_, list|
+        list.filter_map do |link|
+          [link.identifier, link.type] if link.identifier
+        end
+      end.uniq
       highlighted = highlight(@composite.file_lines, links)
       @composite.file_lines.zip(highlighted).map do |line, html|
         file_line = line.label.to_i
         Row.new(kind: :line, number: file_line, label: line.label, html: html,
-                note: @marginalia.for_line(line.text))
+                note: @marginalia.for_line(line.text) || caller_note(file_line))
       end
     end
 
@@ -77,6 +90,27 @@ module WoodsMap
         end
       end
       rows
+    end
+
+    # file line => method name, for the unit's own definitions (W-2)
+    def definition_lines
+      Array(@unit.dig('metadata', 'methods')).each_with_object({}) do |entry, lines|
+        next unless entry.is_a?(Hash) && entry['owner'] == @unit['identifier'] && entry['line'].is_a?(Integer)
+
+        line = References.file_line(@unit, entry['line'])
+        lines[line] ||= entry['name'] if line
+      end
+    end
+
+    # The margin's "called from" on a definition line (B-13).
+    def caller_note(file_line)
+      calls = @callers[@definitions[file_line]] if @definitions.key?(file_line)
+      return unless calls&.any?
+
+      names = calls.map(&:caller).uniq
+      shown = names.first(2).join(', ')
+      more = names.size > 2 ? " +#{names.size - 2}" : ''
+      Marginalia::Note.new(text: "called from #{calls.size}: #{shown}#{more}", layer: 'reference spans')
     end
 
     def header_summary(header)
