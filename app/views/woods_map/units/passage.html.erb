@@ -53,7 +53,7 @@
       ].compact %>
   <div class="main">
     <section class="sec" aria-labelledby="ps">
-      <header><h2 class="t2" id="ps">Passage, <%= p.action %> <span class="n">request → filters → action → templates → response</span><%= info_tip('Every row links to its line. Filters are those whose declared only/except names this action; the resolved chain lands with W-8. Available per-action facts supply assigns, params and renders.') %></h2><button class="tool goto" type="button" data-controller="copy" data-copy-text-value="<%= p.mermaid %>" data-action="copy#copy" data-needs-js>⎘ copy as Mermaid</button></header>
+      <header><h2 class="t2" id="ps">Passage, <%= p.action %> <span class="n">request → filters → action → templates → response</span><%= info_tip('Every row links to its line. Filters are those whose declared only/except names this action; the resolved chain lands with W-8. Available per-action facts supply assigns, params and renders.') %></h2><button class="tool goto" type="button" data-controller="copy" data-copy-text-value="<%= p.mermaid %>" data-action="copy#copy" data-key="y" data-needs-js>⎘ copy as Mermaid</button></header>
       <div class="psg">
         <div class="stage">request<b><%= p.request_label %></b></div>
         <div class="rows">

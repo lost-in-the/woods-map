@@ -1,8 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Page keys that are not owned by a component: c / u / d pick the lifecycle
-// event, 1 / 2 / 3 the depth, y activates the first copy tool on the
-// page. Each is a link or a copy tool on the page, so the key only follows it.
+// event, 1 / 2 / 3 the depth, y activates the copy tool the page marks with
+// data-key="y" (the one its status bar names). Each is a link or a copy tool
+// on the page, so the key only follows it.
 export default class extends Controller {
   connect() {
     this.onKey = (e) => this.key(e)
@@ -18,7 +19,7 @@ export default class extends Controller {
     if (event.target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"]), [aria-modal="true"], dialog[open]')) return
     const map = { c: "[aria-label=entry] a:nth-child(1)", u: "[aria-label=entry] a:nth-child(2)", d: "[aria-label=entry] a:nth-child(3)", 1: "[aria-label=Depth] a:nth-child(1)", 2: "[aria-label=Depth] a:nth-child(2)", 3: "[aria-label=Depth] a:nth-child(3)" }
     if (event.key === "y") {
-      const tool = this.element.querySelector("[data-copy-text-value]")
+      const tool = this.element.querySelector('[data-key~="y"][data-copy-text-value]')
       if (tool) { tool.click(); event.preventDefault() }
       return
     }

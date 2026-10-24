@@ -13,7 +13,7 @@ async function runHelpRegression() {
     const style = doc.createElement('style')
     style.textContent = fixtureData.styles
     doc.head.append(style)
-    doc.body.innerHTML = page.html + '<button id="outside">Outside</button><input id="edit"><div contenteditable="true"><span id="nested">Editable</span></div><nav aria-label="entry"><a href="#create">Create</a></nav><nav aria-label="Depth"><a href="#one">One</a></nav><button data-copy-text-value="test">Copy</button><div id="other" role="dialog" aria-modal="true" hidden><button>Other</button></div>'
+    doc.body.innerHTML = page.html + '<button id="outside">Outside</button><input id="edit"><div contenteditable="true"><span id="nested">Editable</span></div><nav aria-label="entry"><a href="#create">Create</a></nav><nav aria-label="Depth"><a href="#one">One</a></nav><button data-copy-text-value="test" data-key="y">Copy</button><div id="other" role="dialog" aria-modal="true" hidden><button>Other</button></div>'
     const instances = {}
     for (const [name, source] of Object.entries(fixtureData.controllers)) {
       const Klass = win.Function('Controller', source.replace(/^import .*$/m, '').replace('export default class', 'return class'))(class {})
