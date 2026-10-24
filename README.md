@@ -73,6 +73,7 @@ WoodsMap.configure do |config|
   # under <index_dir>/explorer/chats unless guide_chats_dir says otherwise.
   # Index MCP servers kept alive: guide_mcp_servers (2 per process; 0 starts one
   # per answer), guide_mcp_idle_seconds (600), guide_mcp_wait_seconds (10).
+  # guide_heartbeat_seconds (15): an SSE comment on a quiet stream, for proxies.
 end
 ```
 

@@ -56,6 +56,11 @@ module WoodsMap
     #   {#guide_mcp_servers} are busy
     attr_accessor :guide_mcp_wait_seconds
 
+    # @return [Numeric] seconds of quiet after which an answer's event stream
+    #   gets an SSE comment line, so proxies and CDNs do not time it out
+    #   (DEPLOYMENT.md §8). 0 sends none.
+    attr_accessor :guide_heartbeat_seconds
+
     # @return [Integer] tokens one browser session may spend, all answers together
     attr_accessor :guide_token_budget
 
@@ -191,6 +196,7 @@ module WoodsMap
       @guide_mcp_servers = 2
       @guide_mcp_idle_seconds = 600
       @guide_mcp_wait_seconds = 10
+      @guide_heartbeat_seconds = 15
       @guide_token_budget = 60_000
       @guide_tool_calls = 12
       @guide_turns = 10
