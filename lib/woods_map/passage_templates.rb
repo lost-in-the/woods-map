@@ -39,6 +39,33 @@ module WoodsMap
 
     PARTIAL_DEPTH = 3
 
+    # The graph's view templates by every path that names one (+widgets/show+
+    # and +widgets/show.html+ name +widgets/show.html.erb+), built once per
+    # template list: a hub's impact page resolves the templates of thousands
+    # of actions, and a scan of the whole list per path dominated it.
+    TEMPLATE_PATHS = ObjectSpace::WeakMap.new
+    TEMPLATE_PATHS_LOCK = Mutex.new
+
+    # @param ids [Array<String>] the graph's +type_index.view_template+
+    # @return [Hash{String => Array<String>}] path => the templates it names: the
+    #   identifier itself, and each prefix ending before a dot of its file name
+    def self.template_paths(ids)
+      TEMPLATE_PATHS_LOCK.synchronize { TEMPLATE_PATHS[ids] ||= build_template_paths(ids) }
+    end
+
+    # @param ids [Array<String>]
+    # @return [Hash{String => Array<String>}]
+    def self.build_template_paths(ids)
+      ids.each_with_object({}) do |id, paths|
+        id = id.to_s
+        (paths[id] ||= []) << id
+        dot = id.rindex('/') || -1
+        while (dot = id.index('.', dot + 1))
+          (paths[id[0...dot]] ||= []) << id
+        end
+      end
+    end
+
     # @param repository [WoodsMap::Repository]
     # @param unit [Hash] a controller or mailer unit
     # @param action [String]
@@ -118,11 +145,12 @@ module WoodsMap
       end
     end
 
+    # The view templates a path names: the template itself, or one with an
+    # extension (or more) after it in the same directory.
     def at(path)
       prefix = "#{path}."
-      found = Array(@repository.graph.dig('type_index', 'view_template')).select do |id|
-        id == path || (id.start_with?(prefix) && id.delete_prefix(prefix).exclude?('/'))
-      end
+      ids = @repository.graph.dig('type_index', 'view_template')
+      found = ids.is_a?(Array) ? Array(self.class.template_paths(ids)[path.to_s]) : []
       found = mailer_templates.select { |id| id.start_with?(prefix) } if found.empty? && mailer?
       found.empty? ? [path] : found.sort
     end
