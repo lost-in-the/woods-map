@@ -130,12 +130,26 @@
           <% if partials_shown %>
             <div class="finding note"><span class="flag note">ⓘ</span> <b>Partial locals are not checked.</b> The index publishes no local a partial reads, and no local a template passes to its partials; a local passed and never read cannot be found. <%= layer_chip(WoodsMap::Passage::LOCALS_ITEM) %></div>
           <% end %>
+          <% flow_gap = @repository.flow_failures.find { |f| f['entry_point'] == "#{@page.identifier}##{p.action}" } %>
+          <% if flow_gap %>
+            <div class="finding note"><span class="flag note">⚑</span> <b>The precomputed flow of <%= flow_gap['entry_point'] %> did not assemble.</b> Woods ran with <code>precompute_flows = :best_effort</code> and recorded it instead of aborting: <%= flow_gap['error'] %>. Flows through this action are not in the index. <%= layer_chip("#{flow_gap['reason']}, W-14") %></div>
+          <% end %>
           <% if facts %>
             <div class="finding note"><span class="flag note">ⓘ</span> Template mentions are lexical and may include comments or template-local assignments. Helpers and filter conditions are not evaluated; these notes do not prove a runtime value.</div>
           <% end %>
         </div>
       </div>
     </section>
+    <% dynamic = WoodsMap::DynamicView.new(@repository) unless p.mailer? %>
+    <% if dynamic&.attributed? %>
+      <% dyn_steps = @ladder && @ladder_event ? @ladder.steps(@ladder_event) : [] %>
+      <% dyn_text = dynamic.passage(p, @ladder && @ladder_model, dyn_steps, @ladder && @ladder_event) %>
+      <% dyn_refusal = WoodsMap::DynamicView.refusal(dyn_text) %>
+      <section class="sec" aria-labelledby="c4">
+        <header><h2 class="t2" id="c4">Across containers <span class="n">C4 dynamic</span><%= info_tip("The passage's steps in the containers W-9 attributes them to, as on the Landscape page. #{@ladder ? "With the callback ladder's #{@ladder_event} of #{@ladder_model['identifier']}: its write in the database and the jobs and mailers it hands work to." : 'No model save is implied, so nothing reaches the database here.'}") %></h2></header>
+        <%= render 'woods_map/components/diagram', title: 'C4 dynamic', facts: ["#{@page.identifier}##{p.action}", ("#{@ladder_model['identifier']} #{@ladder_event}" if @ladder)].compact, name: "#{@page.identifier} #{p.action} passage dynamic", mermaid_url: woods_map.unit_passage_mmd_path(type: @page.type, identifier: @page.identifier, action_name: p.action, view: 'dynamic', event: (@ladder ? @ladder_event : nil)), mermaid: dyn_text, label: "C4 dynamic view of #{@page.identifier}##{p.action}: the request in the web process#{@ladder ? ", the #{@ladder_event} of #{@ladder_model['identifier']} and its write in the database" : ''}", refusal: dyn_refusal && "#{dyn_refusal}; the passage above lists every step.", legend: [['▭', 'a container, with its technology'], [tag.span('→', class: 'ar'), 'call or write; callback numbers match the ladder'], [tag.span('⇢', class: 'ar'), 'async hop to another container']], provenance: ['W-9 containers', "gen #{@repository.generation_number}"] %>
+      </section>
+    <% end %>
     <% unless p.mailer? || p.filters.empty? %>
       <section class="sec" aria-labelledby="fm">
         <header><h2 class="t2" id="fm">Filter matrix <span class="n">declared scope</span><%= info_tip('A ✓ means the filter\'s declared only/except names the action; the resolved chain (skip_before_action, inherited and concern-supplied filters, conditions) lands with W-8. The current action\'s column is marked in the head.') %></h2></header>

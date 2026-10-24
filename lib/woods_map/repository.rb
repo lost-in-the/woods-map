@@ -140,6 +140,15 @@ module WoodsMap
       @graph_analysis = {}
     end
 
+    # The request flows a best-effort extraction could not assemble (W-14,
+    # woods#764): +entry_point+, +controller+, +action+, +reason+, +error+.
+    # Empty when none failed, or with a Woods that does not publish them.
+    #
+    # @return [Array<Hash>]
+    def flow_failures
+      @flow_failures ||= @reader.respond_to?(:flow_failures) ? Array(@reader.flow_failures).grep(Hash) : []
+    end
+
     # Drift of the working tree against this generation, within a quarter
     # second budget; compares file identities, never runs git.
     #
