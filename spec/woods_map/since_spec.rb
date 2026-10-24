@@ -69,4 +69,15 @@ RSpec.describe WoodsMap::Since do
       expect(since_with(ranges, to: 2).line_marks('User', 'model')).to be_nil
     end
   end
+
+  it 'reads the columns a record names as moved, added before modified before removed' do
+    record = range_report_changes.first.merge('column_changes' => { 'added' => %w[zeta alpha], 'modified' => ['mid'],
+                                                                    'removed' => ['old'] })
+    stub_range_report(range_report_data.merge('changed' => [record]))
+    marks = described_class.from_param('gen:1', index_dir: 'x', repository: repository).column_marks('User', 'model')
+    expect([marks['alpha'], marks['mid'], marks['old'], marks.summary])
+      .to eq([:added, :modified, nil, '+alpha +zeta ~mid −old'])
+    expect(described_class.from_param('gen:1', index_dir: 'x', repository: repository).column_marks('Nope', 'model'))
+      .to be_nil
+  end
 end

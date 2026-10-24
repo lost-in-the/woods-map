@@ -8,10 +8,14 @@ module WoodsMap
     # @param erd [Erd]
     # @param chunk [Erd::Chunk]
     # @param columns [String] keys or all
-    def initialize(erd, chunk, columns: 'keys')
+    # @param notes [Hash{String => Hash{String => String}}] table name => column
+    #   name => a note drawn as the attribute's comment (`?since=`, E-8); a
+    #   noted column is drawn even in the keys-only view
+    def initialize(erd, chunk, columns: 'keys', notes: {})
       @erd = erd
       @chunk = chunk
       @columns = columns
+      @notes = notes
     end
 
     # @return [String]
@@ -28,21 +32,22 @@ module WoodsMap
 
     def entity_lines(table)
       keys = key_marks(table)
-      shown = table.columns.select { |c| @columns == 'all' || keys.key?(c['name'].to_s) }
+      notes = @notes.fetch(table.name, {})
+      shown = table.columns.map { |c| c['name'].to_s }.zip(table.columns)
+                   .select { |name, _| @columns == 'all' || keys.key?(name) || notes.key?(name) }
       return ["  #{quoted(table.name)}"] if shown.empty?
 
-      ["  #{quoted(table.name)} {", *shown.map { |c| "    #{attribute(c, keys[c['name'].to_s])}" }, '  }']
+      attributes = shown.map { |name, c| "    #{attribute(c, keys.fetch(name, nil), notes[name])}" }
+      ["  #{quoted(table.name)} {", *attributes, '  }']
     end
 
     # Mermaid attribute names and types are words; anything else reads as an underscore.
-    def attribute(column, marks)
+    def attribute(column, marks, note = nil)
       type = column['type'].to_s.gsub(/\W/, '_').presence || 'unknown'
       text = "#{type} #{column['name'].to_s.gsub(/[^\w-]/, '_')}"
-      return text unless marks
-
-      text += " #{marks[:keys].join(', ')}" if marks[:keys].any?
-      text += ' "no FK"' if marks[:no_fk]
-      text
+      text += " #{marks[:keys].join(', ')}" if marks && marks[:keys].any?
+      comment = [('no FK' if marks && marks[:no_fk]), note].compact.join(', ')
+      comment.empty? ? text : "#{text} #{quoted(comment)}"
     end
 
     # column => { keys: PK, FK, UK; no_fk: an association names it without a key }

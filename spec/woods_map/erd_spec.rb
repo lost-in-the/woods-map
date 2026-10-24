@@ -35,6 +35,15 @@ RSpec.describe WoodsMap::Erd do
       expect(erd.mermaid(chunk, columns: 'all')).to include('    datetime created_at')
     end
 
+    it 'draws a noted column even in the keys-only view and joins notes with a key comment (?since=)' do
+      notes = { 'microposts' => { 'content' => 'modified since gen 1' },
+                'relationships' => { 'follower_id' => 'added since gen 1' } }
+      text = erd.mermaid(chunk, notes: notes)
+      expect(text).to include('    text content "modified since gen 1"',
+                              '    integer follower_id "no FK, added since gen 1"')
+      expect(erd.mermaid(chunk)).not_to include('content')
+    end
+
     it 'finds associations without a foreign key, from the published facts only' do
       expect(erd.findings.map { |f| [f.severity, f.rule, f.where.last] })
         .to eq([[:blocking, 'association without a foreign key, not polymorphic', 'relationships.followed_id'],

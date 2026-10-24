@@ -4,7 +4,10 @@
 <% counts = @erd.findings.counts %>
 <% chunks = @erd.chunks(@by) %>
 <%= render 'woods_map/shared/crumbs', crumbs: @chunk ? [['erd', woods_map.erd_path], [@chunk.database, nil], [@chunk.label, nil]] : [['erd', nil]] %>
-<% mermaid = @chunk && @erd.mermaid(@chunk, columns: @columns) %>
+<% since_from = current_since&.available? ? current_since.from_generation : nil %>
+<% column_marks = since_from && @chunk ? @chunk.tables.filter_map { |name| table = @erd.table_named(name); marks = table && current_since.column_marks(table.identifier, 'database_table'); [name, marks] if marks }.to_h : {} %>
+<% notes = column_marks.transform_values { |marks| marks.by_name.transform_values { |kind| "#{kind} since gen #{since_from}" } } %>
+<% mermaid = @chunk && @erd.mermaid(@chunk, columns: @columns, notes: notes) %>
 <% controls = safe_join([
      tag.span('columns', class: 'lbl'), tag.span(safe_join(WoodsMap::Erd::COLUMN_MODES.map { |mode| link_to(mode, here.call(columns: mode), 'aria-current': (mode == @columns ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'columns'),
      tag.span('chunk by', class: 'lbl'), tag.span(safe_join(WoodsMap::Erd::GROUPINGS.map { |by| link_to(by, here.call(by: by, chunk: nil), 'aria-current': (by == @by ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'chunk by'),
@@ -15,7 +18,7 @@
   <div class="frame-facts">
     <% if current_since.available? %>
       <% moved = @erd.tables.count { |t| current_since.change(t.identifier, 'database_table') } %>
-      <%= render 'woods_map/components/banner', severity: (moved.positive? ? :mod : nil), lead: "#{moved} #{'table'.pluralize(moved)} changed since gen #{current_since.from_generation}.", text: "Woods' report, gen #{current_since.from_generation} → gen #{current_since.to_generation}. Changed tables are marked M in each chunk's table list; the diagram is drawn as it is now.", tools: link_to('clear', woods_map.erd_path(chunk: @chunk&.number)) %>
+      <%= render 'woods_map/components/banner', severity: (moved.positive? ? :mod : nil), lead: "#{moved} #{'table'.pluralize(moved)} changed since gen #{current_since.from_generation}.", text: "Woods' report, gen #{current_since.from_generation} → gen #{current_since.to_generation}. Changed tables are marked M in each chunk's table list with the columns that moved (woods#821); the diagram notes added and modified columns and is otherwise drawn as it is now.", tools: link_to('clear', woods_map.erd_path(chunk: @chunk&.number)) %>
     <% else %>
       <%= render 'woods_map/components/banner', severity: :mod, lead: "No comparison since #{current_since.selector}.", text: current_since.message, tools: link_to('clear', woods_map.erd_path(chunk: @chunk&.number)) %>
     <% end %>
@@ -50,8 +53,8 @@
     </section>
     <section class="sec" aria-labelledby="erd-tables">
       <header><h2 class="t2" id="erd-tables">Tables in this chunk <%= count_tag(tables.size) %></h2></header>
-      <%= render 'woods_map/components/table', label: 'Tables in this chunk', min_width: '860px', columns: [{ label: 'table', width: '200px', cell_class: 'nw id' }, { label: 'model', width: '180px' }, { label: 'columns', width: '80px' }, { label: 'foreign keys' }, { label: 'indexes', width: '120px' }, { label: 'finding', width: '220px' }],
-            rows: tables.map { |t| unique = t.indexes.count { |i| i['unique'] }; findings = @erd.findings.for_table(t); change = current_since&.change(t.identifier, 'database_table'); { classes: (change ? 'chg' : nil), cells: [safe_join([(change ? safe_join([chip(:modified), tag.span(" #{change['status']} since gen #{current_since.from_generation}: ", class: 'sr-only')]) : nil), unit_link(t.identifier, 'database_table', label: t.name, since: (change ? current_since.selector : nil))].compact, ' '), t.model ? unit_link(t.model, 'model') : tag.span('none, unmodelled', class: 'dim'), t.columns.size, t.foreign_keys.any? ? safe_join(t.foreign_keys.map { |fk| "#{fk['column']} → #{fk['to_table']}" }, tag.br) : empty_value(applicable: false), "#{t.indexes.size}#{", #{unique} unique" if unique.positive?}", findings.any? ? safe_join(findings.map { |f| safe_join([chip(:note), ' ', f]) }, tag.br) : empty_value(applicable: false)] } } %>
+      <%= render 'woods_map/components/table', label: 'Tables in this chunk', min_width: '860px', columns: [{ label: 'table', width: '200px', cell_class: 'nw id' }, { label: 'model', width: '180px' }, { label: 'columns', width: (column_marks.any? ? '200px' : '80px') }, { label: 'foreign keys' }, { label: 'indexes', width: '120px' }, { label: 'finding', width: '220px' }],
+            rows: tables.map { |t| unique = t.indexes.count { |i| i['unique'] }; findings = @erd.findings.for_table(t); change = current_since&.change(t.identifier, 'database_table'); { classes: (change ? 'chg' : nil), cells: [safe_join([(change ? safe_join([chip(:modified), tag.span(" #{change['status']} since gen #{current_since.from_generation}: ", class: 'sr-only')]) : nil), unit_link(t.identifier, 'database_table', label: t.name, since: (change ? current_since.selector : nil))].compact, ' '), t.model ? unit_link(t.model, 'model') : tag.span('none, unmodelled', class: 'dim'), (column_marks[t.name] ? safe_join([t.columns.size, tag.span(" columns moved since gen #{since_from}:", class: 'sr-only'), tag.br, tag.span(column_marks[t.name].summary, class: 'mut')]) : t.columns.size), t.foreign_keys.any? ? safe_join(t.foreign_keys.map { |fk| "#{fk['column']} → #{fk['to_table']}" }, tag.br) : empty_value(applicable: false), "#{t.indexes.size}#{", #{unique} unique" if unique.positive?}", findings.any? ? safe_join(findings.map { |f| safe_join([chip(:note), ' ', f]) }, tag.br) : empty_value(applicable: false)] } } %>
     </section>
     <% if crossing.any? %>
       <section class="sec" aria-labelledby="erd-crossing">

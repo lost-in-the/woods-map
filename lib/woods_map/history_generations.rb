@@ -66,7 +66,7 @@ module WoodsMap
     def read_filters(filters)
       @week = parse_date(filters[:week])
       @by = HistoryView::BY.include?(filters[:by].to_s) ? filters[:by].to_s : HistoryView::BY.first
-      @gen = filters[:gen].to_s.match?(/\A[1-9][0-9]{0,8}\z/) ? filters[:gen].to_i : nil
+      @gen = parse_generation(filters[:gen])
       @span = DateSpan.parse(filters[:span])
     end
 

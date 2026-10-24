@@ -184,7 +184,18 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
     erd = WoodsMap::Erd.build(repository)
     WoodsMap::Erd::GROUPINGS.product(WoodsMap::Erd::COLUMN_MODES).flat_map do |by, columns|
       erd.chunks(by).map { |c| ['er', "erd #{index} #{by} #{columns} #{c.number}", erd.mermaid(c, columns: columns)] }
+    end + noted_erd(erd, index)
+  end
+
+  # ?since= draws moved columns with a comment, beside a key's (E-8).
+  def noted_erd(erd, index)
+    chunk = erd.chunks('namespace').first
+    return [] unless chunk
+
+    notes = chunk.tables.index_with do |name|
+      erd.table_named(name).columns.first(2).to_h { |c| [c['name'].to_s, 'modified since gen 1'] }
     end
+    [['er', "erd #{index} noted", erd.mermaid(chunk, notes: notes)]]
   end
 
   def model_diagrams(unit, analysis)
