@@ -4,7 +4,12 @@ module WoodsMap
   # One application filter: its declared scope and, from W-8, the actions it
   # applies to, its owner and its applicability.
   PassageFilter = Struct.new(:kind, :name, :only, :except, :if_condition, :unless_condition, :file, :line,
-                             :owner, :applies_to, :applicability, keyword_init: true) do
+                             :owner, :applies_to, :applicability, :declaration, keyword_init: true) do
+    # @return [Hash] the shape {Since::Changed#callback} reads: name and declaration (woods#820)
+    def since_entry
+      { 'filter' => name, 'declaration' => declaration }
+    end
+
     # @return [String] the declared scope as Rails reads it
     def scope
       return "only: #{only.join(', ')}" if only

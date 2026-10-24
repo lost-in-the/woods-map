@@ -75,7 +75,7 @@ module WoodsMap
         Filter.new(kind: f['kind'] || f['type'].to_s.sub('_action', ''), name: f['filter'].to_s,
                    only: f['only'], except: f['except'], if_condition: f['if'], unless_condition: f['unless'],
                    file: f['file'], line: f['line'], owner: f['owner'], applies_to: f['applies_to'],
-                   applicability: f['applicability'])
+                   applicability: f['applicability'], declaration: f['declaration'])
       end
     end
 

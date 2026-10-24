@@ -177,8 +177,8 @@ module WoodsMap
     # @param chunk [Chunk]
     # @param columns [String] keys or all
     # @return [String] the chunk's erDiagram text (see {ErdDiagram})
-    def mermaid(chunk, columns: 'keys')
-      ErdDiagram.new(self, chunk, columns: columns).mermaid
+    def mermaid(chunk, columns: 'keys', notes: {})
+      ErdDiagram.new(self, chunk, columns: columns, notes: notes).mermaid
     end
 
     # @return [ErdFindings] the whole database's findings and facts
