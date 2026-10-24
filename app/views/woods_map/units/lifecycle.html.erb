@@ -2,22 +2,53 @@
 <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
 <% chains = @lifecycle.chains %>
 <% steps = @lifecycle.steps(@event) %>
-<% controls = safe_join([tag.span('entry', class: 'lbl'), tag.span(safe_join(WoodsMap::Lifecycle::EVENTS.map { |e| link_to(e, woods_map.unit_lifecycle_path(type: @page.type, identifier: @page.identifier, event: e), 'aria-current': (e == @event ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'entry')]) %>
+<% here = ->(event: @event, view: @view) { woods_map.unit_lifecycle_path(type: @page.type, identifier: @page.identifier, event: event, view: (view == WoodsMap::Lifecycle::VIEWS.first ? nil : view)) } %>
+<% controls = safe_join([
+     tag.span('entry', class: 'lbl'), tag.span(safe_join(WoodsMap::Lifecycle::EVENTS.map { |e| link_to(e, here.call(event: e), 'aria-current': (e == @event ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'entry'),
+     tag.span('view', class: 'lbl'), tag.span(safe_join(WoodsMap::Lifecycle::VIEWS.map { |v| link_to(v, here.call(view: v), 'aria-current': (v == @view ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'view')
+   ], ' ') %>
 <%= render 'woods_map/units/frame', page: @page, tab: 'lifecycle', controls: controls, definition: @definition %>
+<% transitions = @state_machines.flat_map { |machine| machine.transitions.map { |t| [machine, t] } } %>
 <div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
   <%= render 'woods_map/components/rail', heading: 'Lifecycle, as Rails runs it', groups: [
-        { label: 'events', count: 'steps', items: chains.map { |event, list| { key: '·', text: link_to(event, woods_map.unit_lifecycle_path(type: @page.type, identifier: @page.identifier, event: event)), own: "#{list.size} #{'step'.pluralize(list.size)}#{list.any?(&:async?) ? ', async' : ''}", current: event == @event } } },
-        { label: 'limits', count: 3, items: [{ key: '·', text: "#{@lifecycle.framework.size} framework #{'callback'.pluralize(@lifecycle.framework.size)} hidden", own: layer_chip('not defined here') }, { key: '·', text: 'proc callbacks are not analysed', own: layer_chip('CallbackAnalyzer') }, { key: '·', text: 'nothing here proves a path ran', own: layer_chip('static') }] }
-      ] %>
+        { label: 'events', count: 'steps', items: chains.map { |event, list| { key: '·', text: link_to(event, here.call(event: event)), own: "#{list.size} #{'step'.pluralize(list.size)}#{list.any?(&:async?) ? ', async' : ''}", current: event == @event } } },
+        ({ label: 'transitions', count: 'state machine', items: transitions.map { |_, t| { key: '·', text: t.event || 'transition', own: "#{t.from} → #{t.to}#{", guard #{t.guard}" if t.guard}" } } } if transitions.any?),
+        { label: 'limits', count: 4, items: [{ key: '·', text: "#{@lifecycle.framework.size} framework #{'callback'.pluralize(@lifecycle.framework.size)} hidden", own: layer_chip('not defined here') }, { key: '·', text: 'proc callbacks are not analysed', own: layer_chip('CallbackAnalyzer') }, { key: '·', text: 'no C4-dynamic view: it needs container attribution', own: layer_chip('W-9') }, { key: '·', text: 'nothing here proves a path ran', own: layer_chip('static') }] }
+      ].compact %>
   <div class="main">
-    <% mermaid = @lifecycle.mermaid(@event) %>
+    <% mermaid = @lifecycle.diagram(@view, @event) %>
+    <% panel = {
+         'sequence' => { title: 'Sequence', label: "Sequence of the #{@event} callbacks on #{@page.identifier}, numbered as in the steps below", unit: 'participants and messages',
+                         legend: [[tag.span('→', class: 'ar'), 'call, same process'], [tag.span('⇒', class: 'ar'), 'async hop: a new process; the transaction has ended'], ['', 'numbers match the steps below']] },
+         'flowchart' => { title: 'Flowchart', label: "Flowchart of the #{@event} callbacks on #{@page.identifier}, with each condition as a branch, numbered as in the steps below", unit: 'nodes',
+                          legend: [['◇', 'a condition; its "no" branch skips the step'], [tag.span('⇢', class: 'ar'), 'async hop to a job or mailer, another process'], ['', 'numbers match the steps below']] },
+         'lanes' => { title: 'Lanes', label: "Lanes of the #{@event} callbacks on #{@page.identifier}: validation, the transaction, after commit and another process", unit: 'nodes',
+                      legend: [['', 'one lane per place a step runs'], [tag.span('⇢', class: 'ar'), 'async hop to a job or mailer, another process'], ['', 'numbers match the steps below']] }
+       }.fetch(@view) %>
     <section class="sec">
-      <%= render 'woods_map/components/diagram', title: 'Sequence', facts: ["#{@page.identifier} #{@event}", "#{steps.size} steps"], tools: tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: mermaid, action: 'copy#copy', key: 'y' }), mermaid: mermaid, label: "Sequence of the #{@event} callbacks on #{@page.identifier}, numbered as in the steps below", refusal: (@lifecycle.over_budget?(@event) ? "#{@lifecycle.sequence_size(@event)} participants and messages is over the sequence budget of #{WoodsMap::Lifecycle::SEQUENCE_BUDGET}; the steps below list every one." : nil), legend: [[tag.span('→', class: 'ar'), 'call, same process'], [tag.span('⇒', class: 'ar'), 'async hop: a new process; the transaction has ended'], ['', 'numbers match the steps below']], provenance: ['resolved chain', "gen #{@repository.generation_number}"] %>
+      <%= render 'woods_map/components/diagram', title: panel[:title], facts: ["#{@page.identifier} #{@event}", "#{steps.size} steps"], name: "#{@page.identifier} lifecycle #{@event} #{@view}", mermaid_url: woods_map.unit_lifecycle_mmd_path(type: @page.type, identifier: @page.identifier, event: @event, view: (@view == WoodsMap::Lifecycle::VIEWS.first ? nil : @view)), mermaid: mermaid, key: 'y', label: panel[:label], refusal: (@lifecycle.refusal(@event, view: @view) && "#{@lifecycle.refusal(@event, view: @view)}; the steps below list every one."), legend: panel[:legend], provenance: ['resolved chain', "gen #{@repository.generation_number}"] %>
     </section>
     <section class="sec" aria-labelledby="ladder">
       <header><h2 class="t2" id="ladder">Steps for <%= @event %> <%= count_tag("#{steps.size} steps, in the order Rails runs them") %><%= info_tip('Order is the resolved runtime chain, not file order. Side effects come from a regex analysis of the callback body; a proc callback is skipped.') %></h2></header>
       <%= render 'woods_map/units/ladder', steps: steps, owner: @page.identifier, label: "Steps for #{@event}", event: @event %>
     </section>
-    <%= render 'woods_map/shared/status', items: ['sequence', 'numbers match the steps', "gen #{@repository.generation_number}"], keys: [[%w[c u d], 'event'], [%w[y], 'copy Mermaid'], [%w[/], 'search']] %>
+    <% @state_machines.each_with_index do |machine, index| %>
+      <% heading = "sm#{index}" %>
+      <section class="sec" aria-labelledby="<%= heading %>">
+        <header><h2 class="t2" id="<%= heading %>">State machine transitions <%= count_tag("#{machine.events.size} #{'event'.pluralize(machine.events.size)}, #{machine.states.size} #{'state'.pluralize(machine.states.size)}") %></h2><%= unit_link(machine.identifier, 'state_machine') %></header>
+        <% state_text = machine.mermaid %>
+        <%= render 'woods_map/components/diagram', title: 'State', facts: [machine.identifier, machine.gem].compact, name: "#{machine.identifier} state", mermaid_url: woods_map.unit_lifecycle_mmd_path(type: 'state_machine', identifier: machine.identifier), mermaid: state_text, label: "State diagram of #{machine.identifier}: #{machine.states.size} states and the events that move between them", refusal: (machine.refusal && "#{machine.refusal}; the transitions below list every one."), legend: [['label', 'the event, then its guard in brackets'], ['●', 'enters the initial state']], provenance: ['state_machine unit', "gen #{@repository.generation_number}"] %>
+        <%= render 'woods_map/components/table', label: "Transitions of #{machine.identifier}", min_width: '560px', columns: [{ label: 'event', width: '180px', cell_class: 'nw id' }, { label: 'from → to' }, { label: 'guard', width: '200px' }],
+              rows: machine.transitions.map { |t| { cells: [t.event || empty_value(applicable: false), "#{t.from} → #{t.to}", t.guard || empty_value(applicable: false)] } } %>
+      </section>
+      <% if machine.callbacks.any? %>
+        <section class="sec" aria-labelledby="<%= heading %>cb">
+          <header><h2 class="t2" id="<%= heading %>cb">Transition callbacks <%= count_tag(machine.callbacks.size) %><%= info_tip('As the extractor recorded each line of the DSL. The index does not tie a callback to its transitions or record its side effects (woods#796), so the diagram does not draw them.') %></h2></header>
+          <%= render 'woods_map/components/table', label: "Transition callbacks of #{machine.identifier}", min_width: '560px', columns: [{ label: 'callback, as declared', cell_class: 'id' }, { label: 'source', width: '200px' }],
+                rows: machine.callbacks.map { |line| { cells: [line, layer_chip('state machine DSL')] } } %>
+        </section>
+      <% end %>
+    <% end %>
+    <%= render 'woods_map/shared/status', items: [@view, 'numbers match the steps', "gen #{@repository.generation_number}"], keys: [[%w[c u d], 'event'], [%w[s f l], 'view'], [%w[y], 'copy Mermaid'], [%w[/], 'search']] %>
   </div>
 </div>

@@ -62,6 +62,8 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .keyboard-help dd{margin:0;overflow-wrap:anywhere}
 /* The current rail item sits on --select-tint, where --dim misses AA in the light theme (4.23:1). */
 .wm .rail li[aria-current=true] .own{color:var(--mut)}
+/* The ERD rail numbers its chunks; the number sits on the same tint. */
+.wm .rail li[aria-current=true] .k{color:var(--mut)}
 /* The hover card on a reference (B-3), inside the one tooltip (D-16). */
 .wm .tip .hcard{min-width:220px}
 .wm .hcard .hch{display:flex;gap:var(--s2);align-items:baseline;margin-bottom:var(--s1)}
@@ -138,7 +140,7 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .filter.auto{width:auto}
 .wm .tbl.fixed{table-layout:fixed}
 .wm .tbl.fit{min-width:max-content}
-.wm .tbl.min-480{--tbl-min:480px} .wm .tbl.min-560{--tbl-min:560px} .wm .tbl.min-640{--tbl-min:640px} .wm .tbl.min-720{--tbl-min:720px} .wm .tbl.min-760{--tbl-min:760px}
+.wm .tbl.min-480{--tbl-min:480px} .wm .tbl.min-560{--tbl-min:560px} .wm .tbl.min-640{--tbl-min:640px} .wm .tbl.min-700{--tbl-min:700px} .wm .tbl.min-720{--tbl-min:720px} .wm .tbl.min-760{--tbl-min:760px}
 .wm .tbl.min-820{--tbl-min:820px} .wm .tbl.min-860{--tbl-min:860px} .wm .tbl.min-900{--tbl-min:900px} .wm .tbl.min-980{--tbl-min:980px}
 .wm .tree [data-level="0"]{--l:0} .wm .tree [data-level="1"]{--l:1} .wm .tree [data-level="2"]{--l:2} .wm .tree [data-level="3"]{--l:3} .wm .tree [data-level="4"]{--l:4} .wm .tree [data-level="5"]{--l:5} .wm .tree [data-level="6"]{--l:6} .wm .tree [data-level="7"]{--l:7} .wm .tree [data-level="8"]{--l:8} .wm .tree [data-level="9"]{--l:9} .wm .tree [data-level="10"]{--l:10} .wm .tree [data-level="11"]{--l:11} .wm .tree [data-level="12"]{--l:12} .wm .tree [data-level="13"]{--l:13} .wm .tree [data-level="14"]{--l:14} .wm .tree [data-level="15"]{--l:15} .wm .tree [data-level="16"]{--l:16} .wm .tree [data-level="17"]{--l:17} .wm .tree [data-level="18"]{--l:18} .wm .tree [data-level="19"]{--l:19} .wm .tree [data-level="20"]{--l:20} .wm .tree [data-level="21"]{--l:21} .wm .tree [data-level="22"]{--l:22} .wm .tree [data-level="23"]{--l:23} .wm .tree [data-level="24"]{--l:24}
 .wm .tree .deep{--l:24}

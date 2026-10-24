@@ -4,7 +4,7 @@
 COPY_KEY_PROMISES = {
   '/woods/units/model/User/schema' => ['copy Mermaid', '⎘ copy Mermaid'],
   '/woods/units/model/User/lifecycle' => ['copy Mermaid', '⎘ copy Mermaid'],
-  '/woods/units/controller/UsersController/passage?action_name=edit' => ['copy Mermaid', '⎘ copy as Mermaid'],
+  '/woods/units/controller/UsersController/passage?action_name=edit' => ['copy Mermaid', '⎘ copy Mermaid'],
   '/woods/impact?focus=User' => ['copy URL', '⎘ copy focus URL'],
   '/woods/impact?focus=User&lens=risks' => ['copy URL', '⎘ copy focus URL']
 }.freeze

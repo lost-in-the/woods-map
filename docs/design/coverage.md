@@ -31,7 +31,7 @@ opens the file tree.
 | callers panel | Callers of the current method | B-13 | [B8-Code](boards/B8-Code.html) (margin "called from") | partial |
 | unit diff across generations | Unified source diff with metadata changes | B-14, FR-7 | [B8-Impact-Changed](boards/B8-Impact-Changed.html) (diff component) | partial, no unit-page entry |
 | Schema tab | ER one hop, associations, columns, database facts | FR-6 | [B6-Schema](boards/B6-Schema.html) | final |
-| Lifecycle tab | Sequence / flowchart / lanes, numbered steps, state machine | FR-6, B-19, B-23 | [B6-Lifecycle](boards/B6-Lifecycle.html) | final; C4-dynamic rendering (B-23) missing from the view control |
+| Lifecycle tab | Sequence / flowchart / lanes, numbered steps, state machine | FR-6, B-19, B-23 | [B6-Lifecycle](boards/B6-Lifecycle.html), [lifecycle views note](notes/lifecycle-views.md) | final; the flowchart and lanes renderings follow the note; C4-dynamic (B-23) needs W-9 and is not offered; per-transition callbacks wait on [woods#796](https://github.com/lost-in-the/woods/issues/796) |
 | Graph tab | Neighbourhood, filters, depth, hubs | FR-5, A-1, A-2 | [B6-Graph](boards/B6-Graph.html) | final; built with the Cytoscape canvas, the second layout is *radial* rather than *organic* pending [woods-map#63](https://github.com/lost-in-the/woods-map/issues/63) |
 | History tab | Commit strip, commits with description rows, co-change, people | FR-7, B-6, C-5 | [B6-History](boards/B6-History.html) | final; generation picker not drawn |
 | Controller: Routes tab | Routes, helpers, action sources | FR-3 | [Routes tab note](notes/routes-tab.md) | routes as declared joined to route units, named-route helpers, action sources, unresolvable-route findings; helper references are controller-level until [woods#795](https://github.com/lost-in-the/woods/issues/795) |
@@ -45,7 +45,7 @@ opens the file tree.
 | Landscape Hotspots | Quadrant, coupling matrix, sankey, treemap, structural risk | design study §7 | [B6-Overview](boards/B6-Overview.html) | final |
 | Landscape Domains | Domain clusters | design study §7 | — | **none** |
 | `/woods/graph` | Full-screen graph, domain clusters, list equivalent, flow overlay | FR-5, A-3 to A-6 | B5-Graph (tab only); [design note](notes/graph-page.md) | partial: page, list equivalent, blast tint and position cache built; clusters wait on [woods#799](https://github.com/lost-in-the/woods/issues/799); flow overlay and timeline open |
-| `/woods/erd` | Whole database by chunk, findings | FR-6 | [B6-ERD](boards/B6-ERD.html) | final |
+| `/woods/erd` | Whole database by chunk, findings | FR-6 | [B6-ERD](boards/B6-ERD.html) | final; the engine cuts chunks at the ER budget of 40 tables (R-4), not the board's ~15, lists relations to other chunks instead of drawing their far table, and leaves out the board's commits column and polymorphic candidates (W-23) |
 | `/woods/history` | Cross-unit timeline for a selected set, commit → node | FR-7, A-6 | — | **none** |
 | `/woods/impact` Overview | The PR comment, rendered | E-7 | B5-Impact-Overview | v5 |
 | Impact Changed | Units as subdivided rows, focus detail, diff | E-2, E-6 | [B8-Impact-Changed](boards/B8-Impact-Changed.html) | final |
@@ -56,7 +56,7 @@ opens the file tree.
 | Impact Unknown | Unknowns and what each layer proves | E-4, E-10 | [B8-Impact-Unknown](boards/B8-Impact-Unknown.html) | final |
 | `?since=` on any view | Changed lines, nodes, steps, columns highlighted | E-8 | [B8-States](boards/B8-States.html) (degraded), tree M badges | partial |
 | pre-change mode | Blast radius from a unit or method, no range | E-9 | — | **none** (the impact frame with a focus title; the engine renders it that way from the Changed, Risks, Tests and Unknown boards) |
-| Share menu | Focus URL and Mermaid (D-25) | E-6, E-7 | [Share menu note](notes/share-menu.md) | focus URL and the page's Mermaid on unit and impact pages, settled by D-25 ([woods-map#57](https://github.com/lost-in-the/woods-map/issues/57)); Markdown and JSON stay with Woods |
+| Share menu | Focus URL and Mermaid (D-25) | E-6, E-7 | [Share menu note](notes/share-menu.md) | the token-free focus URL, and for each diagram panel its Mermaid copy and stable `.mmd` link, on unit and impact pages; settled by D-25 ([woods-map#57](https://github.com/lost-in-the/woods-map/issues/57)); Markdown and JSON stay with Woods |
 | Trail board | Pinned units, lanes, flags, board state, export | C-1 to C-5 | — | **none** (release 0.2, M6) |
 | Guide panel | Context chips, actions, tool cards, streamed answer, budget | FR-8 | [B8-Guide](boards/B8-Guide.html) | final; chat history list not drawn |
 | settings | Editor URL scheme, lens, wrap and font size, per browser | B-15, D-6 | [Settings note](notes/settings.md) | modal from the code-view header; wrap opt-in in the one scroll region (D-24); *In editor at L…* only with a configured editor |
@@ -72,7 +72,7 @@ them. Each is a comment on that issue, so the issue owns it.
 - **M1 · Reading (woods-map#34, carried over from #2)**: units index and indexed ownership now have a [bounded design note](notes/m1-indexed-navigation.md) under [#34](https://github.com/lost-in-the/woods-map/issues/34); the Routes tab has a [design note](notes/routes-tab.md); remaining gaps include facts tiles for job, mailer, view, concern, serializer and table units; the hover card has a [design note](notes/hover-card.md); disambiguation popover; the settings popover has a [design note](notes/settings.md); keyboard help; Share menu contents ([design note](notes/share-menu.md), D-25).
 - **M2 · Passage (woods-map#3)**: mailer passage with templates (reuse the controller passage).
 - **M4b · Impact (woods-map#4)**: Overview tab at v8; Graph tab; pre-change mode; `?since=` highlighting on Code, Graph, Lifecycle, Passage, ERD and timeline views.
-- **M3 · Diagrams (woods-map#5)**: Landscape Context L1, Components L3, Domains; C4-dynamic in the Lifecycle view control; the renderer decision (woods-map#25).
+- **M3 · Diagrams (woods-map#5)**: Landscape Context L1, Components L3, Domains; C4-dynamic in the Lifecycle view control (needs W-9); the renderer decision (woods-map#25). The flowchart and lanes views follow the [lifecycle views note](notes/lifecycle-views.md).
 - **M4 · History (woods-map#6)**: `/woods/history` cross-unit timeline; generation picker; unit diff entry from the History tab.
 - **M5 · Graph (woods-map#7)**: [neighbourhood JSON contract](notes/neighbourhood-json.md); the Graph tab's Cytoscape canvas, layouts pending [woods-map#63](https://github.com/lost-in-the/woods-map/issues/63); the [full-screen graph](notes/graph-page.md) without clusters (woods#799); the flow overlay and timeline remain separate.
 - **M6 · Trail (woods-map#8)**: the board, end to end.

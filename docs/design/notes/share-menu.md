@@ -29,12 +29,12 @@ viewport.
 | Item | Source | Without JavaScript |
 | --- | --- | --- |
 | Focus URL with `⎘ copy URL` | `focus_url`: the page's absolute address and query, less any `token` (D-4). On opening it gains the `#L…` line the address targets | the URL text; the copy tool is hidden |
-| `⎘ <diagram title>` under *Mermaid*, one per diagram panel | the Mermaid text the panel already carries (`[data-diagram-target=source]`, D-21), copied unchanged | absent; each panel shows its Mermaid text instead |
+| `⎘ <diagram name>` and `⤓ .mmd` under *Mermaid*, one per distinct diagram export | each `components/mermaid_tools` copy tool (`data-mermaid-name`, `data-mermaid-href`): the Mermaid text the page already carries, unchanged, and the diagram's absolute, token-free `.mmd` URL (D-25) | absent; each panel shows its Mermaid text and its own `.mmd` link instead |
 
 **What the menu does not do:**
 
 - It never renders, parses, derives or hands through a Markdown or JSON report (D-25), and the boards' *Markdown for PR* button is dropped.
-- It does not add its own Mermaid export. Diagram-panel export belongs to the diagram panels.
+- It does not render Mermaid itself: it lists the exports the diagram tools already offer. The `.mmd` routes are paced like the JSON endpoints (M8) and answer a 429 as plain text.
 - The `y` key keeps copying the page's own first copy tool, skipping the Share menu's.
 
 ## Validation

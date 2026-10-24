@@ -16,7 +16,13 @@ WoodsMap::Engine.routes.draw do
   get 'graph/neighbourhood', to: 'neighbourhoods#show', as: :neighbourhood, defaults: { format: :json }
 
   # The impact page (M4b): a focus set with no range is the blast radius; a range delegates to Woods' report (W-12).
+  # The Mermaid text of a page's diagram as text/plain (D-25); see docs/design/notes/mermaid-text-urls.md.
+  get 'impact.mmd', to: 'impact#show', as: :impact_mmd, defaults: { mmd: '1' }, format: false
   get 'impact', to: 'impact#show', as: :impact
+
+  # The whole database by chunk (M3, B6-ERD): a chunk number, never a table name or path.
+  get 'erd.mmd', to: 'erd#show', as: :erd_mmd, defaults: { mmd: '1' }, format: false
+  get 'erd(/:chunk)', to: 'erd#show', as: :erd, constraints: { chunk: /[1-9][0-9]{0,5}/ }, format: false
 
   get 'units', to: 'units#index', as: :units
   # File paths are exact admitted file_map keys, never host filesystem paths.
@@ -26,6 +32,10 @@ WoodsMap::Engine.routes.draw do
   # Unit pages (M1): one route per tab, taking a unit type and an identifier
   # from the pinned generation; never a file path.
   scope 'units/:type', constraints: { type: /[a-z0-9_]+/ }, format: false do
+    # The tabs' Mermaid text (D-25), ahead of the glob routes that would take `.mmd` as part of an identifier.
+    %w[schema passage lifecycle graph].each do |tab|
+      get "*identifier/#{tab}.mmd", to: "units##{tab}", as: :"unit_#{tab}_mmd", defaults: { mmd: '1' }
+    end
     get '*identifier/schema', to: 'units#schema', as: :unit_schema
     get '*identifier/routes', to: 'units#routes', as: :unit_routes
     get '*identifier/passage', to: 'units#passage', as: :unit_passage

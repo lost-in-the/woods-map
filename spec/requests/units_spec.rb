@@ -46,6 +46,48 @@ RSpec.describe 'Unit pages', type: :request do
     expect(response.body).to include('List equivalent').and include('has_many')
   end
 
+  it 'offers the lifecycle as a sequence, a flowchart or lanes, falling back to the sequence' do
+    { nil => %w[Sequence sequenceDiagram], 'flowchart' => ['Flowchart', 'flowchart TD'],
+      'lanes' => ['Lanes', 'swimlane-beta TB'], 'c4' => %w[Sequence sequenceDiagram] }.each do |view, (title, start)|
+      get '/woods/units/model/User/lifecycle', params: { event: 'update', view: view }.compact
+      page = response.parsed_body
+      expect(page.at_css('.dia .dh b').text).to eq(title)
+      expect(page.at_css('.dia pre[data-diagram-target="source"]').text).to start_with(start)
+      expect(page.at_css('[aria-label="view"] a[aria-current="true"]').text).to eq(title.downcase)
+    end
+  end
+
+  it 'keeps the event across views and the view across events, and names the missing C4 view' do
+    get '/woods/units/model/User/lifecycle', params: { event: 'update', view: 'lanes' }
+    page = response.parsed_body
+    expect(page.css('[aria-label="view"] a').pluck('href'))
+      .to eq(['/woods/units/model/User/lifecycle?event=update',
+              '/woods/units/model/User/lifecycle?event=update&view=flowchart',
+              '/woods/units/model/User/lifecycle?event=update&view=lanes'])
+    expect(page.css('[aria-label="entry"] a').first['href'])
+      .to eq('/woods/units/model/User/lifecycle?event=create&view=lanes')
+    expect(response.body).to include('no C4-dynamic view: it needs container attribution')
+  end
+
+  it 'draws the model\'s published state machine under its steps' do
+    get '/woods/units/model/User/lifecycle'
+    panel = response.parsed_body.css('.dia[data-controller="diagram"]').last
+    expect(panel.at_css('.dh b').text).to eq('State')
+    expect(panel.at_css('pre').text).to start_with('stateDiagram-v2').and include('s1 --> s2 : suspend [admin?]')
+    expect(response.body).to include('after_transition :send_activation_email, on: :activate')
+    expect(response.parsed_body.at_css('a[href="/woods/units/state_machine/User::aasm"]')).to be_present
+  end
+
+  it 'lists every transition of the machine, and leaves the section out for a model without one' do
+    get '/woods/units/model/User/lifecycle'
+    table = response.parsed_body.at_css('table[aria-label="Transitions of User::aasm"]')
+    expect(table.css('tbody tr').map { |row| row.css('td').map(&:text) })
+      .to eq([['activate', 'pending → active', '—'], ['suspend', 'active → suspended', 'admin?'],
+              ['reinstate', 'suspended → active', '—']])
+    get '/woods/units/model/Micropost/lifecycle'
+    expect(response.body).not_to include('State machine transitions')
+  end
+
   it 'gives each diagram panel its Mermaid text for Pele, the text kept as the fallback' do
     { 'schema' => 'erDiagram', 'lifecycle' => 'sequenceDiagram', 'graph' => 'flowchart LR' }.each do |tab, start|
       get "/woods/units/model/User/#{tab}"
@@ -69,6 +111,7 @@ RSpec.describe 'Unit pages', type: :request do
   it 'keeps over-budget ER and sequence diagrams as text and names their budgets' do
     stub_const('WoodsMap::SchemaView::TABLE_BUDGET', 1)
     stub_const('WoodsMap::Lifecycle::SEQUENCE_BUDGET', 1)
+    stub_const('WoodsMap::StateMachineView::STATE_BUDGET', 1)
     { 'schema' => ['over the ER budget of 1', 'erDiagram'],
       'lifecycle' => ['over the sequence budget of 1', 'sequenceDiagram'] }.each do |tab, (says, text)|
       get "/woods/units/model/User/#{tab}"

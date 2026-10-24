@@ -6,12 +6,17 @@
     Mermaid text is drawn by Pele in the browser (D-21) and stays in the
     page as the no-JavaScript fallback and the copy source; refusal (String
     or nil) keeps the text and says why nothing is drawn, such as a node
-    budget (R-4). %>
+    budget (R-4). A Mermaid panel carries its own copy tool and .mmd link
+    (components/mermaid_tools); name (String) names the file, the title by
+    default; mermaid_url (String) is the panel's .mmd route (D-25); key ("y" or nil) marks
+    the copy the status bar names; and
+    export: false leaves the tools out. %>
 <% mermaid = local_assigns[:mermaid] %>
 <% refusal = local_assigns[:refusal] %>
 <% drawn = mermaid && !refusal %>
+<% export = mermaid && local_assigns.fetch(:export, true) %>
 <div class="dia"<% if drawn %> data-controller="diagram" data-diagram-label-value="<%= local_assigns[:label] || title %>"<% end %>>
-  <div class="dh"><b><%= title %></b><% facts.each do |fact| %><span><%= fact %></span><% end %><% if local_assigns[:tools] || drawn %><span class="tools"><%= local_assigns[:tools] %><% if drawn %><button class="tool" type="button" hidden data-diagram-target="toggle" data-action="diagram#toggle" aria-pressed="false">Mermaid text</button><% end %></span><% end %></div>
+  <div class="dh"><b><%= title %></b><% facts.each do |fact| %><span><%= fact %></span><% end %><% if local_assigns[:tools] || drawn || export %><span class="tools"><%= local_assigns[:tools] %><% if export %><%= render 'woods_map/components/mermaid_tools', text: mermaid, name: local_assigns[:name] || title, url: local_assigns[:mermaid_url], key: local_assigns[:key] %><% end %><% if drawn %><button class="tool" type="button" hidden data-diagram-target="toggle" data-action="diagram#toggle" aria-pressed="false">Mermaid text</button><% end %></span><% end %></div>
   <% if mermaid %>
     <div class="dw hscroll" data-controller="cliff" data-diagram-target="scroller">
       <% if refusal %><p class="cap refusal"><%= refusal %></p><% else %><p class="cap refusal" role="status" data-diagram-target="message" hidden></p><% end %>

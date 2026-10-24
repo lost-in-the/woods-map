@@ -99,6 +99,13 @@ module WoodsMap
       node_count > NODE_BUDGET
     end
 
+    # @return [String, nil] why the flowchart is not drawn, nil within the budget
+    def refusal
+      return nil unless over_budget?
+
+      "#{node_count} units is over the flowchart budget of #{NODE_BUDGET}; narrow the types or mechanisms to draw it"
+    end
+
     # Mermaid flowchart text for the filtered edges.
     #
     # @return [String]

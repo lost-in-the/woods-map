@@ -32,7 +32,7 @@ RSpec.describe 'The y copy key in Chromium', type: :request do
 
   def copy_key_pages
     { '/woods/units/model/User/schema' => '⎘ copy Mermaid', '/woods/units/model/User/lifecycle' => '⎘ copy Mermaid',
-      '/woods/units/controller/UsersController/passage?action_name=edit' => '⎘ copy as Mermaid',
+      '/woods/units/controller/UsersController/passage?action_name=edit' => '⎘ copy Mermaid',
       '/woods/impact?focus=User' => '⎘ copy focus URL' }.map do |path, expected|
       get path
       { path: path, expected: expected, html: response.parsed_body.at_css('main').inner_html }

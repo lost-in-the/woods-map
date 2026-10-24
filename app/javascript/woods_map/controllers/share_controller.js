@@ -3,8 +3,8 @@ import { Controller } from "@hotwired/stimulus"
 // The Share menu (E-6, E-7) is a native <details> disclosure: Enter or Space
 // on the summary opens it, Escape or a click outside closes it and focus
 // returns to the summary. On opening, the focus URL gains the line the
-// address targets (#L…), and one copy tool appears per diagram panel on the
-// page, copying the Mermaid text that panel already carries (D-21).
+// address targets (#L…), and each diagram export on the page gets a copy of
+// its Mermaid text and a link to its stable .mmd URL (D-25).
 export default class extends Controller {
   static targets = ["url", "copyUrl", "diagrams"]
 
@@ -34,23 +34,40 @@ export default class extends Controller {
     this.element.querySelector("summary").focus()
   }
 
+  // One row per diagram export on the page (components/mermaid_tools): copy
+  // its Mermaid text, and link its stable .mmd URL when the page has one.
   fillDiagrams() {
     const list = this.diagramsTarget
-    list.querySelectorAll("button").forEach((button) => button.remove())
-    const panels = [...document.querySelectorAll(".dia")].filter((panel) => panel.querySelector('[data-diagram-target="source"]'))
-    for (const panel of panels) {
-      const text = panel.querySelector('[data-diagram-target="source"]').textContent
-      const title = panel.querySelector(".dh b")?.textContent.trim() || "diagram"
+    list.querySelectorAll("button, a").forEach((node) => node.remove())
+    // One row per distinct text: the Graph tab's canvas and its flowchart fallback export the same diagram.
+    const seen = new Set()
+    const tools = [...document.querySelectorAll("[data-mermaid-name][data-copy-text-value]")].filter((tool) => {
+      const key = `${tool.dataset.copyTextValue}\u0000${tool.dataset.mermaidHref || ""}`
+      if (this.element.contains(tool) || seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+    for (const tool of tools) {
+      const title = tool.dataset.mermaidName
       const button = document.createElement("button")
       button.type = "button"
       button.className = "tool"
       button.textContent = `⎘ ${title}`
       button.setAttribute("aria-label", `Copy the Mermaid text of ${title}`)
       button.dataset.controller = "copy"
-      button.dataset.copyTextValue = text
+      button.dataset.copyTextValue = tool.dataset.copyTextValue
       button.dataset.action = "copy#copy"
       list.appendChild(button)
+      if (tool.dataset.mermaidHref) {
+        const link = document.createElement("a")
+        link.className = "tool"
+        link.href = tool.dataset.mermaidHref
+        link.type = "text/plain"
+        link.textContent = "⤓ .mmd"
+        link.setAttribute("aria-label", `${title} as Mermaid text, ${tool.dataset.mermaidHref}`)
+        list.appendChild(link)
+      }
     }
-    list.hidden = panels.length === 0
+    list.hidden = tools.length === 0
   }
 }

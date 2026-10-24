@@ -9,7 +9,8 @@
       unit_url           URL template with __type__ and __identifier__
       rail_extra         HTML for the rail after the filters, or nil
       blast              WoodsMap::BlastRadius or nil (tints the canvas)
-      page               true on the full-screen page %>
+      page               true on the full-screen page
+      mermaid_url        the flowchart's .mmd route (D-25), or nil %>
 <% blast = local_assigns[:blast] %>
 <% page = local_assigns.fetch(:page, false) %>
 <% filters = { types: params[:types].presence, via: params[:via].presence } %>
@@ -55,7 +56,7 @@
           <button class="tool" type="button" aria-label="Zoom in" data-action="graph#zoomIn">+</button>
           <button class="tool" type="button" aria-label="Zoom out" data-action="graph#zoomOut">−</button>
           <button class="tool" type="button" data-action="graph#fit">fit</button>
-          <%= tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: n.mermaid, action: 'copy#copy' }) %>
+          <%= render 'woods_map/components/mermaid_tools', text: n.mermaid, name: "#{identifier} neighbourhood depth #{n.depth}", url: local_assigns[:mermaid_url] %>
           <button class="tool" type="button" aria-pressed="false" aria-controls="graph-flowchart" data-graph-target="flowchart" data-action="graph#flowchart">flowchart</button>
         </span></div>
         <div class="gcanvas" tabindex="0" role="application" aria-roledescription="graph" aria-label="<%= graph_label %>" aria-describedby="graph-status" data-graph-target="canvas"></div>
@@ -70,9 +71,9 @@
       <p class="cap refusal" role="status" data-graph-target="message" hidden></p>
       <div id="graph-flowchart" data-graph-target="fallback">
       <%= render 'woods_map/components/diagram', title: 'Neighbourhood', facts: ["#{identifier}, depth #{n.depth}, #{n.direction}", "#{n.node_count} #{'unit'.pluralize(n.node_count)}", "#{n.edges.size} #{'edge'.pluralize(n.edges.size)}"],
-            tools: tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: n.mermaid, action: 'copy#copy', needs_js: true }),
+            name: "#{identifier} neighbourhood depth #{n.depth}", mermaid_url: local_assigns[:mermaid_url],
             mermaid: n.mermaid, label: "Neighbourhood of #{identifier} at depth #{n.depth}: #{n.edges.size} edges, each labelled with its mechanism; the list below has the same edges",
-            refusal: (n.over_budget? ? "#{n.node_count} units is over the flowchart budget of #{WoodsMap::Neighbourhood::NODE_BUDGET}; narrow the types or mechanisms to draw it. The list below has every edge." : nil),
+            refusal: (n.refusal && "#{n.refusal}. The list below has every edge."),
             legend: [[tag.i(class: 'sw self'), 'this unit'], [tag.span('→', class: 'ar'), 'edge, labelled with its mechanism']], provenance: ['typed edges', "gen #{@repository.generation_number}"] %>
       </div>
     </section>
