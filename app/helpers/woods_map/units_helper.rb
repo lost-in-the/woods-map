@@ -18,6 +18,19 @@ module WoodsMap
       link_to(label || identifier, woods_map.unit_path(type: type, identifier: identifier))
     end
 
+    # The class or concern that declared a filter (W-8), linked when the index
+    # holds it; a concern is marked "← " as on B8-Passage.
+    #
+    # @param owner [String, nil]
+    # @return [ActiveSupport::SafeBuffer]
+    def filter_owner(owner)
+      return ERB::Util.html_escape('') if owner.blank?
+
+      types = Array(current_repository&.identifier_types(owner))
+      link = unit_link(owner, (%w[controller mailer concern] & types).first || types.first)
+      types.include?('concern') ? safe_join(['← ', link]) : link
+    end
+
     # A link to a line of the unit that owns a file, through the graph's file map.
     #
     # @param file [String] a path relative to the application root
