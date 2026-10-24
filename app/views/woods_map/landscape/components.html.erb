@@ -1,0 +1,58 @@
+<% content_for :title, "#{@landscape.system_name} · Components · Landscape · Woods Map" %>
+<% c = @components %>
+<% by = WoodsMap::Components::GROUPS[c.group] %>
+<%= render 'woods_map/landscape/frame', crumb: 'components' %>
+<div class="body" data-controller="trail">
+  <div class="main landscape">
+    <section class="sec">
+      <header>
+        <h2 class="t2">Components <%= count_tag(c.limit ? "by #{by}" : "#{c.components.size} by #{by}, #{c.unit_count} application units") %><%= info_tip('C4 level 3. Application units (a source file in the application, not routes, migrations or configuration) grouped by the Packwerk package Woods records on each graph node, by top-level namespace, or by the domain clusters in graph_analysis.json. Nothing is inferred: a unit no group claims is listed on its own.') %></h2>
+        <% unless c.limit %><span class="goto">export: <%= link_to('Mermaid', woods_map.landscape_diagram_mmd_path(diagram: 'components', group: c.group), type: 'text/plain', rel: 'alternate') %></span><% end %>
+      </header>
+      <% case c.limit %>
+      <% when :no_packages %>
+        <%= render 'woods_map/components/empty_state', title: 'No Packwerk packages in this generation', text: safe_join(['Woods records a package for every ', tag.code('package.yml'), ' (Packwerk or pks) and writes it on each unit\'s graph node. This application has none, so there is nothing to group by package. Group by ', link_to('namespace', woods_map.landscape_path(tab: 'components', group: 'namespace')), ' or by ', link_to('domain cluster', woods_map.landscape_path(tab: 'components', group: 'cluster')), ' instead.']) %>
+      <% when :no_clusters %>
+        <%= render 'woods_map/components/empty_state', title: 'This generation publishes no domain clusters', text: safe_join(['Woods publishes them in graph_analysis.json from ', link_to('woods#799', 'https://github.com/lost-in-the/woods/issues/799'), '. Group by ', link_to('namespace', woods_map.landscape_path(tab: 'components', group: 'namespace')), ' instead.']) %>
+      <% else %>
+        <div class="c4boxes components">
+          <% c.components.each do |component| %>
+            <div class="c4box">
+              <span class="st">«<%= c.group == 'package' ? 'package' : 'component' %>»</span>
+              <b><%= component.name %></b>
+              <span class="cnts"><%= component.members.size %> <%= 'unit'.pluralize(component.members.size) %>: <%= component.types.first(4).map { |type, n| "#{n} #{type.tr('_', ' ').pluralize(n)}" }.join(', ') %><%= ', …' if component.types.size > 4 %></span>
+              <% if component.hub %><span class="tech">hub <%= unit_link(*component.hub) %></span><% end %>
+              <% unless component.declared.nil? %><span class="tech">declares <%= component.declared.any? ? component.declared.join(', ') : 'no dependency' %></span><% end %>
+              <% out = c.relationships.select { |r| r.from == component.name }.first(4) %>
+              <% if out.any? %><ul><% out.each do |r| %><li><span class="k" aria-hidden="true">→</span><span><%= r.to %>, <%= r.edges %> <%= 'edge'.pluralize(r.edges) %><% if r.undeclared %> <%= chip(:blocking, 'undeclared') %><% end %></span></li><% end %></ul><% end %>
+            </div>
+          <% end %>
+        </div>
+        <%= render 'woods_map/landscape/ladder', current: 3 %>
+      <% end %>
+    </section>
+    <% unless c.limit %>
+      <section class="sec">
+        <%= render 'woods_map/components/diagram', title: 'Component diagram', facts: ["#{c.components.size} components by #{by}", "#{c.relationships.size} relationships"],
+              name: "landscape components by #{c.group}", mermaid_url: woods_map.landscape_diagram_mmd_path(diagram: 'components', group: c.group),
+              mermaid: c.mermaid, refusal: c.refusal, label: "Components of #{@landscape.system_name} by #{by}: #{c.components.size} components and the published edges between them; the relationships table below has every arrow",
+              legend: [[tag.span('[ ]', class: 'ar'), 'component, with its units'], [tag.span('→', class: 'ar'), 'published edges between members']],
+              provenance: [(c.group == 'package' ? 'graph node package (Woods #280)' : (c.group == 'cluster' ? 'graph_analysis domain_clusters' : 'graph node namespace')), "gen #{@repository.generation_number}"] %>
+      </section>
+      <section class="sec">
+        <header><h2 class="t2">Relationships <%= count_tag(c.relationships.size) %><%= info_tip('Published edges from a member of one component to a member of another, by mechanism, leaving out test coverage, documentation and migration bookkeeping. With packages, an edge no package.yml declares is marked from graph_analysis.json.') %></h2></header>
+        <% if c.relationships.any? %>
+          <%= render 'woods_map/components/table', label: 'Component relationships', min_width: '640px',
+                columns: [{ label: 'from', width: '22%' }, { label: 'to', width: '22%' }, { label: 'edges', width: '80px' }, { label: 'mechanisms' }] + (c.group == 'package' ? [{ label: 'declared', width: '120px' }] : []),
+                rows: c.relationships.map { |r|
+                  vias = r.vias.first(4).map { |via, n| "#{via} #{n}" }.join(', ') + (r.vias.size > 4 ? ', …' : '')
+                  { cells: [tag.b(r.from), r.to, r.edges.to_s, vias] + (c.group == 'package' ? [r.undeclared ? chip(:blocking, 'undeclared') : 'declared'] : []) }
+                } %>
+        <% else %>
+          <p class="cap">No published edge runs between these components.</p>
+        <% end %>
+      </section>
+    <% end %>
+    <%= render 'woods_map/shared/status', items: ["components by #{by}", 'typed edges', "gen #{@repository.generation_number}"], keys: [[%w[/], 'search']] %>
+  </div>
+</div>
