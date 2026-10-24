@@ -170,12 +170,16 @@ module WoodsMap
     end
 
     # Drift of the working tree against this generation, within a quarter
-    # second budget; compares file identities, never runs git.
+    # second budget; compares file identities, never runs git. The answer is
+    # reused for {FreshnessCache::TTL} seconds per index and generation.
     #
     # @return [Hash] with 'state' (current, drifted, unknown, unavailable)
     def freshness
-      @freshness ||= Woods::SourceInputs::Status.new(output_dir: @index.index_dir, payload_dir: @index.payload_dir,
-                                                     generation: generation_number, mode: 'quick').call
+      key = [@index.index_dir.to_s, @index.payload_dir.to_s, generation_number]
+      @freshness ||= FreshnessCache.fetch(key) do
+        Woods::SourceInputs::Status.new(output_dir: @index.index_dir, payload_dir: @index.payload_dir,
+                                        generation: generation_number, mode: 'quick').call
+      end
     rescue StandardError => e
       @freshness = { 'state' => 'unknown', 'reasons' => [e.class.name] }
     end
@@ -193,6 +197,15 @@ module WoodsMap
         row.merge('file_path' => graph_node(row['identifier'], type: row['type'])&.dig('file_path'))
       end
       response
+    end
+
+    # Whether this Woods takes a per-call deep-field scan budget
+    # (+max_scan:+). Older readers cap code search at
+    # WOODS_SEARCH_MAX_SCAN only.
+    #
+    # @return [Boolean]
+    def search_scan_budget?
+      @reader.method(:search).parameters.any? { |_kind, name| name == :max_scan }
     end
 
     # The dependency-graph file map restricted to permitted relative keys.

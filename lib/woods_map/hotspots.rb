@@ -182,7 +182,8 @@ module WoodsMap
     def uncovered_rows
       uncovered_hubs.first(5).map do |hub|
         Risk.new(kind: 'uncovered hub', identifier: hub['identifier'], type: hub['type'],
-                 why: "#{hub['dependent_count']} dependents, no mapped test", action: 'add a spec', severity: :note)
+                 why: "#{hub['dependent_count']} dependents by identifier, no mapped test", action: 'add a spec',
+                 severity: :note)
       end
     end
 
