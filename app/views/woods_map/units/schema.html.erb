@@ -2,6 +2,7 @@
 <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
 <%= render 'woods_map/units/frame', page: @page, tab: 'schema', definition: @definition %>
 <% assocs = @schema.associations %>
+<% classes = @schema.class_diagram %>
 <div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
   <%= render 'woods_map/components/rail', heading: 'Schema, as the database has it', groups: [
         { label: 'table', count: @schema.table_name, items: [{ key: '·', text: "#{@schema.columns.size} #{'column'.pluralize(@schema.columns.size)}, #{@schema.indexes.size} #{'index'.pluralize(@schema.indexes.size)}" }] },
@@ -10,6 +11,9 @@
   <div class="main">
     <section class="sec" aria-label="Entity relationship">
       <%= render 'woods_map/components/diagram', title: 'Entity relationship', facts: ["#{@schema.table_name} + 1 hop", "#{assocs.size + 1} tables"], name: "#{@page.identifier} schema", mermaid_url: woods_map.unit_schema_mmd_path(type: @page.type, identifier: @page.identifier), mermaid: @schema.mermaid, key: 'y', label: "Entity relationship diagram of #{@schema.table_name} and the tables one association away", refusal: (@schema.refusal && "#{@schema.refusal}; the associations below list every one."), legend: [['|', 'one'], ['○', 'zero or more'], ['crow\'s foot', 'many']], provenance: ['model metadata', "gen #{@repository.generation_number}"] %>
+    </section>
+    <section class="sec" aria-label="Class diagram">
+      <%= render 'woods_map/components/diagram', title: 'Class diagram', facts: ["#{classes.class_count} classes", 'columns, scopes, own methods'], name: "#{@page.identifier} class diagram", mermaid_url: woods_map.unit_schema_mmd_path(type: @page.type, identifier: @page.identifier, view: 'class'), mermaid: classes.mermaid, label: "Class diagram of #{@page.identifier}: its columns, scopes and methods, its parent, the concerns it includes and the classes one association away", refusal: (classes.refusal && "#{classes.refusal}; the associations below list every one."), legend: [['<|--', 'inherits'], ['..|>', 'includes'], ['-->', 'association, with its multiplicity']], provenance: ['model metadata', "gen #{@repository.generation_number}"] %>
     </section>
     <section class="sec" aria-labelledby="assoc" data-controller="rows">
       <header><h2 class="t2" id="assoc">Associations <%= count_tag(assocs.size) %></h2></header>

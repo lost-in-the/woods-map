@@ -90,4 +90,15 @@ RSpec.describe WoodsMap::Hotspots do
       end
     end
   end
+
+  it 'sizes application units by count or summed PageRank by package (woods-map#5)' do
+    WoodsMap::Repository.open(WoodsMap::PackageIndex.path) do |repository|
+      units = described_class.new(repository, size: 'units')
+      expect(units.metric).to eq('units')
+      expect(units.code_sizes.keys).to contain_exactly('.', 'packs/posts')
+      expect(units.code_sizes['packs/posts'].values.sum).to eq(2)
+      expect([described_class.new(repository, size: 'pagerank').code_sizes.values.flat_map(&:values).min,
+              described_class.new(repository, size: 'nonsense').metric]).to match([be >= 0, 'loc'])
+    end
+  end
 end

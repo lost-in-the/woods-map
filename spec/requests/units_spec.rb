@@ -110,6 +110,7 @@ RSpec.describe 'Unit pages', type: :request do
 
   it 'keeps over-budget ER and sequence diagrams as text and names their budgets' do
     stub_const('WoodsMap::SchemaView::TABLE_BUDGET', 1)
+    stub_const('WoodsMap::SchemaClassDiagram::CLASS_BUDGET', 1)
     stub_const('WoodsMap::Lifecycle::SEQUENCE_BUDGET', 1)
     stub_const('WoodsMap::StateMachineView::STATE_BUDGET', 1)
     { 'schema' => ['over the ER budget of 1', 'erDiagram'],

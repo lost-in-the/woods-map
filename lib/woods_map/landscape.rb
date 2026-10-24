@@ -93,8 +93,16 @@ module WoodsMap
 
     # @return [Array<Container>] mail delivery, object storage and each external consumer
     def externals
-      @externals ||= [mail, storage, *consumers].compact
+      @externals ||= [mail, storage, *consumers, *services].compact
     end
+
+    # @return [LandscapeServices] the external services the code calls (woods#814)
+    def external_services
+      @external_services ||= LandscapeServices.new(@graph, configuration_unit('Gemfile', 'gemfile'), nodes)
+    end
+
+    # @return [Array<Container>] one box per external service
+    def services = external_services.boxes
 
     # @return [Hash{String => Integer}] the shared units by type
     def shared
@@ -108,7 +116,8 @@ module WoodsMap
 
     # @return [Array<Relationship>] container to container, strongest first within each source
     def relationships
-      @relationships ||= ContainerRelationships.new(@repository).to_a + configured_relationships
+      @relationships ||= ContainerRelationships.new(@repository).to_a + configured_relationships +
+                         external_services.relationships
     end
 
     # @param container [Container, String]

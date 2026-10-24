@@ -79,7 +79,12 @@ module WoodsMap
       case external.id
       when 'mail' then Link.new(from: 'system', to: 'mail', label: 'sends mail', source: 'BehavioralProfile')
       when 'storage' then Link.new(from: 'system', to: 'storage', label: 'stores uploads', source: 'BehavioralProfile')
-      else Link.new(from: external.id, to: 'system', label: 'reads shared tables', source: 'declared consumer')
+      else
+        if external.id.start_with?('svc_')
+          Link.new(from: 'system', to: external.id, label: 'calls', source: 'Gemfile and service_call edges')
+        else
+          Link.new(from: external.id, to: 'system', label: 'reads shared tables', source: 'declared consumer')
+        end
       end
     end
 

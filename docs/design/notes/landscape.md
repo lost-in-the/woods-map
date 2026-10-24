@@ -30,10 +30,19 @@ stadiums, the system as a box and externals as subroutines.
 
 **Limits, named on the page.**
 - People are host configuration.
-- The services the code calls aren't published. The Gemfile unit lists its runtime
-  gems (`default` and `production` groups), and the page counts them, but nothing says
-  which gems reach another system. The map keeps no gem-to-service table of its own;
-  the data is filed as [woods#814](https://github.com/lost-in-the/woods/issues/814).
+- External services come only from Woods (woods#814), from two sources:
+  - the Gemfile unit's `external_services`, the catalogued client gems declared for
+    runtime;
+  - the `service_call` edges from units that call a client constant (`Stripe::Charge`,
+    `Aws::S3::Client`).
+
+  Each service is an external box on Context and Containers, with its category and
+  gems, or *no client gem in the Gemfile*, and the number of units calling it. The web
+  and job processes whose units call a service get a relationship to it on Containers.
+  Calls from shared code are counted on the box, not drawn from a process. The map
+  keeps no gem-to-service table of its own. Uncatalogued gems and generic HTTP clients
+  (Faraday, `Net::HTTP`) are not drawn. On a generation without this data, the page
+  counts the Gemfile's runtime gems and names the limit.
 - Inbound callers other than declared table consumers, such as webhooks and API
   clients, aren't recorded.
 
@@ -134,8 +143,10 @@ components (R-4), and the tables still list every one.
   Without packages the application is one block, summed over the graph nodes' `loc`
   with each distinct file once, the way Woods totals a package. A table under the
   diagram has the same figures. A generation without source sizes shows an empty
-  state that links woods#810. The board's *by unit count* and *by PageRank* sizes are
-  not built; the treemap is sized by lines of code only.
+  state that links woods#810.
+- The board's other treemap sizes, `?size=units` and `?size=pagerank`, use the same
+  blocks. They count the application's units (nodes with a container, W-9, and a
+  source file) or sum their PageRank × 1000. `treemap.mmd` takes the same `size`.
 
 ## Domains
 
@@ -144,9 +155,25 @@ entry points. Each row opens `/woods/graph?group=clusters`. The graph's clusters
 draws each cluster as a compound box around its members, and unclustered units share
 one block. Clusters are identifier-level, as Woods publishes them.
 
+A Pele **mindmap** sits above the list. The system is at the root, each cluster on the
+first ring, and the cluster's members on the second, hub first. At most 8 members are
+drawn per cluster, then a count of the rest. The mindmap stops at 30 clusters (R-4).
+The text is at `/woods/landscape/mindmap.mmd`.
+
+## Status
+
+The Status tab lists each published fact the Landscape reads, with:
+- whether this generation publishes it;
+- what it holds here;
+- the Woods work behind it (W-9, woods#799, woods#810, woods#814, Woods #280, git
+  enrichment);
+- what the tabs draw from it.
+
+The tab's count is how many of the nine facts are present. The index's own state,
+freshness and generations stay on `/woods`.
+
 ## Not built
 
-- Status as a separate tab; the global status bar and `/woods` carry it.
-- External systems the code calls (woods#814).
+- Inbound integrations (webhooks, API clients) and services outside Woods' catalogue.
 - The board's *period* control on Hotspots. Commit counts are the generation's own
   git enrichment, with no window to choose.

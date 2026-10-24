@@ -20,10 +20,12 @@ module WoodsMap
     NOT_COUPLING = %w[test_coverage exercises_route documents migrates drawn_in].freeze
 
     # @param repository [Repository]
-    def initialize(repository)
+    # @param size [String, nil] the treemap's size ({CodeSizes::METRICS})
+    def initialize(repository, size: nil)
       @repository = repository
       @graph = repository.graph
       @analysis = repository.graph_analysis
+      @size = size
     end
 
     # @return [Boolean] whether this generation has a graph analysis at all
@@ -124,7 +126,7 @@ module WoodsMap
       (QUADRANT_HEAD + points).join("\n")
     end
 
-    delegate :code_sizes, :sized_by_package?, :treemap_mermaid, to: :sizes
+    delegate :code_sizes, :sized_by_package?, :treemap_mermaid, :metric, to: :sizes
 
     # The layer coupling in the layering direction only (B6-Overview's
     # forward flow) as a Mermaid sankey: edges from a layer to a later one in
@@ -211,7 +213,7 @@ module WoodsMap
       identifier.to_s.gsub('::', '.').gsub(%r{[^A-Za-z0-9 _./#-]}, ' ').squeeze(' ').strip.presence || 'unit'
     end
 
-    def sizes = @sizes ||= CodeSizes.new(@graph, @analysis)
+    def sizes = @sizes ||= CodeSizes.new(@graph, @analysis, metric: @size)
 
     def target_type(edge)
       (edge['type'] || @graph.dig('nodes', edge['target'], 'type')).to_s

@@ -6,7 +6,7 @@
   <div class="main landscape">
     <section class="sec">
       <header>
-        <h2 class="t2">Context <%= count_tag("#{ctx.people.size} #{'person'.pluralize(ctx.people.size)}, 1 system, #{ctx.externals.size} external #{'system'.pluralize(ctx.externals.size)}") %><%= info_tip('C4 level 1. People are the host\'s to name (config.landscape_actors); the index does not know who uses the system. External systems are what the index publishes: mail delivery and object storage from the BehavioralProfile unit, and the declared external consumers of the application\'s tables.') %></h2>
+        <h2 class="t2">Context <%= count_tag("#{ctx.people.size} #{'person'.pluralize(ctx.people.size)}, 1 system, #{ctx.externals.size} external #{'system'.pluralize(ctx.externals.size)}") %><%= info_tip('C4 level 1. People are the host\'s to name (config.landscape_actors); the index does not know who uses the system. External systems are what the index publishes: mail delivery and object storage from the BehavioralProfile unit, the declared external consumers of the application\'s tables, and the external services Woods names from the Gemfile and from calls through a client constant (woods#814).') %></h2>
         <span class="goto">export: <%= link_to('Mermaid', woods_map.landscape_diagram_mmd_path(diagram: 'context'), type: 'text/plain', rel: 'alternate') %><% if l.attributed? %>, <%= link_to('Structurizr DSL', woods_map.landscape_dsl_path, type: 'text/plain', rel: 'alternate') %>, <%= link_to('LikeC4', woods_map.landscape_c4_path, type: 'text/plain', rel: 'alternate') %><% end %></span>
       </header>
       <div class="c4grid">
@@ -59,7 +59,11 @@
       <header><h2 class="t2">What the index does not say <%= info_tip('Limits of level 1 from a Woods index. Each is named rather than guessed.') %></h2></header>
       <ul class="limits">
         <li>Who uses the system: people come only from <code>config.landscape_actors</code>.</li>
-        <li>Which services the code calls over the network. <% if ctx.gemfile? %>The Gemfile unit lists <%= ctx.runtime_gems.size %> runtime <%= 'gem'.pluralize(ctx.runtime_gems.size) %><%= " (#{ctx.runtime_gems.first(6).map { |g| g['name'] }.join(', ')}#{', …' if ctx.runtime_gems.size > 6})" if ctx.runtime_gems.any? %>, but Woods does not publish which of them reach another system, so none is drawn here (<%= link_to 'woods#814', 'https://github.com/lost-in-the/woods/issues/814' %>).<% else %>This generation has no Gemfile unit, and Woods does not publish the services the code calls (<%= link_to 'woods#814', 'https://github.com/lost-in-the/woods/issues/814' %>).<% end %></li>
+        <% if l.external_services.published? %>
+          <li>Services outside Woods' catalogue of client gems, and calls through a generic HTTP client (Faraday, <code>Net::HTTP</code>): the services drawn are the ones Woods names from the Gemfile and from calls through a client constant (<%= link_to 'woods#814', 'https://github.com/lost-in-the/woods/issues/814' %>).</li>
+        <% else %>
+          <li>Which services the code calls over the network. <% if ctx.gemfile? %>The Gemfile unit lists <%= ctx.runtime_gems.size %> runtime <%= 'gem'.pluralize(ctx.runtime_gems.size) %><%= " (#{ctx.runtime_gems.first(6).map { |g| g['name'] }.join(', ')}#{', …' if ctx.runtime_gems.size > 6})" if ctx.runtime_gems.any? %>, but this generation does not say which of them reach another system; a Woods with <%= link_to 'woods#814', 'https://github.com/lost-in-the/woods/issues/814' %> does.<% else %>This generation has no Gemfile unit and does not say which services the code calls (<%= link_to 'woods#814', 'https://github.com/lost-in-the/woods/issues/814' %>).<% end %></li>
+        <% end %>
         <li>Inbound callers other than declared table consumers: webhooks and API clients are not recorded.</li>
       </ul>
     </section>
