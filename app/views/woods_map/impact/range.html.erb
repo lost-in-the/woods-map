@@ -21,8 +21,8 @@
             { label: 'affected', count: rr.affected.size, items: rr.affected.first(8).map { |a| { key: a['distance'] || '·', text: impact_identity(a, rr), own: a['type'].to_s.tr('_', ' ') } } + (rr.affected.size > 8 ? [{ key: '·', text: "+#{rr.affected.size - 8} more" }] : []) },
             { label: 'limits', count: 3, items: [
               { key: '·', text: 'which lines changed', own: layer_chip('woods#802') },
-              { key: '·', text: 'flows not inverted', own: layer_chip('W-13, woods#763') },
-              { key: '·', text: 'no pinned review base', own: layer_chip('W-11, woods#761') }
+              { key: '·', text: "flows: #{rr.coverage['flows'] || 'not recorded'}", own: layer_chip('W-13 membership') },
+              retention_limit(@repository.retention, rr.from_generation)
             ] }
           ].reject { |g| g[:items].empty? } %>
       <div class="main">

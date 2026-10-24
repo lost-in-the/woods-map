@@ -21,6 +21,7 @@ module WoodsMap
         @radius = radius_from_params(repository)
         @review = WoodsMap::ImpactReview.new(repository, @radius)
         @graph = pre_change_graph(repository) if @lens == 'graph' && !@radius.empty?
+        @flows = pre_change_flows(repository) unless @radius.empty?
         render(@radius.empty? ? :pick : :show)
       end
     end
@@ -54,6 +55,15 @@ module WoodsMap
 
       graph_for(repository, { 'identifier' => identifier, 'type' => @radius.type_of(identifier) },
                 depth: [@radius.depth, 2].min)
+    end
+
+    # The Flows tab in pre-change mode (E-4): entry points through the focus
+    # units from Woods' inverted flow membership (W-13); reached units keep
+    # their distance on the steps.
+    def pre_change_flows(repository)
+      roots = @radius.focus.map { |id| [id, @radius.type_of(id)] }
+      marks = @radius.reached.to_h { |a| [[a.identifier, a.type], a.distance] }
+      WoodsMap::ImpactFlows.for_focus(repository, roots: roots, marks: marks)
     end
 
     def graph_for(repository, centre, depth: params.fetch(:depth, 1))
@@ -103,6 +113,7 @@ module WoodsMap
                                                                 focus: params[:focus].to_s.split(','))
         centre = @range_report.graph_centre if @lens == 'graph'
         @graph = graph_for(repository, centre) if centre
+        @flows = WoodsMap::ImpactFlows.for_report(repository, @range_report) if @lens == 'flows'
       end
       render :range, status: @saved_id && @report&.state == :missing ? :not_found : :ok
     end
