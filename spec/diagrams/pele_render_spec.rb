@@ -4,6 +4,7 @@ require 'json'
 require 'open3'
 require_relative '../support/large_schema_index'
 require_relative '../support/trail_index'
+require_relative '../support/state_machine_index'
 
 # The headless render spec (mermaid-diagram-types.md, constraint 4): every
 # Mermaid text the map generates from the fixture index is drawn with the
@@ -27,7 +28,7 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
     erds = [FIXTURE_INDEX, WoodsMap::LargeSchemaIndex.path].each_with_index.flat_map do |dir, i|
       WoodsMap::Repository.open(dir) { |repository| erd_diagrams(repository, i.zero? ? 'fixture' : '300') }
     end
-    unit_diagrams + landscape_diagrams + history_diagrams + erds + trail_diagrams
+    unit_diagrams + landscape_diagrams + history_diagrams + erds + trail_diagrams + transition_callback_diagrams
   end
 
   # The Trail's lanes for each kind of entry, and the pinned graph and ERD,
@@ -216,6 +217,12 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
     WoodsMap::StateMachineView.for_model(repository, unit['identifier']).map do |machine|
       ['state', "state #{machine.identifier}", machine.mermaid]
     end
+  end
+
+  # A machine whose transitions carry structured callbacks (woods#796), labelled per transition.
+  def transition_callback_diagrams
+    unit = StateMachineIndex.instance_method(:machine_unit).bind_call(self, true)
+    [['state', 'state with transition callbacks', WoodsMap::StateMachineView.new(unit).mermaid]]
   end
 
   def graph_diagrams(repository, unit)

@@ -49,4 +49,50 @@ RSpec.describe WoodsMap::StateMachineView do
     stub_const('WoodsMap::StateMachineView::STATE_BUDGET', 4)
     expect(machine).to be_over_budget
   end
+
+  describe 'structured transition callbacks (woods#796)' do
+    let(:structured) do
+      callbacks = [
+        { 'kind' => 'before_transition', 'on' => ['publish'], 'from' => [], 'to' => [], 'method' => 'stamp',
+          'block' => false, 'side_effects' => { 'columns_written' => ['published_at'], 'jobs_enqueued' => [] } },
+        { 'kind' => 'after_transition', 'on' => ['publish'], 'from' => [], 'to' => [], 'method' => 'notify',
+          'block' => false, 'side_effects' => { 'jobs_enqueued' => ['NotifyJob'] } },
+        { 'kind' => 'after_transition', 'on' => [], 'from' => [], 'to' => ['archived'], 'method' => nil,
+          'block' => true, 'side_effects' => nil, 'unanalysed' => 'block' },
+        { 'kind' => 'after_failure', 'on' => [], 'from' => [], 'to' => [], 'method' => 'log', 'block' => false },
+        { 'kind' => 'before_transition', 'on' => [], 'from' => [], 'to' => [], 'method' => 'audit',
+          'block' => false, 'unresolved' => ['from'] }
+      ]
+      described_class.new(unit.merge('metadata' => unit['metadata'].merge('transition_callbacks' => callbacks)))
+    end
+
+    it 'ties each callback to the transitions its literal scope admits, by phase' do
+      publish, archive = structured.transitions
+      expect(structured.callbacks_for(publish).transform_values { |list| list.map(&:label) })
+        .to eq('before' => ['stamp'], 'after' => ['notify'], 'after_failure' => ['log'])
+      expect(structured.callbacks_for(archive).transform_values { |list| list.map(&:label) })
+        .to eq('after' => ['block'], 'after_failure' => ['log'])
+    end
+
+    it 'keeps a callback whose scope is not literal off every transition' do
+      expect(structured.unplaced_callbacks.map(&:label)).to eq(['audit'])
+      expect(structured.callbacks_for(structured.transitions.first)['before'].map(&:label)).not_to include('audit')
+    end
+
+    it 'names the side effects with the Lifecycle verbs' do
+      expect(structured.transition_callbacks.first(2).map(&:effects)).to eq([['writes published_at'],
+                                                                             ['enqueues NotifyJob']])
+    end
+
+    it 'labels the transitions that carry callbacks in the state diagram' do
+      publish = 's0 --> s1 : publish [ready?] / before stamp, after notify, after failure log'
+      expect(structured.mermaid).to include(publish, 's1 --> s2 : archive / after block, after failure log')
+    end
+
+    it 'is structured only when the unit publishes the list, keeping the raw lines for older generations' do
+      expect(structured).to be_structured
+      expect(machine).not_to be_structured
+      expect(machine.mermaid).to include('s0 --> s1 : publish [ready?]')
+    end
+  end
 end
