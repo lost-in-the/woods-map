@@ -1,0 +1,70 @@
+<% content_for :title, 'History · Woods Map' %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<% t = @timeline %>
+<% lane = 34 %>
+<% query = ->(**changes) { { units: t.selection, range: WoodsMap::HistoryView::RANGES.key(t.days) }.merge(changes).compact } %>
+<% range_seg = tag.span(class: 'seg', role: 'group', 'aria-label': 'Range') do %><% WoodsMap::HistoryView::RANGES.each do |key, days| %><%= link_to(key, woods_map.history_path(query.call(range: key)), 'aria-current': (t.days == days ? 'true' : nil)) %><% end %><% end %>
+<%= render 'woods_map/shared/crumbs', crumbs: [['history', woods_map.history_path], [t.empty? ? 'pick units' : "#{t.lanes.size} units", nil]], trail: tag.span('', data: { trail_target: 'list' }) %>
+<%= render 'woods_map/shared/ident', title: 'History', subtitle: "commits across units, HEAD-reachable, gen #{@repository.generation_number}", controls: safe_join([(t.empty? ? nil : safe_join([tag.span('range', class: 'mut'), range_seg], ' ')), render('woods_map/shared/share')].compact, ' ') %>
+<div class="body" data-controller="trail">
+  <div class="main inset">
+    <% if !t.table? %>
+      <%= render 'woods_map/components/empty_state', title: "Generation #{@repository.generation_number} has no commit table", text: 'Woods writes git_commits.json when the extraction can read the application\'s git history (W-3). This index was extracted without it: a container with no .git, a shallow clone, or a Woods version before the table. Each unit\'s History tab still shows its five latest commits.' %>
+    <% elsif t.empty? %>
+      <%= render 'woods_map/components/empty_state', title: t.unknown.any? ? "No unit named #{t.unknown.join(', ')} in gen #{@repository.generation_number}" : 'Pick units to compare', text: 'One lane per unit across the window, a dot per commit that touched its files, and the commits that touched two of them drawn as a pair: which units change together. The most-changed units of the window are listed; a unit page\'s History tab links here with what moves with it.' %>
+      <form method="get" action="<%= woods_map.history_path %>" class="pick-units gap-top">
+        <fieldset><legend class="t3">most-changed units</legend>
+          <% t.suggestions.each_with_index do |s, i| %><label class="f"><input type="checkbox" name="units[]" value="<%= "#{s['type']}:#{s['identifier']}" %>"<%= ' checked'.html_safe if i < 3 %>> <%= s['identifier'] %> <span class="mut"><%= s['type'].tr('_', ' ') %></span> <span class="cnt"><%= s['commits'] %></span></label><% end %>
+        </fieldset>
+        <button class="btn primary" type="submit">Show timeline</button>
+      </form>
+    <% else %>
+      <% events = t.events %>
+      <% pairs = t.pairs %>
+      <section class="sec" aria-labelledby="lanes">
+        <header><h2 class="t2" id="lanes">Timeline <%= count_tag("#{events.size} commits, #{t.days}d") %><%= info_tip('Each lane is a unit; a dot is a commit that touched its files. A vertical rule joins the lanes a commit touched together. Select a dot for the commit below. From the generation\'s commit table (Woods W-3).') %></h2><span class="goto tools">timeline <%= render 'woods_map/components/mermaid_tools', text: t.mermaid, name: "history #{t.lanes.map(&:identifier).join(' ')}", url: woods_map.history_mmd_path(query.call) %></span></header>
+        <div class="tl" data-controller="cliff">
+          <ol class="tl-names" aria-label="Lanes">
+            <% t.lanes.each do |l| %><li><%= unit_link(l.identifier, l.type) %> <span class="mut"><%= l.type.tr('_', ' ') %></span></li><% end %>
+          </ol>
+          <div class="tl-plot">
+            <svg class="tl-svg" width="100%" height="<%= lane * t.lanes.size %>" role="group" aria-label="<%= "#{events.size} commits across #{t.lanes.size} units in #{t.days} days" %>">
+              <% t.lanes.each_index do |i| %><line class="tl-rule" x1="0" x2="100%" y1="<%= (lane * i) + (lane / 2) %>" y2="<%= (lane * i) + (lane / 2) %>"/><% end %>
+              <% events.reverse_each do |e| %>
+                <% x = "#{(100 * t.position(e.date)).round(2)}%" %>
+                <% if e.lanes.size > 1 %><line class="tl-pair" x1="<%= x %>" x2="<%= x %>" y1="<%= (lane * e.lanes.min) + (lane / 2) %>" y2="<%= (lane * e.lanes.max) + (lane / 2) %>"/><% end %>
+                <a href="#c-<%= e.sha[0, 12] %>" aria-label="<%= "#{short_sha(e.sha)} #{e.message}, #{e.author}" %>"><title><%= "#{short_sha(e.sha)} #{e.message} (#{e.author}, #{e.date.to_s[0, 10]})" %></title>
+                  <% e.lanes.each do |i| %><circle class="tl-dot<%= ' pair' if e.lanes.size > 1 %>" cx="<%= x %>" cy="<%= (lane * i) + (lane / 2) %>" r="5"/><% end %>
+                </a>
+              <% end %>
+            </svg>
+            <svg class="strip-axis" width="100%" height="14" aria-hidden="true" focusable="false"><% last = [t.strip.bucket_count - 1, 1].max %><% t.strip.ticks.each do |index, text| %><text x="<%= (100.0 * index / last).round(2) %>%" y="11" text-anchor="<%= index.zero? ? 'start' : (index == last ? 'end' : 'middle') %>"><%= text %></text><% end %></svg>
+          </div>
+        </div>
+        <%= render 'woods_map/components/legend', entries: [[tag.span('●', class: 'sw-dot'), 'a commit'], [tag.span('●', class: 'sw-pair'), 'touched two or more lanes'], [tag.span('│', class: 'sw-pair'), 'changed together']], provenance: ['git_commits.json', "gen #{@repository.generation_number}"] %>
+        <% if t.unknown.any? %><p class="cap">Not in this generation: <%= t.unknown.join(', ') %></p><% end %>
+      </section>
+      <section class="sec" aria-labelledby="pairs">
+        <header><h2 class="t2" id="pairs">Changed together <%= count_tag(pairs.size) %><%= info_tip('Pairs of the selected units and the commits that touched both: co-change from the commit table\'s paths.') %></h2></header>
+        <% if pairs.any? %>
+          <% pair_rows = pairs.map do |p| %>
+            <% latest = events.find { |e| e.sha == p.shas.first } %>
+            <% { cells: [safe_join([unit_link(p.left.identifier, p.left.type), ' + ', unit_link(p.right.identifier, p.right.type)]), p.shas.size,
+                         latest ? link_to(short_sha(latest.sha), "#c-#{latest.sha[0, 12]}") : empty_value, latest ? date_abbr(latest.date) : empty_value, latest ? who(latest.author) : empty_value] } %>
+          <% end %>
+          <%= render 'woods_map/components/table', label: 'Changed together', min_width: '640px', rows: pair_rows,
+                     columns: [{ label: 'pair', cell_class: 'id' }, { label: 'commits', width: '90px', cell_class: 'num' }, { label: 'latest', width: '90px', cell_class: 'nw' }, { label: 'when', width: '64px', cell_class: 'nw' }, { label: 'by', width: '160px' }] %>
+        <% else %>
+          <%= render 'woods_map/components/empty_state', title: 'No commit touched two of these units', text: "In #{t.days} days every commit touched at most one of the selected units." %>
+        <% end %>
+      </section>
+      <section class="sec" aria-labelledby="tl-commits" data-controller="rows">
+        <header><h2 class="t2" id="tl-commits">Commits <%= count_tag(events.size) %><%= info_tip('Newest first; open a row for its description and files. Every unit a commit touched links to its page.') %></h2><button class="tool goto" type="button" data-action="rows#expandAll" data-needs-js>expand all</button></header>
+        <%= render 'woods_map/components/table', label: 'Commits', min_width: '760px', grouped: true,
+                   columns: [{ label: 'when', width: '64px', cell_class: 'nw' }, { label: 'sha', width: '84px', cell_class: 'nw mut' }, { label: 'author', width: '150px' }, { label: 'message', cell_class: 'id' }, { label: 'units', width: '240px' }],
+                   rows: events.map { |e| { cells: [date_abbr(e.date), tag.span(short_sha(e.sha), title: e.sha, id: "c-#{e.sha[0, 12]}"), who(e.author), e.message, safe_join(e.lanes.map { |i| unit_link(t.lanes[i].identifier, t.lanes[i].type) }, ', ')], detail: render('woods_map/components/detail', rows: [(e.description.present? ? ['description', tag.span(e.description, class: 'desc')] : nil), ['all units', safe_join(e.units.first(20).map { |id, type| unit_link(id, type) }, ', ')]].compact) } } %>
+      </section>
+    <% end %>
+    <%= render 'woods_map/shared/status', items: ['history', 'HEAD-reachable', "#{t.days}d", "gen #{@repository.generation_number}", (t.table? ? 'commit table' : 'no commit table')], keys: [[%w[/], 'search']] %>
+  </div>
+</div>

@@ -1,22 +1,82 @@
 <% content_for :title, "#{@page.identifier} · History · Woods Map" %>
 <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
 <% h = @history %>
-<%= render 'woods_map/units/frame', page: @page, tab: 'history', definition: @definition %>
+<% gens = h.generation_numbers %>
+<% diff_pair = gens.size >= 2 ? gens.last(2) : nil %>
+<% range_seg = tag.span(class: 'seg', role: 'group', 'aria-label': 'Range') do %><% WoodsMap::HistoryView::RANGES.each_key do |key| %><%= link_to(key, history_tab_url(@page, range: key, week: nil), 'aria-current': (h.range == key ? 'true' : nil)) %><% end %><% end %>
+<% diff_link = diff_pair && link_to("Diff gen #{diff_pair.first} → #{diff_pair.last}", history_tab_url(@page, from: diff_pair.first, to: diff_pair.last, anchor: 'diff'), class: 'btn primary') %>
+<%= render 'woods_map/units/frame', page: @page, tab: 'history', definition: (diff_link ? nil : @definition), controls: safe_join([tag.span('range', class: 'mut'), range_seg, diff_link].compact, ' ') %>
 <div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
-  <%= render 'woods_map/components/rail', heading: 'History, HEAD-reachable', groups: [
-        { label: 'people', count: h.people.size, items: h.people.map { |p| { key: p.commits, text: who(p.name) } } },
-        { label: 'limits', count: h.limits.size, items: h.limits.map { |l| { key: '·', text: l } } }
-      ] %>
+  <% groups = [] %>
+  <% if h.table? && h.generations.any? %>
+    <% groups << { label: "generations touching #{@page.identifier}", count: h.generations.size, items: h.generations.map { |g| { key: g.number, text: short_sha(g.head), own: safe_join([(g.extracted_at ? date_abbr(g.extracted_at) : nil), (g.baseline ? 'and earlier' : nil)].compact, ', '), current: g.number == @repository.generation_number } } } %>
+  <% end %>
+  <% groups << { label: 'people', count: h.people.size, items: h.people.map { |p| { key: p.commits, text: who(p.name), own: (p.last ? safe_join(['last ', date_abbr(p.last)]) : nil) } } } %>
+  <% if h.co_changes.any? %>
+    <% groups << { label: 'moves with, co-change', count: h.co_changes.size, items: h.co_changes.map { |c| { key: c.commits, text: c.identifier, href: woods_map.unit_history_path(type: c.type, identifier: c.identifier), own: c.type.tr('_', ' ') } } } %>
+  <% end %>
+  <% groups << { label: 'limits', count: h.limits.size, items: h.limits.map { |l| { key: '·', text: l } } } %>
+  <%= render 'woods_map/components/rail', heading: "History, HEAD-reachable, #{h.days}d", groups: groups %>
   <div class="main">
-    <section class="sec" aria-labelledby="commits">
-      <header><h2 class="t2" id="commits">Commits <%= count_tag("latest #{h.commits.size} of #{h.commit_count}") %><%= info_tip('The last commits touching this unit\'s file, as the extractor recorded them; the full commit table, hunks and co-changes arrive with W-3.') %></h2></header>
-      <% if h.any? %>
-        <%= render 'woods_map/components/table', label: 'Commits', min_width: '640px', columns: [{ label: 'when', width: '70px', cell_class: 'nw' }, { label: 'sha', width: '100px', cell_class: 'nw mut' }, { label: 'author', width: '160px' }, { label: 'message', cell_class: 'id' }],
-              rows: h.commits.map { |c| { cells: [date_abbr(c.date), c.sha.to_s[0, 7], who(c.author), c.message] } }, caption: safe_join(["#{h.frequency} churn, last change ", date_abbr(h.last_modified)]) %>
+    <% if @diff %>
+      <section class="sec" aria-labelledby="diff" id="diff">
+        <header><h2 class="t2" id="diff">Unit diff <%= count_tag("gen #{@diff.from} → #{@diff.to}") %><%= info_tip('This unit\'s record in Woods\' change impact report between two retained generations (Woods::Impact::Report, W-12): which facets moved, the categories and metadata keys, the source size. Changed line ranges are not in the report yet (woods#802).') %></h2><%= link_to('full range report', woods_map.impact_path(from: "gen:#{@diff.from}", to: "gen:#{@diff.to}"), class: 'tool goto') %></header>
+        <% case @diff.state %>
+        <% when :changed %>
+          <%= render 'woods_map/components/detail', rows: @diff.rows, framed: true %>
+          <p class="cap">Woods' report as published; changed line ranges are not in it yet (woods#802).</p>
+        <% when :unchanged %>
+          <%= render 'woods_map/components/empty_state', title: "#{@page.identifier} did not change between gen #{@diff.from} and gen #{@diff.to}", text: 'Woods\' report lists no change to its source, metadata or dependencies.' %>
+        <% else %>
+          <%= render 'woods_map/components/banner', severity: :warn, lead: 'No comparison.', text: @diff.message %>
+        <% end %>
+      </section>
+    <% end %>
+    <% if h.table? %>
+      <% strip = h.strip %>
+      <% bar_url = ->(first) { history_tab_url(@page, week: first.iso8601, all: nil, anchor: 'commits') } %>
+      <% exports = h.any? ? safe_join(['XY chart ', render('woods_map/components/mermaid_tools', text: h.mermaid('xychart').to_s, name: "#{@page.identifier} history xychart", url: woods_map.unit_history_mmd_path(type: @page.type, identifier: @page.identifier, view: 'xychart', range: h.range)), ' · timeline ', render('woods_map/components/mermaid_tools', text: h.mermaid('timeline').to_s, name: "#{@page.identifier} history timeline", url: woods_map.unit_history_mmd_path(type: @page.type, identifier: @page.identifier, range: h.range))]) : nil %>
+      <%= render 'woods_map/components/diagram', title: 'Commits', facts: [h.paths_label, "#{strip.total} in #{h.days}d", "#{strip.recent_total} in 4 weeks"],
+                 body: render('woods_map/history/strip', strip: strip, bar_url: bar_url, selected: h.week, label: "#{strip.total} commits touching #{h.paths_label} in #{h.days} days, #{strip.recent_total} in the last 4 weeks"),
+                 legend: [[tag.span('▮', class: 'sw-bar'), "commits per #{strip.step == 1 ? 'day' : 'week'}"], [tag.span('▮', class: 'sw-recent'), 'last 4 weeks'], [tag.span('┆', class: 'sw-gen'), 'generation extracted']], provenance: [exports].compact %>
+    <% end %>
+    <section class="sec" aria-labelledby="commits" id="commits" data-controller="rows">
+      <% shown = h.commits %>
+      <% heading = h.week ? "#{shown.size} in the #{h.strip&.step == 1 ? 'day' : 'week'} of #{h.week.iso8601}" : (h.all? || shown.size == h.total ? "#{h.total} in #{h.days}d" : "latest #{shown.size} of #{h.total}") %>
+      <header><h2 class="t2" id="commits">Commits <%= count_tag(heading) %><%= info_tip(h.table? ? 'Every HEAD-reachable commit in the window that touched this unit\'s file or a file it inlines, from the generation\'s commit table (Woods W-3). Open a row for its description, files and the units that changed with it.' : 'The last commits the extractor recorded for this unit (metadata.git); this generation has no commit table.') %></h2>
+        <span class="goto tools"><% if h.week %><%= link_to('all weeks', history_tab_url(@page, week: nil, anchor: 'commits'), class: 'tool') %><% elsif h.table? && !h.all? && shown.size < h.total %><%= link_to("all #{h.total}", history_tab_url(@page, all: '1', anchor: 'commits'), class: 'tool') %><% end %><% if h.table? && shown.any? %> <button class="tool" type="button" data-action="rows#expandAll" data-needs-js>expand all</button><% end %><% if h.table? %> <%= link_to('timeline with what moves with it', woods_map.history_path(units: (["#{@page.type}:#{@page.identifier}"] + h.co_changes.first(3).map { |c| "#{c.type}:#{c.identifier}" }), range: h.range), class: 'tool') %><% end %></span></header>
+      <% if shown.any? %>
+        <% own = [@page.identifier, @page.type] %>
+        <% columns = [{ label: 'when', width: '64px', cell_class: 'nw' }, { label: 'sha', width: '84px', cell_class: 'nw mut' }, { label: 'author', width: '150px' }, { label: 'message', cell_class: 'id' }] %>
+        <% columns += [{ label: 'files, units', width: '170px', cell_class: 'nw' }, { label: 'gen', width: '60px', cell_class: 'num', abbr: 'generation that first carried the commit' }] if h.table? %>
+        <% rows = shown.map do |c| %>
+          <% cells = [date_abbr(c.date), tag.span(short_sha(c.sha), title: c.sha), who(c.author), c.message] %>
+          <% cells += [files_and_units(c), commit_generation(c.generation)] if h.table? %>
+          <% { cells: cells, detail: (h.table? ? commit_detail(c, own: own) : nil) } %>
+        <% end %>
+        <%= render 'woods_map/components/table', label: 'Commits', min_width: '760px', columns: columns, rows: rows, grouped: h.table?,
+                   caption: safe_join(["HEAD-reachable, last change ", date_abbr(h.last_modified)]) %>
+      <% elsif h.any? %>
+        <%= render 'woods_map/components/empty_state', title: 'No commits in this bar', text: 'Pick another bar of the strip, or list every week.' %>
+      <% elsif h.table? %>
+        <%= render 'woods_map/components/empty_state', title: "No commits touched #{h.paths_label} in #{h.days} days", text: 'The commit table lists every HEAD-reachable commit in its window that touched an indexed file; none touched this unit\'s files. Try the longer range.' %>
       <% else %>
         <%= render 'woods_map/components/empty_state', title: 'No git facts for this unit', text: 'The extraction ran without git history for this file (a container without .git, or a file outside the repository).' %>
       <% end %>
     </section>
-    <%= render 'woods_map/shared/status', items: ['history', 'HEAD-reachable', "gen #{@repository.generation_number}"], keys: [[%w[/], 'search']] %>
+    <% if gens.size >= 2 %>
+      <section class="sec" aria-labelledby="gens">
+        <header><h2 class="t2" id="gens">Generations <%= count_tag("#{gens.size} retained") %><%= info_tip('Compare this unit between two retained generations. The comparison is Woods\' change impact report; the map derives nothing.') %></h2></header>
+        <form class="impact-range-form" method="get" action="<%= woods_map.unit_history_path(type: @page.type, identifier: @page.identifier, anchor: 'diff') %>">
+          <% if h.range %><input type="hidden" name="range" value="<%= h.range %>"><% end %>
+          <label class="lbl" for="diff-from">from</label>
+          <select id="diff-from" name="from" class="filter auto"><% gens.each do |n| %><option value="<%= n %>"<%= ' selected'.html_safe if n == (@diff&.from || gens[-2]) %>>gen <%= n %></option><% end %></select>
+          <label class="lbl" for="diff-to">to</label>
+          <select id="diff-to" name="to" class="filter auto"><% gens.each do |n| %><option value="<%= n %>"<%= ' selected'.html_safe if n == (@diff&.to || gens[-1]) %>>gen <%= n %></option><% end %></select>
+          <button class="btn" type="submit">Diff</button>
+        </form>
+      </section>
+    <% end %>
+    <%= render 'woods_map/shared/status', items: ['history', 'HEAD-reachable', "#{h.days}d", "gen #{@repository.generation_number}", (h.table? ? 'commit table' : 'metadata.git, 5 per unit')], keys: [[%w[/], 'search'], [%w[e], 'expand all']] %>
   </div>
 </div>

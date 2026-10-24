@@ -252,3 +252,32 @@ html.js .wm .guide .guide-nojs{display:none}
 .wm .tbl tbody tr.focus > td:first-child{box-shadow:inset 3px 0 0 var(--select)}
 /* A table row ?since= marks changed (E-8): a --mod rule, the M chip in its first cell. */
 .wm .tbl tbody tr.chg > td:first-child{box-shadow:inset 3px 0 0 var(--mod)}
+/* History (M4, B6-History, notes/history.md): the commit strip is an SVG in viewBox units, bars
+   neutral, the last four weeks hot (D-11), a selected bar in the selection colour, generation marks
+   dashed in the modified hue. Axis labels are SVG text at percentage positions, so no style attribute
+   is needed (CSP). The cross-unit timeline draws one lane per unit at the --s6 row height. */
+.wm .strip{padding:var(--s3) var(--s4) var(--s2)}
+.wm .strip-svg{display:block;width:100%;height:var(--s7)}
+.wm .strip-svg .bar{fill:var(--mut)}
+.wm .strip-svg .bar.zero{fill:var(--rule2)}
+.wm .strip-svg .bar.recent{fill:var(--hot)}
+.wm .strip-svg .bar.sel,.wm .strip-svg a:hover .bar,.wm .strip-svg a:focus .bar{fill:var(--select)}
+.wm .strip-svg a:focus-visible{outline:2px solid var(--select)}
+.wm .strip-svg .gm{stroke:var(--mod);stroke-width:1;stroke-dasharray:2 2;vector-effect:non-scaling-stroke}
+.wm .strip-axis{display:block;overflow:visible}
+.wm .strip-axis text{fill:var(--mut);font-family:var(--ff-data);font-size:var(--fs-11)}
+.wm .legend .sw-bar{color:var(--mut)} .wm .legend .sw-recent{color:var(--hot)} .wm .legend .sw-gen{color:var(--mod)}
+.wm .legend .sw-dot{color:var(--mut)} .wm .legend .sw-pair{color:var(--select)}
+.wm .tl{display:grid;grid-template-columns:minmax(10ch,max-content) minmax(0,1fr);gap:0 var(--s4);overflow-x:auto;padding:var(--s3) 0}
+.wm .tl-names{list-style:none;margin:0;padding:0;font-family:var(--ff-data);font-size:var(--fs-12)}
+.wm .tl-names li{height:var(--s6);display:flex;align-items:center;gap:var(--s2);white-space:nowrap}
+.wm .tl-plot{min-width:calc(var(--s7) * 6)}
+.wm .tl-svg{display:block}
+.wm .tl-svg .tl-rule{stroke:var(--rule);stroke-width:1}
+.wm .tl-svg .tl-pair{stroke:var(--select);stroke-width:2}
+.wm .tl-svg .tl-dot{fill:var(--mut);stroke:var(--panel);stroke-width:1}
+.wm .tl-svg .tl-dot.pair{fill:var(--select)}
+.wm .tl-svg a:hover .tl-dot,.wm .tl-svg a:focus .tl-dot{fill:var(--hot)}
+.wm .tl-svg a:focus-visible{outline:2px solid var(--select)}
+.wm .pick-units fieldset{border:0;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(28ch,1fr));gap:var(--s2) var(--s5)}
+.wm .pick-units .f{display:flex;gap:var(--s2);align-items:center;font-family:var(--ff-data);font-size:var(--fs-12)}
