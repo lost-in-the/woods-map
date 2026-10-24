@@ -24,11 +24,11 @@ The rail lists the changed units (M, + or −), the first affected units and thr
 - flows not inverted: W-13, woods#763;
 - no pinned review base: W-11, woods#761.
 
-Per D-25 there is no *Markdown for PR* button and no Markdown or JSON anywhere on the page. The report's Markdown is the CI comment's, and Woods renders it.
+Per D-25 there is no *Markdown for PR* button and no Markdown or JSON anywhere on the page. The report's Markdown belongs to Woods (`woods:impact`); a CI pull-request comment built from it is out of the map's scope.
 
 ## Overview
 
-The report's summary laid out as the page's own sections, in the same order as Woods' PR comment:
+The report's summary laid out as the page's own sections, in the same order as Woods' Markdown renderer:
 
 1. A **summary table**: one row per section, with its record count, its coverage and its first entries. Each row links to its tab.
 2. **Changed** and **affected** samples, six each.
@@ -51,7 +51,7 @@ When Woods does not declare the report complete, a `mod` banner says so, and eve
 
 **Links.** A record links into the map only when its generation is the one the request pinned and that generation has the typed unit. Every other identity is escaped text with its generation chip, so historical identities still have no current-source links. Changed units link with `?since=gen:<from>`, so the unit page lights what moved.
 
-**Focus.** `focus=<identifier>[,…]` lights the matching rows on every tab with `aria-current` and the select tint. On the Changed tab it also opens those rows, and each row has an anchor (`#changed-N`). The CI comment's focus link uses this: `/woods/impacts/<id>?lens=changed&focus=<template>`.
+**Focus.** `focus=<identifier>[,…]` lights the matching rows on every tab with `aria-current` and the select tint. On the Changed tab it also opens those rows, and each row has an anchor (`#changed-N`). A focus URL for a range or a saved report uses this: `/woods/impact?from=gen:N&to=gen:M&lens=changed&focus=<template>` or `/woods/impacts/<id>?lens=changed&focus=<template>`.
 
 ## Graph tab (E-3, E-8)
 
