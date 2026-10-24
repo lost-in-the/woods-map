@@ -2,7 +2,7 @@
 
 RSpec.describe WoodsMap::Highlighter do
   let(:fragment_class) do
-    Struct.new(:column, :length, :identifier, :type, :kind, :confidence, keyword_init: true)
+    Struct.new(:column, :length, :identifier, :type, :kind, :confidence, :method, :line, :popover, keyword_init: true)
   end
   let(:unit_path) { ->(identifier, type) { "/catalog/map/units/#{type}/#{identifier}" } }
 
