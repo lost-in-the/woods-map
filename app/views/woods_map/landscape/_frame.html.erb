@@ -1,0 +1,13 @@
+<%# The Landscape frame (B8-Landscape, B6-Overview): crumbs, the system's title
+    block, the tabs. Locals: crumb (String). %>
+<% l = @landscape %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<%= render 'woods_map/shared/crumbs', crumbs: [['landscape', woods_map.landscape_path], [crumb, nil]], trail: tag.span('', data: { trail_target: 'list' }) %>
+<% subtitle = [l.rails, "#{l.unit_count} #{'unit'.pluralize(l.unit_count)}", "#{l.processes.size} #{'process'.pluralize(l.processes.size)}", "#{l.stores.size} #{'store'.pluralize(l.stores.size)}", "#{l.externals.size} external #{'system'.pluralize(l.externals.size)}"].compact.join(', ') %>
+<%= render 'woods_map/shared/ident', title: l.system_name, subtitle: subtitle,
+      controls: link_to('Open graph', woods_map.graph_path, class: 'btn primary') %>
+<%= render 'woods_map/shared/tabs', label: 'Landscape tabs', tabs: [
+      { label: 'Containers', count: 'L2', href: woods_map.landscape_path(tab: 'containers'), current: @tab == 'containers' },
+      { label: 'Hotspots', count: @hotspots.risks.size, href: woods_map.landscape_path(tab: 'hotspots'), current: @tab == 'hotspots' },
+      { label: 'Domains', count: @clusters.size, href: woods_map.landscape_path(tab: 'domains'), current: @tab == 'domains' }
+    ] %>

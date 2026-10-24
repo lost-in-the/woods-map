@@ -10,8 +10,14 @@
       rail_extra         HTML for the rail after the filters, or nil
       blast              WoodsMap::BlastRadius or nil (tints the canvas)
       page               true on the full-screen page
-      mermaid_url        the flowchart's .mmd route (D-25), or nil %>
+      mermaid_url        the flowchart's .mmd route (D-25), or nil
+      hidden             Hash of extra GET fields the filter form keeps (the impact page's range)
+      emphasis           :range when blast holds a range report's changed (distance 0)
+                         and affected units (E-3, E-8); the radius of this unit otherwise %>
 <% blast = local_assigns[:blast] %>
+<% clusters = Array(local_assigns[:clusters]) %>
+<% range = local_assigns[:emphasis] == :range %>
+<% blast_legend = range ? [['changed in this range', 0], ['affected directly', 1], ['affected transitively', 2]] : [['a change here reaches it directly', 1], ['transitively', 2]] %>
 <% page = local_assigns.fetch(:page, false) %>
 <% filters = { types: params[:types].presence, via: params[:via].presence } %>
 <% graph_label = "Neighbourhood of #{identifier} at depth #{n.depth}, #{n.direction}: units and their edges, each edge labelled with its mechanism. Arrow keys move along the edges, Enter opens a unit's graph; the list below has the same edges." %>
@@ -21,8 +27,10 @@
      data-graph-url-value="<%= woods_map.neighbourhood_path(centre: identifier, type: type, depth: n.depth, direction: n.direction, **filters) %>"
      data-graph-unit-url-value="<%= unit_url %>"
      data-graph-generation-value="<%= @repository.generation_number %>"
-     data-graph-cache-value="<%= cache_key %>"<% if blast_units %>
-     data-graph-blast-value="<%= blast_units.to_json %>"<% end %>>
+     data-graph-cache-value="<%= cache_key %>"<% if clusters.any? %>
+     data-graph-clusters-value="<%= clusters.to_json %>"<% if params[:group] == 'clusters' %> data-graph-mode-value="clusters"<% end %><% end %><% if blast_units %>
+     data-graph-blast-value="<%= blast_units.to_json %>"<% end %><% if range %>
+     data-graph-emphasis-value="range"<% end %>>
   <nav class="rail" aria-label="Graph filters">
     <form method="get" action="<%= link.call %>">
       <h2 class="t3 on">Neighbourhood</h2>
@@ -35,7 +43,8 @@
       <ol><li><span class="k">·</span><span><a href="<%= woods_map.impact_path(focus: identifier, depth: 2) %>">what a change here reaches</a> <span class="own">impact, pre-change mode</span></span></li></ol>
       <div class="grp">depth</div>
       <div class="pad1"><span class="seg" role="group" aria-label="Depth"><% [1, 2].each do |d| %><a href="<%= link.call(direction: n.direction, depth: d, blast: (blast ? '1' : nil)) %>"<%= ' aria-current="true"'.html_safe if n.depth == d %>><%= d %></a><% end %></span></div>
-      <input type="hidden" name="direction" value="<%= n.direction %>"><input type="hidden" name="depth" value="<%= n.depth %>"><% if blast %><input type="hidden" name="blast" value="1"><% end %>
+      <input type="hidden" name="direction" value="<%= n.direction %>"><input type="hidden" name="depth" value="<%= n.depth %>"><% if blast && !range %><input type="hidden" name="blast" value="1"><% end %>
+      <% local_assigns.fetch(:hidden, {}).each do |name, value| %><input type="hidden" name="<%= name %>" value="<%= value %>"><% end %>
       <div class="grp">types <span class="cnt"><%= n.type_counts.size %></span></div>
       <% n.type_counts.each do |t, count| %><label class="f"><input type="checkbox" name="types[]" value="<%= t %>"<%= ' checked'.html_safe if params[:types].nil? || Array(params[:types]).include?(t) %>> <%= t.to_s.tr('_', ' ') %> <span class="cnt"><%= count %></span></label><% end %>
       <div class="grp">via <span class="cnt"><%= n.via_counts.values.sum(&:size) %></span></div>
@@ -43,7 +52,7 @@
       <div class="pad3"><button class="btn" type="submit">apply filters</button></div>
       <div data-graph-target="layouts" hidden>
         <div class="grp">layout</div>
-        <div class="pad1"><span class="seg" role="group" aria-label="Layout"><% %w[butterfly radial].each do |mode| %><button type="button" aria-pressed="<%= mode == 'butterfly' %>" data-layout="<%= mode %>" data-graph-target="layout" data-action="graph#layout"><%= mode %></button><% end %></span></div>
+        <div class="pad1"><span class="seg" role="group" aria-label="Layout"><% (%w[butterfly radial] + (clusters.any? ? %w[clusters] : [])).each do |mode| %><button type="button" aria-pressed="<%= mode == 'butterfly' %>" data-layout="<%= mode %>" data-graph-target="layout" data-action="graph#layout"><%= mode %></button><% end %></span></div>
         <p class="cap padx">Positions you drag are kept per generation in this browser. <button class="tool" type="button" data-action="graph#forget">reset positions</button></p>
       </div>
       <%= local_assigns[:rail_extra] %>
@@ -64,7 +73,7 @@
         <% legend = n.type_counts.keys.map { |t| [tag.i(class: 'sw gsw', data: { gtype: t }), t.to_s.tr('_', ' ')] } +
                     [[tag.span('──', class: 'ar'), 'association'], [tag.span('┄┄', class: 'ar'), 'other mechanisms'],
                      [tag.i(class: 'sw self'), 'this unit']] %>
-        <% if blast %><% legend += [[tag.i(class: 'sw gblast', data: { distance: 1 }), 'a change here reaches it directly'], [tag.i(class: 'sw gblast', data: { distance: 2 }), 'transitively']] %><% end %>
+        <% if blast %><% legend += blast_legend.map { |text, distance| [tag.i(class: 'sw gblast', data: { distance: distance }), text] } %><% end %>
         <%= render 'woods_map/components/legend', entries: legend + [['', 'hub, cycle: graph_analysis, per identifier']],
                                                      provenance: ['typed edges', 'weight = pagerank', "gen #{@repository.generation_number}"] %>
       </div>
@@ -84,7 +93,11 @@
             rows: n.edges.map { |e|
               other = n.focus?(e.from, e.from_type) ? [e.to, e.to_type] : [e.from, e.from_type]
               notes = n.notes(other.first) + (e.depth > 1 ? ['2 hops'] : [])
-              notes << (reached[other] == 1 ? 'a change here reaches it directly' : "a change here reaches it in #{reached[other]} hops") if reached[other]
+              if reached[other]
+                notes << if range then reached[other].zero? ? 'changed in this range' : "affected, #{reached[other]} #{'hop'.pluralize(reached[other])} from a change"
+                         else reached[other] == 1 ? 'a change here reaches it directly' : "a change here reaches it in #{reached[other]} hops"
+                         end
+              end
               { data: { edge: WoodsMap::GraphElements.edge_id(e) },
                 cells: [n.focus?(e.from, e.from_type) ? e.from : unit_link(e.from, e.from_type), e.via, n.focus?(e.to, e.to_type) ? e.to : unit_link(e.to, e.to_type), notes.join(', ').presence || empty_value(applicable: false)] }
             } %>

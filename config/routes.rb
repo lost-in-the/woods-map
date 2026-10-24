@@ -11,6 +11,14 @@ WoodsMap::Engine.routes.draw do
   # Search (M1): the results page and the palette's hits.
   get 'search', to: 'search#show', as: :search
   get 'search/palette', to: 'search#palette', as: :palette, defaults: { format: :json }
+  # The Landscape (B8-Landscape, B6-Overview): C4 containers, hotspots and domains of one
+  # generation; the container diagram is also plain text for agents and other tools (D-25).
+  get 'landscape.mmd', to: 'landscape#export', as: :landscape_mmd, defaults: { export: 'mermaid' }, format: false
+  get 'landscape.dsl', to: 'landscape#export', as: :landscape_dsl, defaults: { export: 'structurizr' }, format: false
+  get 'landscape.c4', to: 'landscape#export', as: :landscape_c4, defaults: { export: 'likec4' }, format: false
+  get 'landscape(/:tab)', to: 'landscape#show', as: :landscape, constraints: { tab: /containers|hotspots|domains/ },
+                          format: false
+
   # The full-screen graph (M5): a centre by identifier and type, never a path.
   get 'graph', to: 'graphs#show', as: :graph
   get 'graph/neighbourhood', to: 'neighbourhoods#show', as: :neighbourhood, defaults: { format: :json }
@@ -26,10 +34,16 @@ WoodsMap::Engine.routes.draw do
   # The Mermaid text of a page's diagram as text/plain (D-25); see docs/design/notes/mermaid-text-urls.md.
   get 'impact.mmd', to: 'impact#show', as: :impact_mmd, defaults: { mmd: '1' }, format: false
   get 'impact', to: 'impact#show', as: :impact
+  # A saved report (E-6): the SHA-256 ID woods:impact printed, read through Woods' store.
+  get 'impacts/:id', to: 'impact#saved', as: :saved_impact, constraints: { id: /[0-9a-f]{64}/ }, format: false
 
   # The whole database by chunk (M3, B6-ERD): a chunk number, never a table name or path.
   get 'erd.mmd', to: 'erd#show', as: :erd_mmd, defaults: { mmd: '1' }, format: false
   get 'erd(/:chunk)', to: 'erd#show', as: :erd, constraints: { chunk: /[1-9][0-9]{0,5}/ }, format: false
+
+  # The cross-unit timeline (M4): typed identifiers in the query, never a path.
+  get 'history.mmd', to: 'history#show', as: :history_mmd, defaults: { mmd: '1' }, format: false
+  get 'history', to: 'history#show', as: :history
 
   get 'units', to: 'units#index', as: :units
   # File paths are exact admitted file_map keys, never host filesystem paths.
@@ -40,7 +54,7 @@ WoodsMap::Engine.routes.draw do
   # from the pinned generation; never a file path.
   scope 'units/:type', constraints: { type: /[a-z0-9_]+/ }, format: false do
     # The tabs' Mermaid text (D-25), ahead of the glob routes that would take `.mmd` as part of an identifier.
-    %w[schema passage lifecycle graph].each do |tab|
+    %w[schema passage lifecycle graph history].each do |tab|
       get "*identifier/#{tab}.mmd", to: "units##{tab}", as: :"unit_#{tab}_mmd", defaults: { mmd: '1' }
     end
     get '*identifier/schema', to: 'units#schema', as: :unit_schema

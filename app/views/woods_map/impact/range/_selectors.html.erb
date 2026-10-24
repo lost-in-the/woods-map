@@ -1,0 +1,14 @@
+<%# The range selectors: two retained endpoints, resolved once by Woods. %>
+<section class="sec" aria-labelledby="range-selectors">
+  <h2 class="t2" id="range-selectors"><%= @range_report ? 'Compare another range' : 'Compare retained generations' %></h2>
+  <p>Use gen:N, now, or an unambiguous retained commit SHA. Woods resolves both endpoints once. The bar above describes the current index, not historical evidence.</p>
+  <form method="get" action="<%= woods_map.impact_path %>" class="impact-range-form">
+    <input type="hidden" name="mode" value="range">
+    <label class="lbl" for="range-from">From</label>
+    <input class="filter" id="range-from" name="from" value="<%= Array(@range).first %>" placeholder="gen:1" required>
+    <label class="lbl" for="range-to">To</label>
+    <input class="filter" id="range-to" name="to" value="<%= Array(@range).last || 'now' %>" required>
+    <button class="btn<%= ' primary' unless @range_report %>" type="submit">Compare range</button>
+  </form>
+  <p><%= link_to 'Open pre-change blast radius', woods_map.impact_path %></p>
+</section>

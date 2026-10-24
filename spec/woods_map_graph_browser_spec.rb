@@ -62,9 +62,10 @@ RSpec.describe WoodsMap do
   delegate :drawing, to: :GraphBrowserRun
 
   it 'draws every element of a 300-unit neighbourhood and times the first frame' do
-    warn format('graph canvas, 300 units / 1000 edges: first draw %<ms>.1f ms (%<timings>s); radial layout ' \
-                '%<radial>.1f ms; calibration loop (5e7 iterations) %<calibration>.1f ms',
-                ms: drawing['ms'], radial: drawing['radialMs'], calibration: drawing['calibrationMs'],
+    warn format('graph canvas, 300 units / 1000 edges: first draw %<ms>.1f ms (%<timings>s) after a %<warm>.1f ms ' \
+                'warm-up; radial layout %<radial>.1f ms; calibration loop (5e7 iterations) %<calibration>.1f ms',
+                ms: drawing['ms'], warm: drawing['warmMs'], radial: drawing['radialMs'],
+                calibration: drawing['calibrationMs'],
                 timings: drawing['timings'].map { |key, value| "#{key} #{value.round}" }.join(', '))
     expect(drawing).to include('drawn' => true, 'nodes' => 300, 'edges' => 1000, 'panelVisible' => true,
                                'fallbackVisible' => false, 'layoutsVisible' => true, 'canvases' => be_positive)
@@ -102,6 +103,15 @@ RSpec.describe WoodsMap do
   it 'tints the units the blast radius reaches by distance and counts those drawn' do
     expect(drawing['tinted']).to include('direct' => ['n_1'], 'transitive' => ['n_2'])
     expect(drawing.dig('tinted', 'facts')).to include('a change here reaches 3 units, 2 drawn')
+  end
+
+  it 'boxes the units of each published domain cluster in the clusters layout, and unboxes them after (woods#799)' do
+    expect(drawing['clusters']).to eq('boxes' => %w[Billing Shipping], 'boxed' => 'Billing', 'unboxed' => true)
+  end
+
+  it 'fills the units a range report records as changed and names them in the facts' do
+    expect(drawing['ranges']).to include('changed' => ['n_1'], 'direct' => ['n_2'])
+    expect(drawing.dig('ranges', 'facts')).to include('1 changed and 1 affected in the report, 2 drawn')
   end
 
   it 'encodes a re-centring identifier as a query value on the full-screen page' do

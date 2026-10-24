@@ -9,5 +9,6 @@
 <% if local_assigns[:editor] && page.path %><% primary = safe_join([primary, tag.a("In editor at L#{local_assigns[:definition] || 1}", class: 'btn primary', hidden: true, data: { settings_target: 'editor', file: page.path, line: local_assigns[:definition] || 1 })].compact) %><% end %>
 <%= render 'woods_map/shared/ident', title: local_assigns.fetch(:title, page.identifier), subtitle: local_assigns.fetch(:subtitle, page.subtitle), controls: safe_join([local_assigns[:controls], render('woods_map/shared/share'), primary].compact, ' ') %>
 <%= render 'woods_map/shared/tabs', tabs: unit_tabs(page, tab) %>
+<% if current_since %><%= render 'woods_map/units/since', page: page, since: current_since %><% end %>
 <% tiles = local_assigns[:tiles] || page.tiles.map { |tile| { eyebrow: tile[:eyebrow], rows: tile[:rows].map { |label, value| [label, tile_value(value)] } } } %>
 <% if tiles.any? %><div class="frame-facts"><%= render 'woods_map/components/facts', tiles: tiles %></div><% end %>

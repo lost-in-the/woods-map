@@ -1,39 +1,46 @@
-<% content_for :title, 'Impact range · Woods Map' %>
-<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
-<%= render 'woods_map/impact/frame', title: 'Impact range', subtitle: 'retained generation evidence', crumb: 'range', controls: render('woods_map/shared/share') %>
-<div class="body">
-  <div class="main inset">
-    <section class="sec" aria-labelledby="range-selectors">
-      <h2 class="t2" id="range-selectors">Compare retained generations</h2>
-      <p>Use gen:N, now, or an unambiguous retained commit SHA. Woods resolves both endpoints once. The bar above describes the current index, not historical evidence.</p>
-      <form method="get" action="<%= woods_map.impact_path %>" class="impact-range-form">
-        <input type="hidden" name="mode" value="range">
-        <label class="lbl" for="range-from">From</label>
-        <input class="filter" id="range-from" name="from" value="<%= @range.first %>" placeholder="gen:1" required>
-        <label class="lbl" for="range-to">To</label>
-        <input class="filter" id="range-to" name="to" value="<%= @range.last %>" required>
-        <button class="btn primary" type="submit">Compare range</button>
-      </form>
-      <p><%= link_to 'Open pre-change blast radius', woods_map.impact_path %></p>
-    </section>
-    <% if @report && @report.state != :available %>
-      <%= render 'woods_map/components/empty_state', title: 'Range evidence unavailable', text: @report.message %>
-    <% elsif @report %>
-      <% report = @report.data %>
-      <section class="sec" aria-labelledby="range-provenance">
-        <h2 class="t2" id="range-provenance">Endpoint provenance</h2>
-        <p>Manifest checksums cover manifests only; they do not attest payload contents. Historical identities have no current-source links.</p>
-        <%= impact_evidence(report['range']) %>
-      </section>
-      <% { 'coverage' => 'Coverage', 'unknowns' => 'Unknowns', 'parameters' => 'Applied parameters', 'changed' => 'Changed typed units', 'affected' => 'Affected typed units', 'flows' => 'Retained flow evidence' }.each do |key, title| %>
-        <section class="sec" aria-labelledby="range-<%= key %>">
-          <h2 class="t2" id="range-<%= key %>"><%= title %></h2>
-          <% if key == 'changed' %><p>Facets compare retained payloads. Source sizes are whole-source bytes and lines, not added or deleted line counts. Removed units belong to From; added and modified units belong to To.</p><% end %>
-          <% if key == 'affected' %><p>Each record and witness path retains its endpoint and generation. An unavailable weight is not zero.</p><% end %>
-          <% if key == 'flows' %><p>These are retained expanded memberships and changed steps, not newly computed routes.</p><% end %>
-          <% if %w[changed affected flows].include?(key) && report[key].empty? %><p>No records returned. Interpret this alongside coverage and unknowns above; unavailable or not_computed evidence is not a conclusive zero.</p><% elsif key == 'parameters' %><%= impact_parameters(report[key]) %><% else %><%= impact_evidence(report[key]) %><% end %>
-        </section>
+<%# The impact page in range mode (W-12, D-1, D-25): Woods' schema 1 report
+    rendered as tabs, Overview first. Without an available report, the
+    selectors and the reason. The page renders evidence; it computes none. %>
+<% rr = @range_report %>
+<% if rr %>
+  <% title = "gen #{rr.from_generation} → gen #{rr.to_generation}" %>
+  <% content_for :title, "#{title} · Impact · Woods Map" %>
+  <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+  <% base = @saved_id ? ->(**p) { woods_map.saved_impact_path(id: @saved_id, **p) } : ->(**p) { woods_map.impact_path(from: @range.first, to: @range.last, **p) } %>
+  <% range_url = ->(**changes) { base.call(**{ focus: params[:focus].presence, lens: (@lens == 'overview' ? nil : @lens) }.merge(changes).compact) } %>
+  <% controls = safe_join([render('woods_map/shared/share'), tag.button('⎘ copy focus URL', class: 'btn primary', type: 'button', data: { controller: 'copy', copy_text_value: focus_url, action: 'copy#copy', key: 'y' }, 'data-needs-js': '')], ' ') %>
+  <% tabs = WoodsMap::RangeReport::LENSES.map { |lens| { label: lens.capitalize, count: rr.count(lens), href: range_url.call(lens: (lens == 'overview' ? nil : lens)), current: lens == @lens } } %>
+  <% subtitle = [rr.sha('from'), rr.sha('to')].all? ? "#{rr.sha('from')} → #{rr.sha('to')}" : 'retained generation evidence' %>
+  <%= render 'woods_map/impact/frame', title: title, subtitle: subtitle, crumb: (@saved_id ? "report #{@saved_id[0, 7]}" : 'range'), controls: controls, tabs: tabs %>
+  <% if @lens == 'graph' %>
+    <%= render 'woods_map/impact/range/graph', rr: rr, range_url: range_url %>
+  <% else %>
+    <div class="body" data-controller="trail keys" data-trail-title-value="<%= title %>">
+      <%= render 'woods_map/components/rail', heading: @lens.capitalize, groups: [
+            { label: 'changed', count: rr.changed.size, items: rr.changed.first(10).map { |c| { key: (c['status'] == 'removed' ? '−' : (c['status'] == 'added' ? '+' : 'M')), text: impact_identity(c, rr, generation: rr.generation_of_change(c), since: rr.from_generation), own: c['type'].to_s.tr('_', ' '), current: rr.focused?(c) } } + (rr.changed.size > 10 ? [{ key: '·', text: "+#{rr.changed.size - 10} more" }] : []) },
+            { label: 'affected', count: rr.affected.size, items: rr.affected.first(8).map { |a| { key: a['distance'] || '·', text: impact_identity(a, rr), own: a['type'].to_s.tr('_', ' ') } } + (rr.affected.size > 8 ? [{ key: '·', text: "+#{rr.affected.size - 8} more" }] : []) },
+            { label: 'limits', count: 3, items: [
+              { key: '·', text: 'which lines changed', own: layer_chip('woods#802') },
+              { key: '·', text: 'flows not inverted', own: layer_chip('W-13, woods#763') },
+              { key: '·', text: 'no pinned review base', own: layer_chip('W-11, woods#761') }
+            ] }
+          ].reject { |g| g[:items].empty? } %>
+      <div class="main">
+        <%= render "woods_map/impact/range/#{@lens}", rr: rr, range_url: range_url %>
+        <%= render 'woods_map/shared/status', items: ["computed by Woods from gen #{rr.from_generation} and gen #{rr.to_generation}", (rr.complete? ? 'declared complete' : 'incomplete report'), "map on gen #{@repository.generation_number}"], keys: [[%w[y], 'copy URL'], [%w[/], 'search']] %>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <% content_for :title, 'Impact range · Woods Map' %>
+  <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+  <%= render 'woods_map/impact/frame', title: 'Impact range', subtitle: 'retained generation evidence', crumb: (@saved_id ? 'saved report' : 'range'), controls: render('woods_map/shared/share') %>
+  <div class="body">
+    <div class="main inset">
+      <%= render 'woods_map/impact/range/selectors' %>
+      <% if @report %>
+        <%= render 'woods_map/components/empty_state', title: (@saved_id ? 'Saved report unavailable' : 'Range evidence unavailable'), text: @report.message %>
       <% end %>
-    <% end %>
+    </div>
   </div>
-</div>
+<% end %>

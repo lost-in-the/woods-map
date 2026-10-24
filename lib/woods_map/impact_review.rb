@@ -150,13 +150,15 @@ module WoodsMap
       end
     end
 
+    # Woods' render-target resolver publishes +{ name:, reason: }+ for a component render that names no
+    # component (+render Ghost.new+), on controllers and components alike.
     def unresolved_renders
-      @radius.involved.select { |id| @radius.type_of(id) == 'controller' }.flat_map do |id|
-        unit = @repository.unit(id, type: 'controller')
-        Array(unit&.dig('metadata', 'unresolved_renders')).map do |render|
-          target = render.is_a?(Hash) ? render['target'] : render
-          Unknown.new(kind: 'render by name', where: id, why: "render #{target}",
-                      resolves: 'a literal template name, or W-7 per-action renders')
+      @radius.involved.flat_map do |id|
+        renders = Array(@repository.unit(id, type: @radius.type_of(id))&.dig('metadata', 'unresolved_renders'))
+        renders.grep(Hash).map do |render|
+          reason = render['reason'] && " (#{render['reason'].tr('_', ' ')})"
+          Unknown.new(kind: 'render by name', where: id, why: "render #{render['name']}#{reason}",
+                      resolves: 'a component class the index knows')
         end
       end
     end

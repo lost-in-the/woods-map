@@ -1,0 +1,18 @@
+<%# Risks (B8-Impact-Risks) in range mode: the risk records Woods' report
+    holds, each with its kind, unit and evidence. Locals: rr, range_url. %>
+<% groups = rr.risks.group_by { |risk| risk['kind'].to_s } %>
+<section class="sec" aria-labelledby="rsk" data-controller="rows">
+  <header><h2 class="t2" id="rsk">Risks <%= count_tag("#{rr.risks.size} in #{groups.size} #{'kind'.pluralize(groups.size)}") %><%= info_tip("The risk records Woods computed for the changed and affected units, with the published fact behind each; coverage: #{rr.coverage['risks'] || 'not recorded'}.") %></h2><button class="tool goto" type="button" data-action="rows#expandAll" data-needs-js>expand all</button></header>
+  <% if rr.risks.empty? %>
+    <%= render 'woods_map/components/empty_state', title: 'No risk records', text: "Woods recorded none (coverage: #{rr.coverage['risks'] || 'not recorded'}); that is not a conclusive zero." %>
+  <% else %>
+    <%= render 'woods_map/components/table', label: 'Risks', min_width: '760px', grouped: true,
+          columns: [{ label: 'kind', width: '160px', cell_class: 'nw id' }, { label: 'unit' }, { label: 'evidence', width: '240px' }, { label: 'endpoint', width: '120px', cell_class: 'nw' }],
+          rows: rr.risks.first(300).map { |risk|
+            unit = risk['unit'].is_a?(Hash) ? risk['unit'].merge('generation' => risk['generation']) : nil
+            evidence = risk['evidence'].is_a?(Hash) ? [risk.dig('evidence', 'family'), risk.dig('evidence', 'artifact')].compact.join(', ') : risk['evidence'].to_s
+            { current: unit && rr.focused?(unit), classes: (unit && rr.focused?(unit) ? 'focus' : nil), detail: impact_evidence(risk['evidence']),
+              cells: [safe_join([tag.span('⚑', class: 'flag'), ' ', risk['kind'].to_s]), unit ? impact_identity(unit, rr) : empty_value, evidence.presence || empty_value, impact_context(risk)] }
+          }, caption: (rr.risks.size > 300 ? "first 300 of #{rr.risks.size}" : nil) %>
+  <% end %>
+</section>
