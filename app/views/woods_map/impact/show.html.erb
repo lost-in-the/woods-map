@@ -6,7 +6,7 @@
      tag.span('depth', class: 'lbl'), tag.span(safe_join((1..WoodsMap::BlastRadius::MAX_DEPTH).map { |d| link_to(d, impact_url.call(depth: d), 'aria-current': (d == r.depth ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'Depth'),
      tag.span('show', class: 'lbl'), tag.span(safe_join([['all', nil], ['no tests', 'no_tests'], ['no views', 'no_views']].map { |label, value| link_to(label, impact_url.call(show: value), 'aria-current': ((value || 'all') == r.show ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'Show'),
      render('woods_map/shared/share'),
-     tag.button('⎘ copy focus URL', class: 'btn primary', type: 'button', data: { controller: 'copy', copy_text_value: request.original_url, action: 'copy#copy' }, 'data-needs-js': '')
+     tag.button('⎘ copy focus URL', class: 'btn primary', type: 'button', data: { controller: 'copy', copy_text_value: focus_url, action: 'copy#copy', key: 'y' }, 'data-needs-js': '')
    ], ' ') %>
 <% counts = { 'changed' => r.focus.size, 'risks' => v.findings.size, 'flows' => 0, 'tests' => v.tests.size, 'unknown' => v.unknowns.size } %>
 <% tabs = WoodsMap::ImpactController::LENSES.map { |lens| { label: lens.capitalize, count: counts[lens], href: impact_url.call(lens: lens), current: lens == @lens } } %>
@@ -26,6 +26,6 @@
       <%= render 'woods_map/components/banner', severity: :mod, lead: "Not in gen #{@repository.generation_number}: #{r.unknown.join(', ')}.", text: "The radius starts from #{r.focus.join(', ')}." %>
     <% end %>
     <%= render "woods_map/impact/#{@lens}", r: r, v: v, impact_url: impact_url %>
-    <%= render 'woods_map/shared/status', items: ['static: one generation, no range', "reverse edges to depth #{r.depth}, #{r.reached.size} reached, #{r.affected.size} shown", "gen #{@repository.generation_number}"], keys: [[%w[1 2 3], 'depth'], [%w[y], 'copy Mermaid'], [%w[/], 'search']] %>
+    <%= render 'woods_map/shared/status', items: ['static: one generation, no range', "reverse edges to depth #{r.depth}, #{r.reached.size} reached, #{r.affected.size} shown", "gen #{@repository.generation_number}"], keys: [[%w[1 2 3], 'depth'], [%w[y], 'copy URL'], [%w[/], 'search']] %>
   </div>
 </div>
