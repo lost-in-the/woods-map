@@ -126,7 +126,8 @@ module WoodsMap
     def local_mermaid
       lines = ['flowchart LR'] + mermaid_nodes.map { |node| "  #{mermaid_node(*node)}" }
       edges.each do |edge|
-        lines << "  #{node_id(edge.from, edge.from_type)} -->|#{edge.via}| #{node_id(edge.to, edge.to_type)}"
+        arrow = edge.via.to_s.empty? ? '-->' : "-->|#{edge.via}|"
+        lines << "  #{node_id(edge.from, edge.from_type)} #{arrow} #{node_id(edge.to, edge.to_type)}"
       end
       (lines + ['  classDef focus stroke-width:3px', "  class #{node_id(*@focus)} focus"]).join("\n")
     end

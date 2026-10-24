@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-- The Graph neighbourhood, the Schema ER and the Lifecycle sequence draw their Mermaid from Woods' own builders (`Woods::Diagrams`, woods#826) when the loaded Woods has them. The Index MCP server's `diagram` tool and `woods:diagram` answer from the same builders. The text is unchanged, byte for byte: `spec/woods_map/woods_diagrams_spec.rb` compares every unit, depth, direction, filter and event on the fixture and the 300-model index. A Woods without the builders keeps the map's own. The lanes and flowchart views, `?since=` marks, C4 views, the ERD, History and the Trail stay in the map.
+- The Graph neighbourhood, the Schema ER and the Lifecycle sequence draw their Mermaid from Woods' own builders (`Woods::Diagrams`, woods#826) when the loaded Woods has them. The Index MCP server's `diagram` tool and `woods:diagram` answer from the same builders. The text is unchanged, byte for byte: `spec/woods_map/woods_diagrams_spec.rb` compares every unit, depth, direction, filter and event on the fixture and the 300-model index. A Woods without the builders keeps the map's own. An edge without a mechanism draws a plain arrow in both, never an empty label. The lanes and flowchart views, `?since=` marks, C4 views, the ERD, History and the Trail stay in the map.
 
 - Correctness fixes across the unit and impact pages.
   - **Unknown action:** a Passage or Lifecycle URL naming an action the unit does not have answers 404 with the unit's actions as links (plain text on `.mmd`), instead of silently showing the first action.
