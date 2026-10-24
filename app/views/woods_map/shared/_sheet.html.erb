@@ -6,7 +6,12 @@
     <div class="sh"><button class="tool" type="button" aria-label="Close" data-action="sheet#close" data-sheet-target="close">✕</button><span class="eyebrow">files</span><span class="eyebrow aside">on this page</span></div>
     <div data-sheet-target="body">
       <% if local_assigns[:tree] %>
-        <%= render 'woods_map/components/tree', total: "#{tree.unit_count} units, #{tree.unresolved_count} unresolved", rows: tree.rows.map { |row| { kind: row.kind, name: row.name, level: row.level, path: row.path, count: row.count, owner_keys: row.owner_keys, open: row.level < 2, current: row.path == local_assigns[:current_path], unindexed: false, href: (row.kind == :file ? woods_map.file_path(path: row.path) : nil), chips: (row.kind == :file ? tag.span(" #{row.units} #{'unit'.pluralize(row.units)}, #{row.unresolved} unresolved", class: 'ct') : nil) } } %>
+        <% since = current_since if current_since&.available? %>
+        <% moved = ->(row) { since && row.kind == :file && Array(row.owner_keys).any? { |key| since.change(*key) } } %>
+        <% mark = since ? safe_join([chip(:modified, "a unit in this file changed since gen #{since.from_generation}"), tag.span(" changed since gen #{since.from_generation}", class: 'sr-only')]) : nil %>
+        <% rows = tree.rows.map { |row| { kind: row.kind, name: row.name, level: row.level, path: row.path, count: row.count, owner_keys: row.owner_keys, open: row.level < 2, current: row.path == local_assigns[:current_path], unindexed: false, href: (row.kind == :file ? woods_map.file_path(path: row.path) : nil), chips: (row.kind == :file ? safe_join([tag.span(" #{row.units} #{'unit'.pluralize(row.units)}, #{row.unresolved} unresolved", class: 'ct'), (mark if moved.call(row))].compact) : nil) } } %>
+        <% changed_files = since ? tree.rows.count { |row| moved.call(row) } : nil %>
+        <%= render 'woods_map/components/tree', total: safe_join(["#{tree.unit_count} units, #{tree.unresolved_count} unresolved", (changed_files ? ", #{changed_files} changed since gen #{since.from_generation}" : nil)].compact), rows: rows %>
       <% end %>
     </div>
   </div>

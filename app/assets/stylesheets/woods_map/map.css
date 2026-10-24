@@ -211,6 +211,25 @@ html.js .wm .guide .guide-nojs{display:none}
 .wm .guide .budget{flex-wrap:wrap;row-gap:var(--s1);white-space:normal}
 .wm .guide .budget .end{margin-left:auto}
 .wm .guide .sel-chip[hidden],.wm .guide .btn[hidden]{display:none}
+/* The history list (notes/m7-guide.md, no board): it takes the thread's place in the panel. */
+.wm .guide .history{flex:1 1 auto;min-height:0;overflow:auto;display:flex;flex-direction:column}
+.wm .guide .history[hidden],.wm .guide .thread[hidden]{display:none}
+.wm .guide .history .hh{display:flex;gap:var(--s4);align-items:center;padding:var(--s3) var(--s4);border-bottom:1px solid var(--rule)}
+.wm .guide .history .hh .t3{margin:0;color:var(--bright)}
+.wm .guide .history .hh .tool{margin-left:auto}
+.wm .guide .history .cap{margin:0;padding:var(--s3) var(--s4)}
+.wm .guide .hist{list-style:none;margin:0;padding:0}
+.wm .guide .hist li{border-bottom:1px solid var(--rule)}
+.wm .guide .hrow{display:flex;flex-direction:column;gap:var(--s1);width:100%;padding:var(--s3) var(--s4);border:0;background:none;color:var(--text);font:inherit;text-align:left}
+.wm .guide button.hrow{cursor:pointer}
+.wm .guide button.hrow:hover{background:var(--hover)}
+.wm .guide button.hrow:focus-visible{outline:2px solid var(--select);outline-offset:-2px}
+.wm .guide .hrow b{color:var(--bright);font-weight:500;overflow-wrap:anywhere}
+.wm .guide .hrow .mut{font-size:var(--fs-12);color:var(--mut)}
+.wm .guide .hrow.cur{box-shadow:inset 3px 0 0 var(--select)}
+.wm .guide .sel-chip .tool{margin-left:var(--s2);font-size:var(--fs-11)}
+.wm .guide .answer-tools{align-items:baseline;flex-wrap:wrap}
+.wm .guide .answer-tools .cap{margin:0;color:var(--mut)}
 .wm .bar .btn.guide-toggle:disabled,.wm .guide .btn:disabled{opacity:.5;cursor:not-allowed}
 @media (max-width:959px){
   .wm .aside.guide-dock:not([hidden]){display:flex;position:fixed;inset:0;z-index:40;max-width:none;width:auto}
@@ -316,6 +335,10 @@ html.js .wm .guide .guide-nojs{display:none}
 /* The diff component (B8-Impact-Changed) beside a detail block: Woods' unified hunks (woods#802). */
 .wm .diff-block{margin-top:var(--s4)}
 .wm .main .sec + .dia{margin-top:var(--s5)}
+/* ?since= (E-8): lines removed just after a row, beside tokens.css' changed-line rule */
+.wm .cv .row-rm .ln{box-shadow:inset 0 -2px 0 var(--mod)}
+.wm .cv .row:target .ln,.wm .cv .row:target .cm{color:var(--mut)} /* --dim on the target tint is 4.4:1 */
+.wm .cv .row-chg.row-rm .ln{box-shadow:inset 3px 0 0 var(--mod),inset 0 -2px 0 var(--mod)}
 .wm .diff-block .eyebrow{margin-bottom:var(--s2)}
 .wm .difft{overflow-x:auto}
 /* --dim line numbers fall under AA on the diff tints (3.8:1 dark); --mut clears it in both themes */

@@ -65,17 +65,17 @@
       <% if shown.any? %>
         <% own = [@page.identifier, @page.type] %>
         <% columns = [{ label: 'when', width: '64px', cell_class: 'nw' }, { label: 'sha', width: '84px', cell_class: 'nw mut' }, { label: 'author', width: '150px' }, { label: 'message', cell_class: 'id' }] %>
-        <% columns += [{ label: 'files, units', width: '170px', cell_class: 'nw' }, { label: 'gen', width: '60px', cell_class: 'num', abbr: 'generation that first carried the commit' }] if h.table? %>
+        <% columns += [{ label: 'files, units', width: '170px', cell_class: 'nw' }, { label: 'gen', width: (since_generation ? '84px' : '60px'), cell_class: 'num nw', abbr: 'generation that first carried the commit' }] if h.table? %>
         <% moved = h.table? && h.facets.available? %>
         <% columns += [{ label: 'facets moved', width: '170px', abbr: 'what Woods recorded moving in this unit at the generation that first carried the commit' }] if moved %>
         <% rows = shown.map do |c| %>
           <% cells = [date_abbr(c.date), tag.span(short_sha(c.sha), title: c.sha), who(c.author), c.message] %>
           <% cells += [files_and_units(c), commit_generation(c.generation)] if h.table? %>
           <% cells << (h.facets_moved(c) || empty_value) if moved %>
-          <% { cells: cells, detail: (h.table? ? commit_detail(c, own: own) : nil) } %>
+          <% { cells: cells, classes: (since_commit?(c.generation) ? 'chg' : nil), detail: (h.table? ? commit_detail(c, own: own) : nil) } %>
         <% end %>
         <%= render 'woods_map/components/table', label: 'Commits', min_width: (moved ? '920px' : '760px'), columns: columns, rows: rows, grouped: h.table?,
-                   caption: safe_join(["HEAD-reachable, last change ", date_abbr(h.last_modified)]) %>
+                   caption: safe_join(["HEAD-reachable, last change ", date_abbr(h.last_modified), (since_generation ? "; #{shown.count { |c| since_commit?(c.generation) }} shown arrived after gen #{since_generation}, marked M" : nil)].compact) %>
       <% elsif h.any? %>
         <%= render 'woods_map/components/empty_state', title: 'No commits in this bar', text: 'Pick another bar of the strip, or list every week.' %>
       <% elsif h.table? %>
