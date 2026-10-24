@@ -77,7 +77,7 @@ Run this before a milestone issue is opened and again before it closes.
 | W-5 model lifecycle entries | [woods#755](https://github.com/lost-in-the/woods/issues/755) |
 | W-6 method-level span targets | [woods#756](https://github.com/lost-in-the/woods/issues/756) |
 | W-7 per-action facts | [woods#757](https://github.com/lost-in-the/woods/issues/757) |
-| W-8 filter applicability | [woods#758](https://github.com/lost-in-the/woods/issues/758) |
+| W-8 filter applicability (merged via [woods#800](https://github.com/lost-in-the/woods/pull/800); the Passage filter matrix consumes it) | [woods#758](https://github.com/lost-in-the/woods/issues/758) |
 | W-9 container attribution | [woods#759](https://github.com/lost-in-the/woods/issues/759) |
 | W-10 facet diff | [woods#760](https://github.com/lost-in-the/woods/issues/760) |
 | W-11 generation pin | [woods#761](https://github.com/lost-in-the/woods/issues/761) |
