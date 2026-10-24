@@ -5,6 +5,7 @@ require 'active_support/core_ext/module/delegation'
 require 'woods/published_index'
 require 'woods/mcp/index_reader'
 require 'woods/source_inputs/status'
+require_relative 'repository_history'
 
 module WoodsMap
   # One pinned generation per request.
@@ -15,6 +16,8 @@ module WoodsMap
   # deleting a payload mid-render. Every read below goes through the index
   # reader of that one generation; nothing is resolved from a path.
   class Repository
+    include RepositoryHistory
+
     # Raised when no published generation can be opened at the configured root.
     class Unavailable < StandardError; end
 
@@ -121,6 +124,9 @@ module WoodsMap
       nodes = Array(nodes_by_identifier[identifier])
       type ? nodes.find { |node| node['type'].to_s == type.to_s } : nodes.first
     end
+
+    # @return [Pathname] the index root this repository was opened at
+    delegate :index_dir, to: :@index
 
     # @return [Hash] the raw dependency graph (nodes, edges, reverse, reverse_via, pagerank, file_map)
     def graph

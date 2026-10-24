@@ -86,6 +86,9 @@ Run this before a milestone issue is opened and again before it closes.
 | Model attribute writers for the permitted-param flag (B-18) | [woods#797](https://github.com/lost-in-the/woods/issues/797), [design note](notes/passage-mismatch-limits.md) |
 | Partial locals passed and read for the partial-local flag (B-18) | [woods#798](https://github.com/lost-in-the/woods/issues/798), [design note](notes/passage-mismatch-limits.md) |
 | W-14 best-effort flows | [woods#764](https://github.com/lost-in-the/woods/issues/764) |
+| M4 History: History tab from the commit table (strip, commits with detail blocks, people, co-change), per-file gutter heat, generation picker and unit diff from Woods' report, `/woods/history` timeline, timeline and XY exports | [woods-map#6](https://github.com/lost-in-the/woods-map/issues/6), [note](notes/history.md) |
+| Commit table line counts and hunks (B6-History `+6 −1`, *hunks*) | [woods#804](https://github.com/lost-in-the/woods/issues/804) |
+| Changed line ranges per modified unit in the impact report (unified unit diff, B-14) | [woods#802](https://github.com/lost-in-the/woods/issues/802) |
 | Engine scaffold (the M1 skeleton: gem, Engine, Repository, authentication, states, token sheet served) | [woods-map#11](https://github.com/lost-in-the/woods-map/pull/11) |
 | Bounded M1 units index and indexed file ownership (FR-3, B-5); other M1 follow-ups remain separate | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [design note](notes/m1-indexed-navigation.md) |
 | Keyboard help (NFR-3), with focus and shortcut browser coverage | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/keyboard-help.md) |
