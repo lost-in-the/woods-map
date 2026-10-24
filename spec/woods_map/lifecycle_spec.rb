@@ -71,6 +71,26 @@ RSpec.describe WoodsMap::Lifecycle do
     expect(lifecycle.steps('update').map(&:filter)).to eq(%w[set_slug normalize_tags])
   end
 
+  describe 'on:-scoped callbacks' do
+    let(:scoped) do
+      methods = %w[check_new check_edit always created updated saved]
+      callbacks = [%w[before_validation check_new create], %w[before_validation check_edit update],
+                   %w[before_save always], %w[after_commit created create], %w[after_commit updated update],
+                   ['after_commit', 'saved', 'create update']].map do |type, filter, on|
+        { 'type' => type, 'filter' => filter, 'conditions' => on ? { 'on' => on.split } : {} }
+      end
+      { 'identifier' => 'Widget', 'metadata' => { 'callbacks' => callbacks },
+        'source_code' => "class Widget\n#{methods.map { |name| "  def #{name}; end\n" }.join}end\n" }
+    end
+
+    it 'lists each under its own event only' do
+      chains = described_class.new(scoped)
+      expect(chains.steps('create').map(&:filter)).to eq(%w[check_new always created saved])
+      expect(chains.steps('update').map(&:filter)).to eq(%w[check_edit always updated saved])
+      expect(chains.steps('destroy')).to be_empty
+    end
+  end
+
   it 'hides framework callbacks and procs and counts them as a limit' do
     expect(lifecycle.callbacks.pluck('filter')).to contain_exactly('notify', 'set_slug', 'normalize_tags')
     expect(lifecycle.framework.pluck('filter')).to eq(['normalize_changed_in_place_attributes'])

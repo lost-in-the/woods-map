@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- The page keys controller mounts once, on the body. The Passage tab and both impact pages mounted it a second time on their body element, so every page key ran its handler twice (`y` wrote once only because the first handler marked the key handled). Regression specs cover the single mount, `on:`-scoped callbacks listed under their own event only, and the existing path-extension, palette and copy-key fixes.
+
 - The graph has one layout, the butterfly (D-30, closes woods-map#63). Radial and the clusters layout are removed from the Graph tab and `/woods/graph`; domain clusters stay on Landscape Domains and Components, whose rows now open the hub's depth-2 graph. No layout library is vendored.
   - **Labels:** the edges between the same two units share one path and one label (`has_many ×2`, `belongs_to, has_many`, `code_reference +1`), where the labels used to stack into each other.
   - **Bundles:** each edge turns at a trunk just outside its busier end's column, so a hub's edges bundle into one trunk instead of every edge in a gap sharing the midpoint. Overview mode draws the same routes.
