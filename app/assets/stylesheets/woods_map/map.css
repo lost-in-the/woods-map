@@ -388,3 +388,8 @@ html.no-js .wm .amb-pop[hidden]{display:block}
    author that filters the timeline (woods-map#92) is a link, not a tooltip. */
 .wm .tbl td .who{max-width:100%}
 .wm a.who{cursor:pointer}
+
+/* Freshness: the bar's words link to the status page's reasons. */
+.wm .bar-fresh a.why{color:inherit;text-decoration:none}
+.wm .bar-fresh a.why:hover .w{text-decoration:underline}
+.wm .fresh-list{margin:var(--s1) 0 var(--s2);padding-left:var(--s5);list-style:disc}
