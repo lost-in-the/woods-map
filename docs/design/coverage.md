@@ -39,11 +39,11 @@ opens the file tree.
 | Mailer: Passage and Templates | Mailer action passage, delivery, templates | B-17 | — | **none** (same component as the controller passage) |
 | Unit pages: job, mailer, view, concern, serializer, table | Type-specific facts tiles | B-4 | [Published facts note](notes/published-type-facts.md) | bounded published-metadata tiles |
 | `/woods/files/*path` | Indexed file ownership: primary and contributor paths, typed owners and unresolved membership | B-5 | [M1 navigation note](notes/m1-indexed-navigation.md) | shared components; mounted acceptance separate |
-| `/woods/landscape` Context L1 | People and external systems | B-21 | [B8-Landscape](boards/B8-Landscape.html) (ladder only) | partial |
-| Landscape Containers L2 | C4 containers, relationships, structural risk | B-21, W-9 | [B8-Landscape](boards/B8-Landscape.html) | final |
+| `/woods/landscape` Context L1 | People and external systems | B-21 | [B8-Landscape](boards/B8-Landscape.html) (ladder only) | partial; people from `config.landscape_actors`, inside the Containers tab ([note](notes/landscape.md)) |
+| Landscape Containers L2 | C4 containers, relationships, structural risk | B-21, W-9 | [B8-Landscape](boards/B8-Landscape.html) | final; built from W-9 with Mermaid, Structurizr DSL and LikeC4 exports ([note](notes/landscape.md)) |
 | Landscape Components L3 | Compound graph by package with container frame | B-22 | — | **none** |
-| Landscape Hotspots | Quadrant, coupling matrix, sankey, treemap, structural risk | design study §7 | [B6-Overview](boards/B6-Overview.html) | final |
-| Landscape Domains | Domain clusters | design study §7 | — | **none** |
+| Landscape Hotspots | Quadrant, coupling matrix, sankey, treemap, structural risk | design study §7 | [B6-Overview](boards/B6-Overview.html) | final; tiles, churn ranking, coupling matrix and risk built; quadrant, sankey and treemap not ([note](notes/landscape.md)) |
+| Landscape Domains | Domain clusters | design study §7 | [design note](notes/landscape.md) | built from woods#799, with the graph's clusters layout |
 | `/woods/graph` | Full-screen graph, domain clusters, list equivalent, flow overlay | FR-5, A-3 to A-6 | B5-Graph (tab only); [design note](notes/graph-page.md) | partial: page, list equivalent, blast tint and position cache built; clusters wait on [woods#799](https://github.com/lost-in-the/woods/issues/799); flow overlay and timeline open |
 | `/woods/erd` | Whole database by chunk, findings | FR-6 | [B6-ERD](boards/B6-ERD.html) | final; the engine cuts chunks at the ER budget of 40 tables (R-4), not the board's ~15, lists relations to other chunks instead of drawing their far table, and leaves out the board's commits column and polymorphic candidates (W-23) |
 | `/woods/history` | Cross-unit timeline for a selected set, commit → node | FR-7, A-6 | [History note](notes/history.md) | note; server-rendered lanes with changed-together pairs, a picker of the most-changed units, the `timeline` export |

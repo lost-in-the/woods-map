@@ -24,7 +24,7 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
     erds = [FIXTURE_INDEX, WoodsMap::LargeSchemaIndex.path].each_with_index.flat_map do |dir, i|
       WoodsMap::Repository.open(dir) { |repository| erd_diagrams(repository, i.zero? ? 'fixture' : '300') }
     end
-    unit_diagrams + history_diagrams + erds
+    unit_diagrams + landscape_diagrams + history_diagrams + erds
   end
 
   def unit_diagrams
@@ -34,6 +34,14 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
       full.call('model').flat_map { |unit| model_diagrams(unit, analysis) + state_diagrams(repository, unit) } +
         repository.units.flat_map { |entry| graph_diagrams(repository, entry) } +
         %w[controller mailer].flat_map { |type| full.call(type) }.flat_map { |unit| passage_diagrams(repository, unit) }
+    end
+  end
+
+  # The container diagram, from the fixture as a Woods with container attribution writes it.
+  def landscape_diagrams
+    WoodsMap::Repository.open(WoodsMap::LandscapeIndex.path) do |repository|
+      landscape = WoodsMap::Landscape.new(repository, system_name: 'Blog "main" <b>')
+      [['flowchart', 'landscape containers', WoodsMap::LandscapeExport.new(landscape).mermaid]]
     end
   end
 

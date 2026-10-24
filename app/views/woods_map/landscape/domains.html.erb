@@ -1,0 +1,25 @@
+<% content_for :title, "#{@landscape.system_name} · Domains · Landscape · Woods Map" %>
+<%= render 'woods_map/landscape/frame', crumb: 'domains' %>
+<div class="body" data-controller="trail">
+  <div class="main landscape">
+    <section class="sec">
+      <header><h2 class="t2">Domain clusters <%= count_tag(@clusters.size) %><%= info_tip('C4 level 3 by namespace: Woods seeds a cluster from each top-level namespace of the application\'s own units, adds the unnamespaced units most connected to it and merges clusters under three units (graph_analysis.json, per identifier).') %></h2></header>
+      <% if !@repository.graph_analysis.key?('domain_clusters') %>
+        <%= render 'woods_map/components/empty_state', title: 'This generation publishes no domain clusters', text: safe_join(['Woods publishes them in graph_analysis.json from ', link_to('woods#799', 'https://github.com/lost-in-the/woods/issues/799'), '. Extract again with a Woods that includes it.']) %>
+      <% elsif @clusters.empty? %>
+        <%= render 'woods_map/components/empty_state', title: 'No domain clusters', text: 'No namespace of the application has enough units to seed a cluster.' %>
+      <% else %>
+        <%= render 'woods_map/components/table', label: 'Domain clusters', min_width: '760px', columns: [{ label: 'cluster', width: '18%' }, { label: 'hub', width: '24%' }, { label: 'units', width: '8%' }, { label: 'types' }, { label: 'entry points', width: '22%' }, { label: 'graph', width: '12%' }],
+              rows: @clusters.map { |cluster|
+                hub_type = Array(cluster['typed_members']).find { |m| m['identifier'] == cluster['hub'] }&.dig('type')
+                types = Hash(cluster['types']).sort_by { |type, n| [-n, type] }.map { |type, n| "#{n} #{type.tr('_', ' ').pluralize(n)}" }.join(', ')
+                entries = Array(cluster['entry_points'])
+                { cells: [tag.b(cluster['name']), hub_type ? unit_link(cluster['hub'], hub_type) : cluster['hub'], cluster['member_count'].to_s, types,
+                          entries.any? ? safe_join(entries.first(3).map { |e| unit_link(e) }, ', ') + (entries.size > 3 ? " +#{entries.size - 3}" : '') : empty_value,
+                          hub_type ? link_to('clustered', woods_map.graph_path(centre: cluster['hub'], type: hub_type, depth: 2, group: 'clusters')) : empty_value(applicable: false)] }
+              } %>
+      <% end %>
+    </section>
+    <%= render 'woods_map/shared/status', items: ['graph_analysis domain_clusters', "gen #{@repository.generation_number}"], keys: [[%w[/], 'search']] %>
+  </div>
+</div>

@@ -103,6 +103,7 @@ Run this before a milestone issue is opened and again before it closes.
 | D-22 Inline links need a cue besides colour (settled, amends D-11) | [woods-map#26](https://github.com/lost-in-the/woods-map/issues/26) |
 | D-23 Token contrast corrections for AA (settled, amends D-11); the hover tint follow-up is [woods-map#49](https://github.com/lost-in-the/woods-map/issues/49) | [woods-map#27](https://github.com/lost-in-the/woods-map/issues/27) |
 | M3 first slice: the Pele renderer, Schema ER, Lifecycle sequence and Graph neighbourhood panels with their budgets (R-4); other M3 work remains on #5 | [woods-map#5](https://github.com/lost-in-the/woods-map/issues/5), [woods-map#37](https://github.com/lost-in-the/woods-map/pull/37) |
+| Landscape: Containers (W-9) with Mermaid, Structurizr DSL and LikeC4 exports, Hotspots, Domains ([design note](notes/landscape.md)); M3 scope | [woods-map#5](https://github.com/lost-in-the/woods-map/issues/5) |
 | M5 full-screen graph page: blast tint, position cache, hubs ([design note](notes/graph-page.md)) | [woods-map#7](https://github.com/lost-in-the/woods-map/issues/7) |
 | Woods Map data: domain clusters in `graph_analysis.json` (M5 full-screen graph) | [woods#799](https://github.com/lost-in-the/woods/issues/799) |
 | M5 Graph tab layouts without fcose or dagre: a computed butterfly and Cytoscape's concentric radial (needs-decision) | [woods-map#63](https://github.com/lost-in-the/woods-map/issues/63) |
