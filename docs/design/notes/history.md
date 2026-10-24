@@ -28,6 +28,7 @@ no board, and this note sets them:
   - The last four weeks are drawn in `--hot`.
   - A dashed mark in `--mod` shows where a retained generation was extracted.
   - Each bar with commits links to `?week=` and lists its commits.
+  - **Picking a span** (the board's *drag to pick a range*): drag across the bars, or focus a bar and extend with Shift+← / Shift+→, then Enter; Escape cancels (`brush` controller). The page reloads with `?span=first..last` (inclusive days, `WoodsMap::DateSpan`), lights the bars in the span and lists their commits; *whole window* clears it. The band is an SVG rect placed by attributes (CSP), and an `aria-live` line reads the selection. A click without a drag keeps the bar's own link. `/woods/history` takes the same span on its timeline, from a focused dot.
   - *By generation* (`?by=generation`, the board's *by generation | commit* control): one bar per retained generation with a table, holding the commits that generation first carried (`WoodsMap::GenerationStrip` over `CommitLedger`). The pinned generation is drawn hot; the oldest retained table's bar says its commits are only known to be at or before it. A bar links to `?by=generation&gen=N`, which lists only those commits. *Commit* is the default and keeps the time strip.
   - The strip is an SVG in viewBox units. Its axis labels are SVG text at percentage positions, so the page needs no `style` attribute (CSP, M8).
 - **Commits table** (D-17).

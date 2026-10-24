@@ -25,13 +25,18 @@ module WoodsMap
     # @param selection [Array<String>, String, nil] `type:identifier` or a bare identifier
     # @param days [Integer]
     # @param now [Time]
-    def initialize(repository, selection, days: 365, now: Time.now.utc)
+    # @param span [Range<Date>, nil] only the days a drag picked ({DateSpan})
+    def initialize(repository, selection, days: 365, now: Time.now.utc, span: nil)
+      @span = span
       @repository = repository
       @table = repository.git_commits
       @days = days
       @now = now
       @lanes, @unknown = resolve(Array(selection).grep(String).first(MAX_LANES))
     end
+
+    # @return [Range<Date>, nil] the days a drag picked
+    attr_reader :span
 
     # @return [Array<Lane>]
     attr_reader :lanes
@@ -59,6 +64,7 @@ module WoodsMap
         @table.commits_for(*@lanes.flat_map(&:paths)).filter_map do |row|
           time = parse(row['date'])
           next unless time && time >= cutoff
+          next if @span && !@span.cover?(time.to_date)
 
           event(row)
         end.first(EVENT_LIMIT)

@@ -18,7 +18,7 @@ module WoodsMap
       with_unit do
         @history = WoodsMap::HistoryView.new(@repository, @unit, range: params[:range], week: params[:week],
                                                                  all: params[:all] == '1', by: params[:by],
-                                                                 gen: params[:gen])
+                                                                 gen: params[:gen], span: params[:span])
         next render_history_mermaid if mermaid_request?
 
         @diff = WoodsMap::UnitDiff.for(@repository, @unit, from: params[:from], to: params[:to])

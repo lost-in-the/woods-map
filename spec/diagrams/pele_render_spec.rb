@@ -91,7 +91,16 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
       end
     end
     events + [['flowchart', 'dynamic async', view.lifecycle(models.first, async_steps, 'update')]] +
-      passage_dynamic_diagrams(repository, view)
+      changed_step_diagrams + passage_dynamic_diagrams(repository, view)
+  end
+
+  # ?since= marks a moved step with `class sN chg` in both node views (E-8).
+  def changed_step_diagrams
+    steps = async_steps.each_with_index.map { |step, i| i.zero? ? step.dup.tap { |s| s.changed = :method } : step }
+    chart = WoodsMap::LifecycleChart.new(steps, 'Post update')
+    expect(chart.flowchart).to include('class s1 chg')
+    [['flowchart', 'lifecycle flowchart changed', chart.flowchart],
+     ['swimlane', 'lifecycle lanes changed', chart.lanes]]
   end
 
   def async_steps

@@ -15,7 +15,8 @@ module WoodsMap
     # @param changes [Hash{Symbol => Object}]
     # @return [String]
     def history_tab_url(page, **changes)
-      query = request.query_parameters.slice('range', 'week', 'all', 'from', 'to', 'by', 'gen', 'since').symbolize_keys
+      query = request.query_parameters.slice('range', 'week', 'all', 'from', 'to', 'by', 'gen', 'since',
+                                             'span').symbolize_keys
                      .merge(changes).compact
       woods_map.unit_history_path(type: page.type, identifier: page.identifier, **query)
     end

@@ -23,6 +23,25 @@ RSpec.describe 'History', type: :request do
       expect(strip.css('a').pluck('href')).to include('/woods/units/job/ApplicationJob/history?week=2026-10-12#commits')
     end
 
+    it 'lists only the commits inside a picked span and lights its bars' do
+      get '/woods/units/job/ApplicationJob/history', params: { span: '2026-10-05..2026-10-14' }
+      expect(doc.css('table[aria-label="Commits"] tbody tr:not(.sub)').map { |tr| tr.css('td')[4].text })
+        .to eq(['Send subscriber digests from the job'])
+      expect(doc.at_css('#commits h2').text).to include('1 from 2026-10-05 to 2026-10-14')
+      expect(doc.at_css('#commits .tools a').text).to eq('whole window')
+      expect(doc.css('svg.strip-svg rect.bar.sel').size).to eq(2)
+    end
+
+    it 'draws the brush: the span URL, the bars as buckets and a live status line' do
+      get '/woods/units/job/ApplicationJob/history'
+      strip = doc.at_css('.strip[data-controller="brush"]')
+      expect(strip['data-brush-url']).to eq('/woods/units/job/ApplicationJob/history?span=__SPAN__#commits')
+      buckets = JSON.parse(strip['data-brush-buckets'])
+      expect([buckets.size, buckets.last]).to eq([53, %w[2026-10-12 2026-10-18]])
+      expect(strip.css('a[data-index]').size).to eq(2)
+      expect(strip.at_css('[data-brush-status][aria-live="polite"]')).to be_present
+    end
+
     it 'lists the commit table rows with their detail blocks' do
       get '/woods/units/job/ApplicationJob/history'
       row = doc.css('table[aria-label="Commits"] tbody tr:not(.sub)').first
@@ -185,6 +204,15 @@ RSpec.describe 'History', type: :request do
       expect(pairs).to include('ApplicationJob', 'MailingListMailer', 'Sam Okafor-Whitfield')
       commits = doc.at_css('table[aria-label="Commits"]').text
       expect(commits).to include('Send subscriber digests from the job')
+    end
+
+    it 'keeps only the commits of a picked span on the timeline' do
+      units = %w[job:ApplicationJob mailer:MailingListMailer]
+      get '/woods/history', params: { units: units, span: '2026-10-10..2026-10-13' }
+      expect(doc.at_css('h2#lanes').text).to include('1 commit from 2026-10-10 to 2026-10-13')
+      plot = doc.at_css('.tl-plot[data-controller="brush"]')
+      expect(CGI.unescape(plot['data-brush-url'])).to include('units[]=job:ApplicationJob', 'span=__SPAN__')
+      expect(plot.css('a[data-index]').size).to eq(1)
     end
 
     it 'serves the timeline as Mermaid text and asks for units without them' do

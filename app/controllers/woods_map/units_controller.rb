@@ -156,7 +156,8 @@ module WoodsMap
     end
 
     def lifecycle_for(unit, dynamic: nil)
-      WoodsMap::Lifecycle.new(unit, concern_methods: concern_methods(unit), dynamic: dynamic)
+      WoodsMap::Lifecycle.new(unit, concern_methods: concern_methods(unit), dynamic: dynamic,
+                                    changed: current_since&.changed_members(unit))
     end
 
     # The ladder's event: ?event= when valid, else the one the action implies, else the first chain.

@@ -1,13 +1,15 @@
 <%# The callback ladder (B6-Lifecycle, B8-Passage): the resolved chain of one
     event as a steps table, an async hop as a boundary row. Locals: steps
     (Array<Lifecycle::Step>), owner (String: the model the steps belong to),
-    label (String: the table's accessible name), event (String). %>
+    label (String: the table's accessible name), event (String). Under
+    ?since= a step whose method or declaration moved is marked M (E-8). %>
 <% if steps.empty? %>
   <%= render 'woods_map/components/empty_state', title: "No callbacks on #{event}", text: "#{owner} declares nothing that runs on #{event}; validations and framework callbacks are not listed." %>
 <% else %>
   <% rows = [] %>
   <% steps.each do |s| %>
-    <% rows << { cells: [s.n, s.type, s.filter, s.owner == owner ? owner : unit_link(s.owner, 'concern'), s.condition == '—' ? empty_value(applicable: false) : s.condition, s.effects.any? ? s.effects.join(', ') : empty_value, layer_chip(s.commit? ? 'after commit' : 'resolved chain')], classes: (s.commit? ? 'proc' : nil) } %>
+    <% step_cell = s.changed ? safe_join([chip(:modified, s.changed == :method ? 'its method changed' : 'its declaration changed'), tag.span(s.changed == :method ? ' its method changed since the selected generation: ' : ' its declaration changed since the selected generation: ', class: 'sr-only'), ' ', s.filter]) : s.filter %>
+    <% rows << { cells: [s.n, s.type, step_cell, s.owner == owner ? owner : unit_link(s.owner, 'concern'), s.condition == '—' ? empty_value(applicable: false) : s.condition, s.effects.any? ? s.effects.join(', ') : empty_value, layer_chip(s.commit? ? 'after commit' : 'resolved chain')], classes: [('proc' if s.commit?), ('chg' if s.changed)].compact.join(' ').presence } %>
     <% if s.async? %><% rows << { cells: ['', 'async hop', safe_join([tag.span('⇒', class: 'ar async'), ' ', Array(s.side_effects['jobs_enqueued']).map { |j| unit_link(j, 'job') }.then { |l| safe_join(l, ', ') }, ' runs in a new process, the transaction has ended']), '', '', '', layer_chip('job metadata')], classes: 'bnd' } %><% end %>
   <% end %>
   <%= render 'woods_map/components/table', label: label, min_width: '900px', columns: [{ label: '#', width: '40px', cell_class: 'num' }, { label: 'kind', width: '140px', cell_class: 'nw' }, { label: 'step', cell_class: 'id' }, { label: 'defined in', width: '150px' }, { label: 'condition', width: '150px' }, { label: 'side effects', width: '220px' }, { label: 'layer', width: '130px' }], rows: rows %>

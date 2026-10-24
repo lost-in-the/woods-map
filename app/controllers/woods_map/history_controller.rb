@@ -11,7 +11,8 @@ module WoodsMap
     def show
       with_repository do |repository|
         @repository = repository
-        @timeline = WoodsMap::HistoryTimeline.new(repository, selection, days: days)
+        @timeline = WoodsMap::HistoryTimeline.new(repository, selection, days: days,
+                                                                         span: WoodsMap::DateSpan.parse(params[:span]))
         next render_timeline_mermaid if mermaid_request?
 
         @freshness = repository.freshness
