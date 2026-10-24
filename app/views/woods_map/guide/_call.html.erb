@@ -1,0 +1,4 @@
+<%# A tool-call card (B8-Guide): ✓ done, ◌ running, ✕ failed; the tool with
+    its arguments; the duration. Locals: call (Hash). %>
+<% state = call['state'].to_s %>
+<div class="call" data-call="<%= call['id'] %>"><span class="g<%= ' run' if state == 'running' %><%= ' fail' if state == 'failed' %>" role="img" aria-label="<%= state %>"><%= { 'running' => '◌', 'failed' => '✕' }.fetch(state, '✓') %></span><span><%= call['name'] %><span class="mut">(<%= call['args'] %>)</span></span><span class="t"><%= call['ms'] ? "#{(call['ms'].to_f / 1000).round(1)}s" : '' %></span></div>

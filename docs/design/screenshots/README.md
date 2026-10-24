@@ -12,6 +12,8 @@ widths are the tiers of D-19.
 | Status page (`/woods`) | [B8-States](../boards/B8-States.html), *stale: the status page* panel | [1440](status-1440.png), [960](status-960.png), [390](status-390.png) |
 | First run, no index published | [B8-States](../boards/B8-States.html), *first run* panel | [1440](first-run-1440.png) |
 | Refused, non-loopback host without a token | [B8-States](../boards/B8-States.html), *non-loopback host without a token* panel | [1440](refused-1440.png), [640](refused-640.png), [390](refused-390.png) |
+| Guide panel (M7): answered, streaming, budget spent | [B8-Guide](../boards/B8-Guide.html) ([note](../notes/m7-guide.md)); a fake provider in a testbed copy | [answered 1440](guide-answered-1440.png), [960](guide-answered-960.png), [390](guide-answered-390.png), [streaming](guide-streaming-1440.png), [budget spent](guide-exhausted-1440.png) |
+| Guide unavailable (Ruby below 3.2 or no ruby_llm) | [B8-States](../boards/B8-States.html), *guide unavailable below Ruby 3.2* panel | [1440](guide-unavailable-1440.png) |
 | Too many requests (429, M8) | not designed; the 403 panel's structure ([note](../notes/m8-staging.md), [woods-map#59](https://github.com/lost-in-the/woods-map/issues/59)) | [1440](rate-limited-1440.png), [390](rate-limited-390.png) |
 | Session form (token configured, no cookie yet) | not designed; the 403 panel's structure with a form | [1440](session-form-1440.png) |
 | Guidelines, C1 tokens (`/woods/guidelines#tokens`) | [C1-Tokens](../boards/C1-Tokens.html) | [1440](guidelines-c1-tokens-1440.png) |

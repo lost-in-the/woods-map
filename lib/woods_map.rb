@@ -43,6 +43,7 @@ require 'woods_map/unassigned_ivar_rule'
 require 'woods_map/file_tree'
 require 'woods_map/search_results'
 require 'woods_map/palette'
+require 'woods_map/guide'
 require 'woods_map/engine' if defined?(Rails::Engine)
 
 # Woods Map mounts a code-comprehension explorer over a published Woods index.

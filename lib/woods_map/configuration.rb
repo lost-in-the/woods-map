@@ -25,7 +25,45 @@ module WoodsMap
     attr_accessor :require_token
 
     # @return [Boolean] enable the RubyLLM guide panel (M7). Off by default.
+    #   It also needs Ruby 3.2 and `ruby_llm` in the host bundle; below that
+    #   the bar shows a disabled Guide button and a one-line notice.
     attr_accessor :guide_enabled
+
+    # @return [Hash] keywords for `RubyLLM.chat` (`model:`, `provider:`, ...).
+    #   Empty uses RubyLLM's configured default model; the map names none (F-4).
+    attr_accessor :guide_chat_options
+
+    # @return [Array<String>, nil] the stdio command that starts the Woods
+    #   Index MCP server (D-7). Nil runs `bundle exec woods-mcp <index_dir>`.
+    attr_accessor :guide_mcp_command
+
+    # @return [String, nil] a deployed `woods-mcp-http` endpoint to use
+    #   instead of stdio, with {#guide_mcp_token} as its bearer.
+    attr_accessor :guide_mcp_url
+
+    # @return [String, nil] bearer token for {#guide_mcp_url}
+    attr_accessor :guide_mcp_token
+
+    # @return [Integer] tokens one browser session may spend, all answers together
+    attr_accessor :guide_token_budget
+
+    # @return [Integer] tool calls one answer may make (the visible "n of 12")
+    attr_accessor :guide_tool_calls
+
+    # @return [Integer] model turns one answer may take
+    attr_accessor :guide_turns
+
+    # @return [Numeric] seconds one answer may run before it is stopped
+    attr_accessor :guide_seconds
+
+    # @return [Pathname, String, nil] where conversations are written; nil
+    #   is `<index_dir>/explorer/chats`, outside every payload
+    attr_accessor :guide_chats_dir
+
+    # @return [Proc, nil] builds the chat for one answer; called with no
+    #   arguments. Nil builds `WoodsMap::Guide::Agent.chat(**guide_chat_options)`.
+    #   Specs and hosts with their own backend pass one.
+    attr_accessor :guide_chat_factory
 
     # @return [String] cookie name holding the exchanged token digest.
     attr_accessor :cookie_name
@@ -63,6 +101,7 @@ module WoodsMap
       @authorize = nil
       @require_token = false
       @guide_enabled = false
+      initialize_guide
       @cookie_name = 'woods_map_session'
       @content_security_policy = nil
       @rate_limit = 120
@@ -94,6 +133,11 @@ module WoodsMap
       !token.nil? && !token.to_s.strip.empty?
     end
 
+    # @return [Pathname] where guide conversations are kept
+    def guide_chats_path
+      guide_chats_dir ? Pathname.new(guide_chats_dir.to_s) : index_path.join('explorer', 'chats')
+    end
+
     # @return [Pathname]
     def index_path
       Pathname.new(index_dir.to_s)
@@ -116,6 +160,19 @@ module WoodsMap
     end
 
     private
+
+    def initialize_guide
+      @guide_chat_options = {}
+      @guide_mcp_command = nil
+      @guide_mcp_url = nil
+      @guide_mcp_token = nil
+      @guide_token_budget = 60_000
+      @guide_tool_calls = 12
+      @guide_turns = 10
+      @guide_seconds = 120
+      @guide_chats_dir = nil
+      @guide_chat_factory = nil
+    end
 
     def default_index_dir
       if defined?(Rails) && Rails.respond_to?(:root) && Rails.root
