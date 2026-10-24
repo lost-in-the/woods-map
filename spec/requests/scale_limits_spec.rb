@@ -60,25 +60,24 @@ RSpec.describe 'Scale limits', type: :request do
   end
 
   describe 'Mermaid text over the inline budget' do
-    before do
-      stub_const('WoodsMap::MermaidExport::INLINE_BYTES', 10)
+    before { stub_const('WoodsMap::MermaidExport::INLINE_BYTES', 10) }
+
+    it 'leaves a refused diagram\'s text out of the page, with no copy of a text its .mmd refuses' do
       stub_const('WoodsMap::Neighbourhood::NODE_BUDGET', 0)
       get '/woods/units/model/User/graph'
-    end
-
-    it 'links a refused diagram to its .mmd route instead of carrying the text' do
-      panel = html_response_document.at_css('#graph-flowchart')
+      document = html_response_document
+      panel = document.at_css('#graph-flowchart')
       expect(panel.at_css('pre[data-diagram-target=source]')).to be_nil
-      link = panel.at_css('.dw .cap a[rel=alternate]')
-      expect(link.text).to eq('open it as text')
-      expect(link['href']).to start_with('/woods/units/model/User/graph.mmd')
+      expect(panel.at_css('.dw .cap:not(.refusal)').text).to match(/Its Mermaid text, .+, is not carried in this page\./)
+      expect(document.css('button[data-controller=copy][data-mermaid-name]:not([data-pr-comment])')).to be_empty
+      expect(panel.at_css('a[data-mermaid-url]')['href']).to start_with('/woods/units/model/User/graph.mmd')
     end
 
-    it 'copies from the .mmd route' do
-      buttons = html_response_document.css('button[data-controller=copy][data-mermaid-name]')
-      expect(buttons).not_to be_empty
-      expect(buttons.pluck('data-copy-url-value')).to all(start_with('/woods/units/model/User/graph.mmd'))
-      expect(buttons.pluck('data-copy-text-value').compact).to be_empty
+    it 'copies an unbudgeted diagram from its .mmd route' do
+      get '/woods/impact', params: { focus: 'User', depth: 2 }
+      button = html_response_document.at_css('section[aria-labelledby="chg"] button[data-mermaid-name]')
+      expect(button['data-copy-url-value']).to start_with('/woods/impact.mmd?')
+      expect(button['data-copy-text-value']).to be_nil
     end
   end
 

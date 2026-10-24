@@ -12,10 +12,12 @@
     names), refused (Boolean: the panel draws nothing over its budget).
     data-mermaid-name and data-mermaid-href let the Share menu list the page's
     diagrams with their absolute .mmd URLs and comments (D-25). Text over
-    MermaidExport::INLINE_BYTES is copied from the .mmd route instead. %>
+    MermaidExport::INLINE_BYTES is copied from the .mmd route instead, and
+    not at all when the diagram is over its budget (its .mmd answers 422). %>
 <% href = local_assigns[:url] && public_url_for(local_assigns[:url]) %>
-<% linked = WoodsMap::MermaidExport.linked?(text, local_assigns[:url]) %>
-<%= tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: (linked ? nil : text), copy_url_value: (linked ? url : nil), action: 'copy#copy', needs_js: true, key: local_assigns[:key], mermaid_name: name, mermaid_href: href }.compact) %>
+<% oversized = WoodsMap::MermaidExport.oversized?(text) %>
+<% linked = oversized && local_assigns[:url].present? %>
+<% unless oversized && local_assigns[:refused] %><%= tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: (linked ? nil : text), copy_url_value: (linked ? url : nil), action: 'copy#copy', needs_js: true, key: local_assigns[:key], mermaid_name: name, mermaid_href: href }.compact) %><% end %>
 <% if local_assigns[:url] %><%= link_to('⤓ .mmd', url, class: 'tool', rel: 'alternate', type: 'text/plain', download: WoodsMap::MermaidExport.filename(name), data: { mermaid_url: true }) %><% end %>
 <% unless local_assigns[:refused] %>
   <% comment = pr_comment(text, name: name, url: local_assigns[:url]) %>
