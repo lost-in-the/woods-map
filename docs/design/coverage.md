@@ -78,7 +78,7 @@ them. Each is a comment on that issue, so the issue owns it.
 - **M4 · History (woods-map#6, closed)**: built from the [History note](notes/history.md): `/woods/history`, the generation picker and the unit diff entry; line counts and hunks from [woods#804](https://github.com/lost-in-the/woods/issues/804), the unified diff and facets moved from [woods#802](https://github.com/lost-in-the/woods/issues/802).
 - **M5 · Graph (woods-map#7)**: [neighbourhood JSON contract](notes/neighbourhood-json.md); the Graph tab's Cytoscape canvas in the butterfly (D-30, [woods-map#63](https://github.com/lost-in-the/woods-map/issues/63)); the [full-screen graph](notes/graph-page.md) with the flow overlay (A-4) and the commit timeline (A-6); closed (300 units draw in about 200 ms in the browser spec).
 - **M6 · Trail (woods-map#8, closed)**: built from the [Trail note](notes/trail.md); "Explain this investigation" is the guide's action on the board.
-- **M7 · Guide (woods-map#9)**: open on a real provider run; the stream fallback is [woods-map#101](https://github.com/lost-in-the/woods-map/issues/101) (needs-decision).
+- **M7 · Guide (woods-map#9)**: open on a real provider run; no stream fallback for now (D-31, [woods-map#101](https://github.com/lost-in-the/woods-map/issues/101)).
 
 ## Consistency rules checked across boards
 
