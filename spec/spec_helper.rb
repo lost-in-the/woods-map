@@ -8,6 +8,7 @@ require_relative 'support/landscape_index'
 require_relative 'support/flow_index'
 require_relative 'support/package_index'
 require_relative 'support/fake_guide_chat'
+require_relative 'support/woods_line_stats'
 
 RSpec::Matchers.define_negated_matcher :not_include, :include
 
@@ -26,6 +27,7 @@ RSpec.configure do |config|
   config.before do
     WoodsMap.reset_configuration!
     WoodsMap.configuration.index_dir = FIXTURE_INDEX
+    WoodsMap::GenerationFacets.reset!
   end
 
   # The token-less loopback mode requires a loopback Host (DNS rebinding,
