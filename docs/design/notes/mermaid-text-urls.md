@@ -26,6 +26,8 @@ HTML. The text is byte for byte what the panel draws, plus a final newline.
 - Only the route sets the format (the `mmd` path default). A query parameter cannot turn a page into text.
 - The routes read the generation currently published, as the pages do. The answer names it in an `X-Woods-Generation` header. There is no generation parameter yet (W-11).
 - Each panel's ⤓ `.mmd` link (`a[data-mermaid-url]`, `rel="alternate"`, `type="text/plain"`) is the URL for that exact view. The Share menu can reuse it.
+- Every route also answers as `.md` (woods-map#76): the same text as a GitHub pull-request comment, in a ```` ```mermaid ```` fence with one line linking the page and the `.mmd` URL, as `text/markdown`. A `.md` follows every rule below. A comment longer than GitHub's 65,536 characters is 422 with the reason. The Landscape's text routes (`landscape.mmd`, `landscape/:diagram.mmd`) follow these rules too. See [pr-comment-share.md](pr-comment-share.md).
+- Absolute URLs, such as a 422's page link, start at `config.public_url` when one is set.
 
 ## Answers
 
@@ -42,4 +44,4 @@ HTML. The text is byte for byte what the panel draws, plus a final newline.
 ## Limits
 
 - Structurizr DSL and LikeC4 need container attribution (W-9, [woods#759](https://github.com/lost-in-the/woods/issues/759)) and are not served.
-- Diagram types newer than GitHub's Mermaid (only `swimlane-beta` among the generated ones) carry a "may not render on GitHub" mark in the panel. GitHub's actual version is still unmeasured.
+- GitHub renders Mermaid 11.16.1 (woods-map#76). `spec/diagrams/github_mermaid_spec.rb` parses every generated text with that build, and every one parses, `swimlane-beta` included. A type newer than it would carry a "may not render on GitHub" mark in the panel; none is generated. [pr-comment-share.md](pr-comment-share.md) has the table.

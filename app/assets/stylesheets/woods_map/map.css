@@ -46,7 +46,7 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .dia .pele-host svg{max-width:none!important}
 .wm .dia .refusal{margin:0 0 var(--s3);color:var(--mut)}
 /* On a phone the band would clip its tools; they drop to a second line instead. */
-@container wm (max-width:639px){ .wm .dia .dh{flex-wrap:wrap;row-gap:var(--s2)} .wm .dia .dh .tools{margin-left:0} }
+@container wm (max-width:639px){ .wm .dia .dh{flex-wrap:wrap;row-gap:var(--s2)} .wm .dia .dh .tools{margin-left:0;flex-wrap:wrap;flex-shrink:1;min-width:0;row-gap:var(--s2)} .wm .dia .dh .tools .lyr{white-space:normal;margin-left:0} }
 
 /* The range form wraps to keep every selector and label reachable on narrow screens. */
 .impact-range-form { display:flex; gap:var(--s3); align-items:center; flex-wrap:wrap; }
@@ -104,6 +104,8 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .share-panel .sh-row .tool{margin-left:auto}
 .wm .share-panel .sh-dia[hidden]{display:none}
 .wm .share-panel .sh-url{font-family:var(--ff-data);font-size:var(--fs-11);overflow-wrap:anywhere;user-select:all}
+/* Why a diagram has no PR comment copy (woods-map#76): a sentence on its own line, wrapped in the panel. */
+.wm .share-panel .sh-dia .lyr{white-space:normal;margin-left:0;flex-basis:100%}
 @container wm (max-width:959px){ .wm .share-panel{right:auto;left:0} }
 
 /* The Content-Security-Policy (M8) refuses style attributes, so what views once wrote inline is a

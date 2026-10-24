@@ -13,12 +13,19 @@ WoodsMap::Engine.routes.draw do
   get 'search/palette', to: 'search#palette', as: :palette, defaults: { format: :json }
   # The Landscape (B8-Landscape, B6-Overview): C4 containers, components, hotspots and domains
   # of one generation; every diagram is also plain text for agents and other tools (D-25).
-  get 'landscape.mmd', to: 'landscape#export', as: :landscape_mmd, defaults: { export: 'mermaid' }, format: false
+  # `.md` is the same diagram as a GitHub pull-request comment (woods-map#76), under the `.mmd` rules.
+  get 'landscape.mmd', to: 'landscape#export', as: :landscape_mmd, defaults: { export: 'mermaid', mmd: '1' },
+                       format: false
+  get 'landscape.md', to: 'landscape#export', as: :landscape_md, defaults: { export: 'mermaid', mmd: '1', md: '1' },
+                      format: false
   get 'landscape.dsl', to: 'landscape#export', as: :landscape_dsl, defaults: { export: 'structurizr' }, format: false
   get 'landscape.c4', to: 'landscape#export', as: :landscape_c4, defaults: { export: 'likec4' }, format: false
   get 'landscape/:diagram.mmd', to: 'landscape#diagram', as: :landscape_diagram_mmd,
                                 constraints: { diagram: /context|components|quadrant|sankey|treemap|mindmap/ },
-                                format: false
+                                defaults: { mmd: '1' }, format: false
+  get 'landscape/:diagram.md', to: 'landscape#diagram', as: :landscape_diagram_md,
+                               constraints: { diagram: /context|components|quadrant|sankey|treemap|mindmap/ },
+                               defaults: { mmd: '1', md: '1' }, format: false
   get 'landscape(/:tab)', to: 'landscape#show', as: :landscape,
                           constraints: { tab: /context|containers|components|hotspots|domains|status/ }, format: false
 
@@ -39,21 +46,26 @@ WoodsMap::Engine.routes.draw do
 
   # The impact page (M4b): a focus set with no range is the blast radius; a range delegates to Woods' report (W-12).
   # The Mermaid text of a page's diagram as text/plain (D-25); see docs/design/notes/mermaid-text-urls.md.
+  # `.md` is the same diagram as a GitHub pull-request comment (woods-map#76), under the `.mmd` rules.
   get 'impact.mmd', to: 'impact#show', as: :impact_mmd, defaults: { mmd: '1' }, format: false
+  get 'impact.md', to: 'impact#show', as: :impact_md, defaults: { mmd: '1', md: '1' }, format: false
   get 'impact', to: 'impact#show', as: :impact
   # A saved report (E-6): the SHA-256 ID woods:impact printed, read through Woods' store.
   get 'impacts/:id', to: 'impact#saved', as: :saved_impact, constraints: { id: /[0-9a-f]{64}/ }, format: false
 
   # The whole database by chunk (M3, B6-ERD): a chunk number, never a table name or path.
   get 'erd.mmd', to: 'erd#show', as: :erd_mmd, defaults: { mmd: '1' }, format: false
+  get 'erd.md', to: 'erd#show', as: :erd_md, defaults: { mmd: '1', md: '1' }, format: false
   get 'erd(/:chunk)', to: 'erd#show', as: :erd, constraints: { chunk: /[1-9][0-9]{0,5}/ }, format: false
 
   # The cross-unit timeline (M4): typed identifiers in the query, never a path.
   get 'history.mmd', to: 'history#show', as: :history_mmd, defaults: { mmd: '1' }, format: false
+  get 'history.md', to: 'history#show', as: :history_md, defaults: { mmd: '1', md: '1' }, format: false
   get 'history', to: 'history#show', as: :history
 
   # The Trail (M6, notes/trail.md): the board is its query; `.mmd` is its Mermaid (D-25).
   get 'trail.mmd', to: 'trails#show', as: :trail_mmd, defaults: { mmd: '1' }, format: false
+  get 'trail.md', to: 'trails#show', as: :trail_md, defaults: { mmd: '1', md: '1' }, format: false
   get 'trail/graph', to: 'trails#graph', as: :trail_graph, defaults: { format: :json }
   get 'trail', to: 'trails#show', as: :trail, format: false
 
@@ -68,6 +80,7 @@ WoodsMap::Engine.routes.draw do
     # The tabs' Mermaid text (D-25), ahead of the glob routes that would take `.mmd` as part of an identifier.
     %w[schema passage lifecycle graph history].each do |tab|
       get "*identifier/#{tab}.mmd", to: "units##{tab}", as: :"unit_#{tab}_mmd", defaults: { mmd: '1' }
+      get "*identifier/#{tab}.md", to: "units##{tab}", as: :"unit_#{tab}_md", defaults: { mmd: '1', md: '1' }
     end
     get '*identifier/schema', to: 'units#schema', as: :unit_schema
     get '*identifier/routes', to: 'units#routes', as: :unit_routes

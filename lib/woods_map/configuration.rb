@@ -119,6 +119,21 @@ module WoodsMap
     #   are always accepted.
     attr_accessor :allowed_origins
 
+    # @return [String, nil] the address reviewers reach the host application
+    #   at, such as `https://staging.example.com` (woods-map#76). Absolute
+    #   links the map hands out (focus URLs, `.mmd` and `.md` URLs, the links
+    #   in a pull-request comment) start with it instead of the request's own
+    #   origin, which behind a proxy can be an internal name. A path prefix a
+    #   proxy strips may follow the host. Nil uses the request's origin.
+    #   Defaults to `WOODS_MAP_PUBLIC_URL`. See docs/DEPLOYMENT.md.
+    attr_reader :public_url
+
+    # @param value [String, nil]
+    # @raise [ArgumentError] unless an absolute http(s) URL (see {WoodsMap::PublicUrl.normalize})
+    def public_url=(value)
+      @public_url = PublicUrl.normalize(value)
+    end
+
     def initialize
       @index_dir = default_index_dir
       @rate_limiter_mutex = Mutex.new
@@ -135,6 +150,7 @@ module WoodsMap
       @rate_limit_period = 60
       @rate_limit_key = ->(request) { request.remote_ip }
       @allowed_origins = []
+      self.public_url = ENV.fetch('WOODS_MAP_PUBLIC_URL', nil)
     end
 
     # @return [Boolean] whether expensive endpoints are rate limited

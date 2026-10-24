@@ -59,9 +59,7 @@ module WoodsMap
     end
 
     def render_tab_mermaid(text, what, refusal: nil)
-      page = request.base_url + raw_request_path.delete_suffix('.mmd')
-      page += "?#{request.query_string}" if request.query_string.present?
-      render_mermaid(text, name: "#{@page.identifier} #{what}", refusal: refusal, page: page)
+      render_mermaid(text, name: "#{@page.identifier} #{what}", refusal: refusal, page: mermaid_page_url)
     end
   end
 end

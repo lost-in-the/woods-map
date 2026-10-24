@@ -101,6 +101,8 @@ Run this before a milestone issue is opened and again before it closes.
 | Hover card on a reference (B-3), prefetched with the Code tab | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/hover-card.md) |
 | Reading settings (B-15, D-6): lens, wrap, font size and editor link per browser | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/settings.md) |
 | Share menu (E-6, E-7): focus URL and the page's Mermaid, per D-25 | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/share-menu.md), [woods-map#57](https://github.com/lost-in-the/woods-map/issues/57) |
+| Share output that pastes into a GitHub pull-request comment (D-25 amended, E-6): every text parses with GitHub's Mermaid 11.16.1, *copy for PR comment* in each panel and the Share menu, `.md` beside every `.mmd`, `config.public_url`; closed | [woods-map#76](https://github.com/lost-in-the/woods-map/issues/76), [note](notes/pr-comment-share.md) |
+| Woods diagrams for review agents: `Woods::Diagrams`, a `diagram` MCP tool and `woods:diagram` (neighbourhood, schema, lifecycle, impact), needs a decision | [woods#826](https://github.com/lost-in-the/woods/issues/826) |
 | Type-specific facts tiles (B-4); other M1 follow-ups remain separate | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/published-type-facts.md) |
 | Design system epic (tokens, fonts, components, responsive tiers) | [woods-map#23](https://github.com/lost-in-the/woods-map/issues/23) |
 | D-22 Inline links need a cue besides colour (settled, amends D-11), closed | [woods-map#26](https://github.com/lost-in-the/woods-map/issues/26) |

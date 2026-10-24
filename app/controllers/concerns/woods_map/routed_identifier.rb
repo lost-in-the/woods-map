@@ -17,10 +17,17 @@ module WoodsMap
     # @return [Array<String>]
     def routed_identifiers
       identifier = params[:identifier].to_s
-      suffix = action_name == 'show' ? '' : "/#{action_name}#{'.mmd' if mermaid_request?}"
+      suffix = action_name == 'show' ? '' : "/#{action_name}#{text_suffix}"
       path = raw_request_path
       slashed = path.end_with?("/#{suffix}") && !identifier.end_with?('/')
       slashed ? ["#{identifier}/", identifier] : [identifier]
+    end
+
+    # @return [String] what a text route adds after the tab: `.mmd`, `.md` or nothing
+    def text_suffix
+      return '' unless mermaid_request?
+
+      pr_comment_request? ? '.md' : '.mmd'
     end
 
     def render_missing_unit
