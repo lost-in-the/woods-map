@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+- A hub's first impact view no longer opens every unit it reaches.
+  - **Render-by-name unknowns:** the Unknown tab opens only the reached units that Woods' graph lists as having unresolved renders (`unresolved_render_count`, woods#837), through `Repository#units_with`. A generation from an older Woods, or a Woods without the summary, still opens every reached unit.
+  - **Action templates:** the passages behind the unassigned-ivar rule find an action's templates through an index of the generation's view templates, built once per template list, instead of scanning every template for every action.
+
 - Pages stay usable on a large generation (measured on synthetic apps of about 4,600 and 10,300 units).
   - **One reader per generation:** the index reader, the dependency graph and what the map derives from them (the typed node lookup, file ownership, the identifier index, the unit listings) are built once per published generation and shared by the requests that pin it (`WoodsMap::GenerationSnapshot`), where every request re-parsed the graph and re-read every unit index. Derived values are frozen.
   - **Units index:** each type shows its first 100 units, by name, with its exact count and a link to `/woods/units?type=<type>`, which lists that type 500 a page.
