@@ -120,6 +120,11 @@ module WoodsMap
       @permitted_attributes ||= permitted.map { |entry| PermittedAttributes.new(@repository, entry) }
     end
 
+    # @return [WoodsMap::PartialLocals] the locals each partial here is passed, set against what it reads
+    def partial_locals
+      @partial_locals ||= PartialLocals.new(@repository, templates, "#{identifier}##{action}")
+    end
+
     # @return [Array<PassageTemplates::Template>] the action's templates (depth 0) and their partial chain
     def templates
       template_resolver.all

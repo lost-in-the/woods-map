@@ -83,8 +83,8 @@ Run this before a milestone issue is opened and again before it closes.
 | W-11 generation pin | [woods#761](https://github.com/lost-in-the/woods/issues/761) |
 | W-12 impact report | [woods#762](https://github.com/lost-in-the/woods/issues/762) |
 | W-13 inverted flow index | [woods#763](https://github.com/lost-in-the/woods/issues/763) |
-| Model attribute writers for the permitted-param flag (B-18) | [woods#797](https://github.com/lost-in-the/woods/issues/797), [design note](notes/passage-mismatch-limits.md) |
-| Partial locals passed and read for the partial-local flag (B-18) | [woods#798](https://github.com/lost-in-the/woods/issues/798), [design note](notes/passage-mismatch-limits.md) |
+| Model attribute writers for the permitted-param flag (B-18) | [woods#797](https://github.com/lost-in-the/woods/issues/797), published by [woods#806](https://github.com/lost-in-the/woods/pull/806), [design note](notes/passage-mismatch-limits.md) |
+| Partial locals passed and read for the partial-local flag (B-18) | [woods#798](https://github.com/lost-in-the/woods/issues/798), published by [woods#806](https://github.com/lost-in-the/woods/pull/806), [design note](notes/passage-mismatch-limits.md) |
 | W-14 best-effort flows | [woods#764](https://github.com/lost-in-the/woods/issues/764) |
 | Engine scaffold (the M1 skeleton: gem, Engine, Repository, authentication, states, token sheet served) | [woods-map#11](https://github.com/lost-in-the/woods-map/pull/11) |
 | Bounded M1 units index and indexed file ownership (FR-3, B-5); other M1 follow-ups remain separate | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [design note](notes/m1-indexed-navigation.md) |
