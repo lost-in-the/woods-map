@@ -78,4 +78,20 @@ RSpec.describe WoodsMap::HistoryView do
                                          '(no readable git history at extraction)')
     end
   end
+
+  # woods-map#92, design-study scenario 2 step 4: the author as git recorded it.
+  it 'narrows the commits to one author and keeps every author in the people list' do
+    view('ApplicationJob', 'job', author: 'Sam Okafor-Whitfield') do |history|
+      expect(history.commits.map(&:author).uniq).to eq(['Sam Okafor-Whitfield'])
+      expect(history.total).to eq(1)
+      expect(history.people.map(&:name)).to include('Leah Armstrong', 'Sam Okafor-Whitfield')
+    end
+  end
+
+  it 'shows nothing for an author no commit in the window carries, rather than guessing' do
+    view('ApplicationJob', 'job', author: 'Nobody') do |history|
+      expect(history.commits).to eq([])
+      expect(history.author).to eq('Nobody')
+    end
+  end
 end

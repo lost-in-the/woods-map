@@ -43,4 +43,13 @@ RSpec.describe WoodsMap::HistoryTimeline do
       expect(t.suggestions.first(2).pluck('identifier')).to contain_exactly('ApplicationJob', 'Micropost')
     end
   end
+
+  # woods-map#92, design-study scenario 2 step 4: the author as git recorded it.
+  it 'narrows the events to one author and still names every author of the window' do
+    timeline(%w[job:ApplicationJob mailer:MailingListMailer], author: 'Sam Okafor-Whitfield') do |t|
+      expect(t.events.map(&:author).uniq).to eq(['Sam Okafor-Whitfield'])
+      expect(t.author).to eq('Sam Okafor-Whitfield')
+      expect(t.authors).to include('Leah Armstrong', 'Sam Okafor-Whitfield')
+    end
+  end
 end
