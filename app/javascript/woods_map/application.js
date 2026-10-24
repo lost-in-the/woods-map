@@ -18,6 +18,7 @@ import KeysController from "./controllers/keys_controller.js"
 import HelpController from "./controllers/help_controller.js"
 import SettingsController from "./controllers/settings_controller.js"
 import DiagramController from "./controllers/diagram_controller.js"
+import GraphController from "./controllers/graph_controller.js"
 
 const application = Application.start()
 application.register("cliff", CliffController)
@@ -35,5 +36,6 @@ application.register("keys", KeysController)
 application.register("help", HelpController)
 application.register("settings", SettingsController)
 application.register("diagram", DiagramController)
+application.register("graph", GraphController)
 
 document.documentElement.dataset.woodsMap = "ready"

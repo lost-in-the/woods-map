@@ -12,7 +12,7 @@ module WoodsMap
         @freshness = repository.freshness
         @results = WoodsMap::SearchResults.new(repository, params[:q], mode: params[:in].to_s,
                                                                        types: Array(params[:types]).presence)
-        @nav = [['Units', woods_map.units_path, false], ['Impact', woods_map.impact_path, false]]
+        @nav = primary_nav
         render :show
       end
     end

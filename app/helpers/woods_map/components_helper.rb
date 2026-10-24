@@ -7,7 +7,7 @@ module WoodsMap
     # Table minimum widths, in px, that map.css has a class for. The policy
     # (M8) refuses style attributes, so a table's minimum is a class, not a
     # custom property set inline.
-    TABLE_MIN_WIDTHS = [560, 640, 720, 760, 820, 860, 900, 980].freeze
+    TABLE_MIN_WIDTHS = [480, 560, 640, 720, 760, 820, 860, 900, 980].freeze
 
     # @param value [String, nil] a minimum width such as `"900px"`
     # @return [String, nil] the class that sets it

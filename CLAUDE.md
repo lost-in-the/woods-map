@@ -7,7 +7,7 @@ relationship graphs, schema and history, and get change-impact reports with
 sharable focus URLs. It reads the published index only: no live database, no
 runtime reflection, no git subprocess at request time.
 
-Status: scaffold, design system, M1 Reading, M2 Passage, the pre-change and range modes of M4b Impact, the Pele renderer slice of M3 Diagrams, the neighbourhood endpoint of M5 Graph and the CSP, rate-limit and origin-guard slice of M8 Staging landed. The design study, decision log, boards
+Status: scaffold, design system, M1 Reading, M2 Passage, the pre-change and range modes of M4b Impact, the Pele renderer slice of M3 Diagrams, the neighbourhood endpoint, Graph tab canvas and full-screen graph page of M5 Graph, and the CSP, rate-limit and origin-guard slice of M8 Staging landed. The design study, decision log, boards
 and milestone plan live in `docs/design/` and are the source of truth for
 scope; `docs/design/foundations/tokens.css` is the stylesheet the engine ships
 verbatim (a spec keeps the two copies identical).
@@ -55,15 +55,16 @@ lib/woods_map/{content_security_policy,rate_limiter}.rb  # M8: the engine's CSP 
 lib/woods_map/importmap.rb       # pins for vendored modules, the literal import map
 app/controllers/concerns/woods_map/authentication.rb  # token, cookie and loopback gate (D-4)
 lib/woods_map/glyphs.rb          # the glyph vocabulary (D-20)
-app/controllers/woods_map/       # application (gate order, 403 panel), status, sessions, assets, guidelines, units, search, impact
+app/controllers/woods_map/       # application (gate order, 403 panel), status, sessions, assets, guidelines, units, search, impact, graphs, neighbourhoods
 app/helpers/woods_map/           # asset URLs, date shorthand (D-15), short SHA; components (glyphs, chips, ⓘ, people)
 app/assets/stylesheets/woods_map/ # tokens.css (verbatim from docs/design/foundations), fonts.css, map.css (engine-only rules)
-app/javascript/woods_map/        # Stimulus controllers: cliff, tooltip, rows, tree, sheet, copy, share, palette, peek, card, settings, trail, keys, help, diagram (Pele, D-21)
+app/javascript/woods_map/        # Stimulus controllers: cliff, tooltip, rows, tree, sheet, copy, share, palette, peek, card, settings, trail, keys, help, diagram (Pele, D-21), graph (Cytoscape canvas, M5)
 app/views/woods_map/shared/      # the frame: bar, crumbs, ident, tabs, status, sheet
 app/views/woods_map/components/  # table, steps, detail, rail, tree, facts, legend, diagram, banner, empty state
 app/views/woods_map/guidelines/  # the C1 to C5 boards rendered from the partials above
 app/views/woods_map/{units,search,impact}/ # unit pages (Code, Routes, Passage, Schema, Lifecycle, Graph, History, peek, 404), search, impact lenses
-vendor/javascript/               # stimulus, pele (vendored); turbo, cytoscape, vis-timeline, highlight.js as milestones land them
+app/views/woods_map/graphs/       # the explorer partial shared by the Graph tab and /woods/graph, the page and its hub picker
+vendor/javascript/               # stimulus, pele, cytoscape (vendored); turbo, vis-timeline, highlight.js as milestones land them
 vendor/fonts/                    # Inter (latin subsets) and the complete Fira Code, WOFF2 (D-12)
 docs/design/                     # design study, decisions, boards, foundations, plan
 ```
@@ -86,6 +87,7 @@ docs/design/                     # design study, decisions, boards, foundations,
 - Hover cards (B-3) are rendered with the Code tab as inert `<template data-card-target="card" data-href=…>` elements, one per linked unit (`CodeView#linked_targets`), and handed to the one tooltip as `data-tip-html` with `data-tip-delay="100"`. Hovering makes no request. Card markup must stay free of `abbr`, `[title]` and ⓘ, because the tooltip would open a nested tip.
 - Reading settings (B-15) live in `localStorage["woods_map.settings"]` behind `try/catch`; the lens stays on its `?lens=` cookie. Wrap is an opt-in (`data-code-wrap=on` on `.wm`) that fits the source column to the one scroll region, never an automatic narrow-width wrap. *In editor at L…* is rendered hidden on the Code tab and shown only when this browser's editor template resolves; never build an editor URL from the index alone, and refuse `javascript:`/`data:`/`vbscript:` templates.
 - The Share menu (`shared/_share`, E-6) is a `<details>` disclosure with the page's `focus_url`, which never carries `token`, and copies of the Mermaid text the diagram panels already hold. It offers no Markdown or JSON report, not even Woods output handed through (D-25). The `y` key skips copy tools inside `.share`.
+- The Graph tab's canvas (`graph` controller) fetches `/woods/graph/neighbourhood` for the page's own query and draws it with the vendored Cytoscape; the Pele flowchart and the list stay the no-JavaScript page and the Mermaid export. Layouts are the controller's butterfly (signed traversal columns) and Cytoscape's built-in `concentric` (woods-map#63): no layout extension is vendored. Type tints are `--g` on `[data-gtype]` in `map.css`, read through a probe and mixed into `--panel`, so canvas and legend agree; a theme switch repaints. List rows carry `data-edge` (`GraphElements.edge_id`), the JSON's edge id. Above 150 edges the mechanism labels appear only when zoomed in. `spec/woods_map_graph_browser_spec.rb` times a 300-unit draw synchronously before load (virtual time freezes `performance.now()` once a timer fires); set `WOODS_MAP_GRAPH_BUDGET_MS` to enforce a budget. The tab and `/woods/graph` share `graphs/_explorer`; dragged positions are kept in `localStorage` per generation, query and layout (A-3), and the page's blast tint comes from `BlastRadius`, never from the client. Domain clusters are not drawn until Woods publishes them (woods#799).
 - The code view is one scroll region (`.cvwrap`, D-24, woods-map#29): the source column grows to its longest line and the gutters are sticky. Do not reintroduce `overflow-x:auto` on `.src`.
 - Code links consume only published `metadata.references` with `kind: constant` and `confidence: verified`, resolved by exact target and target type in the pinned generation. Their 1-based lines address annotated `source_code`; columns and lengths count UTF-8 bytes, including original newlines. Only unchanged file rows can carry links. Missing/invalid metadata and hidden or transformed rows stay unlinked; the internal reference cache is not a public link source. `source_line_map` runs contain annotated start, original start and length, not an ending line. Verification describes the published typed-registry evidence, not complete runtime call coverage.
 

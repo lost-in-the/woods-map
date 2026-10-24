@@ -12,4 +12,9 @@ RSpec.describe WoodsMap::Importmap do
     json = JSON.parse(described_class.to_json(url_for: ->(digest, path) { "/woods/assets/#{digest}/#{path}" }))
     expect(json['imports']['pele']).to eq("/woods/assets/#{WoodsMap::Assets.digest}/pele.js")
   end
+
+  it 'pins the vendored Cytoscape ESM build the Graph tab loads on demand (M5)' do
+    json = JSON.parse(described_class.to_json(url_for: ->(digest, path) { "/woods/assets/#{digest}/#{path}" }))
+    expect(json['imports']['cytoscape']).to eq("/woods/assets/#{WoodsMap::Assets.digest}/cytoscape.esm.min.mjs")
+  end
 end

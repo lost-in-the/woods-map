@@ -138,7 +138,7 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .filter.auto{width:auto}
 .wm .tbl.fixed{table-layout:fixed}
 .wm .tbl.fit{min-width:max-content}
-.wm .tbl.min-560{--tbl-min:560px} .wm .tbl.min-640{--tbl-min:640px} .wm .tbl.min-720{--tbl-min:720px} .wm .tbl.min-760{--tbl-min:760px}
+.wm .tbl.min-480{--tbl-min:480px} .wm .tbl.min-560{--tbl-min:560px} .wm .tbl.min-640{--tbl-min:640px} .wm .tbl.min-720{--tbl-min:720px} .wm .tbl.min-760{--tbl-min:760px}
 .wm .tbl.min-820{--tbl-min:820px} .wm .tbl.min-860{--tbl-min:860px} .wm .tbl.min-900{--tbl-min:900px} .wm .tbl.min-980{--tbl-min:980px}
 .wm .tree [data-level="0"]{--l:0} .wm .tree [data-level="1"]{--l:1} .wm .tree [data-level="2"]{--l:2} .wm .tree [data-level="3"]{--l:3} .wm .tree [data-level="4"]{--l:4} .wm .tree [data-level="5"]{--l:5} .wm .tree [data-level="6"]{--l:6} .wm .tree [data-level="7"]{--l:7} .wm .tree [data-level="8"]{--l:8} .wm .tree [data-level="9"]{--l:9} .wm .tree [data-level="10"]{--l:10} .wm .tree [data-level="11"]{--l:11} .wm .tree [data-level="12"]{--l:12} .wm .tree [data-level="13"]{--l:13} .wm .tree [data-level="14"]{--l:14} .wm .tree [data-level="15"]{--l:15} .wm .tree [data-level="16"]{--l:16} .wm .tree [data-level="17"]{--l:17} .wm .tree [data-level="18"]{--l:18} .wm .tree [data-level="19"]{--l:19} .wm .tree [data-level="20"]{--l:20} .wm .tree [data-level="21"]{--l:21} .wm .tree [data-level="22"]{--l:22} .wm .tree [data-level="23"]{--l:23} .wm .tree [data-level="24"]{--l:24}
 .wm .tree .deep{--l:24}
@@ -173,3 +173,27 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .spec .irail.lanes{display:inline-flex;gap:var(--s2)}
 .wm .spec .tgl.lane{font-size:12px}
 .wm .spec .tgl.lane.on{background:var(--bright);color:var(--bg)}
+
+/* The Graph tab's Cytoscape canvas (M5): one tab stop with the selection's focus ring, a fixed
+   height in spacing steps, and the status line naming the selected unit. Each unit type's tint is
+   --g on [data-gtype]: the graph controller reads it through a probe and mixes it into --panel,
+   as the legend swatches do, so canvas and legend share one source. Types without a rule stay neutral. */
+.wm .dia.graph .dh .gfacts{display:inline-flex;gap:var(--s5);flex-wrap:wrap}
+@container wm (max-width:639px){ .wm .dia.graph .dh{flex-wrap:wrap;white-space:normal;row-gap:var(--s2)} .wm .dia.graph .dh .tools{margin-left:0;flex-wrap:wrap} }
+.wm .gcanvas{position:relative;height:calc(var(--s7) * 10);background:var(--bg);border-top:1px solid var(--rule)}
+.wm .gcanvas:focus-visible{outline:2px solid var(--select);outline-offset:-2px}
+.wm .gstatus{min-height:1.55em;padding:var(--s2) var(--s4);font-family:var(--ff-ui);font-size:var(--fs-12);color:var(--mut);border-top:1px solid var(--rule)}
+@container wm (max-width:639px){ .wm .gcanvas{height:calc(var(--s7) * 7)} }
+.wm [data-gtype]{--g:var(--op)}
+.wm [data-gtype=model],.wm [data-gtype=database_table],.wm [data-gtype=database_view],.wm [data-gtype=migration]{--g:var(--fn)}
+.wm [data-gtype=controller],.wm [data-gtype=route],.wm [data-gtype=middleware]{--g:var(--k)}
+.wm [data-gtype=view_template],.wm [data-gtype=component],.wm [data-gtype=view_component],.wm [data-gtype=phlex]{--g:var(--str)}
+.wm [data-gtype=job],.wm [data-gtype=mailer],.wm [data-gtype=scheduled_job]{--g:var(--var)}
+.wm .legend i.gsw{background:color-mix(in srgb,var(--g) 18%,var(--panel))}
+/* The full-screen graph (notes/graph-page.md): the canvas takes the viewport below the chrome;
+   blast-radius swatches match the canvas borders (hot: reached directly, mod: transitively). */
+.wm .graph-page .gcanvas{height:max(calc(var(--s7) * 8), calc(100vh - var(--s7) * 4))}
+@container wm (max-width:639px){ .wm .graph-page .gcanvas{height:calc(var(--s7) * 9)} }
+.wm .legend i.gblast{background:var(--panel);border-width:2px}
+.wm .legend i.gblast[data-distance="1"]{border-color:var(--hot)}
+.wm .legend i.gblast[data-distance="2"]{border-color:var(--mod)}

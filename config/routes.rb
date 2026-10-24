@@ -11,6 +11,8 @@ WoodsMap::Engine.routes.draw do
   # Search (M1): the results page and the palette's hits.
   get 'search', to: 'search#show', as: :search
   get 'search/palette', to: 'search#palette', as: :palette, defaults: { format: :json }
+  # The full-screen graph (M5): a centre by identifier and type, never a path.
+  get 'graph', to: 'graphs#show', as: :graph
   get 'graph/neighbourhood', to: 'neighbourhoods#show', as: :neighbourhood, defaults: { format: :json }
 
   # The impact page (M4b): a focus set with no range is the blast radius; a range delegates to Woods' report (W-12).
