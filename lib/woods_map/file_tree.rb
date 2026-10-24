@@ -4,12 +4,16 @@ module WoodsMap
   # The file-tree explorer's rows (C3, D-18) from the graph's file map: the
   # application's files as they are on disk, directories with the count of
   # distinct typed owners beneath them, each file retaining its exact path.
-  # Built once per generation and kept in a small process cache.
+  # Files whose every owner is framework or gem source (Woods' rails_source
+  # and gem_source units, installed-gem paths) are left out: the tree is the
+  # application. Built once per generation and kept in a small process cache.
   class FileTree
     Row = Struct.new(:kind, :name, :level, :path, :count, :identifier, :type, :units, :owner_keys, :unresolved,
                      keyword_init: true)
 
     CACHE_SIZE = 4
+    # Unit types that are framework or gem source, not the application's own code.
+    FRAMEWORK_TYPES = %w[rails_source gem_source].freeze
     @cache = {}
     @mutex = Mutex.new
 
@@ -22,9 +26,16 @@ module WoodsMap
           @cache.fetch(key) do
             @cache.shift while @cache.size >= CACHE_SIZE
             owners = repository.file_map.keys.index_with { |path| repository.file_owners(path) }
-            @cache[key] = new(repository.file_map, {}, owners: owners)
+            files = repository.file_map.reject { |path, _| framework?(owners[path]) }
+            @cache[key] = new(files, {}, owners: owners)
           end
         end
+      end
+
+      # @param owners [Array<Hash>] a file's typed owners
+      # @return [Boolean] whether every owner is framework or gem source
+      def framework?(owners)
+        owners.present? && owners.all? { |owner| FRAMEWORK_TYPES.include?(owner['type'].to_s) }
       end
 
       # @return [void]

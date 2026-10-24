@@ -29,12 +29,19 @@ export default class extends Controller {
   globalKey(event) {
     if (event.key === "Escape" && !event.defaultPrevented && !this.wrapTarget.hidden) { this.dismiss(event); return }
     if (event.key !== "/" || event.defaultPrevented || event.isComposing || event.metaKey || event.ctrlKey || event.altKey) return
+    if (event.shiftKey && event.code === "Slash") return // Shift+Slash is ?, the help's key
     if (event.target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return
     if (event.target.closest('[aria-modal="true"]') || !this.inputTarget.getClientRects().length) return
     event.preventDefault()
     this.inputTarget.focus()
     this.inputTarget.select()
     this.open()
+  }
+
+  // A tap anywhere on the search box (the ⌕, its padding) types into it.
+  focus(event) {
+    if (event.target === this.inputTarget || this.wrapTarget.contains(event.target)) return
+    this.inputTarget.focus()
   }
 
   open() {

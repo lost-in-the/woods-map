@@ -59,8 +59,7 @@ RSpec.describe 'Indexed navigation', type: :request do
   it 'keeps a single-owner contributor page and selects the requested path' do
     get '/woods/files/spec/report.rb'
     expect(response).to have_http_status(:ok)
-    current = html_response_document.css('.tree [aria-current="true"]')
-    expect(current.pluck('data-path')).to eq(['spec/report.rb'])
+    expect(html_response_document.at_css('.sheet [data-sheet-target=tree]')['data-current']).to eq('spec/report.rb')
     expect(response.body).to include('href="/woods/units/factory/Report"')
     expect(response.body).to include('Indexed file, 1 unit, gen')
   end
@@ -72,7 +71,7 @@ RSpec.describe 'Indexed navigation', type: :request do
   end
 
   it 'publishes exact typed owner keys for client filtering without file-map guesses' do
-    get '/woods/units'
+    get '/woods/tree'
     rows = html_response_document.css('.tree a[data-owner-keys]')
     row = rows.find { |element| element['data-path'] == path }
     expect(JSON.parse(row['data-owner-keys']))

@@ -34,19 +34,13 @@ module WoodsMap
     end
 
     # @return [Array<Hash>] hubs as published: identifier, type, dependent_count
-    def hubs
-      Array(@analysis['hubs'])
-    end
+    def hubs = Array(@analysis['hubs'])
 
     # @return [Array<Hash>] bridges: identifier, type, score
-    def bridges
-      Array(@analysis['bridges'])
-    end
+    def bridges = Array(@analysis['bridges'])
 
     # @return [Array<Array<String>>]
-    def cycles
-      Array(@analysis['cycles'])
-    end
+    def cycles = Array(@analysis['cycles'])
 
     # @return [Array<String>]
     def orphans = Array(@analysis['orphans'])
@@ -113,6 +107,10 @@ module WoodsMap
     # The churn × dependents quadrant (B6-Overview) as Mermaid: x is commits
     # against the most changed unit, y is dependents on a log scale against
     # the most depended upon, so the top right is what to review first.
+    # Points are named by their rank in {#churn}, which the table beside the
+    # chart numbers too: whole identifiers collide on a chart this size. Units
+    # at the same position share one point, named by every rank there, and a
+    # comment line names each rank's unit for readers of the text.
     #
     # @param limit [Integer] units labelled
     # @return [String, nil] nil without commit counts
@@ -120,10 +118,8 @@ module WoodsMap
       rows = churn(limit: limit)
       return nil if rows.empty?
 
-      most = [rows.pluck(:commits).max, 1].max
-      widest = Math.log(1 + [rows.pluck(:dependents).max, 1].max)
-      points = rows.map { |row| quadrant_point(row, most, widest) }
-      (QUADRANT_HEAD + points).join("\n")
+      names = rows.each_with_index.map { |row, index| "  %% #{index + 1} #{point_name(row[:identifier])}" }
+      (QUADRANT_HEAD + names + quadrant_points(rows)).join("\n")
     end
 
     delegate :code_sizes, :sized_by_package?, :treemap_mermaid, :metric, to: :sizes
@@ -199,12 +195,20 @@ module WoodsMap
                 action: 'candidates to delete', severity: :note)]
     end
 
-    # One point: commits against the most changed, dependents on a log scale
-    # against the most depended upon, kept off the chart's edges.
-    def quadrant_point(row, most, widest)
+    # The points, each named by the ranks of the units at its position.
+    def quadrant_points(rows)
+      most = [rows.pluck(:commits).max, 1].max
+      widest = Math.log(1 + [rows.pluck(:dependents).max, 1].max)
+      places = rows.each_with_index.group_by { |row, _| quadrant_place(row, most, widest) }
+      places.map { |place, ranked| "  #{ranked.map { |_, index| index + 1 }.join('/')}: [#{place}]" }
+    end
+
+    # One point's position: commits against the most changed, dependents on
+    # a log scale against the most depended upon, kept off the chart's edges.
+    def quadrant_place(row, most, widest)
       x = (row[:commits].to_f / most).clamp(0.02, 0.98)
       y = (Math.log(1 + row[:dependents]) / widest).clamp(0.02, 0.98)
-      "  #{point_name(row[:identifier])}: [#{format('%.2f', x)}, #{format('%.2f', y)}]"
+      "#{format('%.2f', x)}, #{format('%.2f', y)}"
     end
 
     # A quadrant point's name: the identifier with only characters the

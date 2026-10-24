@@ -2,6 +2,23 @@
 
 ## [Unreleased]
 
+- Navigation and the files sheet at any size of index and any width.
+  - **The file tree is no longer in every page.** The sheet fetches it the first time it opens, one response per generation that the browser keeps. On a generated index of 4,500 units the status page went from 1.75 MB to 11.5 KB.
+  - The tree leaves out framework and gem source files.
+  - Folded folders hide what is under them; clearing the filter puts the folds back; an empty filter result says so in a live region.
+  - **The sheet:** ☰ opens it at every width. Its header and filter stay in view while the rest scrolls. Below 960 it carries the primary nav, which the bar hides there.
+  - **Below 640** the bar keeps a usable search field, and the status bar wraps instead of clipping.
+  - **The trail** keeps one entry per unit, across its tabs. It never shows an empty entry, names pages from their title, and writes an action as `Controller#action` with one `#`.
+  - **The peek** stays inside the code region, and Escape or ✕ returns focus to the reference that opened it.
+  - **Keys:** `j` / `k` step into the page's first table from anywhere, Shift+Slash opens the keyboard help, and the page keys controller is mounted once.
+  - **Expand all** reads *collapse all* while every row is open.
+  - **Labels:** a toggle column names only what its rows carry.
+  - **The lens:** `?lens=` renders that lens at that URL and remembers it, instead of redirecting to the bare URL; an unknown lens is ignored.
+  - **Passage:** the rail links to the filter matrix and the callback ladder. The matrix can narrow to the filters that run on the page's action.
+  - **Timeline:** below 640, the lane names are truncated so every dot is on screen.
+  - **Hotspots:** quadrant points are named by their rank in the table, with units at one position sharing a point, so labels no longer collide.
+  - **Landscape Status:** its state column fits *published*.
+
 - The graph has one layout, the butterfly (D-30, closes woods-map#63). Radial and the clusters layout are removed from the Graph tab and `/woods/graph`; domain clusters stay on Landscape Domains and Components, whose rows now open the hub's depth-2 graph. No layout library is vendored.
   - **Labels:** the edges between the same two units share one path and one label (`has_many ×2`, `belongs_to, has_many`, `code_reference +1`), where the labels used to stack into each other.
   - **Bundles:** each edge turns at a trunk just outside its busier end's column, so a hub's edges bundle into one trunk instead of every edge in a gap sharing the midpoint. Overview mode draws the same routes.

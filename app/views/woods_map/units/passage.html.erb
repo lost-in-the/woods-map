@@ -46,7 +46,7 @@
 <% extra_rows = param_flags.map { |key, model| ['param', safe_join([tag.span(key, class: 'iv bad'), ", no attribute on #{model}"])] } + local_flags.map { |f| ['local', safe_join([tag.span(f.local, class: 'iv bad'), ", passed to #{f.partial.delete_suffix('.html.erb')}, never read"])] } %>
 <% tiles << { eyebrow: flags || extra_flags.positive? ? "Flags #{Array(flags).size + extra_flags}#{', incomplete' unless complete}" : 'Flags', rows: extra_rows + flag_rows } %>
 <%= render 'woods_map/units/frame', page: @page, tab: 'passage', controls: controls, definition: p.declared&.dig('line') || @definition, title: "#{@page.identifier}##{p.action}", subtitle: p.request_label, tiles: tiles %>
-<div class="body" data-controller="trail keys" data-trail-title-value="<%= @page.identifier %>##<%= p.action %>">
+<div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>#<%= p.action %>">
   <%= render 'woods_map/components/rail', heading: 'Passage', groups: [
         { label: 'stages', count: 6, items: [
           { key: '·', text: 'request', own: p.request_label },
@@ -56,7 +56,7 @@
           { key: '·', text: 'after', own: "#{after.size} #{'filter'.pluralize(after.size)}" },
           { key: '·', text: 'responds', own: p.formats.join(', ').presence || 'unknown' }
         ] },
-        { label: 'also here', count: @ladder ? 2 : 1, items: [{ key: '·', text: 'filter matrix' }, (@ladder ? { key: '·', text: 'callback ladder', own: "#{@ladder_model['identifier']}, #{@ladder_event}" } : nil)].compact },
+        (also = [(p.mailer? || p.filters.empty? ? nil : { key: '·', text: 'filter matrix', href: '#fm' }), (@ladder ? { key: '·', text: 'callback ladder', own: "#{@ladder_model['identifier']}, #{@ladder_event}", href: '#cl' } : nil)].compact).any? ? { label: 'also here', count: also.size, items: also } : nil,
         (Array(flags).size + extra_flags).positive? ? { label: 'flags', count: Array(flags).size + extra_flags, items: Array(flags).map { |f| { key: tag.span('⚑', class: 'flag'), text: f.ivar, own: "mentioned in #{f.template}, no recorded assignment" } } + param_flags.map { |key, model| { key: tag.span('⚑', class: 'flag'), text: key, own: "permitted, no attribute on #{model}" } } + local_flags.map { |f| { key: tag.span('⚑', class: 'flag'), text: f.local, own: "passed to #{f.partial}, never read" } } } : nil,
         { label: 'limits', count: 3 + (writers_known ? 0 : 1) + (locals.published? ? 0 : 1), items: [
           (facts ? { key: '·', text: 'helpers the action calls are not followed', own: layer_chip('per-action facts') } : { key: '·', text: 'assigns, params read and renders per action', own: layer_chip('W-7, woods#757') }),
@@ -174,12 +174,13 @@
       </section>
     <% end %>
     <% unless p.mailer? || p.filters.empty? %>
-      <section class="sec" aria-labelledby="fm">
+      <section class="sec" aria-labelledby="fm" data-controller="matrix">
         <% if resolved %>
         <header><h2 class="t2" id="fm">Filter matrix <span class="n">chain order</span><%= info_tip('Resolved only/except per action (W-8), inherited and concern-supplied filters and skip_before_action included. A filter with an if/unless condition is marked conditional: Woods does not evaluate the condition, so its ✓ means it can run. Hover a ✓ for its condition; the current action\'s column is marked in the head.') %></h2></header>
         <% else %>
         <header><h2 class="t2" id="fm">Filter matrix <span class="n">declared scope</span><%= info_tip('A ✓ means the filter\'s declared only/except names the action. This generation has no resolved chain (W-8): skip_before_action, inherited and concern-supplied filters and conditions are not reflected. The current action\'s column is marked in the head.') %></h2></header>
         <% end %>
+        <p class="cap matrix-tools" data-needs-js><button class="tool" type="button" aria-pressed="false" data-matrix-target="toggle" data-action="matrix#toggle">only filters on <%= p.action %></button> <span role="status" data-matrix-target="status"></span></p>
         <div class="tblwrap" role="region" aria-label="Filter matrix" tabindex="0" data-controller="cliff">
           <table class="tbl matrix fixed fit" aria-label="Filter matrix">
             <thead><tr><th width="200"><%= resolved ? 'filter, owner' : 'filter, declared in' %></th><% p.actions.each do |a| %><th class="c<%= ' cur' if a == p.action %>" width="66"><%= a %></th><% end %></tr></thead>

@@ -29,6 +29,8 @@ RSpec.configure do |config|
     WoodsMap.reset_configuration!
     WoodsMap.configuration.index_dir = FIXTURE_INDEX
     WoodsMap::GenerationFacets.reset!
+    # Specs stub a repository's graph under the fixture's generation key.
+    WoodsMap::TreesController.reset!
   end
 
   # The token-less loopback mode requires a loopback Host (DNS rebinding,

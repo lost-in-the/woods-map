@@ -21,7 +21,7 @@
     </main>
     <% if guide_status == :ready && current_repository %><%= render 'woods_map/guide/panel' %><% end %>
   </div>
-  <%= render 'woods_map/shared/sheet', tree: @tree, current_path: @file_path || @page&.path %>
+  <%= render 'woods_map/shared/sheet', tree_url: files_sheet_tree_url(@files_sheet), current_path: @file_path || @page&.path, nav: @nav || primary_nav %>
   <%= render 'woods_map/shared/keyboard_help' %>
 </body>
 </html>

@@ -10,7 +10,7 @@ module WoodsMap
         next render_chunk_mermaid(repository) if mermaid_request?
 
         @freshness = repository.freshness
-        @tree = WoodsMap::FileTree.for(repository)
+        @files_sheet = true
         @nav = primary_nav('ERD')
         choose_views
         @erd = WoodsMap::Erd.for(repository)
