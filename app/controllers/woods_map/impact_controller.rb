@@ -11,8 +11,10 @@ module WoodsMap
 
     def show
       with_repository do |repository|
+        next render_impact_mermaid(repository) if mermaid_request?
+
         load_frame(repository)
-        next render_range if params[:mode] == 'range' || params[:from].present? || params[:to].present?
+        next render_range if range_request?
 
         @radius = radius_from_params(repository)
         @review = WoodsMap::ImpactReview.new(repository, @radius)
@@ -26,8 +28,23 @@ module WoodsMap
       @repository = repository
       @freshness = repository.freshness
       @tree = WoodsMap::FileTree.for(repository)
-      @nav = [['Units', woods_map.units_path, false], ['Impact', woods_map.impact_path, true]]
+      @nav = primary_nav(:impact)
       @lens = LENSES.include?(params[:lens]) ? params[:lens] : 'changed'
+    end
+
+    # The blast radius's paths as Mermaid text (D-25). A range has no diagram
+    # here: Woods' report is the range's export (D-1).
+    def render_impact_mermaid(repository)
+      return render_text(:not_found, 'A range has no Mermaid text here; Woods publishes its report.') if range_request?
+
+      radius = radius_from_params(repository)
+      return render_text(:bad_request, 'Name the focus: /woods/impact.mmd?focus=<identifier>.') if radius.empty?
+
+      render_mermaid(radius.mermaid, name: "impact #{radius.focus.join(' ')}")
+    end
+
+    def range_request?
+      params[:mode] == 'range' || params[:from].present? || params[:to].present?
     end
 
     def radius_from_params(repository)

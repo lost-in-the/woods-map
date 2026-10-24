@@ -92,6 +92,11 @@ module WoodsMap
       table_count > TABLE_BUDGET
     end
 
+    # @return [String, nil] why the diagram is not drawn, nil within the budget
+    def refusal
+      "#{table_count} tables is over the ER budget of #{TABLE_BUDGET}" if over_budget?
+    end
+
     private
 
     def er_associations

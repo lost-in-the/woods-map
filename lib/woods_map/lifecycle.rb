@@ -11,6 +11,14 @@ module WoodsMap
     # names the budget and keeps the text.
     SEQUENCE_BUDGET = 150
 
+    # The renderings of one chain, in the order the view control offers them
+    # (B6-Lifecycle): the sequence first, then the branching flowchart and
+    # the lanes. C4-dynamic needs container attribution (W-9) and is a limit.
+    VIEWS = %w[sequence flowchart lanes].freeze
+
+    # Flowchart and lanes budget (R-4), nodes: the same as the neighbourhood.
+    FLOWCHART_BUDGET = 150
+
     # Chain order per event: the callback types that fire, in sequence.
     ORDER = {
       'create' => %w[before_validation after_validation before_save before_create after_create after_save
@@ -54,6 +62,18 @@ module WoodsMap
         return nil unless async?
 
         Array(side_effects['jobs_enqueued']).first || Array(side_effects['mailers_triggered']).first || 'Mailer'
+      end
+
+      # @return [String] the lane the step runs in: validation, transaction or commit
+      def phase
+        return 'validation' if type.to_s.include?('validation')
+
+        commit? ? 'commit' : 'transaction'
+      end
+
+      # @return [Array<String>] every job and mailer the step hands work to, jobs first
+      def async_targets
+        Array((side_effects || {})['jobs_enqueued']) + Array((side_effects || {})['mailers_triggered'])
       end
 
       # @return [String] the condition column, "—" when unconditional
@@ -113,6 +133,53 @@ module WoodsMap
       lines.join("\n")
     end
 
+    # The branching flowchart of one event (see {LifecycleChart#flowchart}).
+    #
+    # @param event [String] create, update or destroy
+    # @return [String]
+    def flowchart(event)
+      chart(event).flowchart
+    end
+
+    # The lanes of one event (see {LifecycleChart#lanes}).
+    #
+    # @param event [String] create, update or destroy
+    # @return [String]
+    def lanes(event)
+      chart(event).lanes
+    end
+
+    # The text for one view of one event.
+    #
+    # @param view [String] one of {VIEWS}
+    # @param event [String] create, update or destroy
+    # @return [String]
+    def diagram(view, event)
+      case view
+      when 'flowchart' then flowchart(event)
+      when 'lanes' then lanes(event)
+      else mermaid(event)
+      end
+    end
+
+    # @param view [String] one of {VIEWS}
+    # @param event [String]
+    # @return [Integer] what the view's budget counts: participants plus
+    #   messages for the sequence, nodes for the flowchart and the lanes
+    def size(view, event)
+      case view
+      when 'flowchart' then chart(event).flowchart_size
+      when 'lanes' then chart(event).lanes_size
+      else sequence_size(event)
+      end
+    end
+
+    # @param view [String] one of {VIEWS}
+    # @return [Integer] the budget (R-4) that view is held to
+    def budget(view)
+      %w[flowchart lanes].include?(view) ? FLOWCHART_BUDGET : SEQUENCE_BUDGET
+    end
+
     # @param event [String] create, update or destroy
     # @return [Integer] participants plus messages in the event's sequence
     def sequence_size(event)
@@ -121,12 +188,28 @@ module WoodsMap
     end
 
     # @param event [String] create, update or destroy
-    # @return [Boolean] whether the event's sequence would exceed {SEQUENCE_BUDGET}
-    def over_budget?(event)
-      sequence_size(event) > SEQUENCE_BUDGET
+    # @param view [String] one of {VIEWS}; the sequence by default
+    # @return [Boolean] whether the event's view would exceed its budget
+    def over_budget?(event, view: 'sequence')
+      size(view, event) > budget(view)
+    end
+
+    # @param event [String] create, update or destroy
+    # @param view [String] one of {VIEWS}; the sequence by default
+    # @return [String, nil] why the view is not drawn, nil within its budget
+    def refusal(event, view: 'sequence')
+      return nil unless over_budget?(event, view: view)
+
+      sequence = %w[flowchart lanes].exclude?(view)
+      "#{size(view, event)} #{sequence ? 'participants and messages' : 'nodes'} is over the " \
+        "#{sequence ? 'sequence' : 'flowchart'} budget of #{budget(view)}"
     end
 
     private
+
+    def chart(event)
+      LifecycleChart.new(steps(event), "#{@owner} #{event}")
+    end
 
     def fires?(callback, type, event)
       return false unless callback['type'].to_s == type

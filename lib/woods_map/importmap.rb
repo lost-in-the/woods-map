@@ -18,7 +18,8 @@ module WoodsMap
     PINS = {
       'woods_map' => 'woods_map/application.js',
       '@hotwired/stimulus' => 'stimulus.js',
-      'pele' => 'pele.js'
+      'pele' => 'pele.js',
+      'cytoscape' => 'cytoscape.esm.min.mjs'
     }.freeze
 
     module_function

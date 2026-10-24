@@ -10,7 +10,22 @@
   - RubyLLM stays out of the gemspec. Below Ruby 3.2, or without `ruby_llm`, the bar shows a disabled Guide button and one notice.
   - The guide refuses non-loopback requests without the token and is rate limited.
 
+- M1 follow-ups (#34): a controller **Routes** tab (FR-3): declared routes joined to route units, named-route helpers, action sources, unresolvable-route findings and the units that reach the controller through a route helper (helper- and action-level use is woods#795). **Hover cards** on code references (B-3): type, path, PageRank place, last author and churn, prefetched with the page and shown by the one tooltip at 100 ms and on focus. **Reading settings** (B-15, D-6): lens, opt-in wrap in the single scroll region (D-24), font size and a per-browser editor link that makes *In editor at L…* the Code tab's primary action. The **Share menu** (E-6, E-7, D-25): the token-free focus URL and the page's Mermaid. `y` now copies what the status bar names instead of the breadcrumb path.
 - M8 staging hardening, first slice (woods-map#10). Every engine response carries the engine's own Content-Security-Policy: scripts, styles and fonts load only from the digested assets route, inline scripts only with a per-response nonce, no `'unsafe-inline'` or `'unsafe-eval'`, `frame-ancestors 'none'`, `base-uri 'none'`, `form-action 'self'`, `connect-src 'self'`. Host pages outside the mount are untouched; `config.content_security_policy` amends the policy or hands the header back to the host. Views no longer write `style` attributes (classes in `map.css`), and Pele's SVG styles are applied through the CSSOM. Search with the palette, the graph JSON and impact have a per-client in-process budget (`config.rate_limit`, `rate_limit_period`, `rate_limit_key`; 120 per minute by default) answered with a 429 panel or JSON and `Retry-After`. Writes check Origin, then Referer, then Sec-Fetch-Site; the token-less loopback mode also requires a loopback Host (DNS rebinding) unless the name is in `config.allowed_origins`. `WOODS_MAP_RUN_HTTP_SERVER=1` runs the gate end to end under Puma.
+- M8 (woods-map#10): `docs/THREAT_MODEL.md` (assets, actors, threats and the control for each, residual risks, a checklist for the host's own model) and `docs/DEPLOYMENT.md` (who may connect, tokens, `config.authorize` with Devise and an SSO header, origins, reverse proxies, the Content-Security-Policy and a host policy, rate limits, streaming behind proxies), beside Woods' `MCP_HTTP_TRANSPORT.md`.
+- M5 Graph tab canvas (woods-map#7; FR-5, A-1, A-2, A-5): Cytoscape 3.34.3 is vendored as its unmodified ESM build (`vendor/javascript/cytoscape.esm.min.mjs`, MIT) and loaded on demand by a new `graph` controller. The controller draws the page's own neighbourhood query from `/woods/graph/neighbourhood`. Units are tinted by type from the tokens, sized by PageRank, and marked hub and cycle per identifier; truncated units are dashed. The butterfly layout puts dependents left and dependencies right; the radial layout is Cytoscape's built-in `concentric`. Neither needs a layout extension; fcose and dagre are deferred to woods-map#63. Other controls:
+  - click, or Enter on the selection, opens a unit's graph;
+  - arrow keys move along the edges, Home returns to this unit, and + / − / 0 zoom and fit;
+  - list rows light their edge, and ↑ / ↓ move between them;
+  - the toolbar has zoom, fit, copy Mermaid and a *flowchart* toggle.
+
+  The Pele flowchart and the list stay the page without JavaScript and when the fetch fails.
+- M5 full-screen graph (`/woods/graph`, docs/design/notes/graph-page.md): the Graph tab's explorer, extracted to `graphs/_explorer`, over the full viewport.
+  - Without a centre it lists the published hubs. Clicking a node re-centres the page.
+  - `blast=1` tints the units `BlastRadius` reaches, directly or transitively.
+  - Dragged positions are kept per generation and query in `localStorage`, with a reset (A-3).
+  - `Graph` joins the primary bar.
+  - Domain clusters wait on woods#799.
 
 - Add contextual keyboard help (`?` and a primary-bar button), focus containment and return, typing/modal guards and Chromium keyboard regressions (NFR-3, #34). Remove the unimplemented source-line j/k hint.
 

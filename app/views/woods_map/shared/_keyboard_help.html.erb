@@ -2,14 +2,15 @@
   <header><h2 class="t2" id="wm-keyboard-title">Keyboard shortcuts</h2><button class="tool" type="button" aria-label="Close keyboard help" data-help-target="close" data-action="help#close" autofocus>Close</button></header>
   <p>Page shortcuts pause while typing or using a modal. Component keys apply while that component has focus.</p>
   <% groups = {
-    'Every page' => [['?', 'Open this help'], ['/', 'Focus search'], ['Escape', 'Dismiss help, the search palette or Files and sections']],
+    'Every page' => [['?', 'Open this help'], ['/', 'Focus search'], ['Escape', 'Dismiss help, reading settings, the search palette or Files and sections']],
     'Search palette' => [['↑ / ↓', 'Select a result'], ['Enter', 'Open the selected result']],
     'File tree' => [['↑ / ↓', 'Move between visible files and folders'], ['← / →', 'Fold or unfold a focused folder'], ['Enter', 'Open a file or toggle a folder'], ['t', 'Toggle the sidebar strip while the tree has focus']],
     'Tables and search results' => [['j / k', 'Move between rows'], ['Enter', 'Toggle row details when available; follow a focused link otherwise'], ['e / Shift+E', 'Expand / collapse all details in this table'], ['Space', 'Toggle a focused checkbox']],
     'Code references' => [['p / Alt+click', 'Peek at a focused reference'], ['Escape', 'Close the peek while focus is inside the code view']],
-    'Lifecycle and Passage' => [['c / u / d', 'Choose create / update / destroy when those event controls are present']],
+    'Lifecycle and Passage' => [['c / u / d', 'Choose create / update / destroy when those event controls are present'], ['s / f / l', 'Choose the sequence, flowchart or lanes view on Lifecycle']],
+    'ERD' => [['[ / ]', 'Previous / next chunk']],
     'Graph and Impact' => [['1 / 2', 'Choose graph or impact depth'], ['3', 'Choose depth 3 on Impact']],
-    'Copy tools' => [['y', 'Activate the first copy tool on the page']],
+    'Copy tools' => [['y', 'Copy what the status bar names: the diagram\'s Mermaid, or the focus URL on impact pages']],
     'Guide' => [['g', 'Open or close the guide'], ['Enter / Shift+Enter', 'Ask / new line in the question'], ['Escape', 'Close the guide while focus is inside it']],
     'This dialog' => [['Tab / Shift+Tab', 'Keep focus on Close'], ['Escape', 'Close and return focus to the opener']]
   } %>

@@ -39,6 +39,19 @@ RSpec.describe 'Rate limits', type: :request do
     expect(response).to have_http_status(:ok)
   end
 
+  it 'paces the .mmd text routes and answers 429 as plain text' do
+    2.times do
+      get '/woods/units/model/User/schema.mmd'
+      expect(response).to have_http_status(:ok)
+    end
+    get '/woods/units/model/User/lifecycle.mmd'
+    expect([response.status, response.media_type, response.headers['Retry-After'].to_i.positive?])
+      .to eq([429, 'text/plain', true])
+    expect(response.body).to start_with('Too many requests: 2 per 60s')
+    get '/woods/units/model/User/schema'
+    expect(response).to have_http_status(:ok)
+  end
+
   it 'limits the graph JSON and the impact page' do
     3.times { get '/woods/graph/neighbourhood', params: { centre: 'User', type: 'model' } }
     expect(response).to have_http_status(:too_many_requests)

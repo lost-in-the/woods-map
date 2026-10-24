@@ -40,10 +40,13 @@ function state(controller) {
 }
 
 const drawn = panel("drawn", "flowchart LR\n  A[\"Post\"] -->|belongs_to| B[\"User\"]")
+// The Lifecycle tab's lanes (swimlane-beta) and state diagram draw in the browser too.
+const lanes = panel("lanes", 'swimlane-beta TB\n  subgraph l_transaction ["in the transaction"]\n    s1["1 · before_save set_slug"]\n  end\n  subgraph l_async ["another process"]\n    a0["NotifySubscribersJob"]\n  end\n  s1 -.->|enqueues| a0')
+const machine = panel("state", 'stateDiagram-v2\n  state "draft" as s0\n  state "published" as s1\n  [*] --> s0\n  s0 --> s1 : publish')
 const refused = panel("refused", "flowchart LR\n" + '  A["<img src=x onerror=window.pwned=1>"]-->B\n'.repeat(1500))
 
-Promise.all([drawn.connect(), refused.connect()]).then(() => new Promise((resolve) => setTimeout(resolve, 50))).then(() => {
+Promise.all([drawn.connect(), lanes.connect(), machine.connect(), refused.connect()]).then(() => new Promise((resolve) => setTimeout(resolve, 50))).then(() => {
   document.getElementById("result").textContent = JSON.stringify({
-    drawn: state(drawn), refused: state(refused), pwned: window.pwned === 1, violations
+    drawn: state(drawn), lanes: state(lanes), state: state(machine), refused: state(refused), pwned: window.pwned === 1, violations
   })
 })

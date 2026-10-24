@@ -12,14 +12,15 @@ module WoodsMap
   # 3. a `?token=` on a GET, exchanged once for the signed cookie (D-4);
   # 4. the token gate: a bearer header, the exchanged cookie, or a loopback
   #    request naming a loopback host while no token is configured;
-  # 5. on search, the palette, graph JSON and impact: the per-client budget,
-  #    429 when it is spent.
+  # 5. on search, the palette, graph JSON, impact and the `.mmd` text routes:
+  #    the per-client budget, 429 when it is spent (plain text for `.mmd`).
   #
   # A refused request gets the 403 panel from the States board, rendered
   # without the frame and before the repository opens anything, so nothing
   # from the index reaches a client that is not allowed in.
   class ApplicationController < ActionController::Base
     include WoodsMap::Authentication
+    include WoodsMap::MermaidText
 
     protect_from_forgery with: :exception
     layout 'woods_map/application'
@@ -29,8 +30,10 @@ module WoodsMap
     before_action :check_origin!
     before_action :exchange_query_token!
     before_action :authenticate!
+    # The `.mmd` text routes (D-25) are paced like the JSON endpoints.
+    before_action(if: :mermaid_request?) { enforce_rate_limit!(:mermaid) }
 
-    helper_method :woods_map_config, :current_repository, :woods_map, :guide_page_values
+    helper_method :woods_map_config, :current_repository, :woods_map, :primary_nav, :guide_page_values
 
     # Page kinds the guide offers actions for, by unit tab.
     GUIDE_TABS = { 'show' => 'code', 'lifecycle' => 'lifecycle', 'passage' => 'passage' }.freeze
@@ -56,6 +59,16 @@ module WoodsMap
     # @return [ApplicationController] route helpers in this request's context
     def woods_map
       self
+    end
+
+    # The global bar's pages that exist, in the order the boards give them
+    # (coverage.md: Units, Landscape, Graph, ERD, Impact, History).
+    #
+    # @param current [String, Symbol, nil] the page being shown: its label or :units, :graph, :erd, :impact
+    # @return [Array<Array(String, String, Boolean)>] label, href, current?
+    def primary_nav(current = nil)
+      [['Units', woods_map.units_path], ['Graph', woods_map.graph_path], ['ERD', woods_map.erd_path],
+       ['Impact', woods_map.impact_path]].map { |label, href| [label, href, label.casecmp?(current.to_s)] }
     end
 
     # @return [WoodsMap::Configuration]
@@ -136,7 +149,9 @@ module WoodsMap
     def render_rate_limited(group, decision)
       @rate_group = group
       @rate_decision = decision
-      if request.format.json?
+      if mermaid_request?
+        render plain: "#{rate_limited_message(decision)}\n", status: :too_many_requests, content_type: 'text/plain'
+      elsif request.format.json?
         render json: { 'error' => 'rate_limited', 'retry_after' => decision.retry_after,
                        'message' => rate_limited_message(decision) }, status: :too_many_requests
       else
@@ -174,6 +189,8 @@ module WoodsMap
     # browser is sent to the same URL without it, so the secret does not stay
     # in the address bar or the history. Ignored while no token is configured.
     def exchange_query_token!
+      return if mermaid_request? # text for agents: the header or the cookie, never a token in the URL
+
       presented = query_token
       return if presented.nil?
 
@@ -199,11 +216,12 @@ module WoodsMap
     end
 
     def respond_to_unauthenticated
-      if request.format.html?
+      if request.format.html? && !mermaid_request?
         redirect_to woods_map.new_session_path
       else
         response.headers['WWW-Authenticate'] = 'Bearer realm="Woods Map"'
-        head :unauthorized
+        next_step = 'Send the token as an Authorization: Bearer header.'
+        mermaid_request? ? render_text(:unauthorized, next_step) : head(:unauthorized)
       end
     end
 
@@ -211,11 +229,15 @@ module WoodsMap
     #
     # @param reason [Symbol] :token, :host, :origin or :rebinding
     def refuse(reason)
+      return render_text(:forbidden, "Woods Map refused the request (#{reason}).") if mermaid_request?
+
       @reason = reason
       render 'woods_map/refusals/show', layout: 'woods_map/bare', status: :forbidden
     end
 
     def render_unavailable(error)
+      return render_text(:service_unavailable, 'No published Woods index.') if mermaid_request?
+
       @error = error
       render 'woods_map/status/unavailable', status: :service_unavailable
     end

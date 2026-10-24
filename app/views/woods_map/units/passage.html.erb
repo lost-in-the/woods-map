@@ -13,6 +13,8 @@
 <% facts = p.facts; flags = p.flags; missing = p.missing_template_facts; unresolved = p.unresolved_renders; complete = p.coverage_complete? %>
 <% unresolved_text = ->(u) { safe_join([tag.code(u.name), u.render_target? ? " in #{u.where}" : " in #{u.where}, #{u.kind}", (u.candidates.any? ? ", candidates #{u.candidates.join(', ')}" : nil), (u.line ? ' ' : nil), (u.line ? code_line_link(u.file, u.line, text: "L#{u.line}") : nil)].compact) } %>
 <% ivs = ->(list) { safe_join(list.map { |v| tag.span(v, class: 'iv') }, ', ') } %>
+<% unverified_keys = p.permitted_attributes.select { |pa| pa.model && pa.unverified.any? }.map { |pa| [pa.unverified.map(&:name), pa.model_name] } %>
+<% partials_shown = p.templates.any? { |t| t.role == 'partial' } %>
 <% at_line = ->(fact) { code_line_link(fact['file'], fact['line'], text: "L#{fact['line']}") } %>
 <% tiles = [] %>
 <% if p.mailer? %>
@@ -45,20 +47,31 @@
         ] },
         { label: 'also here', count: @ladder ? 2 : 1, items: [{ key: '·', text: 'filter matrix' }, (@ladder ? { key: '·', text: 'callback ladder', own: "#{@ladder_model['identifier']}, #{@ladder_event}" } : nil)].compact },
         (flags&.any? ? { label: 'flags', count: flags.size, items: flags.map { |f| { key: tag.span('⚑', class: 'flag'), text: f.ivar, own: "mentioned in #{f.template}, no recorded assignment" } } } : nil),
-        { label: 'limits', count: 3, items: [
+        { label: 'limits', count: 5, items: [
           (facts ? { key: '·', text: 'helpers the action calls are not followed', own: layer_chip('per-action facts') } : { key: '·', text: 'assigns, params read and renders per action', own: layer_chip('W-7, woods#757') }),
           { key: '·', text: 'resolved filter chain and owners', own: layer_chip('W-8, woods#758') },
+          { key: '·', text: 'permitted keys against every model writer', own: layer_chip(WoodsMap::PermittedAttributes::WRITERS_ITEM) },
+          { key: '·', text: 'partial locals passed and read', own: layer_chip(WoodsMap::Passage::LOCALS_ITEM) },
           { key: '·', text: 'nothing here proves a path ran', own: layer_chip('static') }
         ] }
       ].compact %>
   <div class="main">
     <section class="sec" aria-labelledby="ps">
-      <header><h2 class="t2" id="ps">Passage, <%= p.action %> <span class="n">request → filters → action → templates → response</span><%= info_tip('Every row links to its line. Filters are those whose declared only/except names this action; the resolved chain lands with W-8. Available per-action facts supply assigns, params and renders.') %></h2><button class="tool goto" type="button" data-controller="copy" data-copy-text-value="<%= p.mermaid %>" data-action="copy#copy" data-needs-js>⎘ copy as Mermaid</button></header>
+      <header><h2 class="t2" id="ps">Passage, <%= p.action %> <span class="n">request → filters → action → templates → response</span><%= info_tip('Every row links to its line. Filters are those whose declared only/except names this action; the resolved chain lands with W-8. Available per-action facts supply assigns, params and renders.') %></h2><span class="goto tools"><%= render 'woods_map/components/mermaid_tools', text: p.mermaid, name: "#{@page.identifier} #{p.action} passage", url: woods_map.unit_passage_mmd_path(type: @page.type, identifier: @page.identifier, action_name: p.action), key: 'y' %></span></header>
       <div class="psg">
         <div class="stage">request<b><%= p.request_label %></b></div>
         <div class="rows">
           <% p.path_params.each do |name| %><div><span>param</span><span><span class="iv"><%= name %></span> path <%= layer_chip('routes') %></span></div><% end %>
-          <% p.permitted.each do |pp| %><div><span>permits</span><span><code><%= pp['method'] %></code> → <%= unit_link(pp['model'].camelize, 'model') %>: <%= pp['permitted'].join(', ') %> <%= layer_chip('permitted_params') %></span></div><% end %>
+          <% p.permitted_attributes.each do |pa| %>
+            <div><span>permits</span><span><code><%= pa.method_name %></code> → <%= unit_link(pa.model_name, 'model') %>: <%= pa.keys.map(&:name).join(', ') %> <%= layer_chip('permitted_params') %></span></div>
+            <% if pa.model %>
+              <% groups = pa.matched_by_fact.map { |via, names| safe_join(["#{via}: ", ivs.call(names)]) } %>
+              <% groups << safe_join(['unverified: ', ivs.call(pa.unverified.map(&:name))]) if pa.unverified.any? %>
+              <div><span>attributes</span><span><%= safe_join(groups, ' · ') %> <%= layer_chip('model metadata') %></span></div>
+            <% else %>
+              <div><span>attributes</span><span>no model <%= pa.model_name %> in the index, keys not checked</span></div>
+            <% end %>
+          <% end %>
           <% if p.path_params.empty? && p.permitted.empty? %><div><span>params</span><span>none declared</span></div><% end %>
           <div><span>format</span><span><%= p.formats.join(', ').presence || 'unknown' %></span></div>
         </div>
@@ -87,7 +100,7 @@
         <div class="stage">renders<b><%= p.templates.size %> <%= 'template'.pluralize(p.templates.size) %></b></div>
         <div class="rows">
           <% p.templates.each do |t| %>
-            <div><span><%= t.role %></span><span><%= safe_join(['↳ '] * t.depth) %><%= template_link.call(t) %><% if t.unit %><% if t.instance_variables.any? %> mentions <%= safe_join(t.instance_variables.map { |v| tag.span(v, class: 'iv') }, ', ') %><% end %><% if t.helpers.any? %>, <%= t.helpers.size %> <%= 'helper'.pluralize(t.helpers.size) %><% end %><% else %> <span class="dim">not in the index</span><% end %></span></div>
+            <div><span><%= t.role %></span><span><%= safe_join(['↳ '] * t.depth) %><%= template_link.call(t) %><% if t.locals %> locals: <%= t.locals.any? ? ivs.call(t.locals) : 'none' %><% end %><% if t.unit %><% if t.instance_variables.any? %> mentions <%= safe_join(t.instance_variables.map { |v| tag.span(v, class: 'iv') }, ', ') %><% end %><% if t.helpers.any? %>, <%= t.helpers.size %> <%= 'helper'.pluralize(t.helpers.size) %><% end %><% else %> <span class="dim">not in the index</span><% end %></span></div>
           <% end %>
           <% unresolved.each do |u| %><div><span>unresolved</span><span><%= u.render_target? ? 'render target ' : 'partial ' %><%= unresolved_text.call(u) %>, not resolved in the index</span></div><% end %>
           <% if p.templates.empty? && unresolved.empty? %><div><span>template</span><span>none tied to this action in the index</span></div><% end %>
@@ -110,6 +123,12 @@
           <% end %>
           <% unless complete %>
             <div class="finding note"><span class="flag note">⚑</span> <b>Flag coverage is incomplete.</b><% if missing.any? %> Template ivar facts or deeper partial chains are unavailable for <%= missing.join(', ') %>.<% end %><% if unresolved.any? %> The index does not resolve <%= safe_join(unresolved.map { |u| safe_join([u.render_target? ? 'render target ' : 'partial ', unresolved_text.call(u)]) }, '; ') %>; the templates behind <%= unresolved.one? ? 'it are' : 'them are' %> not checked.<% end %></div>
+          <% end %>
+          <% if unverified_keys.any? %>
+            <div class="finding note"><span class="flag note">ⓘ</span> <b>Unverified, not flagged: <%= safe_join(unverified_keys.map { |keys, model| safe_join([ivs.call(keys), " for #{model}"]) }, '; ') %>.</b> No published column, association, attachment, rich-text field or class-body writer matches; <code>has_secure_password</code>, the attribute API, nested attributes and module writers are not published, so a missing attribute cannot be told from an unpublished writer. <%= layer_chip("permitted_params + model metadata, #{WoodsMap::PermittedAttributes::WRITERS_ITEM}") %></div>
+          <% end %>
+          <% if partials_shown %>
+            <div class="finding note"><span class="flag note">ⓘ</span> <b>Partial locals are not checked.</b> The index publishes no local a partial reads, and no local a template passes to its partials; a local passed and never read cannot be found. <%= layer_chip(WoodsMap::Passage::LOCALS_ITEM) %></div>
           <% end %>
           <% if facts %>
             <div class="finding note"><span class="flag note">ⓘ</span> Template mentions are lexical and may include comments or template-local assignments. Helpers and filter conditions are not evaluated; these notes do not prove a runtime value.</div>
