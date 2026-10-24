@@ -67,4 +67,49 @@ RSpec.describe WoodsMap::ImpactRange do
       expect(described_class.new(FIXTURE_INDEX, from: 'gen:1').state).to eq(:error)
     end
   end
+
+  it 'passes on Woods\' resolution message, which names retained generations only, with the W-11 limit' do
+    error = Class.new(ArgumentError) { def self.name = 'Woods::Impact::ResolutionError' }
+    detail = 'Selector "gen:9" does not identify one retained payload; use gen:1, gen:2'
+    allow(backend).to receive(:compare).and_raise(error, detail)
+    message = described_class.new(FIXTURE_INDEX, from: 'gen:9').message
+    expect(message).to start_with('Selector "gen:9" does not identify one retained payload; use gen:1, gen:2. ')
+    expect(message).to include('W-11, woods#761')
+  end
+
+  describe '.saved' do # rubocop:disable RSpec/MultipleMemoizedHelpers
+    let(:store_class) do
+      Class.new do
+        def initialize(_index_dir); end
+
+        def read(_id) = nil
+      end
+    end
+    let(:store) { class_double(store_class) }
+    let(:id) { 'a' * 64 }
+
+    before { allow(described_class).to receive(:store).and_return(store) }
+
+    it 'reads the exact bytes through Woods\' store and validates the envelope' do
+      reader = instance_double(store_class)
+      allow(store).to receive(:new).with(FIXTURE_INDEX).and_return(reader)
+      allow(reader).to receive(:read).with(id).and_return(JSON.generate(data))
+      result = described_class.saved(FIXTURE_INDEX, id)
+      expect([result.state, result.data]).to eq([:available, data])
+    end
+
+    it 'refuses anything but a SHA-256 ID before touching the store' do
+      allow(store).to receive(:new)
+      expect(described_class.saved(FIXTURE_INDEX, '../../etc').state).to eq(:missing)
+      expect(store).not_to have_received(:new)
+    end
+
+    it 'says a report the store cannot find is missing, not empty' do
+      reader = instance_double(store_class)
+      allow(store).to receive(:new).and_return(reader)
+      allow(reader).to receive(:read).and_raise(IOError, 'Saved impact report is unavailable or unsafe')
+      result = described_class.saved(FIXTURE_INDEX, id)
+      expect([result.state, result.message]).to eq([:missing, described_class::MESSAGES[:missing]])
+    end
+  end
 end

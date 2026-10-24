@@ -31,7 +31,7 @@ RSpec.describe 'Impact range', type: :request do
                                                                              state: :available, data: data))
     get '/woods/impact', params: { from: 'gen:4', to: 'now' }
     expect(response.body).to include('&lt;old&gt;', 'same-manifest', 'not_computed', 'node_budget')
-    expect(response.body).to include('Removed units belong to From', 'Unavailable', 'Unrestricted', '/synthetic')
+    expect(response.body).to include('Removed units belong to From', 'unavailable', 'Unrestricted', '/synthetic')
     expect(response.body).not_to include('/woods/units/model/%3Cold%3E', '/woods/units/controller/Shared')
     expect(data['affected'].pluck('generation')).to eq([4, 5])
   end

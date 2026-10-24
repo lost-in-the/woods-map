@@ -1,0 +1,11 @@
+<%# Tests (B8-Impact-Tests) in range mode: the test units Woods' report
+    suggests running, with the published relationship behind each. %>
+<section class="sec" aria-labelledby="tst">
+  <header><h2 class="t2" id="tst">Run first <%= count_tag(rr.tests.size) %><%= info_tip("Test units whose published test_coverage edges reach a changed or affected unit; a heuristic suggestion, not proof of coverage. Coverage: #{rr.coverage['tests'] || 'not recorded'}.") %></h2></header>
+  <% if rr.tests.empty? %>
+    <%= render 'woods_map/components/empty_state', title: 'No tests suggested', text: "Woods recorded none (coverage: #{rr.coverage['tests'] || 'not recorded'}); that is not a conclusive zero." %>
+  <% else %>
+    <%= render 'woods_map/components/table', label: 'Tests', min_width: '640px', columns: [{ label: 'test', cell_class: 'id' }, { label: 'reaches', width: '260px' }, { label: 'endpoint', width: '120px', cell_class: 'nw' }],
+          rows: rr.tests.first(200).map { |t| reaches = Array(t['evidence']).filter_map { |e| e.is_a?(Hash) ? e.dig('target', 'identifier') : nil }.uniq; { cells: [t.is_a?(Hash) ? impact_identity(t, rr) : t.to_s, reaches.join(', ').presence || empty_value, t.is_a?(Hash) ? impact_context(t) : empty_value] } } %>
+  <% end %>
+</section>

@@ -167,12 +167,22 @@ function drawing(cytoscape) {
   const unboxed = clustered.cy.nodes(".cluster").length === 0 && clustered.cy.getElementById("n_1").parent().empty()
   const clusters = { boxes, boxed, unboxed }
 
+  // The impact page's range emphasis (E-3, E-8): distance 0 is a unit the report records as changed.
+  const ranged = mount("ranged")
+  ranged.emphasisValue = "range"
+  ranged.hasEmphasisValue = true
+  ranged.blastValue = [{ identifier: "Generated::Unit1", type: "controller", distance: 0 },
+    { identifier: "Generated::Unit2", type: "view_template", distance: 1 }]
+  ranged.draw(cytoscape, small)
+  const ranges = { changed: ranged.cy.nodes(".chg").map((n) => n.id()), direct: ranged.cy.nodes(".br1").map((n) => n.id()),
+    facts: ranged.factsTarget.textContent }
+
   // On the full-screen page a node re-centres the page: the identifier is a query value.
   blasted.unitUrlValue = "/woods/graph?centre=__identifier__&type=__type__&depth=2"
   const recentre = blasted.unitUrl({ type: "route", identifier: "GET /users/:id?x=1&y" })
 
   return {
-    restored, forgotten, tinted, recentre, clusters,
+    restored, forgotten, tinted, ranges, recentre, clusters,
     ms: Number(big.element.dataset.graphRenderMs), wall, calibrationMs, warmMs, timings: big.timings, radialMs, radialMoved,
     drawn: big.element.dataset.graphDrawn === "true",
     nodes: big.cy.nodes().length, edges: big.cy.edges().length,

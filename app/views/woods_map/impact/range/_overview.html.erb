@@ -1,0 +1,65 @@
+<%# Overview (E-7, D-25): the report's summary as the page's own sections,
+    the same shape as Woods' PR comment, rendered from the report's records;
+    no Markdown is rendered or offered. Locals: rr (RangeReport), range_url. %>
+<% sample = 6 %>
+<section class="sec" aria-labelledby="ov-head">
+  <header><h2 class="t2" id="ov-head">Change impact <%= count_tag(rr.complete? ? 'declared complete' : 'incomplete report') %><%= info_tip('Woods computed this report from two retained payloads (W-12). Counts are its records; a section Woods did not compute says so, and an empty section is not a conclusive zero.') %></h2></header>
+  <% if !rr.complete? %><%= render 'woods_map/components/banner', severity: :mod, lead: "Incomplete: #{rr.unknowns.size} unknown #{'record'.pluralize(rr.unknowns.size)}.", text: 'Read every count beside coverage and the Unknown tab.' %><% end %>
+  <%= render 'woods_map/components/table', label: 'Report summary', min_width: '640px', columns: [{ label: 'section', width: '180px', cell_class: 'nw id' }, { label: 'records', width: '90px', cell_class: 'num' }, { label: 'coverage', width: '160px', cell_class: 'nw' }, { label: 'first entries' }],
+        rows: [['changed', 'Changed units', 'diff'], ['affected', 'Affected units', 'affected'], ['flows', 'Flows', 'flows'], ['tables', 'Tables', 'tables'], ['templates', 'Templates', 'templates'], ['risks', 'Risks', 'risks'], ['tests', 'Tests', 'tests'], ['unknowns', 'Unknowns', nil]].map { |key, label, cov|
+          records = rr.public_send(key)
+          lens = { 'changed' => 'changed', 'affected' => 'changed', 'tables' => 'changed', 'templates' => 'changed', 'flows' => 'flows', 'risks' => 'risks', 'tests' => 'tests', 'unknowns' => 'unknown' }[key]
+          first = records.first(3).map { |item| item.is_a?(Hash) && item['identifier'] ? item['identifier'] : (item.is_a?(Hash) ? (item['entry_point'] || item['kind'] || item.dig('unit', 'identifier')).to_s : item.to_s) }.reject(&:empty?)
+          { cells: [link_to(label, range_url.call(lens: lens)), records.size, cov ? (rr.coverage[cov] || tag.span('not recorded', class: 'mut')).to_s : empty_value(applicable: false), first.any? ? safe_join([first.join(', '), (records.size > 3 ? " +#{records.size - 3}" : nil)].compact) : tag.span('none recorded', class: 'mut')] }
+        } %>
+</section>
+<section class="sec" aria-labelledby="range-changed">
+  <header><h2 class="t2" id="range-changed">Changed typed units <%= count_tag(rr.changed.size) %></h2></header>
+  <p>Facets compare retained payloads. Source sizes are whole-source bytes and lines, not added or deleted line counts. Removed units belong to From; added and modified units belong to To.</p>
+  <% if rr.changed.empty? %>
+    <p>No records returned. Interpret this alongside coverage and unknowns below; unavailable or not_computed evidence is not a conclusive zero.</p>
+  <% else %>
+    <%= render 'woods_map/components/table', label: 'Changed typed units', min_width: '720px', columns: [{ label: 'unit', cell_class: 'id' }, { label: 'type', width: '130px', cell_class: 'nw mut' }, { label: 'status', width: '100px', cell_class: 'nw' }, { label: 'facets', width: '200px' }, { label: 'categories', width: '160px' }],
+          rows: rr.changed.first(sample).map { |c| { current: rr.focused?(c), classes: (rr.focused?(c) ? 'focus' : nil), cells: [impact_identity(c, rr, generation: rr.generation_of_change(c), since: rr.from_generation), c['type'].to_s.tr('_', ' '), c['status'].to_s, Array(c['facets']).join(', ').presence || empty_value, Array(c['categories']).join(', ').presence || empty_value] } } %>
+    <% if rr.changed.size > sample %><p class="cap"><%= link_to("All #{rr.changed.size} changed units", range_url.call(lens: 'changed')) %></p><% end %>
+  <% end %>
+</section>
+<section class="sec" aria-labelledby="range-affected">
+  <header><h2 class="t2" id="range-affected">Affected typed units <%= count_tag(rr.affected.size) %></h2></header>
+  <p>Each record and witness path retains its endpoint and generation. An unavailable weight is not zero.</p>
+  <% if rr.affected.empty? %>
+    <p>No records returned. Interpret this alongside coverage and unknowns below; unavailable or not_computed evidence is not a conclusive zero.</p>
+  <% else %>
+    <%= render 'woods_map/components/table', label: 'Affected typed units', min_width: '720px', columns: [{ label: 'unit', cell_class: 'id' }, { label: 'type', width: '130px', cell_class: 'nw mut' }, { label: 'distance', width: '90px', cell_class: 'num' }, { label: 'weight', width: '100px', cell_class: 'num' }, { label: 'endpoint', width: '120px', cell_class: 'nw' }],
+          rows: rr.affected.first(sample).map { |a| { cells: [impact_identity(a, rr), a['type'].to_s.tr('_', ' '), a['distance'] || empty_value, impact_weight(a['weight']), impact_context(a)] } } %>
+  <% end %>
+</section>
+<section class="sec" aria-labelledby="range-flows">
+  <header><h2 class="t2" id="range-flows">Retained flow evidence <%= count_tag(rr.flows.size) %></h2></header>
+  <p>These are retained expanded memberships and changed steps, not newly computed routes.</p>
+  <% if rr.flows.empty? %><p>No records returned. Interpret this alongside coverage and unknowns below; unavailable or not_computed evidence is not a conclusive zero.</p><% else %><%= impact_evidence(rr.flows.first(sample)) %><% end %>
+</section>
+<section class="sec" aria-labelledby="range-provenance">
+  <header><h2 class="t2" id="range-provenance">Endpoint provenance</h2></header>
+  <p>Manifest checksums cover manifests only; they do not attest payload contents. Historical identities have no current-source links.</p>
+  <%= render 'woods_map/components/table', label: 'Endpoint provenance', min_width: '640px', columns: [{ label: 'endpoint', width: '100px', cell_class: 'nw id' }, { label: 'generation', width: '110px', cell_class: 'num' }, { label: 'selector', width: '120px', cell_class: 'nw' }, { label: 'commit', width: '110px', cell_class: 'nw' }, { label: 'manifest checksum', cell_class: 'mut' }],
+        rows: %w[from to].map { |side| e = rr.data.dig('range', side) || {}; { cells: [side, e['generation'] || empty_value, e['selector'].presence || empty_value, rr.sha(side) || tag.span('unavailable', class: 'mut'), e['manifest_checksum'].presence || tag.span('Unavailable', class: 'mut')] } } %>
+</section>
+<section class="sec" aria-labelledby="range-coverage">
+  <header><h2 class="t2" id="range-coverage">Coverage and parameters</h2></header>
+  <%= render 'woods_map/components/table', label: 'Coverage', min_width: '480px', columns: [{ label: 'analysis', width: '220px', cell_class: 'nw id' }, { label: 'coverage' }],
+        rows: rr.coverage.map { |key, value| { cells: [key.tr('_', ' '), value.to_s] } } %>
+  <% parameters = rr.data['parameters'] || {} %>
+  <%= render 'woods_map/components/table', label: 'Applied parameters', min_width: '480px', columns: [{ label: 'parameter', width: '220px', cell_class: 'nw id' }, { label: 'value' }],
+        rows: parameters.map { |key, value| { cells: [key.tr('_', ' '), (%w[types via].include?(key) && value.nil?) ? 'Unrestricted' : (value.nil? ? tag.span('Unavailable', class: 'mut') : Array(value).join(', '))] } } %>
+</section>
+<section class="sec" aria-labelledby="range-unknowns">
+  <header><h2 class="t2" id="range-unknowns">Unknowns <%= count_tag(rr.unknowns.size) %></h2></header>
+  <% by_kind = rr.unknowns.group_by { |u| u.is_a?(Hash) ? u['kind'].to_s : u.to_s } %>
+  <% if by_kind.empty? %><p class="mut">None recorded.</p><% else %>
+    <%= render 'woods_map/components/table', label: 'Unknowns by kind', min_width: '480px', columns: [{ label: 'kind', width: '280px', cell_class: 'nw id' }, { label: 'records', cell_class: 'num' }],
+          rows: by_kind.first(sample).map { |kind, list| { cells: [kind, list.size] } } %>
+    <p class="cap"><%= link_to("All #{rr.unknowns.size} unknowns, with their detail", range_url.call(lens: 'unknown')) %></p>
+  <% end %>
+</section>
+<%= render 'woods_map/impact/range/selectors' unless @saved_id %>
