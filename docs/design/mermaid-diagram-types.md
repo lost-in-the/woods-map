@@ -98,6 +98,6 @@ The connection inventory in [`connection-types.md`](connection-types.md) is the 
 - [ ] Event modeling (25): fit on a testbed variant with `event` units; skip if the result is a decorated sequence diagram.
 - [ ] Use case (12): only if the host supplies actors; decide with the Landscape L1 design.
 - [ ] Agentflow (32): render one real guide transcript; revisit when it enters the public docs nav and its syntax is declared stable.
-- [ ] GitHub's Mermaid version at the time of M3, to mark which exports render in pull requests.
+- [ ] GitHub's Mermaid version at the time of M3, to mark which exports render in pull requests. Not yet measured. Until it is, `WoodsMap::MermaidExport::NEWER_THAN_GITHUB` marks the types from Mermaid 11.13 on, and of the generated types only `swimlane-beta` is among them.
 
 Record each outcome in `decisions.md` with the testbed variant and the Mermaid version used.

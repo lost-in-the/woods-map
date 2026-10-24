@@ -1,0 +1,10 @@
+<%# The export tools of a diagram (mermaid-diagram-types.md, constraint 3):
+    ⎘ copies the Mermaid text, ⤓ saves it as a .mmd file, both from the text
+    already in the page. A type newer than GitHub's Mermaid says so.
+    Locals: text (String, the Mermaid text), name (String, what the diagram
+    shows, for the file name), from_panel (Boolean: the download reads the
+    panel's source instead of carrying the text again). %>
+<% filename = WoodsMap::MermaidExport.filename(name) %>
+<%= tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: text, action: 'copy#copy', needs_js: true }) %>
+<%= tag.button('⤓ download .mmd', class: 'tool', type: 'button', data: { controller: 'download', download_filename_value: filename, download_text_value: (local_assigns[:from_panel] ? nil : text), action: 'download#save', needs_js: true }) %>
+<% if WoodsMap::MermaidExport.newer_than_github?(text) %><span class="lyr">may not render on GitHub</span><% end %>

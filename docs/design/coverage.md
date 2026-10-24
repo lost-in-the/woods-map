@@ -55,7 +55,7 @@ opens the file tree.
 | Impact Unknown | Unknowns and what each layer proves | E-4, E-10 | [B8-Impact-Unknown](boards/B8-Impact-Unknown.html) | final |
 | `?since=` on any view | Changed lines, nodes, steps, columns highlighted | E-8 | [B8-States](boards/B8-States.html) (degraded), tree M badges | partial |
 | pre-change mode | Blast radius from a unit or method, no range | E-9 | — | **none** (the impact frame with a focus title; the engine renders it that way from the Changed, Risks, Tests and Unknown boards) |
-| Share menu | Focus URL, Markdown, JSON, Mermaid | E-6, E-7 | buttons only | partial |
+| Share menu | Focus URL, Markdown, JSON, Mermaid | E-6, E-7 | buttons only | partial; every diagram panel, the passage and the impact paths copy their Mermaid text and download it as `.mmd` (woods-map#5); Structurizr DSL and LikeC4 need W-9 |
 | Trail board | Pinned units, lanes, flags, board state, export | C-1 to C-5 | — | **none** (release 0.2, M6) |
 | Guide panel | Context chips, actions, tool cards, streamed answer, budget | FR-8 | [B8-Guide](boards/B8-Guide.html) | final; chat history list not drawn |
 | settings | Editor URL scheme, lens, wrap and font size, per browser | B-15, D-6 | Code toolbar only | partial |
