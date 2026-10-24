@@ -129,9 +129,16 @@ Settled by the maintainer on [woods-map#63](https://github.com/lost-in-the/woods
 |---|---|---|---|
 | D-30 | The layout of the Graph tab and `/woods/graph` | One layout, the butterfly the map computes: this unit alone in the middle, dependents left and dependencies right in columns by signed traversal level. No layout library is vendored. dagre was rejected at 8.8 s for 300 units and has no notion of the focus's direction; fcose at 2.0 s, and it ships only as UMD, so using it breaks the unmodified-vendor rule. Radial (Cytoscape's concentric) and the clusters layout are removed from the layout control: most of their drawings were illegible at real sizes. | The rail keeps only *reset positions*, and the position cache is keyed by generation and query alone. Domain clusters stay on Landscape Domains and Components. The butterfly is drawn for legibility: one label per pair of units, edges bundled at each hub's trunk outside its column, wrapped columns staggered so edges pass between units, and the focus centred and filled. Overview mode (no names, arrows or edge labels) starts whenever the fitted zoom is below 0.5, where Cytoscape stops drawing names, and above 120 units or 150 edges. The 300-unit first frame stays under the 500 ms budget. |
 
+## Guide streaming (24 October 2026)
+
+Settled by the maintainer on [woods-map#101](https://github.com/lost-in-the/woods-map/issues/101) for now; to be re-evaluated later.
+
+| # | Question | Decision | Consequence |
+|---|---|---|---|
+| D-31 | A fallback for when the guide's event stream cannot open | None for now. The guide keeps one `ActionController::Live` stream per answer with a heartbeat comment (`guide_heartbeat_seconds`) and the proxy settings in [DEPLOYMENT.md §8](../DEPLOYMENT.md#8-streaming-the-m7-guide-behind-proxies). When the stream cannot open, the panel says so and names §8. | The design study's "fall back to polling Turbo Frames" is superseded. Turbo stays unvendored, and the engine starts no background work in the host. The answer runs inside the stream request, so any later fallback must first move the run out of it, either to a thread the engine starts or to the host's Active Job, and then poll the stored turn. Re-evaluate this when a deployment's proxy cannot be configured for streaming, or at the next guide milestone. |
+
 ## Open
 
-- Server-sent events behind proxies: the settings are in [DEPLOYMENT.md](../DEPLOYMENT.md#8-streaming-the-m7-guide-behind-proxies), and the guide stream sends a heartbeat comment (`guide_heartbeat_seconds`). Whether to build a fallback for a stream that cannot open (the study's polling Turbo Frames) is [woods-map#101](https://github.com/lost-in-the/woods-map/issues/101), `needs-decision`.
 - Boundary-row labels in flow tables (`⇒ async hop, new process: …`) are placeholders; the real label comes from the job or mailer unit named by the flow.
 - The ☰ sheet and tree strip have token and layout rules but no interaction prototype yet; verify with keyboard and screen reader on the testbed before M1 closes.
 - Light-mode diagram renders on the B6 boards still use the dark Mermaid theme. The engine draws with Pele from the `--pele-*` tokens in every theme (D-21, [woods-map#5](https://github.com/lost-in-the/woods-map/issues/5)); only the boards' static renders remain.

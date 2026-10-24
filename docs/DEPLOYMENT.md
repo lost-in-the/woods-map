@@ -287,9 +287,9 @@ settings that matter between the browser and Puma:
   it below your proxy's idle timeout, or 0 to send none.
 - **When a stream cannot open:** the panel says the answer stream was
   interrupted; an answer that finished is kept and shows on the next page.
-  There is no polling fallback;
-  [woods-map#101](https://github.com/lost-in-the/woods-map/issues/101) decides
-  whether to build one.
+  There is no polling fallback for now (D-31,
+  [woods-map#101](https://github.com/lost-in-the/woods-map/issues/101)); it
+  will be re-evaluated later.
 - **Policy:** `connect-src 'self'` already admits the guide's
   `EventSource`. No change is needed.
 
