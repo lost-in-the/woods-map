@@ -10,7 +10,8 @@
 <% templates = p.action_templates; partials = p.templates - templates %>
 <% template_link = ->(t) { t.unit ? unit_link(t.identifier, 'view_template') : tag.span(t.identifier, class: 'dim', title: 'not in the index') } %>
 <% ivars = p.instance_variables_read %>
-<% facts = p.facts; flags = p.flags; missing = p.missing_template_facts %>
+<% facts = p.facts; flags = p.flags; missing = p.missing_template_facts; unresolved = p.unresolved_renders; complete = p.coverage_complete? %>
+<% unresolved_text = ->(u) { safe_join([tag.code(u.name), u.render_target? ? " in #{u.where}" : " in #{u.where}, #{u.kind}", (u.candidates.any? ? ", candidates #{u.candidates.join(', ')}" : nil), (u.line ? ' ' : nil), (u.line ? code_line_link(u.file, u.line, text: "L#{u.line}") : nil)].compact) } %>
 <% ivs = ->(list) { safe_join(list.map { |v| tag.span(v, class: 'iv') }, ', ') } %>
 <% at_line = ->(fact) { code_line_link(fact['file'], fact['line'], text: "L#{fact['line']}") } %>
 <% tiles = [] %>
@@ -25,12 +26,12 @@
                 [['ivar mentions', ivars.any? ? ivs.call(ivars) : 'none'], ['rule', 'unassigned-ivar-read'], ['needs', 'assigns per action and filter, W-7'], ['source', layer_chip('template ivars')]]
               elsif flags.any?
                 flags.map { |f| ['ivar', safe_join([tag.span(f.ivar, class: 'iv bad'), ', no recorded assignment'])] } + [['rule', 'unassigned-ivar-read'], ['source', layer_chip('template ivars + per-action facts')]]
-              elsif missing.any?
-                [['coverage', 'incomplete'], ['needs', 'template ivar facts and complete partial chains'], ['source', layer_chip('per-action facts')]]
+              elsif !complete
+                [['coverage', 'incomplete'], ['needs', unresolved.any? ? 'literal render targets, template ivar facts and complete partial chains' : 'template ivar facts and complete partial chains'], ['source', layer_chip('per-action facts')]]
               else
                 [['ivar mentions', ivars.any? ? ivs.call(ivars) : 'none'], ['unmatched mentions', 'none in available facts'], ['rule', 'unassigned-ivar-read'], ['source', layer_chip('template ivars + per-action facts')]]
               end %>
-<% tiles << { eyebrow: flags ? "Flags #{flags.size}#{', incomplete' if missing.any?}" : 'Flags', rows: flag_rows } %>
+<% tiles << { eyebrow: flags ? "Flags #{flags.size}#{', incomplete' unless complete}" : 'Flags', rows: flag_rows } %>
 <%= render 'woods_map/units/frame', page: @page, tab: 'passage', controls: controls, definition: p.declared&.dig('line') || @definition, title: "#{@page.identifier}##{p.action}", subtitle: p.request_label, tiles: tiles %>
 <div class="body" data-controller="trail keys" data-trail-title-value="<%= @page.identifier %>##<%= p.action %>">
   <%= render 'woods_map/components/rail', heading: 'Passage', groups: [
@@ -77,7 +78,7 @@
             <% reads = facts.params(p.action) %>
             <div><span>params read</span><span><%= reads.any? ? safe_join(reads.map { |r| safe_join([tag.span(r['via'] ? "#{r['via']} (#{r['key']})" : "params[:#{r['key']}]", class: 'iv'), ' ', at_line.call(r)]) }, ', ') : 'none' %></span></div>
             <% facts.redirects(p.action).each do |r| %><div><span>redirects</span><span><code><%= r['target'] %></code> <%= at_line.call(r) %></span></div><% end %>
-            <% facts.other_renders.each do |r| %><div><span>responds</span><span><%= r['format'] ? "render #{r['format']}" : (r['head'] ? "head :#{r['head']}" : "render #{r['object']}") %><% if r['line'] %> <%= at_line.call(r) %><% end %></span></div><% end %>
+            <% facts.other_renders.each do |r| %><div><span>responds</span><span><%= r['format'] ? "render #{r['format']}" : (r['head'] ? "head :#{r['head']}" : "render #{r['object']}") %><% if r['line'] %> <%= at_line.call(r) %><% end %><% if r['object'] %>, target unresolved <%= layer_chip('per-action facts') %><% end %></span></div><% end %>
             <div><span>in scope after</span><span><%= facts.assigned.any? ? safe_join(facts.assigns.uniq { |a| a['ivar'] }.map { |a| safe_join([tag.span(a['ivar'], class: 'iv'), " (#{a['method']})"]) }, ', ') : 'no instance variable' %></span></div>
           <% else %>
             <div><span>assigns</span><span>per-action assigns and reads are not published yet <%= layer_chip('W-7, woods#757') %></span></div>
@@ -88,7 +89,8 @@
           <% p.templates.each do |t| %>
             <div><span><%= t.role %></span><span><%= safe_join(['↳ '] * t.depth) %><%= template_link.call(t) %><% if t.unit %><% if t.instance_variables.any? %> mentions <%= safe_join(t.instance_variables.map { |v| tag.span(v, class: 'iv') }, ', ') %><% end %><% if t.helpers.any? %>, <%= t.helpers.size %> <%= 'helper'.pluralize(t.helpers.size) %><% end %><% else %> <span class="dim">not in the index</span><% end %></span></div>
           <% end %>
-          <% if p.templates.empty? %><div><span>template</span><span>none tied to this action in the index</span></div><% end %>
+          <% unresolved.each do |u| %><div><span>unresolved</span><span><%= u.render_target? ? 'render target ' : 'partial ' %><%= unresolved_text.call(u) %>, not resolved in the index</span></div><% end %>
+          <% if p.templates.empty? && unresolved.empty? %><div><span>template</span><span>none tied to this action in the index</span></div><% end %>
           <div><span>layout</span><span><%= p.layout || 'not in the index (W-7)' %></span></div>
         </div>
         <div class="stage">after<b><%= after.size %> <%= 'filter'.pluralize(after.size) %></b></div>
@@ -103,11 +105,11 @@
           <div class="finding note"><span class="flag note">⚑</span> <b>No flag can be raised yet.</b> The unassigned-ivar-read rule needs the assigns of this action and its filters (W-7); available template ivar mentions are <%= ivars.any? ? safe_join(ivars.map { |v| tag.span(v, class: 'iv') }, ', ') : 'none' %>. <%= layer_chip("template ivars, gen #{@repository.generation_number}") %></div>
           <% elsif flags.any? %>
             <% flags.each do |f| %><div class="finding note"><span class="flag note">⚑</span> <b><%= tag.span(f.ivar, class: 'iv bad') %> is mentioned in <%= unit_link(f.template, 'view_template') %> with no recorded assignment in this action or its analyzed filter bodies.</b> <%= layer_chip("template ivars + per-action facts, gen #{@repository.generation_number}") %></div><% end %>
-          <% elsif missing.empty? %>
+          <% elsif complete %>
             <div><span>flags</span><span>none in available facts: every recorded template ivar mention has a recorded assignment <%= layer_chip('per-action facts') %></span></div>
           <% end %>
-          <% if missing.any? %>
-            <div class="finding note"><span class="flag note">⚑</span> <b>Flag coverage is incomplete.</b> Template ivar facts or deeper partial chains are unavailable for <%= missing.join(', ') %>.</div>
+          <% unless complete %>
+            <div class="finding note"><span class="flag note">⚑</span> <b>Flag coverage is incomplete.</b><% if missing.any? %> Template ivar facts or deeper partial chains are unavailable for <%= missing.join(', ') %>.<% end %><% if unresolved.any? %> The index does not resolve <%= safe_join(unresolved.map { |u| safe_join([u.render_target? ? 'render target ' : 'partial ', unresolved_text.call(u)]) }, '; ') %>; the templates behind <%= unresolved.one? ? 'it are' : 'them are' %> not checked.<% end %></div>
           <% end %>
           <% if facts %>
             <div class="finding note"><span class="flag note">ⓘ</span> Template mentions are lexical and may include comments or template-local assignments. Helpers and filter conditions are not evaluated; these notes do not prove a runtime value.</div>

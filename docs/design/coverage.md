@@ -24,7 +24,7 @@ opens the file tree.
 | `/woods?token=` refused, no index, drifted, stale, degraded, empty results, guide unavailable | States and banners | FR-1, D-4, R-1, E-10 | [B8-States](boards/B8-States.html) | final |
 | `/woods/units` | Units index, grouped by actual type with distinct typed counts | FR-3 | [M1 navigation note](notes/m1-indexed-navigation.md) | shared components; mounted acceptance separate |
 | search palette, `/woods/search` | Name, path and full-text code search, completeness | FR-2, B-12 | [B8-Search](boards/B8-Search.html) | final |
-| `/woods/units/model/Post` Code | Two lenses, outline, marginalia, peek, confidence marks, folds, concerns inlined | FR-3, FR-4, B-1, B-2, B-7 to B-11, B-15 | [B8-Code](boards/B8-Code.html) | final; the engine scrolls the view as one region ([woods-map#29](https://github.com/lost-in-the/woods-map/issues/29)) |
+| `/woods/units/model/Post` Code | Two lenses, outline, marginalia, peek, confidence marks, folds, concerns inlined | FR-3, FR-4, B-1, B-2, B-7 to B-11, B-15 | [B8-Code](boards/B8-Code.html) | final, amended by D-24: the view scrolls as one region ([woods-map#29](https://github.com/lost-in-the/woods-map/issues/29)) |
 | hover card on a reference | Type, path, PageRank, last author, churn in 100 ms | B-3 | — | **none** (tooltip component exists, C5) |
 | disambiguation popover | Candidates with types and paths for an ambiguous name | FR-4, B-1 | — | **none** |
 | callers panel | Callers of the current method | B-13 | [B8-Code](boards/B8-Code.html) (margin "called from") | partial |
