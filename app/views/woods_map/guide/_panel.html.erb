@@ -1,0 +1,36 @@
+<%# The guide panel (B8-Guide, M7), docked beside the page and closed until
+    the bar's Guide button or `g` opens it: header with the model and the
+    tools, the page context, the actions this page offers, the conversation,
+    the question box and the budget line. Streams over EventSource; without
+    JavaScript it says so. Rendered only while the guide is ready. %>
+<% context = guide_context %>
+<% values = guide_page_values %>
+<% store = guide_view_store %>
+<% turns = store ? store.turns : [] %>
+<% spent = store ? store.tokens : 0 %>
+<% exhausted = WoodsMap::Guide::Budget.exhausted?(woods_map_config, spent) %>
+<% actions = WoodsMap::Guide::Actions.for(values['page']&.to_sym, type: values['type']) %>
+<aside class="aside guide guide-dock" id="wm-guide" aria-labelledby="wm-guide-title" hidden data-guide-target="panel" data-action="keydown->guide#keydown"
+       data-ask-url="<%= woods_map.guide_questions_path %>" data-reset-url="<%= woods_map.guide_conversation_path %>"
+       data-tool-limit="<%= woods_map_config.guide_tool_calls %>" data-tokens="<%= spent %>">
+  <div class="gh"><h2 class="t3" id="wm-guide-title"><b>Guide</b></h2><span class="model"><%= guide_model_label %></span><span class="tools"><button class="tool" type="button" data-action="guide#reset" data-guide-target="reset">new</button><button class="tool close" type="button" aria-label="Close the guide" data-action="guide#close">✕</button></span></div>
+  <p class="cap guide-nojs">The guide streams its answers with JavaScript, which is off in this browser.</p>
+  <div class="ctx"><span class="eyebrow">context</span><% Array(context&.chips).each do |bold, plain| %><span class="sel-chip"><b><%= bold %></b> <%= plain %></span><% end %><span class="sel-chip" data-guide-target="lines" hidden></span><span class="dim">gen <%= current_repository&.generation_number %><% if @generation&.dig('git_sha') %>, <%= short_sha(@generation['git_sha']) %><% end %>, read-only tools</span></div>
+  <% if actions.any? %>
+    <div class="acts" role="group" aria-label="Guide actions"><% actions.each do |key| %><button class="btn" type="button" data-action="guide#run" data-guide-key-param="<%= key %>"<% if WoodsMap::Guide::Actions::LIST[key][:needs] == :lines %> data-guide-target="needsLines" disabled title="Select lines in the code first"<% end %><%= ' disabled'.html_safe if exhausted %>><%= WoodsMap::Guide::Actions.label(key) %></button><% end %></div>
+  <% end %>
+  <div class="thread" data-guide-target="thread" role="log" aria-label="Conversation" aria-live="polite" tabindex="0">
+    <% if turns.empty? %><p class="cap empty" data-guide-target="empty">Ask about <%= context&.identifier || 'this application' %>, or pick an action above. Answers cite units from gen <%= current_repository&.generation_number %>; names the index does not know stay plain.</p><% end %>
+    <% turns.each do |turn| %><%= render 'woods_map/guide/asked', turn: turn %><%= render 'woods_map/guide/answer', turn: turn %><% end %>
+  </div>
+  <% if exhausted %><div class="finding note limit" data-guide-target="exhausted"><b>Budget spent.</b> This session has used its <%= guide_tokens(woods_map_config.guide_token_budget) %> tokens; the guide answers again in a new browser session.</div><% end %>
+  <form class="ask" data-guide-target="form" data-action="submit->guide#ask">
+    <% values.each do |key, value| %><input type="hidden" name="context[<%= key %>]" value="<%= value %>"><% end %>
+    <input type="hidden" name="context[lines]" value="" data-guide-target="linesField">
+    <label class="sr-only" for="wm-guide-question">Ask the guide</label>
+    <textarea class="in" id="wm-guide-question" name="question" rows="2" maxlength="2000" placeholder="Ask about <%= context&.identifier || 'this application' %>, or pick an action above" data-guide-target="input" data-action="keydown->guide#submitOnEnter"<%= ' disabled'.html_safe if exhausted %>></textarea>
+    <button class="btn primary" type="submit" data-guide-target="submit"<%= ' disabled'.html_safe if exhausted %>>Ask</button>
+    <button class="btn" type="button" data-guide-target="stop" data-action="guide#stop" hidden>Stop</button>
+  </form>
+  <div class="budget" data-guide-target="budget"><span><b data-guide-target="calls">0 of <%= woods_map_config.guide_tool_calls %></b> tool calls</span><span><b data-guide-target="tokens"><%= guide_tokens(spent) %></b> of <%= guide_tokens(woods_map_config.guide_token_budget) %> tokens this session</span><span>index-only tools</span><span class="end">links only to known identifiers</span></div>
+</aside>

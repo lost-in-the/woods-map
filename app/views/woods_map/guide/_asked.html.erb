@@ -1,0 +1,3 @@
+<%# One question as asked (B8-Guide): the action's label or the typed text,
+    and the context it carried. Locals: turn (Hash). %>
+<div class="msg me"><span class="who">you</span><%= turn['label'] || turn['question'] %><% if turn['label'] && turn['question'].present? %>: <%= turn['question'] %><% end %><% summary = turn.dig('context', 'summary') %><% if summary.present? %> <span class="dim">(<%= summary %>)</span><% end %></div>

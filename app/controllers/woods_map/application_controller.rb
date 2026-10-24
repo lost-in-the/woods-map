@@ -30,7 +30,10 @@ module WoodsMap
     before_action :exchange_query_token!
     before_action :authenticate!
 
-    helper_method :woods_map_config, :current_repository, :woods_map
+    helper_method :woods_map_config, :current_repository, :woods_map, :guide_page_values
+
+    # Page kinds the guide offers actions for, by unit tab.
+    GUIDE_TABS = { 'show' => 'code', 'lifecycle' => 'lifecycle', 'passage' => 'passage' }.freeze
 
     # Count the named actions against the per-client budget of a group.
     # Named apart from Rails 7.2's `rate_limit`, which the floor lacks.
@@ -75,6 +78,24 @@ module WoodsMap
         @repository = repository
         @generation = repository.generation_facts
         yield repository
+      end
+    end
+
+    # What this page names for the guide (M7): its kind and the unit, the
+    # action, the impact focus or range. The guide rebuilds the context from
+    # these against the pinned generation.
+    #
+    # @return [Hash{String => String}]
+    def guide_page_values
+      if @page
+        { 'page' => GUIDE_TABS.fetch(@tab.to_s, 'unit'), 'type' => @page.type, 'identifier' => @page.identifier,
+          'action_name' => @passage&.action }.compact
+      elsif @range
+        { 'page' => 'range', 'from' => @range.first, 'to' => @range.last }
+      elsif @radius.present?
+        { 'page' => 'impact', 'focus' => @radius.focus.join(',') }
+      else
+        {}
       end
     end
 
