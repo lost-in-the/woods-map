@@ -6,6 +6,7 @@ require 'woods/published_index'
 require 'woods/mcp/index_reader'
 require 'woods/source_inputs/status'
 require_relative 'repository_history'
+require_relative 'repository_flows'
 
 module WoodsMap
   # One pinned generation per request.
@@ -17,6 +18,7 @@ module WoodsMap
   # reader of that one generation; nothing is resolved from a path.
   class Repository
     include RepositoryHistory
+    include RepositoryFlows
 
     # Raised when no published generation can be opened at the configured root.
     class Unavailable < StandardError; end

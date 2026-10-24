@@ -63,13 +63,15 @@ module WoodsMap
     end
 
     # The global bar's pages that exist, in the order the boards give them
-    # (coverage.md: Units, Landscape, Graph, ERD, Impact, History).
+    # (coverage.md: Units, Landscape, Graph, ERD, Impact, History), then the Trail.
     #
-    # @param current [String, Symbol, nil] the page being shown: its label or :units, :graph, :erd, :impact, :history
+    # @param current [String, Symbol, nil] the page being shown: its label or :units, :graph, :erd, :impact,
+    #   :history, :trail
     # @return [Array<Array(String, String, Boolean)>] label, href, current?
     def primary_nav(current = nil)
       [['Units', woods_map.units_path], ['Graph', woods_map.graph_path], ['ERD', woods_map.erd_path],
-       ['Impact', woods_map.impact_path], ['History', woods_map.history_path]].map do |label, href|
+       ['Impact', woods_map.impact_path], ['History', woods_map.history_path],
+       ['Trail', woods_map.trail_path]].map do |label, href|
         [label, href,
          label.casecmp?(current.to_s)]
       end

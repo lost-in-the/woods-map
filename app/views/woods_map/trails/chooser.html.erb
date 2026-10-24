@@ -1,0 +1,30 @@
+<% content_for :title, 'Trail · Woods Map' %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<%= render 'woods_map/shared/crumbs', crumbs: [['trail', nil]], trail: tag.span('', data: { trail_target: 'list' }) %>
+<%= render 'woods_map/shared/ident', title: 'Trail', subtitle: "a lifecycle across async hops, gen #{@repository.generation_number}" %>
+<div class="body" data-controller="trail" data-trail-title-value="Trail">
+  <div class="main inset">
+    <% missing = @board.entry && !@repository.graph_node(@board.entry_unit) %>
+    <%= render 'woods_map/components/empty_state',
+          title: missing ? "No unit named #{@board.entry_unit} in gen #{@repository.generation_number}" : (@board.rejected_entry ? "#{@board.rejected_entry} is not a flow entry" : 'Choose an entry'),
+          text: tag.p(safe_join(['The Trail follows one entry through the units it calls, across each ', tag.code('perform_later'), ' and mail delivery into the job or mailer that runs it, and flags what the published facts say is risky. The board is its URL: an entry, pins, a generation and a hop budget.'])) %>
+    <section class="sec" aria-labelledby="trail-entry">
+      <header><h2 class="t2" id="trail-entry">Entry</h2></header>
+      <form class="trail-form" method="get" action="<%= woods_map.trail_path %>">
+        <label for="trail-entry-field">entry</label>
+        <input id="trail-entry-field" type="text" name="entry" value="<%= @board.entry || @board.rejected_entry %>" placeholder="NotifySubscribersJob#perform" spellcheck="false" autocomplete="off">
+        <button class="btn primary" type="submit">Follow</button>
+        <p class="cap">A job's <code>Job#perform</code>, a mailer action <code>Mailer#action</code>, a controller action <code>Controller#action</code>, or a model event: <code>Post@create</code>, <code>Post@update</code>, <code>Post@destroy</code>, <code>Post@after_commit(create)</code>.</p>
+      </form>
+    </section>
+    <% chooser_entries.each do |group, entries| %>
+      <% next if entries.empty? %>
+      <section class="sec" aria-labelledby="trail-<%= group.parameterize %>">
+        <header><h2 class="t2" id="trail-<%= group.parameterize %>"><%= group.capitalize %> <%= count_tag(entries.size) %></h2></header>
+        <%= render 'woods_map/components/table', label: group.capitalize, min_width: '480px', columns: [{ label: 'entry' }],
+              rows: entries.map { |entry| { cells: [link_to(entry, woods_map.trail_path(entry: entry))] } } %>
+      </section>
+    <% end %>
+    <%= render 'woods_map/shared/status', items: ['Trail', 'flows assembled on demand', "gen #{@repository.generation_number}"], keys: [[%w[/], 'search']] %>
+  </div>
+</div>

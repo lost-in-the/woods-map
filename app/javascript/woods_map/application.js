@@ -20,6 +20,7 @@ import SettingsController from "./controllers/settings_controller.js"
 import DiagramController from "./controllers/diagram_controller.js"
 import GraphController from "./controllers/graph_controller.js"
 import GuideController from "./controllers/guide_controller.js"
+import PinboardController from "./controllers/pinboard_controller.js"
 
 const application = Application.start()
 application.register("cliff", CliffController)
@@ -39,5 +40,6 @@ application.register("settings", SettingsController)
 application.register("diagram", DiagramController)
 application.register("graph", GraphController)
 application.register("guide", GuideController)
+application.register("pinboard", PinboardController)
 
 document.documentElement.dataset.woodsMap = "ready"

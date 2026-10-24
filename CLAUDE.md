@@ -7,7 +7,7 @@ relationship graphs, schema and history, and get change-impact reports with
 sharable focus URLs. It reads the published index only: no live database, no
 runtime reflection, no git subprocess at request time.
 
-Status: scaffold, design system, M1 Reading, M2 Passage, M4b Impact on the map (pre-change and range modes, saved reports, `?since=`; a CI pull-request comment is out of scope), the Pele renderer slice of M3 Diagrams, the neighbourhood endpoint, Graph tab canvas and full-screen graph page of M5 Graph, the CSP, rate-limit and origin-guard slice of M8 Staging, the M7 Guide panel (no real-provider run yet) and M4 History (History tab, gutter heat, generation picker and unit diff, `/woods/history`) landed. The design study, decision log, boards
+Status: scaffold, design system, M1 Reading, M2 Passage, M4b Impact on the map (pre-change and range modes, saved reports, `?since=`; a CI pull-request comment is out of scope), the Pele renderer slice of M3 Diagrams, the neighbourhood endpoint, Graph tab canvas and full-screen graph page of M5 Graph, the CSP, rate-limit and origin-guard slice of M8 Staging, the M7 Guide panel (no real-provider run yet) M4 History (History tab, gutter heat, generation picker and unit diff, `/woods/history`) and M6 Trail (`/woods/trail`) landed. The design study, decision log, boards
 and milestone plan live in `docs/design/` and are the source of truth for
 scope; `docs/design/foundations/tokens.css` is the stylesheet the engine ships
 verbatim (a spec keeps the two copies identical).
@@ -54,6 +54,8 @@ lib/woods_map/{neighbourhood_query,neighbourhood_response,graph_elements}.rb  # 
 lib/woods_map/{blast_radius,impact_review}.rb  # the impact page's pre-change mode: reverse-edge propagation with paths; rules, tests, gaps, unknowns
 lib/woods_map/{impact_range,range_report,since}.rb  # Woods' range or saved report, its tabs, and ?since= evidence for unit pages (E-6 to E-8)
 lib/woods_map/{search_results,palette,file_tree}.rb  # search modes, the palette's groups, the per-generation file tree
+lib/woods_map/{trail_board,lifecycle_builder,lifecycle_reach,trail_lanes,trail_flags,pinned_views,trail_co_changes}.rb  # the Trail (M6): URL board, lifecycle across async hops, flags, pinned graph and ERD, co-change
+lib/woods_map/repository_flows.rb  # Woods' FlowAssembler over the pinned generation, cached per generation and entry
 lib/woods_map/assets.rb          # engine-served files: roots, content digests, content types
 lib/woods_map/{content_security_policy,rate_limiter}.rb  # M8: the engine's CSP header, the in-process per-client budget
 lib/woods_map/guide.rb + guide/  # M7: status/backend (RubyLLM optional), actions + prompts/, context, store, budget, runner, answer; agent.rb only with ruby_llm

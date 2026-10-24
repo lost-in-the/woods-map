@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+- M6 Trail (woods-map#8, C-1 to C-5): `/woods/trail` follows one entry (a job, a mailer action, a controller action or a model event such as `Post@create`) through Woods' flow and across each `perform_later` and mail delivery into the job or mailer that runs it, in lanes by unit type, with each mailer action's templates.
+  - Flags from published facts, each naming its evidence: no `retry_on`/`discard_on` and no `rescue_from` (W-4), conditional callbacks, `if` without else, dynamic dispatch, cross-database edges, hubs, and template ivars the mailer action never assigns.
+  - The board is its URL: entry, `pin[]=type:identifier`, `gen` and `hops`, token-free. A retained `gen` is read as the board was made.
+  - Pin notes stay in the browser. Graph of pinned reuses the Cytoscape explorer, ERD of pinned the ERD renderer, and co-change reads the commit table (W-3).
+  - The Share menu offers the URL and the lanes, graph and ERD as Mermaid with `.mmd` links (D-25). `Trail` joins the primary bar.
+
 - M7 guide (woods-map#9, FR-8). `config.guide_enabled` (off by default) docks a guide panel beside every framed page (B8-Guide). The panel is a RubyLLM 2.1 agent over the Woods Index MCP server: stdio to `woods-mcp` (D-7) or a deployed `woods-mcp-http`, with the twelve read-only tools only.
   - Eight page-aware actions, as overridable prompt templates, plus free questions, seeded with a server-built context: generation, unit, selected lines, action, impact focus or range.
   - Answers stream over server-sent events, with tool cards as calls start and end, and finish as Markdown rendered with links only to known identifiers.

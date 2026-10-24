@@ -57,7 +57,7 @@ opens the file tree.
 | `?since=` on any view | Changed lines, nodes, steps, columns highlighted | E-8 | [Since note](notes/since.md), [B8-States](boards/B8-States.html) (degraded), tree M badges | Code (marginalia by metadata key), Graph, Passage templates, ERD tables and a banner on every unit tab, from Woods' report only; changed lines wait on [woods#802](https://github.com/lost-in-the/woods/issues/802); tree and timeline not done |
 | pre-change mode | Blast radius from a unit or method, no range | E-9 | — | **none** (the impact frame with a focus title; the engine renders it that way from the Changed, Risks, Tests and Unknown boards) |
 | Share menu | Focus URL and Mermaid (D-25) | E-6, E-7 | [Share menu note](notes/share-menu.md) | the token-free focus URL, and for each diagram panel its Mermaid copy and stable `.mmd` link, on unit and impact pages; settled by D-25 ([woods-map#57](https://github.com/lost-in-the/woods-map/issues/57)); Markdown and JSON stay with Woods |
-| Trail board | Pinned units, lanes, flags, board state, export | C-1 to C-5 | — | **none** (release 0.2, M6) |
+| Trail board | Pinned units, lanes, flags, board state, export | C-1 to C-5 | [Trail note](notes/trail.md) | `/woods/trail`: lanes across async hops, flags, pinboard with per-browser notes, graph and ERD of pinned, co-change, the Share menu's URL and Mermaid (D-25); no server-side save |
 | Guide panel | Context chips, actions, tool cards, streamed answer, budget | FR-8 | [B8-Guide](boards/B8-Guide.html), [M7 note](notes/m7-guide.md) | final; chat history list not drawn; the engine streams with EventSource and no Turbo |
 | settings | Editor URL scheme, lens, wrap and font size, per browser | B-15, D-6 | [Settings note](notes/settings.md) | modal from the code-view header; wrap opt-in in the one scroll region (D-24); *In editor at L…* only with a configured editor |
 | keyboard help | `?` overlay listing every page's keys | NFR-3 | [Keyboard help note](notes/keyboard-help.md) | contextual modal and keyboard coverage |
@@ -75,7 +75,7 @@ them. Each is a comment on that issue, so the issue owns it.
 - **M3 · Diagrams (woods-map#5)**: Landscape Context L1, Components L3, Domains; C4-dynamic in the Lifecycle view control (needs W-9); the renderer decision (woods-map#25). The flowchart and lanes views follow the [lifecycle views note](notes/lifecycle-views.md).
 - **M4 · History (woods-map#6)**: `/woods/history` cross-unit timeline; generation picker; unit diff entry from the History tab. Built from the [History note](notes/history.md).
 - **M5 · Graph (woods-map#7)**: [neighbourhood JSON contract](notes/neighbourhood-json.md); the Graph tab's Cytoscape canvas, layouts pending [woods-map#63](https://github.com/lost-in-the/woods-map/issues/63); the [full-screen graph](notes/graph-page.md) without clusters (woods#799); the flow overlay and timeline remain separate.
-- **M6 · Trail (woods-map#8)**: the board, end to end.
+- **M6 · Trail (woods-map#8)**: built from the [Trail note](notes/trail.md); "Explain this investigation" waits on the guide (#9).
 - **M7 · Guide (woods-map#9)**: chat history, pin and "open as investigation" handoff.
 
 ## Consistency rules checked across boards
