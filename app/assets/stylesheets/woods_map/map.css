@@ -280,6 +280,7 @@ html.js .wm .guide .guide-nojs{display:none}
 .wm .legend i.gblast[data-distance="0"]{background:color-mix(in srgb,var(--mod) 22%,var(--panel));border-color:var(--mod)}
 /* A row the focus URL selects (E-6): lit with the selection tint and a select rule. */
 .wm .tbl tbody tr.focus > td{background:var(--select-tint)}
+.wm .tbl tbody tr.focus .lyr{color:var(--mut)}
 .wm .tbl tbody tr.focus > td:first-child{box-shadow:inset 3px 0 0 var(--select)}
 /* A table row ?since= marks changed (E-8): a --mod rule, the M chip in its first cell. */
 .wm .tbl tbody tr.chg > td:first-child{box-shadow:inset 3px 0 0 var(--mod)}
@@ -312,6 +313,13 @@ html.js .wm .guide .guide-nojs{display:none}
 .wm .tl-svg a:focus-visible{outline:2px solid var(--select)}
 .wm .pick-units fieldset{border:0;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(28ch,1fr));gap:var(--s2) var(--s5)}
 .wm .pick-units .f{display:flex;gap:var(--s2);align-items:center;font-family:var(--ff-data);font-size:var(--fs-12)}
+/* The diff component (B8-Impact-Changed) beside a detail block: Woods' unified hunks (woods#802). */
+.wm .diff-block{margin-top:var(--s4)}
+.wm .main .sec + .dia{margin-top:var(--s5)}
+.wm .diff-block .eyebrow{margin-bottom:var(--s2)}
+.wm .difft{overflow-x:auto}
+/* --dim line numbers fall under AA on the diff tints (3.8:1 dark); --mut clears it in both themes */
+.wm .difft .dl.add span:nth-child(-n+2),.wm .difft .dl.del span:nth-child(-n+2){color:var(--mut)}
 
 /* Code references by confidence (W-1): a static link is dashed, an ambiguous
    reference is a button with a dotted rule that opens its candidates. */
