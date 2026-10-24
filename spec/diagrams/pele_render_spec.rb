@@ -41,7 +41,58 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
   def landscape_diagrams
     WoodsMap::Repository.open(WoodsMap::LandscapeIndex.path) do |repository|
       landscape = WoodsMap::Landscape.new(repository, system_name: 'Blog "main" <b>')
-      [['flowchart', 'landscape containers', WoodsMap::LandscapeExport.new(landscape).mermaid]]
+      hotspots = WoodsMap::Hotspots.new(repository)
+      [['flowchart', 'landscape containers', WoodsMap::LandscapeExport.new(landscape).mermaid],
+       ['quadrantChart', 'hotspots quadrant', hotspots.quadrant_mermaid],
+       ['sankey', 'hotspots forward flow', hotspots.sankey_mermaid]] + component_diagrams +
+        dynamic_diagrams(repository, WoodsMap::DynamicView.new(repository, landscape: landscape))
+    end
+  end
+
+  # The Components tab for every grouping, with packages and without.
+  def component_diagrams
+    [WoodsMap::LandscapeIndex.path, WoodsMap::PackageIndex.path].flat_map do |dir|
+      WoodsMap::Repository.open(dir) do |repository|
+        WoodsMap::Components::GROUPS.keys.filter_map do |group|
+          c = WoodsMap::Components.new(repository, group: group)
+          ['flowchart', "components #{File.basename(dir)} #{group}", c.mermaid] unless c.limit
+        end
+      end
+    end
+  end
+
+  # The C4 dynamic views (B-23): every model event, an event with async hops
+  # into jobs and mail, and every controller passage with its ladder.
+  def dynamic_diagrams(repository, view)
+    models = repository.units(type: 'model').map { |e| repository.unit(e['identifier'], type: 'model') }
+    events = models.flat_map do |unit|
+      lifecycle = WoodsMap::Lifecycle.new(unit, dynamic: view)
+      lifecycle.chains.keys.map do |event|
+        ['flowchart', "dynamic #{unit['identifier']} #{event}", lifecycle.dynamic(event)]
+      end
+    end
+    events + [['flowchart', 'dynamic async', view.lifecycle(models.first, async_steps, 'update')]] +
+      passage_dynamic_diagrams(repository, view)
+  end
+
+  def async_steps
+    effects = { 'jobs_enqueued' => ['ApplicationJob'], 'mailers_triggered' => ['UserMailer'] }
+    [WoodsMap::Lifecycle::Step.new(n: 1, type: 'before_save', filter: 'touch "it"', conditions: {}, side_effects: {}),
+     WoodsMap::Lifecycle::Step.new(n: 2, type: 'after_update_commit', filter: 'announce', conditions: {},
+                                   side_effects: effects)]
+  end
+
+  def passage_dynamic_diagrams(repository, view)
+    repository.units(type: 'controller').flat_map do |entry|
+      unit = repository.unit(entry['identifier'], type: 'controller')
+      WoodsMap::Passage.new(repository, unit).actions.map do |action|
+        passage = WoodsMap::Passage.new(repository, unit, action: action)
+        model = passage.ladder_model
+        event = passage.ladder_event
+        steps = model && event ? WoodsMap::Lifecycle.new(model).steps(event) : []
+        ['flowchart', "dynamic passage #{entry['identifier']}##{action}",
+         view.passage(passage, (model if event), steps, (event if model))]
+      end
     end
   end
 
@@ -131,7 +182,7 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
   it 'draws every generated text as the diagram type it declares' do
     list = diagrams
     expect(list.map(&:first).uniq).to contain_exactly('er', 'sequence', 'flowchart', 'swimlane', 'state', 'timeline',
-                                                      'xychart')
+                                                      'xychart', 'quadrantChart', 'sankey')
     results = render_all(list)
     failures = list.filter_map do |type, name, _|
       r = results.fetch(name)

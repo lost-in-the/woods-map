@@ -5,6 +5,7 @@
 <% since = current_since&.available? ? { since: current_since.selector } : {} %>
 <%= render 'woods_map/graphs/explorer', identifier: @page.identifier, type: @page.type, n: n,
       blast: current_since&.graph_blast, emphasis: (current_since&.available? ? :range : nil), hidden: since,
+      flows: @flows, flow: @flow, timeline: @timeline,
       link: ->(**opts) { woods_map.unit_graph_path(type: @page.type, identifier: @page.identifier, **opts.except(:blast).merge(since).compact) },
       unit_url: woods_map.unit_graph_path(type: '__type__', identifier: '__identifier__', depth: n.depth, direction: n.direction, **since),
       mermaid_url: woods_map.unit_graph_mmd_path(type: @page.type, identifier: @page.identifier, direction: n.direction, depth: n.depth, types: params[:types].presence, via: params[:via].presence),

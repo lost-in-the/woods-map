@@ -26,8 +26,8 @@ import { Controller } from "@hotwired/stimulus"
 // is the screen-reader equivalent; ↑ / ↓ move between its rows and a row in
 // focus lights its edge on the canvas.
 export default class extends Controller {
-  static targets = ["panel", "canvas", "facts", "status", "message", "fallback", "flowchart", "layouts", "layout", "list"]
-  static values = { url: String, unitUrl: String, label: String, generation: Number, cache: String, blast: Array, emphasis: String, clusters: Array, mode: String }
+  static targets = ["panel", "canvas", "facts", "status", "message", "fallback", "flowchart", "layouts", "layout", "list", "play", "scrub", "scrubFrom", "scrubTo", "window"]
+  static values = { url: String, unitUrl: String, label: String, generation: Number, cache: String, blast: Array, emphasis: String, clusters: Array, mode: String, flow: Object, timeline: Array }
 
   static LAYOUT_KEY = "woods-map:graph-layout"
   static POSITIONS_KEY = "woods-map:graph-positions"
@@ -69,6 +69,7 @@ export default class extends Controller {
   }
 
   disconnect() {
+    if (this.flowTimer) clearTimeout(this.flowTimer)
     this.themeObserver?.disconnect()
     if (this.hasListTarget) {
       this.listTarget.removeEventListener("keydown", this.onListKey)
@@ -146,6 +147,7 @@ export default class extends Controller {
     const nodes = data.elements.nodes
     const edges = data.elements.edges
     this.byId = new Map(nodes.map((node) => [node.data.id, node.data]))
+    this.byIdentity = new Map(nodes.map((node) => [this.constructor.identity(node.data), node.data.id]))
     this.focusId = nodes.find((node) => node.data.focus)?.data.id || nodes[0]?.data.id
     const hidden = new Map((data.truncation?.boundaries || []).map((b) => [b.node_id, b]))
     const palette = this.palette(nodes)
@@ -236,6 +238,8 @@ export default class extends Controller {
     if (this.mode !== "butterfly") this.arrange()
     this.restore()
     this.tint()
+    this.overlayFlow()
+    this.showScrub()
 
     marks.cytoscape = performance.now() - started
     this.facts()
@@ -390,6 +394,9 @@ export default class extends Controller {
         "font-family": font.family, "font-size": font.size, padding: 13, events: "no"
       } },
       { selector: "node.chg", style: { "background-color": changedFill, "border-color": t.mod, "border-width": 2.5, color: t.bright } },
+      { selector: "node.tl", style: { "background-color": changedFill, "border-color": t.mod, "border-width": 2.5, color: t.bright } },
+      { selector: "node.flow", style: { "border-color": t.link, "border-width": 2.5 } },
+      { selector: "node.flowcur", style: { "border-color": t.link, "border-width": 4, "overlay-color": t.link, "overlay-opacity": 0.16, "overlay-padding": 5, color: t.bright } },
       { selector: "node.sel", style: { "border-color": t.select, "border-width": 3, "overlay-color": t.select, "overlay-opacity": 0.12, "overlay-padding": 4, color: t.bright } },
       { selector: "edge", style: { width: 1, "line-color": t.dim, "curve-style": "haystack", "haystack-radius": 0 } },
       { selector: "edge.detail", style: {
@@ -403,6 +410,8 @@ export default class extends Controller {
       { selector: "edge.detail.ls", style: { label: "", "source-label": "data(label)", "source-text-offset": "data(off)", "source-text-margin-y": "data(dy)" } },
       { selector: "edge.detail.lt", style: { label: "", "target-label": "data(label)", "target-text-offset": "data(off)", "target-text-margin-y": "data(dy)" } },
       { selector: "edge:loop", style: { "curve-style": "bezier", "target-arrow-shape": "triangle", "target-arrow-color": t.dim, "loop-direction": "-45deg", "loop-sweep": "-60deg", "control-point-step-size": 72 } },
+      { selector: "edge.flow", style: { width: 2.5, "line-color": t.link, "target-arrow-color": t.link, "z-index": 9 } },
+      { selector: "edge.flowcur", style: { width: 4, "line-color": t.link, "target-arrow-color": t.link, color: t.bright, "z-index": 11 } },
       { selector: "edge.lit", style: { width: 2, "line-color": t.select, "target-arrow-color": t.select, color: t.bright, "z-index": 10 } }
     ]
   }
@@ -608,6 +617,128 @@ export default class extends Controller {
     this.facts()
   }
 
+static identity(d) {
+  return `${d.type}\u0000${d.identifier}`
+}
+
+// Flow overlay (A-4): the selected flow's drawn steps, in document order,
+// and the drawn edge that reached each, outlined in the link colour. Steps
+// the canvas cannot show are in the page's flow list, not drawn here.
+overlayFlow() {
+  this.flowSteps = []
+  if (!this.cy || !this.hasFlowValue || !Array.isArray(this.flowValue?.steps)) return
+  const id = (pair) => pair && this.byIdentity.get(this.constructor.identity({ identifier: pair[0], type: pair[1] }))
+  for (const step of this.flowValue.steps) {
+    const node = this.byIdentity.get(this.constructor.identity(step))
+    if (!node) continue
+    const source = id(step.from), target = id(step.to)
+    const edge = source && target ? this.cy.edges().filter((e) => e.source().id() === source && e.target().id() === target).first() : null
+    this.flowSteps.push({ ...step, node, edge: edge?.nonempty() ? edge : null })
+  }
+  this.cy.batch(() => {
+    for (const step of this.flowSteps) {
+      this.cy.getElementById(step.node).addClass("flow")
+      step.edge?.addClass("flow")
+    }
+  })
+  this.facts()
+}
+
+// Walks the flow one step at a time, lighting each unit and the edge that
+// reached it and naming it in the status line and the flow list. With
+// reduced motion the whole path is lit at once and named in one line.
+playFlow() {
+  if (!this.cy || !this.flowSteps?.length) return
+  this.stopFlow()
+  const total = this.flowValue.total || this.flowSteps.length
+  const name = (step) => `${step.position}. ${step.identifier}`
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+    this.cy.batch(() => this.flowSteps.forEach((step) => this.lightStep(step, false)))
+    this.statusTarget.textContent = `Flow ${this.flowValue.entry_point}, ${this.flowSteps.length} of ${total} steps drawn: ${this.flowSteps.map(name).join(" → ")}`
+    return
+  }
+  let index = 0
+  const show = () => {
+    const step = this.flowSteps[index]
+    this.lightStep(step, true)
+    this.announce(step.node, `flow ${this.flowValue.entry_point}, step ${step.position} of ${total}`)
+    index += 1
+    if (index >= this.flowSteps.length) { this.flowTimer = null; return }
+    this.flowTimer = setTimeout(show, 900)
+  }
+  show()
+}
+
+lightStep(step, only) {
+  if (only) this.cy.elements(".flowcur").removeClass("flowcur")
+  this.cy.getElementById(step.node).addClass("flowcur")
+  step.edge?.addClass("flowcur")
+  this.element.querySelectorAll("tr[data-flow-step]").forEach((row) => {
+    if (only) row.classList.toggle("focus", row.dataset.flowStep === String(step.position))
+    else if (row.dataset.flowStep === String(step.position)) row.classList.add("focus")
+  })
+}
+
+stopFlow() {
+  if (this.flowTimer) clearTimeout(this.flowTimer)
+  this.flowTimer = null
+  this.cy?.elements(".flowcur").removeClass("flowcur")
+}
+
+// Timeline (A-6): with a script the window of commits is scrubbed with two
+// range inputs, oldest first, and the units its commits touched are filled
+// in the modified hue; the commit list names them without a script.
+showScrub() {
+  if (!this.hasScrubTarget || !this.hasTimelineValue || !this.timelineValue.length) return
+  this.scrubTarget.hidden = false
+}
+
+scrub() {
+  let from = Number(this.scrubFromTarget.value), to = Number(this.scrubToTarget.value)
+  if (from > to) [from, to] = [to, from]
+  this.tintWindow(from, to)
+}
+
+pickCommit(event) {
+  const index = Number(event.currentTarget.dataset.commit)
+  if (!Number.isInteger(index)) return
+  this.scrubFromTarget.value = index
+  this.scrubToTarget.value = index
+  this.tintWindow(index, index)
+}
+
+clearWindow() {
+  if (!this.hasScrubTarget) return
+  this.scrubFromTarget.value = 0
+  this.scrubToTarget.value = this.timelineValue.length - 1
+  this.cy?.nodes(".tl").removeClass("tl")
+  this.element.querySelectorAll("tr[data-commit].focus").forEach((row) => row.classList.remove("focus"))
+  this.windowTarget.textContent = "Move the window to tint the units its commits touched."
+  this.windowDrawn = null
+}
+
+tintWindow(from, to) {
+  const commits = this.timelineValue.slice(from, to + 1)
+  if (!commits.length) return
+  const touched = new Set(commits.flatMap((commit) => commit.units.map((unit) => this.constructor.identity(unit))))
+  let drawn = 0
+  this.cy?.batch(() => {
+    this.cy.nodes(".tl").removeClass("tl")
+    this.cy.nodes().forEach((node) => {
+      const d = this.byId.get(node.id())
+      if (d && touched.has(this.constructor.identity(d))) { node.addClass("tl"); drawn += 1 }
+    })
+  })
+  this.element.querySelectorAll("tr[data-commit]").forEach((row) => {
+    const index = Number(row.dataset.commit)
+    row.classList.toggle("focus", index >= from && index <= to)
+  })
+  const first = commits[0], last = commits[commits.length - 1]
+  const span = first === last ? `${first.sha}, ${first.date}, ${first.message}` : `${commits.length} commits, ${first.date} to ${last.date}`
+  this.windowDrawn = drawn
+  this.windowTarget.textContent = `${span}: ${drawn} ${drawn === 1 ? "unit" : "units"} drawn changed`
+}
+
   storedLayout() {
     try {
       const stored = window.localStorage.getItem(this.constructor.LAYOUT_KEY)
@@ -783,6 +914,7 @@ export default class extends Controller {
         facts.push(`a change here reaches ${total} ${total === 1 ? "unit" : "units"}, ${this.blastDrawn} drawn`)
       }
     }
+    if (this.flowSteps?.length) facts.push(`flow ${this.flowValue.entry_point}, ${this.flowSteps.length} of ${this.flowValue.total || this.flowSteps.length} steps drawn`)
     if (t.truncated) facts.push(`${t.omitted_nodes} more units and ${t.omitted_edges} edges hidden past the ${t.node_limit}-unit limit; dashed units have more`)
     const generation = this.payload.provenance?.generation
     if (this.hasGenerationValue && generation != null && generation !== this.generationValue) {
@@ -836,7 +968,7 @@ export default class extends Controller {
   tokens() {
     const style = getComputedStyle(this.canvasTarget)
     const read = (name) => style.getPropertyValue(`--${name}`).trim()
-    return Object.fromEntries(["bg", "panel", "text", "bright", "mut", "dim", "rule2", "select", "hot", "mod"].map((name) => [name, read(name)]))
+    return Object.fromEntries(["bg", "panel", "text", "bright", "mut", "dim", "rule2", "select", "hot", "mod", "link"].map((name) => [name, read(name)]))
   }
 
   font() {

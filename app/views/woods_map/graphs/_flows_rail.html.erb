@@ -1,0 +1,25 @@
+<%# The rail's flows (A-4, W-13): the precomputed flows that expanded a step
+    of this unit, each a link that lays the flow over the canvas. Locals:
+    flows (Hash from GraphFlow.entries), flow (GraphFlow or nil), link (Proc). %>
+<% entries = flows[:entries] %>
+<div class="grp">flows <span class="cnt"><%= entries.size %></span></div>
+<% case flows[:state] %>
+<% when :available %>
+  <% if entries.any? %>
+    <ol class="flows">
+      <% entries.first(WoodsMap::GraphFlow::LISTED).each do |entry| %>
+        <li><span class="k" aria-hidden="true"><%= flow&.entry_point == entry ? '▸' : '·' %></span><span><%= link_to entry, link.call(flow: entry), 'aria-current': (flow&.entry_point == entry ? 'true' : nil) %></span></li>
+      <% end %>
+    </ol>
+    <% if entries.size > WoodsMap::GraphFlow::LISTED %><p class="cap padx"><%= entries.size - WoodsMap::GraphFlow::LISTED %> more; open a controller's graph for its own actions.</p><% end %>
+    <% if flow %><p class="cap padx"><%= link_to 'clear the flow', link.call(flow: nil) %></p><% end %>
+  <% else %>
+    <p class="cap padx">No precomputed flow expands this unit. Each flow stops at its own depth, so this does not prove no request reaches it.</p>
+  <% end %>
+<% when :absent %>
+  <p class="cap padx">This generation publishes no flows. Woods precomputes them when <code>precompute_flows</code> is on.</p>
+<% when :unsupported %>
+  <p class="cap padx">Flow membership needs a Woods that publishes it (W-13, <%= link_to 'woods#805', 'https://github.com/lost-in-the/woods/pull/805' %>).</p>
+<% else %>
+  <p class="cap padx">Woods refused this generation's flow artifacts, so no flow is listed.</p>
+<% end %>

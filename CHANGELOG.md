@@ -3,6 +3,16 @@
 ## [Unreleased]
 
 - Routes tab: *Reached by a route helper* shows each helper a referencing unit calls and the action it reaches, linked to that action's Passage, from the unit's `route_helper_references` (woods#795). On a generation extracted before them the column reads *not in this generation* and the controller-level limit stays named.
+- Graph flow overlay and timeline (woods-map#7, A-4, A-6, docs/design/notes/graph-page.md). Both appear on the Graph tab and on `/woods/graph`.
+  - **Flows:** the rail lists the precomputed flows that expanded a step of the centre (Woods W-13, `flows/by_unit.json`). `?flow=` lays one over the canvas: each step's unit, and the drawn edge between consecutive steps, are outlined in the link colour. *Play the flow* lights the steps in order; with reduced motion the whole path is lit at once.
+  - A side list gives every step with its operation count, whether the canvas draws it, and the edge that reached it. Steps with no graph edge are marked, never invented.
+  - Without W-13 readers or published flows, the rail says why.
+  - **Timeline:** the commits in the commit table (W-3) that touched the units drawn. Two range inputs choose a window of commits, and the units those commits touched are filled with `--mod`. A *tint* button narrows the window to one commit. Without a script, the commit list names the units.
+- Landscape, second slice (woods-map#5, docs/design/notes/landscape.md).
+  - **Components (C4 level 3):** the board's group control groups application units by Packwerk package, top-level namespace or published domain cluster. Each component box shows its hub and, for a package, its declared dependencies. The component diagram is drawn by Pele, with a relationships table that marks undeclared package edges. Without packages or clusters, the tab names the limit.
+  - **Hotspots:** a churn × dependents quadrant and a forward-flow sankey between layers, drawn by Pele. The LOC treemap waits on woods#810.
+  - **Share menu** on every tab: the focus URL and the tab's text exports as plain links. The new diagram texts are at `/woods/landscape/components.mmd?group=`, `/quadrant.mmd` and `/sankey.mmd`; a diagram the generation cannot draw answers 422.
+
 - Passage filters follow Woods' resolved chain (W-8, woods#800; B-16, woods-map#3). The filter matrix is drawn in chain order with each filter's owner, linked when the index holds it and marked `←` for a concern, and the filter stages count the filters that apply and list the skipped ones. A filter with an `if`/`unless` condition is marked conditional: Woods does not evaluate the condition, so its ✓ means it can run. On a generation extracted before W-8 the page keeps the declared `only`/`except` scopes and names the resolved chain as a limit.
 - M7 guide (woods-map#9, FR-8). `config.guide_enabled` (off by default) docks a guide panel beside every framed page (B8-Guide). The panel is a RubyLLM 2.1 agent over the Woods Index MCP server: stdio to `woods-mcp` (D-7) or a deployed `woods-mcp-http`, with the twelve read-only tools only.
   - Eight page-aware actions, as overridable prompt templates, plus free questions, seeded with a server-built context: generation, unit, selected lines, action, impact focus or range.

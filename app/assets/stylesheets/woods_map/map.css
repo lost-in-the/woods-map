@@ -321,3 +321,13 @@ html.no-js .wm .amb-pop[hidden]{display:block}
 .wm .amb-pop ul{list-style:none;margin:0;padding:0;display:grid;gap:var(--s2)}
 .wm .amb-pop li{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:baseline}
 .wm .amb-pop li .dim{font-family:var(--ff-data);overflow-wrap:anywhere}
+/* The graph's flow overlay (A-4) and timeline (A-6): a flow step is outlined in the link colour, a unit
+   a commit in the window touched is filled with --mod as the range tint draws it; the scrubber's two range
+   inputs sit on one line and wrap at narrow widths. */
+.wm .legend i.gflow{background:var(--panel);border:2px solid var(--link)}
+.wm .legend i.gtl{background:color-mix(in srgb,var(--mod) 22%,var(--panel));border:2px solid var(--mod)}
+.wm .rail ol.flows a[aria-current]{color:var(--bright);font-weight:600}
+.wm .gtimeline .scrub{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3) var(--s5);margin:0 0 var(--s4)}
+.wm .gtimeline .scrub input[type=range]{width:min(100%,28ch);accent-color:var(--select)}
+.wm .gtimeline .scrub output{flex:1 1 30ch;min-width:0}
+.wm .gcommits summary{cursor:pointer;color:var(--link);font-size:var(--fs-12);margin-bottom:var(--s3)}

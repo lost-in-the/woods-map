@@ -6,6 +6,8 @@ module WoodsMap
   # identifier and type, with the blast radius of a change to it tinted on
   # request. Without a centre it offers the hubs as starting points.
   class GraphsController < ApplicationController
+    include WoodsMap::GraphOverlays
+
     HUBS_SHOWN = 24
 
     def show
@@ -17,6 +19,7 @@ module WoodsMap
         @neighbourhood = neighbourhood(repository)
         @blast = blast(repository) if params[:blast] == '1'
         @clusters = clusters(repository)
+        load_graph_overlays(repository, @neighbourhood, @centre['identifier'], @centre['type'])
         render :show
       end
     end
