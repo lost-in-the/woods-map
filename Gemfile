@@ -14,6 +14,9 @@ else
 end
 
 group :development, :test do
+  # The opt-in end-to-end spec boots the dummy host under Puma
+  # (WOODS_MAP_RUN_HTTP_SERVER=1, spec/woods_map/engine_http_server_spec.rb).
+  gem 'puma', '>= 5.0'
   gem 'rails', '>= 6.0'
   gem 'rake', '~> 13.0'
   gem 'rspec', '~> 3.12'

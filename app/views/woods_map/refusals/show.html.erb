@@ -1,15 +1,17 @@
 <% content_for :title, 'Woods Map · refused' %>
-<div class="empty-state" style="padding:var(--s6) var(--s5)">
-  <div class="eyebrow" style="margin-bottom:var(--s3)">HTTP 403</div>
+<div class="empty-state refusal-panel">
+  <div class="eyebrow">HTTP 403</div>
   <h1 class="t2">Woods Map refused the request</h1>
   <% case @reason %>
   <% when :host %>
     The host's <code>config.authorize</code> hook did not allow this request. Sign in to the host application with an account the hook accepts, then open the map again.
   <% when :origin %>
     The request came from another origin. Writes to the map are accepted from its own origin only; open the map directly and try again.
+  <% when :rebinding %>
+    The request arrived over loopback but named a host that is not loopback, which is how a DNS-rebinding page would reach the map through this browser. Open the map at <code>localhost</code> or <code>127.0.0.1</code>, list the name in <code>config.allowed_origins</code>, or configure <code>WOODS_MAP_TOKEN</code>.
   <% else %>
     This host is not loopback and no <code>WOODS_MAP_TOKEN</code> is configured, so the map does not boot its routes. Set the token and open <code>/woods?token=…</code> once; it becomes a cookie. Or let the host gate it with <code>config.authorize</code>.
-    <pre class="cmd">WOODS_MAP_TOKEN=$(openssl rand -hex 24)   # staging only
+    <pre class="cmd" tabindex="0" role="region" aria-label="Token and hook configuration">WOODS_MAP_TOKEN=$(openssl rand -hex 24)   # staging only
 # config/initializers/woods_map.rb
 WoodsMap.configure do |c|
   c.authorize = ->(r) { r.env["warden"].user&.admin? }

@@ -9,11 +9,11 @@ RSpec.describe WoodsMap do
     skip 'Set WOODS_MAP_BROWSER to run the Chromium DOM/CSS regression' unless ENV['WOODS_MAP_BROWSER']
 
     expect(browser_result).to include(
-      'drawn' => include('drawn' => true, 'svgLabel' => 'drawn diagram', 'sourceVisible' => false,
+      'drawn' => include('drawn' => true, 'svgLabel' => 'drawn diagram', 'svgStyled' => true, 'sourceVisible' => false,
                          'toggleVisible' => true, 'messageVisible' => false, 'error' => nil),
       'refused' => include('drawn' => false, 'sourceVisible' => true, 'toggleVisible' => false,
                            'messageVisible' => true, 'messageChildren' => 0, 'error' => 'limit'),
-      'pwned' => false
+      'pwned' => false, 'violations' => []
     )
     expect(browser_result.dig('refused', 'message'))
       .to start_with('The diagram could not be drawn: Diagram source is longer than the limit of 50000 characters')
@@ -47,8 +47,12 @@ RSpec.describe WoodsMap do
     controller = File.read(File.join(root, 'app/javascript/woods_map/controllers/diagram_controller.js'))
                      .sub(/\Aimport[^\n]+\n/, '').sub('export default class', 'class DiagramController')
     runner = File.read(File.join(root, 'spec/javascript/diagram_runner.js'))
-    "<!doctype html><html lang=\"en\"><head><style>#{styles}</style>" \
-      "<script type=\"importmap\">#{JSON.generate(imports: { pele: pele })}</script></head>" \
-      "<body><pre id=\"result\"></pre><script>class Controller {}\n#{controller}\n#{runner}</script></body></html>"
+    # The engine's policy for styles: no style attribute applies, so Pele's must arrive through the CSSOM.
+    policy = "default-src 'none'; style-src 'nonce-spec'; script-src 'nonce-spec' data:; img-src data:"
+    "<!doctype html><html lang=\"en\"><head><meta http-equiv=\"Content-Security-Policy\" content=\"#{policy}\">" \
+      "<style nonce=\"spec\">#{styles}</style>" \
+      "<script type=\"importmap\" nonce=\"spec\">#{JSON.generate(imports: { pele: pele })}</script></head>" \
+      "<body><pre id=\"result\"></pre><script nonce=\"spec\">class Controller {}\n#{controller}\n#{runner}</script>" \
+      '</body></html>'
   end
 end

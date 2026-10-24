@@ -6,6 +6,7 @@ module WoodsMap
   # tabs of the report boards over what that generation proves. With a range
   # it delegates retained-generation evidence to Woods::Impact::Report (W-12).
   class ImpactController < ApplicationController
+    woods_map_rate_limit :impact
     LENSES = %w[changed risks flows tests unknown].freeze
 
     def show
