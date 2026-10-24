@@ -1,0 +1,133 @@
+<% lc = @lifecycle %>
+<% board = @board %>
+<% title = board.entry ? (lc&.entry || board.entry) : 'pinboard' %>
+<% content_for :title, "#{title} · Trail · Woods Map" %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<% gen = @repository.generation_number %>
+<% here = ->(**opts) { trail_board_path(board.to_query(**opts)) } %>
+<% mmd = ->(**opts) { woods_map.trail_mmd_path(board.to_query.merge(opts.transform_keys(&:to_s))) } %>
+<% flags = @flags.flags %>
+<% processes = lc ? lc.steps.map(&:process).uniq.size : 0 %>
+<%= render 'woods_map/shared/crumbs', crumbs: [['trail', woods_map.trail_path], [title, nil]], trail: tag.span('', data: { trail_target: 'list' }) %>
+<%# Share first: below 960 the controls wrap and the menu opens to the right of its button. %>
+<% controls = safe_join([
+     render('woods_map/shared/share'),
+     (safe_join([tag.span('hops', class: 'lbl'), tag.span(safe_join(WoodsMap::TrailBoard::HOPS.map { |h| link_to(h, here.call(hops: h), 'aria-current': (h == board.hops ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'Async hop budget')]) if lc)
+   ].compact, ' ') %>
+<%= render 'woods_map/shared/ident', title: "Trail · #{title}",
+      subtitle: [lc && "#{lc.steps.size} #{'step'.pluralize(lc.steps.size)} in #{processes} #{'process'.pluralize(processes)}", "#{board.pins.size} #{'pin'.pluralize(board.pins.size)}", "#{flags.size} #{'flag'.pluralize(flags.size)}", "gen #{gen}"].compact.join(', '),
+      controls: controls %>
+<% banners = [] %>
+<% if @unretained_generation %>
+  <% banners << render('woods_map/components/banner', severity: :mod, lead: "Gen #{@unretained_generation} is no longer retained.", text: "This board was made against gen #{@unretained_generation}; it is read on the published gen #{gen}, so steps and flags may differ from what it showed.", tools: link_to("open on gen #{gen}", here.call(gen: gen))) %>
+<% elsif @published_generation %>
+  <% banners << render('woods_map/components/banner', severity: :mod, lead: "Reading gen #{gen}, as the board was made.", text: "The published generation is #{@published_generation}. A board keeps its generation so a pasted link shows what it showed.", tools: link_to("open on gen #{@published_generation}", here.call(gen: @published_generation))) %>
+<% end %>
+<% if board.rejected_pins.any? %>
+  <% banners << render('woods_map/components/banner', severity: :mod, lead: "#{board.rejected_pins.size} #{'pin'.pluralize(board.rejected_pins.size)} not read.", text: "A pin is type:identifier, at most #{WoodsMap::TrailBoard::MAX_PINS} per board: #{board.rejected_pins.first(3).join(', ')}#{'…' if board.rejected_pins.size > 3}") %>
+<% end %>
+<% if banners.any? %><div class="frame-facts"><%= safe_join(banners) %></div><% end %>
+<% missing_pins = board.pins.reject { |pin| @pinned.identities.include?(pin.identity) } %>
+<div class="body" data-controller="trail pinboard" data-trail-title-value="Trail <%= title %>" data-pinboard-key-value="<%= board.key %>">
+  <%= render 'woods_map/components/rail', label: 'Board', heading: 'On this board', groups: [
+        { label: 'pins', count: board.pins.size, items: board.pins.map { |pin| { key: (@flags.for(pin.identity).any? ? WoodsMap::Glyphs[:flag] : '·'), text: unit_link(pin.identifier, pin.type), own: pin.type.tr('_', ' ') } } },
+        { label: 'sections', count: 7, items: [['flags', 'trail-flags'], ['lanes', 'trail-lanes'], ['steps', 'trail-steps'], ['pinboard', 'trail-pins'], ['graph of pinned', 'trail-graph'], ['ERD of pinned', 'trail-erd'], ['changed together', 'trail-cochange']].map { |text, id| { text: text, href: "##{id}" } } }
+      ] %>
+  <div class="main">
+    <section class="sec" aria-labelledby="trail-flags">
+      <header><h2 class="t2" id="trail-flags">Flags <%= count_tag(flags.size) %><%= info_tip('Derived from published facts only: job resilience (W-4), callback conditions, flow conditionals and dynamic dispatch, cross-database edges, hubs, and template ivars against the mailer action (advisory). Each names its evidence.') %></h2></header>
+      <% if flags.any? %>
+        <%= render 'woods_map/components/table', label: 'Flags', min_width: '860px', columns: [{ label: 'flag', width: '220px' }, { label: 'unit', width: '220px', cell_class: 'id' }, { label: 'what', width: '34%' }, { label: 'evidence' }],
+              rows: flags.map { |f| { cells: [safe_join([trail_flag_chip(f), ' ', f.rule]), unit_link(*f.identity), safe_join([f.text, (f.file ? safe_join([' at ', code_line_link(f.file, f.line)]) : nil)].compact), layer_chip(f.evidence)] } } %>
+      <% else %>
+        <p class="cap">No flags: the published facts raise none for these units.</p>
+      <% end %>
+      <% if @flags.limits.any? %><ul class="cap trail-limits"><% @flags.limits.each do |limit| %><li><%= limit %></li><% end %></ul><% end %>
+    </section>
+    <% if lc %>
+      <section class="sec" aria-labelledby="trail-lanes">
+        <header><h2 class="t2" id="trail-lanes">Lanes <%= count_tag("#{lc.lanes.size} lanes, #{processes} #{'process'.pluralize(processes)}") %><%= info_tip('The flow regrouped by unit type. A dashed rule is an async hop: the work after it runs in another process. Hops past the budget are listed under the steps, never dropped.') %></h2></header>
+        <%= render 'woods_map/trails/lanes', lifecycle: lc, board: board, flags: @flags %>
+        <%= render 'woods_map/components/diagram', title: 'Lanes', facts: ["#{lc.entry}, #{board.hops} #{'hop'.pluralize(board.hops)}", "#{lc.steps.size} steps"],
+              name: "trail #{lc.entry}", mermaid_url: mmd.call, mermaid: lc.mermaid, key: 'y',
+              label: "Lanes of #{lc.entry}: #{lc.steps.size} steps in #{lc.lanes.size} lanes, dashed edges across async hops; the table above has the same steps",
+              refusal: (lc.refusal && "#{lc.refusal}; the table above lists every step."),
+              legend: [['──', 'call, same process'], ['┄┄', 'async hop, another process']], provenance: ['FlowAssembler', "gen #{gen}"] %>
+      </section>
+      <section class="sec" data-controller="rows" aria-labelledby="trail-steps">
+        <header><h2 class="t2" id="trail-steps">Steps <%= count_tag(lc.steps.size) %><%= info_tip("Woods' flow for the entry, assembled on demand (the trace_flow assembler), each step with its operations as the flow records them. Receiverless calls and dynamic dispatch stay as labelled.") %><span class="goto tools"><button class="tool" type="button" data-action="rows#expandAll" data-needs-js>expand all</button></span></h2></header>
+        <%= render 'woods_map/components/table', label: 'Steps', min_width: '860px', columns: [{ label: '#', width: '48px' }, { label: 'step', width: '34%', cell_class: 'id' }, { label: 'lane', width: '90px' }, { label: 'process', width: '80px' }, { label: 'operations', width: '100px' }, { label: 'flags' }, { label: 'pin', width: '70px' }],
+              rows: lc.steps.map { |s|
+                step_flags = @flags.for_step(s)
+                ops = s.operations
+                { id: "step-#{s.n}",
+                  cells: [s.n.to_s, trail_step_link(s), s.lane, s.process.to_s, ops.size.to_s, step_flags.any? ? safe_join(step_flags.map { |f| safe_join([trail_flag_chip(f), ' ', f.text]) }, tag.br) : empty_value(applicable: false), trail_pin_toggle(board, s.identity) || ''],
+                  detail: ops.any? ? render('woods_map/components/detail', rows: ops.map { |op| [op[:line] ? code_line_link(op[:file] || s.file_path, op[:line]) : '—', trail_operation_text(op)] }) : nil }
+              } %>
+        <% if lc.beyond.any? || lc.limits.any? %>
+          <ul class="cap trail-limits">
+            <% if lc.beyond.any? %><li><%= lc.beyond.size %> <%= 'step'.pluralize(lc.beyond.size) %> beyond the hop budget of <%= board.hops %>: <%= lc.beyond.map(&:first).uniq.first(5).join(', ') %>. <%= link_to('raise the budget', here.call(hops: [board.hops + 1, WoodsMap::TrailBoard::HOPS.max].min)) if board.hops < WoodsMap::TrailBoard::HOPS.max %></li><% end %>
+            <% lc.limits.each do |limit, count| %><li><%= count %> <%= limit %></li><% end %>
+          </ul>
+        <% end %>
+        <p class="cap"><%= link_to('pin every unit of this lifecycle', trail_board_path(board.to_query(pins: (board.pins + lc.identities.map { |i, t| WoodsMap::TrailBoard::Pin.new(identifier: i, type: t) }).uniq(&:to_param).first(WoodsMap::TrailBoard::MAX_PINS)))) %></p>
+      </section>
+    <% end %>
+    <section class="sec" aria-labelledby="trail-pins">
+      <header><h2 class="t2" id="trail-pins">Pinboard <%= count_tag("#{board.pins.size} of #{WoodsMap::TrailBoard::MAX_PINS}") %><%= info_tip('Pins are typed units in the URL. Notes stay in this browser: a URL lands in logs and previews, so it carries identifiers and generation numbers only.') %></h2></header>
+      <form class="trail-form" method="get" action="<%= woods_map.trail_path %>">
+        <% board.to_query.each do |name, value| %><% Array(value).each do |v| %><input type="hidden" name="<%= name == 'pin' ? 'pin[]' : name %>" value="<%= v %>"><% end %><% end %>
+        <label for="trail-pin-field">pin</label>
+        <input id="trail-pin-field" type="text" name="pin[]" placeholder="mailer:MailingListMailer" spellcheck="false" autocomplete="off">
+        <button class="btn" type="submit">Pin</button>
+      </form>
+      <% if board.pins.any? %>
+        <%= render 'woods_map/components/table', label: 'Pins', min_width: '860px', columns: [{ label: 'unit', width: '30%', cell_class: 'id' }, { label: 'type', width: '120px' }, { label: 'flags', width: '30%' }, { label: 'note' }, { label: 'pin', width: '70px' }],
+              rows: board.pins.map { |pin|
+                present = @pinned.identities.include?(pin.identity)
+                pin_flags = @flags.for(pin.identity)
+                note = tag.textarea('', class: 'trail-note', rows: 2, 'aria-label': "Note on #{pin.identifier}", data: { pinboard_target: 'note', pin: pin.to_param, action: 'input->pinboard#save', needs_js: true })
+                { cells: [present ? unit_link(pin.identifier, pin.type) : safe_join([pin.identifier, ' ', tag.span("not in gen #{gen}", class: 'dim')]), pin.type.tr('_', ' '), pin_flags.any? ? safe_join(pin_flags.map { |f| safe_join([trail_flag_chip(f), ' ', f.text]) }, tag.br) : empty_value(applicable: false), note, trail_pin_toggle(board, pin.identity)] }
+              } %>
+        <p class="cap" data-pinboard-target="status" data-needs-js>Notes are kept in this browser for this board only.</p>
+      <% else %>
+        <p class="cap">Nothing pinned. Pin steps above, or a unit by <code>type:identifier</code>.</p>
+      <% end %>
+    </section>
+    <%= render 'woods_map/trails/pinned_graph', pinned: @pinned, board: board, mermaid_url: mmd.call(view: 'graph') %>
+    <section class="sec" aria-labelledby="trail-erd">
+      <header><h2 class="t2" id="trail-erd">ERD of pinned <%= count_tag("#{@pinned.tables.size} #{'table'.pluralize(@pinned.tables.size)}") %><%= info_tip('The tables of the pinned models and pinned database tables, drawn as one ERD chunk: keys only, relations inside the set.') %></h2></header>
+      <% erd = @pinned.erd_mermaid %>
+      <% if erd %>
+        <%= render 'woods_map/components/diagram', title: 'ERD of pinned', facts: ["#{@pinned.tables.size} tables", 'keys only'], name: 'trail pinned erd', mermaid_url: mmd.call(view: 'erd'), mermaid: erd,
+              label: "Entity relationship diagram of the pinned units' tables: #{@pinned.tables.map(&:name).join(', ')}", refusal: (@pinned.erd_refusal && "#{@pinned.erd_refusal}; open the ERD page for every chunk."),
+              legend: [['──', 'association with a foreign key'], ['┄┄', 'association with no foreign key']], provenance: ['foreign_keys + associations', "gen #{gen}"] %>
+      <% else %>
+        <p class="cap">No pinned model or table maps a published table. Pin a model, or open the <%= link_to('ERD', woods_map.erd_path) %>.</p>
+      <% end %>
+    </section>
+    <section class="sec" aria-labelledby="trail-cochange">
+      <header><h2 class="t2" id="trail-cochange">Changed together <%= count_tag(@co_changes.pairs.size) %><%= info_tip("Commits that touched the files of two or more pinned units, from this generation's commit table (W-3). A unit's files are the ones its History tab covers.") %></h2></header>
+      <% if @co_changes.state != :available %>
+        <p class="cap"><%= { absent: "Gen #{gen} has no commit table: Woods writes git_commits.json when the extraction can read the application's git history (W-3).", unreadable: "Gen #{gen}'s commit table could not be read.", unsupported: 'This Woods has no commit table reader (W-3).' }.fetch(@co_changes.state, 'No commit table.') %></p>
+      <% elsif @pinned.identities.size < 2 %>
+        <p class="cap">Pin two or more units to see the commits that changed them together.</p>
+      <% elsif @co_changes.pairs.empty? %>
+        <p class="cap">No commit in the table touched two pinned units.</p>
+      <% else %>
+        <%= render 'woods_map/components/table', label: 'Changed together', min_width: '860px', columns: [{ label: 'when', width: '110px' }, { label: 'commit', width: '90px' }, { label: 'subject', width: '34%' }, { label: 'author', width: '140px' }, { label: 'pins' }],
+              rows: @co_changes.pairs.map { |p| c = p.commit; { cells: [date_abbr(c['date']), tag.code(short_sha(c['sha'])), c['message'].to_s, who(c['author']), safe_join(p.pins.map { |i, t| unit_link(i, t) }, ', ')] } } %>
+      <% end %>
+    </section>
+    <section class="sec" aria-labelledby="trail-limits">
+      <header><h2 class="t2" id="trail-limits">Limits</h2></header>
+      <ul class="cap trail-limits">
+        <li>Notes stay in this browser; boards are not saved on the server. A board is its URL.</li>
+        <li>Flows are Woods' static flows: receiverless calls, procs and dynamic dispatch are not resolved, and a hop from a graph edge has no call site.</li>
+        <li>Model events are assembled on demand; Woods precomputes flows for controller actions only.</li>
+        <% if missing_pins.any? %><li><%= missing_pins.size %> <%= 'pin'.pluralize(missing_pins.size) %> not in gen <%= gen %>: <%= missing_pins.map(&:to_param).join(', ') %>.</li><% end %>
+      </ul>
+    </section>
+    <%= render 'woods_map/shared/status', items: ['Trail', 'flows on demand', "gen #{gen}"], keys: [[%w[y], 'copy'], [%w[/], 'search']] %>
+  </div>
+</div>

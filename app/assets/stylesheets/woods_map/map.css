@@ -20,8 +20,8 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .tree [data-tree-target="row"][hidden] { display:none!important; }
 /* Inline links: a cue besides colour (D-22, WCAG 1.4.1, axe link-in-text-block). Standalone
    links stay bare; a link sitting among other text gets a faint underline in its own hue. */
-.wm .crumbs a,.wm .empty-state a,.wm .cap a,.wm .lead a,.wm .det dd a,.wm .facts dd a,.wm .banner .txt a,.wm .legend a,.wm .st a,.wm .mg a,.wm .rail li a,.wm .tip a,.wm .finding a,.wm .status a,.wm .psg .rows a,.wm .sec > header .t2 a,.wm .tbl tr.bnd a,.wm .guide .msg .text a,.wm .matrix .mut a,.wm .tbl td.uses a{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--link) 55%,transparent);text-underline-offset:3px}
-.wm .crumbs a:hover,.wm .empty-state a:hover,.wm .cap a:hover,.wm .lead a:hover,.wm .det dd a:hover,.wm .facts dd a:hover,.wm .banner .txt a:hover,.wm .legend a:hover,.wm .st a:hover,.wm .mg a:hover,.wm .rail li a:hover,.wm .tip a:hover,.wm .finding a:hover,.wm .status a:hover,.wm .psg .rows a:hover,.wm .sec > header .t2 a:hover,.wm .tbl tr.bnd a:hover,.wm .guide .msg .text a:hover,.wm .matrix .mut a:hover,.wm .tbl td.uses a:hover{text-decoration-color:var(--link)}
+.wm .crumbs a,.wm .empty-state a,.wm .cap a,.wm .lead a,.wm .det dd a,.wm .facts dd a,.wm .banner .txt a,.wm .legend a,.wm .st a,.wm .mg a,.wm .rail li a,.wm .tip a,.wm .finding a,.wm .status a,.wm .psg .rows a,.wm .sec > header .t2 a,.wm .tbl tr.bnd a,.wm .guide .msg .text a,.wm .matrix .mut a,.wm .tbl td.uses a,.wm .trail-lanes td a{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--link) 55%,transparent);text-underline-offset:3px}
+.wm .crumbs a:hover,.wm .empty-state a:hover,.wm .cap a:hover,.wm .lead a:hover,.wm .det dd a:hover,.wm .facts dd a:hover,.wm .banner .txt a:hover,.wm .legend a:hover,.wm .st a:hover,.wm .mg a:hover,.wm .rail li a:hover,.wm .tip a:hover,.wm .finding a:hover,.wm .status a:hover,.wm .psg .rows a:hover,.wm .sec > header .t2 a:hover,.wm .tbl tr.bnd a:hover,.wm .guide .msg .text a:hover,.wm .matrix .mut a:hover,.wm .tbl td.uses a:hover,.wm .trail-lanes td a:hover{text-decoration-color:var(--link)}
 /* Native explanation controls retain the inline glyph styling; tabs use the existing scroll cliff. */
 .wm button.info{font-size:inherit;line-height:inherit;padding:0;border:0;background:none}
 .wm .page-tabs .tab{flex-shrink:0;white-space:nowrap}
@@ -348,3 +348,13 @@ html.no-js .wm .amb-pop[hidden]{display:block}
 .wm .gtimeline .scrub input[type=range]{width:min(100%,28ch);accent-color:var(--select)}
 .wm .gtimeline .scrub output{flex:1 1 30ch;min-width:0}
 .wm .gcommits summary{cursor:pointer;color:var(--link);font-size:var(--fs-12);margin-bottom:var(--s3)}
+/* The Trail (M6, notes/trail.md): entry and pin fields, the lanes' async rule, pin notes */
+.wm .trail-form{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);padding:var(--s3) var(--s4)}
+.wm .trail-form label{font-family:var(--ff-ui);font-size:var(--fs-11);color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+.wm .trail-form input[type=text],.wm .trail-note{font:inherit;font-family:var(--ff-data);font-size:var(--fs-12);color:var(--text);background:var(--ground2);border:1px solid var(--rule2);border-radius:var(--r-ctl);padding:var(--s1) var(--s2);min-width:0}
+.wm .trail-form input[type=text]{flex:1 1 28ch}
+.wm .trail-form .cap{flex-basis:100%;margin:0}
+.wm .trail-note{width:100%;resize:vertical;display:block}
+.wm .trail-lanes tr.bnd td{border-top:2px dashed var(--rule2)}
+.wm .trail-limits{margin:var(--s2) var(--s4);padding-left:var(--s5)}
+.wm .ident .t1{overflow-wrap:anywhere;min-width:0}
