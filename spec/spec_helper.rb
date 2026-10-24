@@ -29,6 +29,7 @@ RSpec.configure do |config|
     WoodsMap.reset_configuration!
     WoodsMap.configuration.index_dir = FIXTURE_INDEX
     WoodsMap::GenerationFacets.reset!
+    WoodsMap::ImpactRange.reset!
     # Specs stub a repository's graph under the fixture's generation key.
     WoodsMap::TreesController.reset!
   end

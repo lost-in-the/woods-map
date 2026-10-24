@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- A retained range is compared once per published generation. The impact page's lenses and pages, the unit diff and `?since=` views of one range now share one report from a small per-process cache, instead of each running Woods' comparison of both payloads again. The key holds the selectors, the published marker and the retained generations, so `now` and commit SHAs follow a new publish or a prune. Failures are not kept.
+
 - Correctness fixes across the unit and impact pages.
   - **Unknown action:** a Passage or Lifecycle URL naming an action the unit does not have answers 404 with the unit's actions as links (plain text on `.mmd`), instead of silently showing the first action.
   - **Impact by commit:** a SHA several retained generations recorded resolves (Woods: the commit's first capture as `from`, its last as `to`). A range whose endpoints are one generation says *Nothing changed*, and Woods no longer reads every unit to say so.

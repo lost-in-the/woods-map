@@ -4,6 +4,14 @@ module WoodsMap
   # Reads Woods' authoritative retained-generation report without deriving impact.
   # Historical identities deliberately have no links into the current generation.
   class ImpactRange
+    # Reports kept per process. A range over a large application takes
+    # seconds to compare, and every lens, page, unit diff and `?since=` view
+    # of that range asks for the same report.
+    CACHE_SIZE = 4
+
+    @cache = {}
+    @mutex = Mutex.new
+
     MESSAGES = {
       unavailable: 'Range reports are unavailable in this Woods version. Install a version providing Woods::Impact::Report.',
       invalid: 'The range could not be resolved. Use gen:N, now, or a retained commit SHA (7–40 characters).',
@@ -19,6 +27,52 @@ module WoodsMap
     # @return [ImpactRange]
     def self.saved(index_dir, id)
       allocate.tap { |range| range.send(:load_saved, index_dir, id.to_s) }
+    end
+
+    class << self
+      # The report for a range, compared once per published generation.
+      # Retained payloads never change, and what `now` or a commit SHA
+      # resolves to changes only when a generation is published or pruned,
+      # so the key is the selectors, the published marker and the retained
+      # generations. A report computed while the marker moved is not kept.
+      #
+      # @param index_dir [Pathname, String]
+      # @param from [String]
+      # @param to [String]
+      # @yieldreturn [Hash] the report, computed on a miss
+      # @return [Hash]
+      def cached(index_dir, from, to)
+        key = cache_key(index_dir, from, to)
+        hit = key && @mutex.synchronize { @cache[key] = @cache.delete(key) if @cache.key?(key) }
+        return hit if hit
+
+        data = yield
+        remember(key, data) if key && key == cache_key(index_dir, from, to)
+        data
+      end
+
+      # Drop the cache (specs).
+      # @return [void]
+      def reset!
+        @mutex.synchronize { @cache.clear }
+      end
+
+      private
+
+      def cache_key(index_dir, from, to)
+        root = File.expand_path(index_dir.to_s)
+        marker = Woods::Generation.new(output_dir: root).current
+        return nil if marker.token.nil? && marker.number.to_i.zero?
+
+        [root, from, to, marker.number, marker.token, Woods::PublishedIndex.available_generations(root)]
+      end
+
+      def remember(key, data)
+        @mutex.synchronize do
+          @cache.shift while @cache.size >= CACHE_SIZE
+          @cache[key] = data
+        end
+      end
     end
 
     # @return [Class, nil] Woods' saved-report store, loaded only when a saved report is requested
@@ -58,7 +112,7 @@ module WoodsMap
       @state = :unavailable
       return unless backend
 
-      @data = backend.compare(index_dir, from: from, to: to).to_h
+      @data = self.class.cached(index_dir, from, to) { backend.compare(index_dir, from: from, to: to).to_h }
       @state = valid_envelope? ? :available : :error
     rescue ArgumentError => e
       @state = :invalid
