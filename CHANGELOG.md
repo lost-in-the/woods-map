@@ -7,6 +7,7 @@
   - **Units index:** each type shows its first 100 units, by name, with its exact count and a link to `/woods/units?type=<type>`, which lists that type 500 a page.
   - **Long lists page:** a graph's list equivalent (300 edges a page) and an impact's affected units (300 a page) carry a pager that keeps the page's query. The affected list looks up its covering tests once instead of once per row.
   - **Mermaid text over 64 KB is not carried in the page:** a diagram over its drawing budget says its text is not carried and offers no copy (its `.mmd` answers 422 with the reason, as before); an unbudgeted one, such as the blast radius, copies from its `.mmd` route, from the panel and the Share menu. A hub's depth-2 neighbourhood or blast radius no longer carries megabytes of text, three times over. The full-screen graph links its `.mmd` like the Graph tab.
+  - **Commit table and graph text:** the generation's commit table is parsed once per generation instead of on every Code, Graph and History page, and a neighbourhood builds its Mermaid text and node ids once per request (a hub's depth-2 graph built them twice).
   - **Impact rules and unknowns:** the unassigned-ivar rule's outcome and the "render by name" unknowns are kept per generation and reach (`GenerationMemo`); at a hub they read a passage for every reached action and nearly every unit of the generation.
 
 - Correctness fixes across the unit and impact pages.

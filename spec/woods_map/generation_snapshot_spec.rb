@@ -16,6 +16,13 @@ RSpec.describe WoodsMap::GenerationSnapshot do
     expect(reader).to have_received(:raw_graph_data).once
   end
 
+  it 'reads the commit table once per generation' do
+    allow(Woods::PublishedIndex::CommitTable).to receive(:load).and_call_original
+    tables = Array.new(2) { WoodsMap::Repository.open(FIXTURE_INDEX, &:git_commits) }
+    expect(tables.first).to equal(tables.last).and be_a(Woods::PublishedIndex::CommitTable)
+    expect(Woods::PublishedIndex::CommitTable).to have_received(:load).once
+  end
+
   it 'freezes what it keeps, so a caller cannot change it for the next request' do
     units = WoodsMap::Repository.open(FIXTURE_INDEX, &:units)
     expect(units).to be_frozen
