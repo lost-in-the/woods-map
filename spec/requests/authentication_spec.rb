@@ -85,6 +85,14 @@ RSpec.describe 'Authentication', type: :request do
       expect(response.body).not_to include('gen ')
     end
 
+    it 'says the mount is not on loopback only to a remote client' do
+      get '/woods/session/new', env: remote
+      expect(response.body).to include('This mount is not on loopback.')
+      get '/woods/session/new'
+      expect(response.body).not_to include('not on loopback')
+      expect(response.body).to include('configured with a token')
+    end
+
     it 'refuses a cross-origin write even with a valid token' do
       post '/woods/session', params: { token: 'secret-token' },
                              headers: { 'Origin' => 'https://evil.example', 'Authorization' => 'Bearer secret-token' },

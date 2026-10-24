@@ -11,6 +11,11 @@ module WoodsMap
 
     # Rows and columns of the layer coupling matrix, as unit types.
     LAYERS = %w[controller view_template component job mailer model].freeze
+    # The quadrant's axes and quadrants, top right first as Mermaid numbers them.
+    QUADRANT_HEAD = ['quadrantChart', '  x-axis Few commits --> Many commits',
+                     '  y-axis Few dependents --> Many dependents', '  quadrant-1 Review carefully',
+                     '  quadrant-2 Stable hubs', '  quadrant-3 Quiet', '  quadrant-4 Churning leaves'].freeze
+
     # Edges that are tests, documentation or schema bookkeeping, not coupling.
     NOT_COUPLING = %w[test_coverage exercises_route documents migrates drawn_in].freeze
 
@@ -105,6 +110,45 @@ module WoodsMap
       matrix.reject { |_, row| row.values.sum.zero? }
     end
 
+    # The churn × dependents quadrant (B6-Overview) as Mermaid: x is commits
+    # against the most changed unit, y is dependents on a log scale against
+    # the most depended upon, so the top right is what to review first.
+    #
+    # @param limit [Integer] units labelled
+    # @return [String, nil] nil without commit counts
+    def quadrant_mermaid(limit: 18)
+      rows = churn(limit: limit)
+      return nil if rows.empty?
+
+      most = [rows.pluck(:commits).max, 1].max
+      widest = Math.log(1 + [rows.pluck(:dependents).max, 1].max)
+      points = rows.map { |row| quadrant_point(row, most, widest) }
+      (QUADRANT_HEAD + points).join("\n")
+    end
+
+    # The layer coupling in the layering direction only (B6-Overview's
+    # forward flow) as a Mermaid sankey: edges from a layer to a later one in
+    # {LAYERS}, so the flow has no cycle to draw.
+    #
+    # @return [String, nil] nil when no edge runs forward
+    def sankey_mermaid
+      rows = forward_flow
+      return nil if rows.empty?
+
+      (['sankey-beta', ''] + rows.map { |from, to, count| "#{from},#{to},#{count}" }).join("\n")
+    end
+
+    # @return [Array<Array(String, String, Integer)>] plural layer names and edge counts, forward only
+    def forward_flow
+      coupling.flat_map do |from, row|
+        row.filter_map do |to, count|
+          next unless count.positive? && LAYERS.index(to) > LAYERS.index(from)
+
+          [from.tr('_', ' ').pluralize, to.tr('_', ' ').pluralize, count]
+        end
+      end
+    end
+
     # @return [Array<Risk>] what the analysis can prove, most severe first
     def risks
       undeclared_rows + bridge_rows + cycle_rows + uncovered_rows + orphan_rows
@@ -151,6 +195,20 @@ module WoodsMap
                 why: "#{orphans.size} #{'unit'.pluralize(orphans.size)} with no dependents, " \
                      "#{dead_ends.size} dead ends",
                 action: 'candidates to delete', severity: :note)]
+    end
+
+    # One point: commits against the most changed, dependents on a log scale
+    # against the most depended upon, kept off the chart's edges.
+    def quadrant_point(row, most, widest)
+      x = (row[:commits].to_f / most).clamp(0.02, 0.98)
+      y = (Math.log(1 + row[:dependents]) / widest).clamp(0.02, 0.98)
+      "  #{point_name(row[:identifier])}: [#{format('%.2f', x)}, #{format('%.2f', y)}]"
+    end
+
+    # A quadrant point's name: the identifier with only characters the
+    # quadrant grammar reads as a name.
+    def point_name(identifier)
+      identifier.to_s.gsub('::', '.').gsub(%r{[^A-Za-z0-9 _./#-]}, ' ').squeeze(' ').strip.presence || 'unit'
     end
 
     def target_type(edge)

@@ -9,7 +9,9 @@ module WoodsMap
   class UnitsController < ApplicationController
     include WoodsMap::MethodLinks
     include WoodsMap::UnitMermaid
+    include WoodsMap::RoutedIdentifier
     include WoodsMap::UnitHistory
+    include WoodsMap::GraphOverlays
 
     LENS_COOKIE = 'woods_map_lens'
 
@@ -109,6 +111,7 @@ module WoodsMap
         )
         next render_graph_mermaid if mermaid_request?
 
+        load_graph_overlays(@repository, @neighbourhood, @unit['identifier'], @unit['type'])
         render :graph
       end
     end
@@ -129,7 +132,8 @@ module WoodsMap
       with_repository do |repository|
         @repository = repository
         @tab = action_name
-        @unit = repository.unit(params[:identifier].to_s, type: params[:type].to_s)
+        type = params[:type].to_s
+        @unit = routed_identifiers.lazy.map { |id| repository.unit(id, type: type) }.find(&:itself)
         next render_missing_unit unless @unit
 
         @page = WoodsMap::UnitPage.new(repository, @unit)
@@ -142,21 +146,13 @@ module WoodsMap
       end
     end
 
-    def render_missing_unit
-      @identifier = params[:identifier].to_s
-      @type = params[:type].to_s
-      return render_text(:not_found, "No #{@type.tr('_', ' ')} named #{@identifier}.") if mermaid_request?
-
-      render 'woods_map/units/missing', status: :not_found
-    end
-
     def lens
       cookies[LENS_COOKIE].presence || 'written'
     end
 
     def redirect_to_remembered_lens
       cookies[LENS_COOKIE] = { value: params[:lens], expires: 1.year.from_now, same_site: :lax }
-      redirect_to woods_map.unit_path(type: params[:type], identifier: params[:identifier])
+      redirect_to woods_map.unit_path(type: params[:type], identifier: routed_identifiers.first)
     end
 
     def lifecycle_for(unit, dynamic: nil)

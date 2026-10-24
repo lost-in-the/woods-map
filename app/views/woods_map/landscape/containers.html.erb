@@ -36,20 +36,13 @@
             <% if l.externals.any? %><% l.externals.each do |box| %><%= render 'woods_map/landscape/box', box: box, landscape: l %><% end %><% else %><p class="cap">None the index records.</p><% end %>
           </div>
         </div>
-        <nav class="c4ladder" aria-label="C4 levels">
-          <span><b>L1 · Context</b> <%= woods_map_config.landscape_actors.size %> people, 1 system, <%= l.externals.size %> external</span>
-          <span aria-current="page"><b>L2 · Containers</b> <%= l.processes.size %> processes, <%= l.stores.size %> stores, this page</span>
-          <a href="<%= woods_map.landscape_path(tab: 'domains') %>"><b>L3 · Components</b> <%= @clusters.size %> domain <%= 'cluster'.pluralize(@clusters.size) %></a>
-          <a href="<%= woods_map.units_path %>"><b>L4 · Code</b> <%= l.unit_count %> units</a>
-        </nav>
+        <%= render 'woods_map/landscape/ladder', current: 2 %>
       <% end %>
     </section>
     <% if l.attributed? %>
       <section class="sec">
         <%= render 'woods_map/components/diagram', title: 'Container diagram', facts: ["#{l.containers.size} containers", "#{l.relationships.size} relationships"],
-              tools: safe_join([tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: @export.mermaid, action: 'copy#copy', needs_js: true }),
-                                link_to('⤓ .mmd', woods_map.landscape_mmd_path, class: 'tool', type: 'text/plain', rel: 'alternate', data: { mermaid_url: woods_map.landscape_mmd_path })]),
-              mermaid: @export.mermaid, label: "C4 container diagram of #{l.system_name}: #{l.containers.size} containers and #{l.externals.size} external systems; the relationships table below has every arrow",
+              mermaid: @export.mermaid, name: "#{l.system_name} containers", mermaid_url: woods_map.landscape_mmd_path, label: "C4 container diagram of #{l.system_name}: #{l.containers.size} containers and #{l.externals.size} external systems; the relationships table below has every arrow",
               legend: [[tag.span('[ ]', class: 'ar'), 'container'], [tag.span('( )', class: 'ar'), 'data store'], [tag.span('[[ ]]', class: 'ar'), 'external system']],
               provenance: ['metadata.container', 'BehavioralProfile', "gen #{@repository.generation_number}"] %>
       </section>

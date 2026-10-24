@@ -9,6 +9,14 @@ RSpec.describe 'Guidelines page', type: :request do
     expect(response.body).to include('C4 · Diagrams').and include('C5 · Chrome')
   end
 
+  it 'gives every sample bar its own palette, so no id repeats and each combobox controls its own list' do
+    ids = html_response_document.css('[id]').pluck('id')
+    expect(ids.tally.select { |_, count| count > 1 }.keys).to eq([])
+    html_response_document.css('input.q[aria-controls]').each do |input|
+      expect(html_response_document.css("##{input['aria-controls']}").size).to eq(1)
+    end
+  end
+
   it 'composes every component from its partial' do
     %w[tbl grouped stpt rail tree dia legend facts status crumbs ident tabs det tgl].each do |css_class|
       expect(response.body).to match(/class="[^"]*\b#{css_class}\b/), "expected a .#{css_class} element"

@@ -20,7 +20,9 @@ RSpec.describe WoodsMap::References do
   end
 
   it 'keeps only the published occurrence and the exact typed identity' do
-    link = projected.fetch(1).sole
+    links = projected.fetch(1)
+    expect(links.size).to eq(1)
+    link = links.first
     expect([link.column, link.length, link.identifier, link.type, link.kind, link.confidence])
       .to eq([13, 6, 'Space::Target', 'service', 'constant', 'verified'])
     expect(repository).to have_received(:unit).with('Space::Target', type: 'service').once
@@ -89,7 +91,7 @@ RSpec.describe WoodsMap::References do
   it 'uses byte coordinates after Unicode and tabs' do
     unit['source_code'] = "'雪';\tTarget\r\n"
     record['column'] = 7
-    expect(projected.fetch(1).sole.column).to eq(7)
+    expect(projected.fetch(1).map(&:column)).to eq([7])
   end
 
   it 'rejects partial UTF-8 characters at either boundary' do

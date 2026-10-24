@@ -32,6 +32,7 @@
   <% else %>
     <%= render 'woods_map/components/table', label: 'Affected typed units', min_width: '720px', columns: [{ label: 'unit', cell_class: 'id' }, { label: 'type', width: '130px', cell_class: 'nw mut' }, { label: 'distance', width: '90px', cell_class: 'num' }, { label: 'weight', width: '100px', cell_class: 'num' }, { label: 'endpoint', width: '120px', cell_class: 'nw' }],
           rows: rr.affected.first(sample).map { |a| { cells: [impact_identity(a, rr), a['type'].to_s.tr('_', ' '), a['distance'] || empty_value, impact_weight(a['weight']), impact_context(a)] } } %>
+    <% if rr.affected.size > sample %><p class="cap"><%= link_to("All #{rr.affected.size} affected units", range_url.call(lens: 'changed', anchor: 'aff')) %></p><% end %>
   <% end %>
 </section>
 <section class="sec" aria-labelledby="range-flows">

@@ -16,7 +16,7 @@
     <% @unit_groups.each do |type, units| %>
       <section class="sec" aria-labelledby="type-<%= type %>">
         <header><h2 class="t2" id="type-<%= type %>"><%= type.tr('_', ' ') %> <%= count_tag(units.size) %></h2></header>
-        <%= render 'woods_map/components/table', label: "#{type.tr('_', ' ')} units", min_width: '640px', columns: [{ label: 'unit', width: '300px', cell_class: 'id' }, { label: 'indexed file' }], rows: units.map { |unit| { cells: [unit_link(unit['identifier'], type), unit['file_path'].presence || tag.span('No indexed file', class: 'dim')] } } %>
+        <%= render 'woods_map/components/table', label: "#{type.tr('_', ' ')} units", min_width: '640px', columns: [{ label: 'unit', width: '300px', cell_class: 'id' }, { label: 'indexed file' }], rows: units.map { |unit| { cells: [unit_link(unit['identifier'], type, listed: true), unit['file_path'].presence || tag.span('No indexed file', class: 'dim')] } } %>
       </section>
     <% end %>
   </div>

@@ -43,6 +43,9 @@ module WoodsMap
 
     attr_reader :direction, :depth
 
+    # @return [Array(String, String)] the selected unit as identifier and type
+    attr_reader :focus
+
     # @return [Array<Edge>] the edges within reach, before the type and via filters
     def all_edges
       @all_edges ||= collect
