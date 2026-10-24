@@ -1,9 +1,10 @@
 <%# The C4 ladder (B8-Landscape): L1 to L4, the current level marked, the
-    others linked where the map has a page. Locals: current (2 or 3). %>
+    others linked where the map has a page. Locals: current (1, 2 or 3). %>
 <% l = @landscape %>
 <% c = @components %>
 <nav class="c4ladder" aria-label="C4 levels">
-  <span><b>L1 · Context</b> <%= woods_map_config.landscape_actors.size %> people, 1 system, <%= l.externals.size %> external</span>
+  <% l1 = safe_join([tag.b('L1 · Context'), " #{woods_map_config.landscape_actors.size} people, 1 system, #{l.externals.size} external#{', this page' if current == 1}"]) %>
+  <%= current == 1 ? tag.span(l1, 'aria-current': 'page') : link_to(l1, woods_map.landscape_path(tab: 'context')) %>
   <% l2 = safe_join([tag.b('L2 · Containers'), " #{l.processes.size} processes, #{l.stores.size} stores#{', this page' if current == 2}"]) %>
   <%= current == 2 ? tag.span(l2, 'aria-current': 'page') : link_to(l2, woods_map.landscape_path(tab: 'containers')) %>
   <% l3 = safe_join([tag.b('L3 · Components'), " #{c.components.size} by #{WoodsMap::Components::GROUPS[c.group]}#{", #{c.relationships.count(&:undeclared)} undeclared package edges" if c.group == 'package' && !c.limit}#{', this page' if current == 3}"]) %>

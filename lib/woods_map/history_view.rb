@@ -54,7 +54,6 @@ module WoodsMap
 
     # @return [Range<Date>, nil] the days a drag picked on the strip
     attr_reader :span
-
     # @return [String, nil] the author the commits are narrowed to
     attr_reader :author
 

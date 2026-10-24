@@ -26,16 +26,15 @@ module WoodsMap
     # @param days [Integer]
     # @param now [Time]
     # @param filters [Hash] `author:` only commits whose author, as git
-    #   recorded it, is exactly this; `span:` (Range<Date>) only the days a
-    #   drag picked ({DateSpan})
+    #   recorded it, is exactly this; `span:` only the days a drag picked
+    #   ({DateSpan}, a Range<Date>)
     def initialize(repository, selection, days: 365, now: Time.now.utc, **filters)
-      author = filters[:author]
       @span = filters[:span]
       @repository = repository
       @table = repository.git_commits
       @days = days
       @now = now
-      @author = author.to_s.presence
+      @author = filters[:author].to_s.presence
       @lanes, @unknown = resolve(Array(selection).grep(String).first(MAX_LANES))
     end
 
@@ -60,12 +59,12 @@ module WoodsMap
     delegate :empty?, to: :@lanes
 
     # Commits that touched any selected unit inside the window, newest first,
-    # by {#author} and inside {#span} when they are set.
+    # by {#author} when one is set.
     #
     # @return [Array<Event>]
     def events
-      @events ||= window_events.select { |event| (!@author || event.author == @author) && in_span?(event) }
-                               .first(EVENT_LIMIT)
+      @events ||= (@author ? window_events.select { |event| event.author == @author } : window_events)
+                  .first(EVENT_LIMIT)
     end
 
     # @return [Array<String>] the window's authors, most commits first
@@ -131,14 +130,11 @@ module WoodsMap
         @table.commits_for(*@lanes.flat_map(&:paths)).filter_map do |row|
           time = parse(row['date'])
           next unless time && time >= cutoff
+          next if @span && !@span.cover?(time.to_date)
 
           event(row)
         end
       end
-    end
-
-    def in_span?(event)
-      !@span || DateSpan.cover?(@span, event.date)
     end
 
     def resolve(selection)

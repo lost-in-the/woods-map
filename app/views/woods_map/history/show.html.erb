@@ -28,7 +28,7 @@
           <ol class="tl-names" aria-label="Lanes">
             <% t.lanes.each do |l| %><li><%= unit_link(l.identifier, l.type) %> <span class="mut"><%= l.type.tr('_', ' ') %></span></li><% end %>
           </ol>
-          <% brush_url = woods_map.history_path(request.query_parameters.slice('units', 'range', 'since').merge('span' => '__SPAN__')) %>
+          <% brush_url = woods_map.history_path(request.query_parameters.slice('units', 'range', 'since', 'author').merge('span' => '__SPAN__')) %>
           <%= tag.div(class: 'tl-plot', data: { controller: 'brush', brush_url: brush_url, brush_unit: (t.strip.step == 1 ? 'day' : 'week'), brush_buckets: t.strip.buckets.map { |b| [b.first.iso8601, b.last.iso8601] }.to_json }) do %>
             <svg class="tl-svg" width="100%" height="<%= lane * t.lanes.size %>" role="group" aria-label="<%= "#{events.size} commits across #{t.lanes.size} units in #{t.days} days" %>">
               <rect class="brush-band" x="0" y="0" width="0" height="100%" visibility="hidden" data-brush-band></rect>

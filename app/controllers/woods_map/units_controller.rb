@@ -152,8 +152,7 @@ module WoodsMap
       @event = params[:event] if WoodsMap::Lifecycle::EVENTS.include?(params[:event])
       @event ||= @lifecycle.chains.keys.first || 'create'
       @view = @lifecycle.views.find { |view| view == params[:view] } || WoodsMap::Lifecycle::VIEWS.first
-      @state_machines = []
-      @state_machines = WoodsMap::StateMachineView.for_model(@repository, @page.identifier) if @page.type == 'model'
+      @state_machines = @page.type == 'model' ? WoodsMap::StateMachineView.for_model(@repository, @page.identifier) : []
       return render_lifecycle_mermaid if mermaid_request?
 
       render :lifecycle

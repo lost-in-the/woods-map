@@ -75,8 +75,24 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
       hotspots = WoodsMap::Hotspots.new(repository)
       [['flowchart', 'landscape containers', WoodsMap::LandscapeExport.new(landscape).mermaid],
        ['quadrantChart', 'hotspots quadrant', hotspots.quadrant_mermaid],
-       ['sankey', 'hotspots forward flow', hotspots.sankey_mermaid]] + component_diagrams +
+       ['sankey', 'hotspots forward flow', hotspots.sankey_mermaid],
+       ['flowchart', 'landscape context', WoodsMap::LandscapeContext.new(landscape, actors: context_actors).mermaid]] +
+        component_diagrams + treemap_diagrams +
         dynamic_diagrams(repository, WoodsMap::DynamicView.new(repository, landscape: landscape))
+    end
+  end
+
+  def context_actors
+    [{ name: 'Author "lead"', description: 'writes <posts>', uses: 'signs in' }, { name: 'Reader' }]
+  end
+
+  # Where the code is: by package from package_sizes, and one block from the nodes.
+  def treemap_diagrams
+    WoodsMap::Repository.open(WoodsMap::PackageIndex.path) do |repository|
+      by_package = WoodsMap::Hotspots.new(repository).treemap_mermaid
+      allow(repository).to receive(:graph_analysis).and_return({})
+      [['treemap', 'treemap by package', by_package],
+       ['treemap', 'treemap application', WoodsMap::Hotspots.new(repository).treemap_mermaid]]
     end
   end
 
@@ -233,7 +249,7 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
   it 'draws every generated text as the diagram type it declares' do
     list = diagrams
     expect(list.map(&:first).uniq).to contain_exactly('er', 'sequence', 'flowchart', 'swimlane', 'state', 'timeline',
-                                                      'xychart', 'quadrantChart', 'sankey')
+                                                      'xychart', 'quadrantChart', 'sankey', 'treemap')
     results = render_all(list)
     failures = list.filter_map do |type, name, _|
       r = results.fetch(name)

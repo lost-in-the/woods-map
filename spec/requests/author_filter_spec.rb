@@ -58,6 +58,22 @@ RSpec.describe 'Filtering timelines by author', type: :request do
     expect(query(across['href'])['units[]']).to include('job:ApplicationJob', 'mailer:MailingListMailer')
   end
 
+  it 'narrows /woods/history by a picked span and the author together, keeping the author when brushing' do
+    get '/woods/history', params: { units: ['job:ApplicationJob', 'model:Micropost'], span: '2026-10-01..2026-10-16',
+                                    author: sam }
+    authors = doc.css('table[aria-label="Commits"] tbody tr').map { |tr| tr.at_css('.who')&.text }.compact.uniq
+    expect(authors).to eq([sam])
+    expect(doc.at_css('h2#lanes').text).to include("by #{sam} from 2026-10-01 to 2026-10-16")
+    brush = CGI.unescape(doc.at_css('[data-brush-url]')['data-brush-url'])
+    expect(brush).to include("author=#{sam}", 'span=__SPAN__')
+  end
+
+  it 'narrows the History tab by a picked span and the author together' do
+    get '/woods/units/job/ApplicationJob/history', params: { span: '2026-10-01..2026-10-16', author: sam }
+    rows = doc.css('table[aria-label="Commits"] tbody tr:not(.sub)')
+    expect(rows.map { |tr| tr.at_css('.who')&.text }.uniq).to eq([sam])
+  end
+
   it 'filters /woods/history to the author and links back to every author' do
     get '/woods/history', params: { units: ['job:ApplicationJob', 'model:Micropost'], author: sam }
     expect(response).to have_http_status(:ok)

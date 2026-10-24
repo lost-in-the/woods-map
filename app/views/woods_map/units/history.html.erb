@@ -3,7 +3,7 @@
 <% h = @history %>
 <% gens = h.generation_numbers %>
 <% diff_pair = gens.size >= 2 ? gens.last(2) : nil %>
-<% author_url = ->(name) { history_tab_url(@page, author: name, week: nil, gen: nil, span: nil, all: nil, anchor: 'commits') } %>
+<% author_url = ->(name) { history_tab_url(@page, author: name, week: nil, gen: nil, all: nil, anchor: 'commits') } %>
 <% by_author = h.author ? " by #{h.author}" : '' %>
 <% range_seg = tag.span(class: 'seg', role: 'group', 'aria-label': 'Range') do %><% WoodsMap::HistoryView::RANGES.each_key do |key| %><%= link_to(key, history_tab_url(@page, range: key, week: nil, span: nil), 'aria-current': (h.range == key ? 'true' : nil)) %><% end %><% end %>
 <% by_seg = h.table? ? tag.span(class: 'seg', role: 'group', 'aria-label': 'Group commits by') { safe_join(WoodsMap::HistoryView::BY.map { |key| link_to(key, history_tab_url(@page, by: (key == WoodsMap::HistoryView::BY.first ? nil : key), week: nil, gen: nil, span: nil, anchor: 'commits'), 'aria-current': (h.by == key ? 'true' : nil)) }) } : nil %>
