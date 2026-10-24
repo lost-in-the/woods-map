@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Links back to the current page keep an identifier's trailing slash. On the pages of the root route (`GET /`) the author filters, the Share URL, the `?since=` clear link, the token exchange and a refused `.mmd`'s page link were built from Rails' normalized path and led to 404s. Found by the final sweep on rails-6.0.
 - M3 close-out (woods-map#5).
   - **Exit check:** `spec/support/m3_exit_check.rb` compares every entry Lifecycle (sequence, flowchart, lanes), model event chain and Schema ER with Woods' flow documents and model metadata. It runs on the fixture in CI, and on any index with `WOODS_MAP_EXIT_INDEX`. The testbed run is in docs/design/notes/m3-exit-check.md.
   - The ER now draws an association to the table its target model reads (`active_storage_attachments`, not `active_storage/attachments`).
