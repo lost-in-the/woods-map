@@ -904,7 +904,7 @@ tintWindow(from, to) {
     const edges = this.payload.elements.edges.length
     const query = this.payload.query || {}
     const facts = [
-      `${query.centre}, depth ${query.depth}, ${query.direction}`,
+      query.summary || `${query.centre}, depth ${query.depth}, ${query.direction}`,
       `${nodes} ${nodes === 1 ? "unit" : "units"}`,
       `${edges} ${edges === 1 ? "edge" : "edges"}`
     ]

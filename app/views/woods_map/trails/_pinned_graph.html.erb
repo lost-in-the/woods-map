@@ -1,0 +1,39 @@
+<%# Graph of pinned (notes/trail.md): the M5 graph controller over the
+    pinned units and the published edges between them, with the Pele
+    flowchart as the no-JavaScript view and the list equivalent. Locals:
+    pinned (PinnedViews), board (TrailBoard), mermaid_url (the .mmd route). %>
+<% edges = pinned.edges %>
+<% gen = @repository.generation_number %>
+<% graph_url = woods_map.trail_graph_path(board.to_query.slice('pin', 'gen')) %>
+<section class="sec" aria-labelledby="trail-graph"<% if pinned.identities.size > 1 %> data-controller="graph" data-graph-url-value="<%= graph_url %>" data-graph-unit-url-value="<%= woods_map.graph_path(centre: '__identifier__', type: '__type__') %>" data-graph-generation-value="<%= gen %>" data-graph-cache-value="<%= ['trail', gen, board.pins.map(&:to_param).sort.join(',')].join('|') %>"<% end %>>
+  <header><h2 class="t2" id="trail-graph">Graph of pinned <%= count_tag("#{pinned.identities.size} #{'unit'.pluralize(pinned.identities.size)}, #{edges.size} #{'edge'.pluralize(edges.size)}") %><%= info_tip('The pinned units and the published edges between them, drawn by the graph explorer. Enter on a unit opens its full-screen graph.') %></h2></header>
+  <% if pinned.identities.size < 2 %>
+    <p class="cap">Pin two or more units that gen <%= gen %> has to draw the edges between them.</p>
+  <% else %>
+    <div class="dia graph" data-graph-target="panel" hidden>
+      <div class="dh"><b>Graph of pinned</b><span class="gfacts" data-graph-target="facts"></span><span class="tools">
+        <button class="tool" type="button" aria-label="Zoom in" data-action="graph#zoomIn">+</button>
+        <button class="tool" type="button" aria-label="Zoom out" data-action="graph#zoomOut">−</button>
+        <button class="tool" type="button" data-action="graph#fit">fit</button>
+        <%= render 'woods_map/components/mermaid_tools', text: pinned.graph_mermaid, name: 'trail pinned graph', url: mermaid_url %>
+        <button class="tool" type="button" aria-pressed="false" aria-controls="trail-graph-flowchart" data-graph-target="flowchart" data-action="graph#flowchart">flowchart</button>
+      </span></div>
+      <div class="gcanvas" tabindex="0" role="application" aria-roledescription="graph" aria-label="The pinned units and the edges between them, each labelled with its mechanism. Arrow keys move along the edges; the list below has the same edges." aria-describedby="trail-graph-status" data-graph-target="canvas"></div>
+      <p class="gstatus" id="trail-graph-status" role="status" data-graph-target="status">Tab to the canvas: arrow keys move along the edges, Enter opens a unit's graph, + and − zoom, 0 fits.</p>
+    </div>
+    <p class="cap refusal" role="status" data-graph-target="message" hidden></p>
+    <div id="trail-graph-flowchart" data-graph-target="fallback">
+      <%= render 'woods_map/components/diagram', title: 'Graph of pinned', facts: ["#{pinned.identities.size} units", "#{edges.size} edges"], name: 'trail pinned graph', mermaid_url: mermaid_url,
+            mermaid: pinned.graph_mermaid, label: "The pinned units and #{edges.size} edges between them, each labelled with its mechanism; the list below has the same edges",
+            refusal: pinned.graph_refusal, legend: [[tag.span('→', class: 'ar'), 'edge, labelled with its mechanism']], provenance: ['typed edges', "gen #{gen}"] %>
+    </div>
+    <div data-controller="rows" data-graph-target="list">
+      <% if edges.any? %>
+        <%= render 'woods_map/components/table', label: 'Edges between pinned units', min_width: '720px', columns: [{ label: 'from', width: '40%' }, { label: 'via', width: '160px', cell_class: 'nw' }, { label: 'to', cell_class: 'id' }],
+              rows: edges.map { |e| { data: { edge: WoodsMap::GraphElements.edge_id(e) }, cells: [unit_link(e.from, e.from_type), e.via, unit_link(e.to, e.to_type)] } } %>
+      <% else %>
+        <p class="cap">No published edge joins two pinned units.</p>
+      <% end %>
+    </div>
+  <% end %>
+</section>

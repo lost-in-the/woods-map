@@ -1,0 +1,24 @@
+<%# The lanes (C-1, notes/trail.md): one column per lane, one row per step
+    in flow order, a labelled dashed rule where an async hop starts another
+    process. Plain HTML, the no-JavaScript view and the screen-reader table.
+    Locals: lifecycle (LifecycleBuilder), board (TrailBoard), flags (TrailFlags). %>
+<% lanes = lifecycle.lanes %>
+<% min_width = ((((160 * lanes.size) + 60) / 20.0).ceil * 20).clamp(480, 1200) %>
+<div class="tblwrap" data-controller="cliff">
+  <table class="tbl fixed trail-lanes <%= table_min_width_class("#{min_width}px") %>" aria-label="Lanes of <%= lifecycle.entry %>">
+    <thead><tr><th width="48"><abbr title="step">#</abbr></th><% lanes.each do |lane| %><th><%= lane %></th><% end %></tr></thead>
+    <tbody>
+      <% lifecycle.steps.each do |step| %>
+        <% if step.hop %>
+          <tr class="bnd"><td></td><td colspan="<%= lanes.size %>"><%= trail_hop_text(step.hop) %><% if step.via == :graph %> <%= layer_chip('graph edge, no call site') %><% end %></td></tr>
+        <% end %>
+        <tr id="lane-<%= step.n %>">
+          <td class="nw"><%= step.n %></td>
+          <% lanes.each do |lane| %>
+            <td><% if lane == step.lane %><%= trail_step_link(step) %><% step_flags = flags.for_step(step) %><% if step_flags.any? %> <%= safe_join(step_flags.map { |f| trail_flag_chip(f) }, ' ') %><span class="sr-only">: <%= step_flags.map(&:rule).join(', ') %></span><% end %><% end %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

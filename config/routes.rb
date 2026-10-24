@@ -47,6 +47,11 @@ WoodsMap::Engine.routes.draw do
   get 'history.mmd', to: 'history#show', as: :history_mmd, defaults: { mmd: '1' }, format: false
   get 'history', to: 'history#show', as: :history
 
+  # The Trail (M6, notes/trail.md): the board is its query; `.mmd` is its Mermaid (D-25).
+  get 'trail.mmd', to: 'trails#show', as: :trail_mmd, defaults: { mmd: '1' }, format: false
+  get 'trail/graph', to: 'trails#graph', as: :trail_graph, defaults: { format: :json }
+  get 'trail', to: 'trails#show', as: :trail, format: false
+
   get 'units', to: 'units#index', as: :units
   # File paths are exact admitted file_map keys, never host filesystem paths.
   get 'files', to: 'files#show', format: false

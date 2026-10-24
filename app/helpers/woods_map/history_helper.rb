@@ -8,6 +8,9 @@ module WoodsMap
     # modified file shows none.
     FILE_STATUS = { 'added' => 'new', 'deleted' => 'deleted', 'type_changed' => 'type changed' }.freeze
 
+    # The query parameters the History tab's own links keep.
+    HISTORY_TAB_PARAMS = %w[range week all from to by gen since author].freeze
+
     # The History tab's URL with the current range, week, all, author and
     # diff parameters, overridden by +changes+ (nil removes one).
     #
@@ -15,8 +18,7 @@ module WoodsMap
     # @param changes [Hash{Symbol => Object}]
     # @return [String]
     def history_tab_url(page, **changes)
-      query = request.query_parameters.slice('range', 'week', 'all', 'from', 'to', 'by', 'gen', 'author').symbolize_keys
-                     .merge(changes).compact
+      query = request.query_parameters.slice(*HISTORY_TAB_PARAMS).symbolize_keys.merge(changes).compact
       woods_map.unit_history_path(type: page.type, identifier: page.identifier, **query)
     end
 
@@ -37,6 +39,23 @@ module WoodsMap
       word && tag.span(word, class: status.to_s == 'deleted' ? 'mut' : 'fresh')
     end
 
+    # @return [Integer, nil] with `?since=` and Woods' report, the generation it compares from
+    def since_generation
+      since = current_since
+      since.from_generation if since&.available?
+    end
+
+    # Whether a commit arrived after the `?since=` generation (E-8 on the
+    # timeline views): its first retained table is newer. A commit only
+    # known to be at or before a generation is never claimed.
+    #
+    # @param generation [WoodsMap::CommitLedger::Generation, nil] the commit's first carrier
+    # @return [Boolean]
+    def since_commit?(generation)
+      from = since_generation
+      !from.nil? && !generation.nil? && !generation.baseline && generation.number > from
+    end
+
     # @param generation [WoodsMap::CommitLedger::Generation, nil]
     # @return [ActiveSupport::SafeBuffer, String] "42", "≤ 41" for a commit
     #   already in the oldest retained table, or a dash
@@ -44,7 +63,11 @@ module WoodsMap
       return empty_value unless generation
 
       number = generation.number
-      if generation.baseline
+      if since_commit?(generation)
+        safe_join([chip(:modified, "carried after gen #{since_generation}"),
+                   tag.span(" arrived after gen #{since_generation},", class: 'sr-only'), ' ',
+                   tag.abbr(number.to_s, title: "first carried by generation #{number}")])
+      elsif generation.baseline
         tag.abbr("≤ #{number}", title: "already in generation #{number}, the oldest retained table")
       else
         tag.abbr(number.to_s, title: "first carried by generation #{number}")
