@@ -87,8 +87,8 @@ Run this before a milestone issue is opened and again before it closes.
 | Partial locals passed and read for the partial-local flag (B-18), closed | [woods#798](https://github.com/lost-in-the/woods/issues/798), published by [woods#806](https://github.com/lost-in-the/woods/pull/806), [design note](notes/passage-mismatch-limits.md) |
 | W-14 best-effort flows | [woods#764](https://github.com/lost-in-the/woods/issues/764) |
 | M4 History: History tab from the commit table (strip, commits with detail blocks, people, co-change), per-file gutter heat, generation picker and unit diff from Woods' report, `/woods/history` timeline, timeline and XY exports | [woods-map#6](https://github.com/lost-in-the/woods-map/issues/6), [note](notes/history.md) |
-| Commit table line counts and hunks (B6-History `+6 −1`, *hunks*) | [woods#804](https://github.com/lost-in-the/woods/issues/804) |
-| Changed line ranges per modified unit in the impact report (unified unit diff, B-14, and the `?since=` diff gutter) | [woods#802](https://github.com/lost-in-the/woods/issues/802) |
+| Commit table line counts and hunks (B6-History `+6 −1`, *hunks*); used by the History tab's files and hunks rows | [woods#804](https://github.com/lost-in-the/woods/issues/804) |
+| Changed line ranges per modified unit in the impact report and one unit's unified diff (B-14); used by the unit diff, the range Changed tab's *lines* column and focused diff, and the History tab's facets-moved column and *by generation* strip; the `?since=` diff gutter is still to use it | [woods#802](https://github.com/lost-in-the/woods/issues/802) |
 | Engine scaffold (the M1 skeleton: gem, Engine, Repository, authentication, states, token sheet served) | [woods-map#11](https://github.com/lost-in-the/woods-map/pull/11) |
 | Bounded M1 units index and indexed file ownership (FR-3, B-5); other M1 follow-ups remain separate | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [design note](notes/m1-indexed-navigation.md) |
 | Keyboard help (NFR-3), with focus and shortcut browser coverage | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/keyboard-help.md) |

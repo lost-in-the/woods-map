@@ -36,6 +36,40 @@ RSpec.describe 'Impact tabs over a range report', type: :request do
     expect(row.at_css('a')['href']).to eq('/woods/units/view_template/users/show.html.erb?since=gen%3A1')
   end
 
+  describe 'source lines on the Changed tab' do
+    before do
+      moved = { 'hunks' => [{ 'before' => [2, 1], 'after' => [2, 2] }], 'added_lines' => 2, 'removed_lines' => 1,
+                'coverage' => 'complete' }
+      changes = range_report_changes.each_with_index.map { |c, i| i.zero? ? c.merge('source_changes' => moved) : c }
+      stub_range_report(range_report_data.merge('changed' => changes))
+      allow(WoodsMap::SourceDiff).to receive(:new).and_return(source_diff)
+    end
+
+    let(:source_diff) do
+      lines = [{ 'op' => '-', 'before' => 2, 'after' => nil, 'text' => '  old' },
+               { 'op' => '+', 'before' => nil, 'after' => 2, 'text' => '  new' }]
+      instance_double(WoodsMap::SourceDiff, state: :available,
+                                            hunks: [{ 'before' => [2, 1], 'after' => [2, 1], 'lines' => lines }],
+                                            changes: { 'added_lines' => 1, 'removed_lines' => 1,
+                                                       'coverage' => 'complete' })
+    end
+
+    it "counts each source's moved lines and links to the diff without reading it" do
+      get '/woods/impact', params: { from: 'gen:1', lens: 'changed' }
+      table = doc.at_css('table[aria-label="Changed units"]')
+      expect(table.css('tbody tr:not(.sub)').map { |tr| tr.css('td')[-2].text.strip }).to eq(['+2 −1', '—'])
+      expect(table.at_css('a[href*="focus=User"]').text).to eq('show the diff')
+      expect(WoodsMap::SourceDiff).not_to have_received(:new)
+    end
+
+    it "draws Woods' unified diff for the focused change" do
+      get '/woods/impact', params: { from: 'gen:1', lens: 'changed', focus: 'User' }
+      block = doc.at_css('table[aria-label="Changed units"] .diff-block')
+      expect(block.at_css('.eyebrow').text).to eq('diff, User, +1 −1')
+      expect(block.css('.dl.del, .dl.add').map(&:text)).to eq(['2− removed  old', '2+ added  new'])
+    end
+  end
+
   it 'keeps historical identities as text with their generation' do
     get '/woods/impact', params: { from: 'gen:1', lens: 'changed' }
     expect(doc.at_css('table[aria-label="Affected units"]').text).to include('Gone', 'gen 0', 'unavailable')

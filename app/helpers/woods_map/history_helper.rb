@@ -15,7 +15,8 @@ module WoodsMap
     # @param changes [Hash{Symbol => Object}]
     # @return [String]
     def history_tab_url(page, **changes)
-      query = request.query_parameters.slice('range', 'week', 'all', 'from', 'to').symbolize_keys.merge(changes).compact
+      query = request.query_parameters.slice('range', 'week', 'all', 'from', 'to', 'by', 'gen').symbolize_keys
+                     .merge(changes).compact
       woods_map.unit_history_path(type: page.type, identifier: page.identifier, **query)
     end
 
@@ -47,8 +48,7 @@ module WoodsMap
     # @param own [Array(String, String)] the page's identifier and type, left out of co-changes
     # @return [ActiveSupport::SafeBuffer]
     def commit_detail(commit, own: nil)
-      rows = [description_row(commit), files_row(commit),
-              ['hunks', tag.span('line counts and hunks are not in the commit table (woods#804)', class: 'mut')],
+      rows = [description_row(commit), files_row(commit), hunks_row(commit),
               co_changed_row(commit, own), parents_row(commit)]
       render('woods_map/components/detail', rows: rows.compact)
     end
@@ -57,14 +57,52 @@ module WoodsMap
     # @return [ActiveSupport::SafeBuffer]
     def commit_files(commit)
       lines = commit.files.map do |file|
-        safe_join([tag.span(file.path, class: file.indexed ? nil : 'mut'), (file_status(file.status) ? ' ' : nil),
-                   file_status(file.status)].compact)
+        safe_join([tag.span(file.path, class: file.indexed ? nil : 'mut'), line_counts(file), file_status(file.status)]
+                    .compact, ' ')
       end
       lines << tag.span("#{commit.files_omitted} more not listed", class: 'mut') if commit.files_omitted.positive?
       safe_join(lines, tag.br)
     end
 
+    # @param file [WoodsMap::CommitRows::FileChange]
+    # @return [ActiveSupport::SafeBuffer, nil] "+6 −1", or "binary"; nil without line stats
+    def line_counts(file)
+      return nil unless file.stats
+      return tag.span('binary', class: 'dim') if file.additions.nil?
+
+      text = [("+#{file.additions}" if file.additions.positive?),
+              ("−#{file.deletions}" if file.deletions.to_i.positive?)]
+             .compact.join(' ')
+      text.empty? ? nil : tag.span(text, class: 'dim', title: "#{file.additions} added, #{file.deletions} removed")
+    end
+
     private
+
+    # Each file's hunks as line ranges; a commit that is the file's latest
+    # links them into the Code view, whose lines they then address.
+    def hunks_row(commit)
+      unless commit.line_stats
+        return ['hunks', tag.span('line counts and hunks are not in this commit table (woods#804)', class: 'mut')]
+      end
+
+      lines = commit.files.select { |file| file.hunks.any? }.map { |file| file_hunks(file) }
+      ['hunks', safe_join(lines, tag.br)] if lines.any?
+    end
+
+    def file_hunks(file)
+      ranges = file.hunks.map { |hunk| hunk_range(file, *hunk['new']) }
+      more = file.hunks_truncated ? tag.span(' and more', class: 'mut') : nil
+      safe_join([tag.span(File.basename(file.path), class: 'mut'), ' ', safe_join(ranges, ', '), more].compact)
+    end
+
+    # "L3–4" or "after L5", linked into the Code view when the commit is the
+    # file's latest touch (so its new-side lines are the current ones).
+    def hunk_range(file, start, length)
+      text = length.zero? ? "after L#{start}" : "L#{start}#{"–#{start + length - 1}" if length > 1}"
+      return text unless file.latest && file.owner && length.positive?
+
+      link_to(text, "#{woods_map.unit_path(type: file.owner.last, identifier: file.owner.first)}#L#{start}")
+    end
 
     def description_row(commit)
       ['description', tag.span(commit.description, class: 'desc')] if commit.description.present?
