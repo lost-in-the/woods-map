@@ -133,3 +133,35 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .spec .irail.lanes{display:inline-flex;gap:var(--s2)}
 .wm .spec .tgl.lane{font-size:12px}
 .wm .spec .tgl.lane.on{background:var(--bright);color:var(--bg)}
+
+/* The guide (M7, B8-Guide): docked right of the page under the bar. While it is open the frame
+   becomes one screen tall and the page scrolls beside it; below 960 it covers the page. */
+.wm .page-row{display:flex;flex:1 0 auto;min-width:0;align-items:stretch}
+.wm .page-row > .page-main{flex:1 1 auto;min-width:0}
+.wm .aside.guide-dock{flex:0 0 460px;max-width:460px;display:flex;flex-direction:column;min-height:0}
+.wm .aside.guide-dock[hidden]{display:none}
+.wm.page.guide-open{height:100vh;overflow:hidden}
+.wm.page.guide-open .page-row{flex:1 1 auto;min-height:0}
+.wm.page.guide-open .page-row > .page-main{overflow:auto}
+.wm .guide .gh .t3{margin:0;font-size:inherit;font-weight:inherit}
+.wm .guide .gh .model{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wm .guide .gh .tool.close{text-decoration:none}
+html.js .wm .guide .guide-nojs{display:none}
+.wm .guide .guide-nojs{margin:0;padding:var(--s3) var(--s4)}
+.wm .guide .thread{flex:1 1 auto;min-height:0;overflow:auto}
+.wm .guide .thread .empty{margin:0;padding:var(--s4)}
+.wm .guide .msg ol,.wm .guide .msg ul{margin:0 0 var(--s3);padding-left:1.2em}
+.wm .guide .msg pre.cmd{margin:0 0 var(--s3);overflow:auto}
+.wm .guide .msg .finding,.wm .guide > .finding{margin:var(--s3) 0 0}
+.wm .guide > .finding{margin:0;border-radius:0}
+.wm .guide .answer-tools{display:flex;gap:var(--s4);margin-top:var(--s3)}
+.wm .guide .call .g.fail{color:var(--risk)}
+.wm .guide .ask .in{color:var(--text);font:inherit;resize:vertical;box-sizing:border-box}
+.wm .guide .ask .in::placeholder{color:var(--mut)}
+.wm .guide .ask .in:disabled{opacity:.6}
+.wm .guide .budget .end{margin-left:auto}
+.wm .bar .btn.guide-toggle:disabled{opacity:.5;cursor:not-allowed}
+@media (max-width:959px){
+  .wm .aside.guide-dock:not([hidden]){display:flex;position:fixed;inset:0;z-index:40;max-width:none;width:auto}
+  .wm.page.guide-open .page-row > .page-main{overflow:visible}
+}
