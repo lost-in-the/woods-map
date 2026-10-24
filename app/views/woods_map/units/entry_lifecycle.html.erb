@@ -17,7 +17,7 @@
   <% lc = el.builder %>
   <%= render 'woods_map/components/rail', heading: 'Lifecycle, as the flow runs it', groups: [
         ({ label: (@page.type == 'job' ? 'entry' : 'actions'), count: el.actions.size, items: el.actions.map { |a| { key: '·', text: link_to(a, here.call(action_name: a)), current: a == el.action } } } if el.actions.any?),
-        ({ label: 'processes', count: lc.steps.map(&:process).uniq.size, items: lc.steps.group_by(&:process).map { |process, members| { key: process, text: process.zero? ? 'this request' : (members.first.hop ? members.first.hop.label : members.first.label), own: "#{members.size} #{'step'.pluralize(members.size)}" } } } if lc&.steps&.any?),
+        ({ label: 'processes', count: lc.steps.map(&:process).uniq.size, items: lc.steps.group_by(&:process).map { |process, members| { key: process, text: process.zero? ? el.entry : (members.first.hop ? members.first.hop.label : members.first.label), own: "#{members.size} #{'step'.pluralize(members.size)}" } } } if lc&.steps&.any?),
         { label: 'limits', count: 'static', items: [
           { key: '·', text: "flow #{el.source}", own: layer_chip(el.source == 'precomputed' ? 'W-14' : 'FlowAssembler') },
           *Array(lc&.limits).map { |limit, count| { key: count, text: limit } },
