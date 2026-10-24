@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- The Graph neighbourhood, the Schema ER and the Lifecycle sequence draw their Mermaid from Woods' own builders (`Woods::Diagrams`, woods#826) when the loaded Woods has them. The Index MCP server's `diagram` tool and `woods:diagram` answer from the same builders. The text is unchanged, byte for byte: `spec/woods_map/woods_diagrams_spec.rb` compares every unit, depth, direction, filter and event on the fixture and the 300-model index. A Woods without the builders keeps the map's own. The lanes and flowchart views, `?since=` marks, C4 views, the ERD, History and the Trail stay in the map.
+
 - Navigation and the files sheet at any size of index and any width.
   - **The file tree is no longer in every page.** The sheet fetches it the first time it opens, one response per generation that the browser keeps. On a generated index of 4,500 units the status page went from 1.75 MB to 11.5 KB.
   - The tree leaves out framework and gem source files.

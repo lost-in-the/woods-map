@@ -109,10 +109,19 @@ module WoodsMap
       "#{node_count} units is over the flowchart budget of #{NODE_BUDGET}; narrow the types or mechanisms to draw it"
     end
 
-    # Mermaid flowchart text for the filtered edges.
+    # Mermaid flowchart text for the filtered edges: Woods' own builder when
+    # the loaded Woods has it (woods#826), the same bytes as {#local_mermaid}.
     #
     # @return [String]
     def mermaid
+      WoodsDiagrams.text(@repository, kind: 'neighbourhood', identifier: @focus.first, type: @focus.last,
+                                      depth: @depth, direction: @direction, types: @types, via: @via) || local_mermaid
+    end
+
+    # The map's own flowchart text, for a Woods without the diagram builders.
+    #
+    # @return [String]
+    def local_mermaid
       lines = ['flowchart LR', "  #{mermaid_node(*@focus)}"]
       edges.each do |edge|
         from = mermaid_node(edge.from, edge.from_type)
