@@ -57,7 +57,7 @@ function mount(id, extra = {}) {
   const body = document.createElement("div")
   body.id = id
   body.innerHTML = `
-<div data-graph-target="layouts" hidden><button type="button" data-layout="butterfly" aria-pressed="true"></button><button type="button" data-layout="radial" aria-pressed="false"></button></div>
+<div data-graph-target="positions" hidden><button type="button">reset positions</button></div>
 <div class="dia graph" hidden><div class="dh"><b>Neighbourhood</b><span class="gfacts"></span><span class="tools"><button class="tool" type="button" aria-pressed="false">flowchart</button></span></div>
 <div class="gcanvas" tabindex="0" role="application" aria-label="Neighbourhood"></div><p class="gstatus" role="status"></p></div>
 <p class="cap refusal" role="status" hidden></p>
@@ -69,11 +69,10 @@ function mount(id, extra = {}) {
   Object.assign(controller, {
     element: body, urlValue: "", hasUrlValue: true, unitUrlValue: "/woods/units/__type__/__identifier__/graph?depth=2",
     generationValue: 3, hasGenerationValue: true, cacheValue: `3|model|Post|${id}`, hasCacheValue: true, blastValue: [], hasBlastValue: true,
-    clustersValue: [], hasClustersValue: true, modeValue: "", hasModeValue: true,
     panelTarget: q(".dia.graph"), canvasTarget: q(".gcanvas"), hasCanvasTarget: true, factsTarget: q(".gfacts"), hasFactsTarget: true,
     statusTarget: q(".gstatus"), hasStatusTarget: true, messageTarget: q(".refusal"), hasMessageTarget: true,
     fallbackTarget: q(".fallback"), flowchartTarget: q(".tool"), hasFlowchartTarget: true,
-    layoutsTarget: q("[data-graph-target=layouts]"), hasLayoutsTarget: true, layoutTargets: Array.from(body.querySelectorAll("[data-layout]")),
+    positionsTarget: q("[data-graph-target=positions]"), hasPositionsTarget: true,
     listTarget: q(".list"), hasListTarget: true, pickValue: false, hasPickValue: true
   }, extra)
   controller.connect()
@@ -127,11 +126,23 @@ function drawing(cytoscape) {
   press(big.listTarget.querySelector("a"), "ArrowDown")
   const listMoved = document.activeElement === big.listTarget.querySelectorAll("a")[1]
 
-  const radialStarted = performance.now()
-  big.layout({ currentTarget: big.layoutTargets[1] })
-  const radialMs = performance.now() - radialStarted
-  const moved = (id) => big.cy.getElementById(id).position().x !== big.butterflyPositions.get(id).x
-  const radialMoved = moved("n_1") || moved("n_2")
+  // The butterfly (D-30): this unit in the middle of the fitted canvas, alone in its row
+  // band, every dependent left of it and every dependency right of it.
+  const focusNode = big.cy.getElementById("n_0")
+  const centre = focusNode.renderedPosition()
+  const fp = focusNode.position()
+  const crowding = big.cy.nodes().not(focusNode).filter((node) => {
+    const p = node.position()
+    return Math.abs(p.x - fp.x) < (node.width() + focusNode.width()) / 2 && Math.abs(p.y - fp.y) < (node.height() + focusNode.height()) / 2 + 21
+  })
+  const butterfly = {
+    centred: Math.abs(centre.x - big.cy.width() / 2) < 1 && Math.abs(centre.y - big.cy.height() / 2) < 1,
+    alone: crowding.length === 0,
+    // A unit that is both (an edge each way) stands with the dependencies.
+    dependentsLeft: focusNode.incomers("node").difference(focusNode.outgoers("node")).every((node) => node.position().x < fp.x),
+    dependenciesRight: focusNode.outgoers("node").every((node) => node.position().x > fp.x),
+    overview: big.overview
+  }
 
   // Layout stability (A-3): a dragged position is kept per generation and query and
   // restored by the next draw of the same query; forgetting it lays out afresh.
@@ -143,7 +154,8 @@ function drawing(cytoscape) {
   const again = mount("kept")
   again.draw(cytoscape, small)
   const kept = again.cy.getElementById("n_5").position()
-  const restored = again.element.dataset.graphPositions === "restored" && kept.x === 4321 && kept.y === -1234
+  const restored = again.element.dataset.graphPositions === "restored" && kept.x === 4321 && kept.y === -1234 &&
+    window.localStorage.getItem("woods-map:graph-positions:3|model|Post|kept") !== null
   again.forget()
   const forgotten = again.cy.getElementById("n_5").position().x !== 4321
 
@@ -155,17 +167,30 @@ function drawing(cytoscape) {
   const tinted = { direct: blasted.cy.nodes(".br1").map((n) => n.id()), transitive: blasted.cy.nodes(".br2").map((n) => n.id()),
     facts: blasted.factsTarget.textContent }
 
-  // Domain clusters: the clusters layout boxes each published cluster's members; leaving it removes the boxes.
-  const clustered = mount("clustered")
-  clustered.clustersValue = [["Generated::Unit1", "controller", "Billing"], ["Generated::Unit2", "view_template", "Billing"],
-    ["Generated::Unit3", "job", "Shipping"]]
-  clustered.modeValue = "clusters"
-  clustered.draw(cytoscape, small)
-  const boxes = clustered.cy.nodes(".cluster").map((n) => n.data("label")).sort()
-  const boxed = clustered.cy.getElementById("n_1").parent().data("label")
-  clustered.layout({ currentTarget: clustered.layoutTargets[0] })
-  const unboxed = clustered.cy.nodes(".cluster").length === 0 && clustered.cy.getElementById("n_1").parent().empty()
-  const clusters = { boxes, boxed, unboxed }
+  // Edge routes (D-30): edges between the same two units share one label naming every
+  // mechanism; a hub's edges turn at one trunk beside its column; a label whose both ends
+  // are shared waits until the edge is lit.
+  const pairs = neighbourhood(6, 0)
+  pairs.elements.edges = []
+  const link = (id, source, target, via) => pairs.elements.edges.push({ data: { id, source, target, via, depth: 1, through: null, cross_database: null } })
+  link("p1", "n_0", "n_1", "belongs_to")
+  link("p2", "n_1", "n_0", "has_many")
+  link("p3", "n_0", "n_2", "code_reference")
+  link("p4", "n_0", "n_2", "code_reference")
+  link("p5", "n_3", "n_0", "render")
+  link("p6", "n_4", "n_0", "include")
+  link("p7", "n_5", "n_0", "job_enqueue")
+  const routed = mount("routed")
+  routed.draw(cytoscape, pairs)
+  routed.cy.renderer().render()
+  const label = (id) => routed.cy.getElementById(id).data("label")
+  const turn = (id) => Math.round(routed.cy.getElementById(id).segmentPoints()?.[0]?.x)
+  const routes = {
+    labels: ["p1", "p2", "p3", "p4"].map(label),
+    trunk: [...new Set(["p5", "p6", "p7"].map(turn))].length,
+    outside: ["p5", "p6", "p7"].every((id) => turn(id) < routed.cy.getElementById("n_0").position().x - routed.cy.getElementById("n_0").width() / 2),
+    endLabels: ["p5", "p6", "p7"].every((id) => routed.cy.getElementById(id).hasClass("ls"))
+  }
 
   // The impact page's range emphasis (E-3, E-8): distance 0 is a unit the report records as changed.
   const ranged = mount("ranged")
@@ -256,16 +281,15 @@ timeline.cleared = timed.cy.nodes(".tl").length
   const recentre = blasted.unitUrl({ type: "route", identifier: "GET /users/:id?x=1&y" })
 
   return {
-    restored, forgotten, tinted, ranges, recentre, clusters, flow, timeline, loop, pick,
-    ms: Number(big.element.dataset.graphRenderMs), wall, calibrationMs, warmMs, timings: big.timings, radialMs, radialMoved,
+    restored, forgotten, tinted, ranges, recentre, routes, butterfly, flow, timeline, loop, pick,
+    ms: Number(big.element.dataset.graphRenderMs), wall, calibrationMs, warmMs, timings: big.timings,
     drawn: big.element.dataset.graphDrawn === "true",
     nodes: big.cy.nodes().length, edges: big.cy.edges().length,
-    panelVisible: !big.panelTarget.hidden, fallbackVisible: !big.fallbackTarget.hidden, layoutsVisible: !big.layoutsTarget.hidden,
+    panelVisible: !big.panelTarget.hidden, fallbackVisible: !big.fallbackTarget.hidden, positionsVisible: !big.positionsTarget.hidden,
     canvases: big.canvasTarget.querySelectorAll("canvas").length,
     facts: big.factsTarget.textContent,
     focusSelected: big.byId.get(focusSelected).identifier, handled, rightIsDependency, rightType: right?.type,
     opened, home: big.byId.get(home).identifier, status, lit, listMoved,
-    radialPressed: big.layoutTargets[1].getAttribute("aria-pressed"),
     url: big.unitUrl({ type: "route", identifier: "GET /users/:id" })
   }
 }

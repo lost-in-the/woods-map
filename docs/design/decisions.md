@@ -121,6 +121,14 @@ Settled with the reading settings ([notes/settings.md](notes/settings.md)), whic
 |---|---|---|---|
 | D-29 | Editor deep links | The editor scheme (a preset or a custom template with `{path}`, `{file}` and `{line}`) and the checkout path are per-browser settings, kept in browser storage; the map never guesses either from the index or the host. | *In editor at L…* appears only in a browser that names an editor whose template can be filled, and never without JavaScript; the index and the server hold no editor or checkout path. |
 
+## Graph layout (24 October 2026)
+
+Settled by the maintainer on [woods-map#63](https://github.com/lost-in-the/woods-map/issues/63) after the contact sheets of every candidate on the testbed's depth-1 and depth-2 neighbourhoods and the 300-unit fixture.
+
+| # | Question | Decision | Consequence |
+|---|---|---|---|
+| D-30 | The layout of the Graph tab and `/woods/graph` | One layout, the butterfly the map computes: this unit alone in the middle, dependents left and dependencies right in columns by signed traversal level. No layout library is vendored. dagre was rejected at 8.8 s for 300 units and has no notion of the focus's direction; fcose at 2.0 s, and it ships only as UMD, so using it breaks the unmodified-vendor rule. Radial (Cytoscape's concentric) and the clusters layout are removed from the layout control: most of their drawings were illegible at real sizes. | The rail keeps only *reset positions*, and the position cache is keyed by generation and query alone. Domain clusters stay on Landscape Domains and Components. The butterfly is drawn for legibility: one label per pair of units, edges bundled at each hub's trunk outside its column, wrapped columns staggered so edges pass between units, and the focus centred and filled. Overview mode (no names, arrows or edge labels) starts whenever the fitted zoom is below 0.5, where Cytoscape stops drawing names, and above 120 units or 150 edges. The 300-unit first frame stays under the 500 ms budget. |
+
 ## Open
 
 - Server-sent events behind proxies: the settings are in [DEPLOYMENT.md](../DEPLOYMENT.md#8-streaming-the-m7-guide-behind-proxies), and the guide stream sends a heartbeat comment (`guide_heartbeat_seconds`). Whether to build a fallback for a stream that cannot open (the study's polling Turbo Frames) is [woods-map#101](https://github.com/lost-in-the/woods-map/issues/101), `needs-decision`.

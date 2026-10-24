@@ -22,7 +22,6 @@
 <% flow = local_assigns[:flow] %>
 <% timeline = local_assigns[:timeline] %>
 <% keep = { flow: flow&.entry_point } %>
-<% clusters = Array(local_assigns[:clusters]) %>
 <% range = local_assigns[:emphasis] == :range %>
 <% blast_legend = range ? [['changed in this range', 0], ['affected directly', 1], ['affected transitively', 2]] : [['a change here reaches it directly', 1], ['transitively', 2]] %>
 <% page = local_assigns.fetch(:page, false) %>
@@ -37,8 +36,7 @@
      data-graph-unit-url-value="<%= unit_url %>"
      data-graph-generation-value="<%= @repository.generation_number %>"
      data-graph-cache-value="<%= cache_key %>"<% if pick %>
-     data-graph-pick-value="true"<% end %><% if clusters.any? %>
-     data-graph-clusters-value="<%= clusters.to_json %>"<% if params[:group] == 'clusters' %> data-graph-mode-value="clusters"<% end %><% end %><% if blast_units %>
+     data-graph-pick-value="true"<% end %><% if blast_units %>
      data-graph-blast-value="<%= blast_units.to_json %>"<% end %><% if range %>
      data-graph-emphasis-value="range"<% end %><% if flow&.found? %>
      data-graph-flow-value="<%= flow.payload.to_json %>"<% end %><% if timeline&.commits&.any? %>
@@ -62,10 +60,9 @@
       <div class="grp">via <span class="cnt"><%= n.via_counts.values.sum(&:size) %></span></div>
       <% n.via_counts.each do |family, vias| %><div class="grp flush"><%= family %></div><% vias.each do |via, count| %><label class="f"><input type="checkbox" name="via[]" value="<%= via %>"<%= ' checked'.html_safe if params[:via].nil? || Array(params[:via]).include?(via) %>> <%= via %> <span class="cnt"><%= count %></span></label><% end %><% end %>
       <div class="pad3"><button class="btn" type="submit">apply filters</button></div>
-      <div data-graph-target="layouts" hidden>
-        <div class="grp">layout</div>
-        <div class="pad1"><span class="seg" role="group" aria-label="Layout"><% (%w[butterfly radial] + (clusters.any? ? %w[clusters] : [])).each do |mode| %><button type="button" aria-pressed="<%= mode == 'butterfly' %>" data-layout="<%= mode %>" data-graph-target="layout" data-action="graph#layout"><%= mode %></button><% end %></span></div>
-        <p class="cap padx">Positions you drag are kept per generation in this browser. <button class="tool" type="button" data-action="graph#forget">reset positions</button></p>
+      <div data-graph-target="positions" hidden>
+        <div class="grp">positions</div>
+        <p class="cap padx">Dependents left, dependencies right, this unit in the middle. Positions you drag are kept per generation in this browser. <button class="tool" type="button" data-action="graph#forget">reset positions</button></p>
       </div>
       <% if timeline&.author %><input type="hidden" name="author" value="<%= timeline.author %>"><% end %><% if flows %><% if params[:flow].present? %><input type="hidden" name="flow" value="<%= params[:flow] %>"><% end %><%= render 'woods_map/graphs/flows_rail', flows: flows, flow: flow, link: flow_link %><% end %>
       <%= local_assigns[:rail_extra] %>

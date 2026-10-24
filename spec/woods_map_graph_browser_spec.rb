@@ -63,12 +63,11 @@ RSpec.describe WoodsMap do
 
   it 'draws every element of a 300-unit neighbourhood and times the first frame' do
     warn format('graph canvas, 300 units / 1000 edges: first draw %<ms>.1f ms (%<timings>s) after a %<warm>.1f ms ' \
-                'warm-up; radial layout %<radial>.1f ms; calibration loop (5e7 iterations) %<calibration>.1f ms',
-                ms: drawing['ms'], warm: drawing['warmMs'], radial: drawing['radialMs'],
-                calibration: drawing['calibrationMs'],
+                'warm-up; calibration loop (5e7 iterations) %<calibration>.1f ms',
+                ms: drawing['ms'], warm: drawing['warmMs'], calibration: drawing['calibrationMs'],
                 timings: drawing['timings'].map { |key, value| "#{key} #{value.round}" }.join(', '))
     expect(drawing).to include('drawn' => true, 'nodes' => 300, 'edges' => 1000, 'panelVisible' => true,
-                               'fallbackVisible' => false, 'layoutsVisible' => true, 'canvases' => be_positive)
+                               'fallbackVisible' => false, 'positionsVisible' => true, 'canvases' => be_positive)
     expect(drawing['ms']).to be_positive.and(be <= drawing['wall'])
     # The policy (M8) refuses inline <style>: Cytoscape must not inject its container sheet.
     expect(drawing['injectedStyles']).to eq(0)
@@ -87,8 +86,9 @@ RSpec.describe WoodsMap do
     expect(drawing).to include('lit' => ['e_0'], 'listMoved' => true)
   end
 
-  it 'switches to the radial layout and names the hidden units' do
-    expect(drawing).to include('radialPressed' => 'true', 'radialMoved' => true)
+  it 'centres this unit alone in its band, dependents left and dependencies right, and names the hidden units (D-30)' do
+    expect(drawing['butterfly']).to eq('centred' => true, 'alone' => true, 'dependentsLeft' => true,
+                                       'dependenciesRight' => true, 'overview' => true)
     expect(drawing['facts']).to include('300 units', '1000 edges', '40 more units and 100 edges hidden')
   end
 
@@ -105,8 +105,9 @@ RSpec.describe WoodsMap do
     expect(drawing.dig('tinted', 'facts')).to include('a change here reaches 3 units, 2 drawn')
   end
 
-  it 'boxes the units of each published domain cluster in the clusters layout, and unboxes them after (woods#799)' do
-    expect(drawing['clusters']).to eq('boxes' => %w[Billing Shipping], 'boxed' => 'Billing', 'unboxed' => true)
+  it "labels the edges between two units once and bundles a hub's edges outside its column (D-30)" do
+    expect(drawing['routes']).to eq('labels' => ['belongs_to, has_many', '', 'code_reference ×2', ''],
+                                    'trunk' => 1, 'outside' => true, 'endLabels' => true)
   end
 
   it 'fills the units a range report records as changed and names them in the facts' do

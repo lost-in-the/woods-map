@@ -21,7 +21,7 @@
                 entries = Array(cluster['entry_points'])
                 { cells: [tag.b(cluster['name']), hub_type ? unit_link(cluster['hub'], hub_type) : cluster['hub'], cluster['member_count'].to_s, types,
                           entries.any? ? safe_join(entries.first(3).map { |e| unit_link(e) }, ', ') + (entries.size > 3 ? " +#{entries.size - 3}" : '') : empty_value,
-                          hub_type ? link_to('clustered', woods_map.graph_path(centre: cluster['hub'], type: hub_type, depth: 2, group: 'clusters')) : empty_value(applicable: false)] }
+                          hub_type ? link_to('hub, depth 2', woods_map.graph_path(centre: cluster['hub'], type: hub_type, depth: 2)) : empty_value(applicable: false)] }
               } %>
       <% end %>
     </section>
