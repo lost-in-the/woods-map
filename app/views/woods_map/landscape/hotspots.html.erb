@@ -17,13 +17,13 @@
         <header><h2 class="t2">Hotspots <%= count_tag('churn × dependents') %><%= info_tip('Commits per unit come from Woods\' git enrichment of this generation; dependents from the graph. The most changed and most depended upon come first: review those first.') %></h2></header>
         <% if h.churn? %>
           <% churn = h.churn %>
-          <%= render 'woods_map/components/diagram', title: 'Churn × dependents', facts: ["#{churn.size} units labelled", 'x = commits, y = dependents, log scale', 'review the top right first'],
+          <%= render 'woods_map/components/diagram', title: 'Churn × dependents', facts: ["#{churn.size} units, numbered as the table ranks them", 'x = commits, y = dependents, log scale', 'review the top right first'],
                 name: 'landscape hotspots quadrant', mermaid_url: woods_map.landscape_diagram_mmd_path(diagram: 'quadrant'), mermaid: h.quadrant_mermaid,
                 label: "Quadrant of #{churn.size} units by commits and dependents; the table below ranks the same units",
-                legend: [[tag.span('·', class: 'ar'), 'unit'], ['', 'x = commits against the most changed'], ['', 'y = dependents, log scale']],
+                legend: [[tag.span('·', class: 'ar'), 'unit, by its rank in the table; 3/7 share a position'], ['', 'x = commits against the most changed'], ['', 'y = dependents, log scale']],
                 provenance: ['commit_count on graph nodes', 'graph', "gen #{@repository.generation_number}"] %>
-          <%= render 'woods_map/components/table', label: 'Hotspots', min_width: '560px', columns: [{ label: 'unit', width: '40%' }, { label: 'commits', width: '16%' }, { label: 'dependents', width: '16%' }, { label: 'change frequency' }],
-                rows: churn.map { |row| { cells: [unit_link(row[:identifier], row[:type]), row[:commits].to_s, row[:dependents].to_s, row[:change_frequency] || empty_value(applicable: false)] } } %>
+          <%= render 'woods_map/components/table', label: 'Hotspots', min_width: '560px', columns: [{ label: '#', width: '48px' }, { label: 'unit', width: '40%' }, { label: 'commits', width: '16%' }, { label: 'dependents', width: '16%' }, { label: 'change frequency' }],
+                rows: churn.each_with_index.map { |row, index| { cells: [(index + 1).to_s, unit_link(row[:identifier], row[:type]), row[:commits].to_s, row[:dependents].to_s, row[:change_frequency] || empty_value(applicable: false)] } } %>
         <% else %>
           <%= render 'woods_map/components/empty_state', title: 'No commit history in this generation', text: 'Woods records commits per unit when it extracts inside a git checkout. This generation carries none, so churn cannot be weighed against dependents; the structure below still reads.' %>
         <% end %>

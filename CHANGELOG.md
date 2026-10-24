@@ -2,6 +2,23 @@
 
 ## [Unreleased]
 
+- Navigation and the files sheet at any size of index and any width.
+  - **The file tree is no longer in every page.** The sheet fetches it the first time it opens, one response per generation that the browser keeps. On a generated index of 4,500 units the status page went from 1.75 MB to 11.5 KB.
+  - The tree leaves out framework and gem source files.
+  - Folded folders hide what is under them; clearing the filter puts the folds back; an empty filter result says so in a live region.
+  - **The sheet:** ☰ opens it at every width. Its header and filter stay in view while the rest scrolls. Below 960 it carries the primary nav, which the bar hides there.
+  - **Below 640** the bar keeps a usable search field, and the status bar wraps instead of clipping.
+  - **The trail** keeps one entry per unit, across its tabs. It never shows an empty entry, names pages from their title, and writes an action as `Controller#action` with one `#`.
+  - **The peek** stays inside the code region, and Escape or ✕ returns focus to the reference that opened it.
+  - **Keys:** `j` / `k` step into the page's first table from anywhere, and Shift+Slash opens the keyboard help.
+  - **Expand all** reads *collapse all* while every row is open.
+  - **Labels:** a toggle column names only what its rows carry.
+  - **The lens:** `?lens=` renders that lens at that URL and remembers it, instead of redirecting to the bare URL; an unknown lens is ignored.
+  - **Passage:** the rail links to the filter matrix and the callback ladder. The matrix can narrow to the filters that run on the page's action.
+  - **Timeline:** below 640, the lane names are truncated so every dot is on screen.
+  - **Hotspots:** quadrant points are named by their rank in the table, with units at one position sharing a point, so labels no longer collide.
+  - **Landscape Status:** its state column fits *published*.
+
 - The page keys controller mounts once, on the body. The Passage tab and both impact pages mounted it a second time on their body element, so every page key ran its handler twice (`y` wrote once only because the first handler marked the key handled). Regression specs cover the single mount, `on:`-scoped callbacks listed under their own event only, and the existing path-extension, palette and copy-key fixes.
 
 - Diagrams paste into a GitHub pull-request comment and draw there (closes woods-map#76; D-25 amended; docs/design/notes/pr-comment-share.md).

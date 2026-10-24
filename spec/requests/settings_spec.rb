@@ -5,7 +5,6 @@ RSpec.describe 'Reading settings', type: :request do
 
   before do
     get '/woods/units/model/User', params: { lens: 'effective' }
-    follow_redirect!
   end
 
   it 'offers a script-only settings tool in the code view that opens the dialog' do

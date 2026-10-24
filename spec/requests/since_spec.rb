@@ -89,7 +89,9 @@ RSpec.describe '?since= highlighting from Woods\' range report', type: :request 
 
   it 'marks the files of changed units in the file tree' do
     get '/woods/units/model/User', params: { since: 'gen:1' }
-    tree = doc.at_css('.sheet nav.tree')
+    expect(doc.at_css('.sheet [data-sheet-target=tree]')['data-src']).to eq('/woods/tree?gen=1&since=gen%3A1')
+    get '/woods/tree', params: { gen: 1, since: 'gen:1' }
+    tree = doc.at_css('nav.tree')
     expect(tree.at_css('.th').text).to include('changed since gen 1')
     marked = tree.css('a.f').select { |a| a.at_css('.M') }.pluck('data-path')
     expect(marked).to include('app/models/user.rb')

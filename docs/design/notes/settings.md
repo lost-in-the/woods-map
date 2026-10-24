@@ -16,7 +16,7 @@ Escape row names the dialog.
 
 | Setting | Values | Kept in |
 | --- | --- | --- |
-| Lens | as written, effective class | the existing `woods_map_lens` cookie. Choosing a lens follows the same `?lens=` link as the lens control, so the server remembers it as before (D-6) |
+| Lens | as written, effective class | the existing `woods_map_lens` cookie. Choosing a lens follows the same `?lens=` link as the lens control: the page renders that lens at that URL, so a shared link shows it, and remembers it for the bare URL (D-6) |
 | Wrap long lines | off by default at every width | `localStorage["woods_map.settings"]` |
 | Font size | small (`--fs-12`), medium (`--fs-13`, default), large (`--fs-15`) | the same key |
 | Editor | none (default), VS Code, Cursor, JetBrains `idea://`, TextMate, Zed, or a custom template with `{path}`, `{file}` and `{line}` | the same key |

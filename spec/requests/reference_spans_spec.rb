@@ -175,7 +175,6 @@ RSpec.describe 'Published reference spans', type: :request do
     %w[written effective].each do |lens|
       it "links only the unchanged annotated file row in the #{lens} lens" do
         get "/woods/units/model/Caller?lens=#{lens}"
-        follow_redirect!
         expect(source_links.map(&:text)).to eq(['Widget'])
         expect(source_links.first.ancestors('.row').first['id']).to eq('L2')
         expected = %w[1 2 3] + (lens == 'effective' ? ['c:1'] : [])

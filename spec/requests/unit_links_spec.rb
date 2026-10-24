@@ -50,9 +50,11 @@ RSpec.describe 'Links between unit pages', type: :request do
       expect(response.media_type).to eq('text/plain')
     end
 
-    it 'keeps the slash through the lens redirect' do
+    it 'keeps the slash in the lens links' do
       get '/woods/units/route/GET%20/?lens=written'
-      expect(response).to redirect_to('/woods/units/route/GET%20/')
+      expect(response).to have_http_status(:ok)
+      expect(html_response_document.css('[aria-label=lens] a').pluck('href'))
+        .to eq(['/woods/units/route/GET%20/?lens=written', '/woods/units/route/GET%20/?lens=effective'])
     end
 
     it 'is linked from the units index to a page that opens' do
