@@ -1,6 +1,7 @@
 <%# The Flows tab (B6-Impact-Flows) in pre-change mode: entry points whose
     precomputed flow documents expanded a focus unit, from Woods' inverted
     flow membership (W-13) in the pinned generation. Locals: r, v, impact_url. %>
+<%= render 'woods_map/impact/flow_gaps', r: r %>
 <% f = @flows %>
 <% routes = r.affected.select { |a| a.type == 'route' } %>
 <% nearest = safe_join(['The routes among the affected units are the nearest fact: ', (routes.any? ? safe_join(routes.map { |a| unit_link(a.identifier, 'route') }, ', ') : 'none within this depth'), '.']) %>
