@@ -178,7 +178,7 @@
         <% else %>
         <header><h2 class="t2" id="fm">Filter matrix <span class="n">declared scope</span><%= info_tip('A ✓ means the filter\'s declared only/except names the action. This generation has no resolved chain (W-8): skip_before_action, inherited and concern-supplied filters and conditions are not reflected. The current action\'s column is marked in the head.') %></h2></header>
         <% end %>
-        <div class="tblwrap" data-controller="cliff">
+        <div class="tblwrap" role="region" aria-label="Filter matrix" tabindex="0" data-controller="cliff">
           <table class="tbl matrix fixed fit" aria-label="Filter matrix">
             <thead><tr><th width="200"><%= resolved ? 'filter, owner' : 'filter, declared in' %></th><% p.actions.each do |a| %><th class="c<%= ' cur' if a == p.action %>" width="66"><%= a %></th><% end %></tr></thead>
             <tbody>
