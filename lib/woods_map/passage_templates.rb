@@ -26,6 +26,16 @@ module WoodsMap
       end
     end
 
+    # A render target or partial the index records without resolving it: +kind+ is
+    # +render target+ for an action's dynamic render, else the template's published kind
+    # (+interpolation+, +caller_prefix+, +helper+, +object+). +where+ is +Owner#method+ or the template.
+    Unresolved = Struct.new(:kind, :name, :where, :file, :line, :candidates, keyword_init: true) do
+      # @return [Boolean] whether this is the action's own render target, not a partial in a template
+      def render_target?
+        kind == 'render target'
+      end
+    end
+
     PARTIAL_DEPTH = 3
 
     # @param repository [WoodsMap::Repository]
@@ -55,10 +65,38 @@ module WoodsMap
       all.reject(&:facts_available?).map(&:identifier).concat(@unexpanded || []).uniq
     end
 
+    # What the index records as rendered without naming it: the action's dynamic render targets
+    # (W-7 +object+ renders) and each template's +metadata.unresolved_partials+. Templates behind
+    # them are unknown, so the passage's coverage is incomplete while any remain.
+    #
+    # @return [Array<Unresolved>]
+    def unresolved
+      @unresolved ||= (dynamic_renders + unresolved_partials).uniq
+    end
+
     private
 
     def mailer?
       @unit['type'].to_s == 'mailer'
+    end
+
+    def dynamic_renders
+      Array(@facts&.dynamic_renders).map do |fact|
+        Unresolved.new(kind: 'render target', name: fact['object'].to_s,
+                       where: "#{@unit['identifier']}##{fact['method'] || @action}",
+                       file: fact['file'], line: fact['line'], candidates: [])
+      end
+    end
+
+    # Entries are +{ kind:, name:, candidates: }+; a bare string is read as a name of unknown kind.
+    def unresolved_partials
+      all.flat_map do |template|
+        Array(template.unit&.dig('metadata', 'unresolved_partials')).map do |entry|
+          entry = { 'name' => entry } unless entry.is_a?(Hash)
+          Unresolved.new(kind: entry['kind'].to_s.presence || 'unresolved', name: entry['name'].to_s,
+                         where: template.identifier, candidates: Array(entry['candidates']).map(&:to_s))
+        end
+      end
     end
 
     def by_convention
