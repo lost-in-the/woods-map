@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'woods_map/generation_memo'
 require 'woods_map/version'
 require 'woods_map/rate_limiter'
 require 'woods_map/public_url'
@@ -91,6 +92,8 @@ require 'woods_map/range_report'
 require 'woods_map/impact_flows'
 require 'woods_map/since'
 require 'woods_map/unassigned_ivar_rule'
+require 'woods_map/list_page'
+require 'woods_map/units_index'
 require 'woods_map/file_tree'
 require 'woods_map/search_results'
 require 'woods_map/palette'

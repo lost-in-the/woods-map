@@ -18,6 +18,12 @@ module WoodsMap
     # request. The map generates none of them today; the GitHub Mermaid spec
     # checks that the vendored build still rejects each one.
     NEWER_THAN_GITHUB = %w[usecase-beta agentflow-beta].freeze
+    # Mermaid text larger than this is not carried in the page. A drawn or
+    # unbudgeted diagram's copy tool fetches it from its .mmd route; a
+    # diagram over its drawing budget, whose .mmd answers 422, offers no copy
+    # and its panel says why. A hub's neighbourhood or blast radius otherwise
+    # carries megabytes of text, several times over, on every view.
+    INLINE_BYTES = 64 * 1024
 
     module_function
 
@@ -27,6 +33,12 @@ module WoodsMap
     def filename(name, extension: 'mmd')
       base = name.to_s.gsub('::', '-').parameterize.first(80).delete_suffix('-')
       "#{base.presence || 'diagram'}.#{extension}"
+    end
+
+    # @param text [String] Mermaid text
+    # @return [Boolean] whether the text is too large to carry in a page
+    def oversized?(text)
+      text.to_s.bytesize > INLINE_BYTES
     end
 
     # @param text [String] Mermaid text

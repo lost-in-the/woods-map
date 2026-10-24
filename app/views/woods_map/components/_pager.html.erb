@@ -1,0 +1,11 @@
+<%# Where a long list's page sits and the way to the pages around it.
+    Locals: list (WoodsMap::ListPage), noun (String, plural), anchor (String
+    or nil, the section to land on). The page's own query is kept. %>
+<% if list.paged? %>
+  <% href = ->(number) { "#{request.path}?#{request.query_parameters.merge('page' => number.to_s).to_query}#{"##{local_assigns[:anchor]}" if local_assigns[:anchor]}" } %>
+  <nav class="pager cap" aria-label="<%= noun.capitalize %> pages">
+    <span><%= list.first_row %> to <%= list.last_row %> of <%= list.total %> <%= noun %>, page <%= list.number %> of <%= list.pages %>.</span>
+    <% if list.number > 1 %><%= link_to 'Previous page', href.call(list.number - 1), rel: 'prev' %><% end %>
+    <% if list.number < list.pages %><%= link_to 'Next page', href.call(list.number + 1), rel: 'next' %><% end %>
+  </nav>
+<% end %>

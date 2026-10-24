@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+- Pages stay usable on a large generation (measured on synthetic apps of about 4,600 and 10,300 units).
+  - **One reader per generation:** the index reader, the dependency graph and what the map derives from them (the typed node lookup, file ownership, the identifier index, the unit listings) are built once per published generation and shared by the requests that pin it (`WoodsMap::GenerationSnapshot`), where every request re-parsed the graph and re-read every unit index. Derived values are frozen.
+  - **Units index:** each type shows its first 100 units, by name, with its exact count and a link to `/woods/units?type=<type>`, which lists that type 500 a page.
+  - **Long lists page:** a graph's list equivalent (300 edges a page) and an impact's affected units (300 a page) carry a pager that keeps the page's query. The affected list looks up its covering tests once instead of once per row.
+  - **Mermaid text over 64 KB is not carried in the page:** a diagram over its drawing budget says its text is not carried and offers no copy (its `.mmd` answers 422 with the reason, as before); an unbudgeted one, such as the blast radius, copies from its `.mmd` route, from the panel and the Share menu. A hub's depth-2 neighbourhood or blast radius no longer carries megabytes of text, three times over. The full-screen graph links its `.mmd` like the Graph tab.
+  - **Commit table and graph text:** the generation's commit table is parsed once per generation instead of on every Code, Graph and History page, and a neighbourhood builds its Mermaid text and node ids once per request (a hub's depth-2 graph built them twice).
+  - **Impact rules and unknowns:** the unassigned-ivar rule's outcome and the "render by name" unknowns are kept per generation and reach (`GenerationMemo`); at a hub they read a passage for every reached action and nearly every unit of the generation.
+
 - Correctness fixes across the unit and impact pages.
   - **Unknown action:** a Passage or Lifecycle URL naming an action the unit does not have answers 404 with the unit's actions as links (plain text on `.mmd`), instead of silently showing the first action.
   - **Impact by commit:** a SHA several retained generations recorded resolves (Woods: the commit's first capture as `from`, its last as `to`). A range whose endpoints are one generation says *Nothing changed*, and Woods no longer reads every unit to say so.

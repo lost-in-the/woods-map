@@ -100,11 +100,12 @@
     </section>
     <% if flow %><%= render 'woods_map/graphs/flow', flow: flow, n: n %><% end %>
     <% if timeline %><%= render 'woods_map/graphs/timeline', timeline: timeline %><% end %>
-    <section class="sec" data-controller="rows" data-graph-target="list">
+    <% edge_list = WoodsMap::ListPage.new(n.edges, params[:page], per: WoodsMap::Neighbourhood::LIST_PER_PAGE) %>
+    <section class="sec" id="edge-list" data-controller="rows" data-graph-target="list">
       <header><h2 class="t2">List equivalent <%= count_tag("#{n.edges.size} of #{n.all_edges.size} edges") %><%= info_tip('The same edges the canvas and the flowchart draw; dependents point at this unit, dependencies away from it. Notes come from graph_analysis.json, per identifier. Arrow keys move between rows; a row in focus lights its edge on the canvas.') %></h2></header>
       <% reached = blast ? blast.affected.to_h { |a| [[a.identifier, a.type], a.distance] } : {} %>
       <%= render 'woods_map/components/table', label: 'Edges', min_width: '720px', columns: [{ label: 'from', width: '30%' }, { label: 'via', width: '160px', cell_class: 'nw' }, { label: 'to', width: '30%', cell_class: 'id' }, { label: 'notes' }],
-            rows: n.edges.map { |e|
+            rows: edge_list.items.map { |e|
               other = n.focus?(e.from, e.from_type) ? [e.to, e.to_type] : [e.from, e.from_type]
               notes = n.notes(other.first) + (e.depth > 1 ? ['2 hops'] : [])
               if reached[other]
@@ -115,6 +116,7 @@
               { data: { edge: WoodsMap::GraphElements.edge_id(e) },
                 cells: [n.focus?(e.from, e.from_type) ? e.from : unit_link(e.from, e.from_type), e.via, n.focus?(e.to, e.to_type) ? e.to : unit_link(e.to, e.to_type), notes.join(', ').presence || empty_value(applicable: false)] }
             } %>
+      <%= render 'woods_map/components/pager', list: edge_list, noun: 'edges', anchor: 'edge-list' %>
     </section>
     <%= render 'woods_map/shared/status', items: ['typed edges', 'graph_analysis', "gen #{@repository.generation_number}"], keys: [[%w[← ↑ → ↓], 'move'], [%w[↵], 'open'], [%w[1 2], 'depth'], [%w[/], 'search']] %>
   </div>

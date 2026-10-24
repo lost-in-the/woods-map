@@ -9,8 +9,7 @@ RSpec.describe 'Typed graph pages', type: :request do
       ] }]
     }
     allow(Woods::MCP::IndexReader).to receive(:new).and_return(instance_double(Woods::MCP::IndexReader))
-    repository = WoodsMap::Repository.new(instance_double(Woods::PublishedIndex,
-                                                          payload_dir: Pathname.new('/synthetic/index')))
+    repository = WoodsMap::Repository.new(synthetic_published_index)
     allow(repository).to receive_messages(graph: graph, graph_analysis: {}, file_map: {}, generation_number: 192,
                                           manifest: { 'total_units' => 2 }, generation_facts: { 'generation' => 192 },
                                           generation_key: ['synthetic-typed-graph', 192],
