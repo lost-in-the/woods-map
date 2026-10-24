@@ -94,6 +94,7 @@ Run this before a milestone issue is opened and again before it closes.
 | Controller Routes tab (FR-3); helper- and action-level references need [woods#795](https://github.com/lost-in-the/woods/issues/795) | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/routes-tab.md) |
 | Hover card on a reference (B-3), prefetched with the Code tab | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/hover-card.md) |
 | Reading settings (B-15, D-6): lens, wrap, font size and editor link per browser | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/settings.md) |
+| Share menu (E-6, E-7): focus URL and the page's Mermaid, per D-25 | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/share-menu.md), [woods-map#57](https://github.com/lost-in-the/woods-map/issues/57) |
 | Type-specific facts tiles (B-4); other M1 follow-ups remain separate | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/published-type-facts.md) |
 | Design system epic (tokens, fonts, components, responsive tiers) | [woods-map#23](https://github.com/lost-in-the/woods-map/issues/23) |
 | D-22 Inline links need a cue besides colour (settled, amends D-11) | [woods-map#26](https://github.com/lost-in-the/woods-map/issues/26) |

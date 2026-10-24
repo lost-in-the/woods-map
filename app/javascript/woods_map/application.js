@@ -9,6 +9,7 @@ import RowsController from "./controllers/rows_controller.js"
 import TreeController from "./controllers/tree_controller.js"
 import SheetController from "./controllers/sheet_controller.js"
 import CopyController from "./controllers/copy_controller.js"
+import ShareController from "./controllers/share_controller.js"
 import PaletteController from "./controllers/palette_controller.js"
 import PeekController from "./controllers/peek_controller.js"
 import CardController from "./controllers/card_controller.js"
@@ -25,6 +26,7 @@ application.register("rows", RowsController)
 application.register("tree", TreeController)
 application.register("sheet", SheetController)
 application.register("copy", CopyController)
+application.register("share", ShareController)
 application.register("palette", PaletteController)
 application.register("peek", PeekController)
 application.register("card", CardController)

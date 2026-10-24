@@ -1,0 +1,16 @@
+<%# The Share menu (E-6, E-7): the page's focus URL and copies of the Mermaid
+    text its diagram panels already carry. A native disclosure, so the URL
+    is readable without JavaScript; copy actions need a script. No Markdown
+    or JSON report: those stay with Woods (D-25, D-1). %>
+<% url = focus_url %>
+<details class="share" data-controller="share" data-action="toggle->share#toggle keydown->share#key">
+  <summary class="btn">Share ▾</summary>
+  <div class="share-panel" role="group" aria-label="Share this view">
+    <div class="sh-row">
+      <span class="eyebrow">focus URL</span>
+      <button class="tool" type="button" data-controller="copy" data-copy-text-value="<%= url %>" data-share-target="copyUrl" data-action="copy#copy" data-needs-js>⎘ copy URL</button>
+    </div>
+    <code class="sh-url" data-share-target="url"><%= url %></code>
+    <div class="sh-dia" data-share-target="diagrams" hidden><span class="eyebrow">Mermaid</span></div>
+  </div>
+</details>

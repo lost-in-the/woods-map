@@ -32,6 +32,7 @@ widths are the tiers of D-19.
 | Routes tab, controller (`…/UsersController/routes`) | [Routes tab note](../notes/routes-tab.md) (no board) | [1440](routes-1440.png), [390](routes-390.png) |
 | Hover card on a reference, Code tab (`…/model/User`, hovered at 1440, focused at 390) | [Hover card note](../notes/hover-card.md) (no board) | [1440](hover-card-1440.png), [390](hover-card-390.png) |
 | Reading settings on the Code tab (`…/model/User`) | [Settings note](../notes/settings.md) (no board) | [dialog 1440](settings-1440.png), [dialog 390](settings-390.png), [editor set, 390](settings-editor-390.png), [wrap on, 390](settings-wrap-390.png) |
+| Share menu open, unit tab and impact page (`…/User/schema`, `/woods/impact?focus=User`) | [Share menu note](../notes/share-menu.md) (no board) | [1440](share-1440.png), [impact 390](share-impact-390.png) |
 | Passage tab, controller action (`…/UsersController/passage?action_name=show`) | [B8-Passage](../boards/B8-Passage.html) | [1440](passage-1440.png), [create, with the callback ladder](passage-create-1440.png), [390](passage-390.png) |
 | Passage tab, mailer action | [B8-Passage](../boards/B8-Passage.html) (the mailer passage is undesigned; the controller passage is reused) | [1440](passage-mailer-1440.png) |
 | Impact, pre-change mode (`/woods/impact?focus=User&depth=2`): Changed with a path opened | [B8-Impact-Changed](../boards/B8-Impact-Changed.html), the frame with a focus title | [1440](impact-changed-open-1440.png), [390](impact-390.png) |
