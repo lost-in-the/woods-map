@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- A retained range is compared once per process, with Woods' `ReportCache` (woods#835) when the installed Woods has one. The impact page's lenses and pages, the unit diff and `?since=` views of one range share one comparison. Woods keys it on the payloads the range resolves to, so `gen:N`, a commit SHA and `now` naming one pair share it, and a new publish or prune is a new key. On a Woods without the cache, each view still compares.
+
 - The Graph neighbourhood, the Schema ER and the Lifecycle sequence draw their Mermaid from Woods' own builders (`Woods::Diagrams`, woods#826) when the loaded Woods has them. The Index MCP server's `diagram` tool and `woods:diagram` answer from the same builders. The text is unchanged, byte for byte: `spec/woods_map/woods_diagrams_spec.rb` compares every unit, depth, direction, filter and event on the fixture and the 300-model index. A Woods without the builders keeps the map's own. An edge without a mechanism draws a plain arrow in both, never an empty label. The lanes and flowchart views, `?since=` marks, C4 views, the ERD, History and the Trail stay in the map.
 - Pages stay usable on a large generation (measured on synthetic apps of about 4,600 and 10,300 units).
   - **One reader per generation:** the index reader, the dependency graph and what the map derives from them (the typed node lookup, file ownership, the identifier index, the unit listings) are built once per published generation and shared by the requests that pin it (`WoodsMap::GenerationSnapshot`), where every request re-parsed the graph and re-read every unit index. Derived values are frozen.
