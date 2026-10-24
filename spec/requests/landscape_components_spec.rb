@@ -76,7 +76,7 @@ RSpec.describe 'Landscape components, charts and sharing', type: :request do
     end
 
     it 'routes no diagram it does not draw' do
-      expect { get '/woods/landscape/treemap.mmd' }.to raise_error(ActionController::RoutingError)
+      expect_no_route('/woods/landscape/treemap.mmd')
     end
   end
 end

@@ -1,7 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
 
 // The scroll cliff: `more` on a .hscroll or .tblwrap only while content
-// overflows to the right, `more-left` once it has been scrolled.
+// overflows to the right, `more-left` once it has been scrolled. A row of
+// links that marks the current page (the page tabs at 390) starts scrolled
+// so that link is in view.
 export default class extends Controller {
   connect() {
     this.update = this.update.bind(this)
@@ -9,7 +11,16 @@ export default class extends Controller {
     this.observer.observe(this.element)
     if (this.element.firstElementChild) this.observer.observe(this.element.firstElementChild)
     this.element.addEventListener("scroll", this.update, { passive: true })
+    this.revealCurrent()
     this.update()
+  }
+
+  revealCurrent() {
+    const current = this.element.querySelector(':scope > [aria-current="page"]')
+    if (!current) return
+    const box = this.element.getBoundingClientRect()
+    const link = current.getBoundingClientRect()
+    if (link.right > box.right) this.element.scrollLeft += link.right - box.right + 16
   }
 
   disconnect() {

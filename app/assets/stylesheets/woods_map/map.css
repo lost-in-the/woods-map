@@ -10,6 +10,11 @@ html,body{margin:0;min-height:100%}
 .wm[data-theme=light]{color-scheme:light}
 /* Without JavaScript every detail block is open and the controls that need a script are gone. */
 html.no-js .wm .tgl,html.no-js .wm [data-needs-js]{display:none}
+/* Below 960 the site nav and the search move into the ☰ sheet, which needs a script. Without
+   one the bar wraps instead and keeps both, so every page can still reach Units, Graph, ERD,
+   Impact and search. */
+@container wm (max-width:959px){ html.no-js .wm .bar{flex-wrap:wrap;height:auto;min-height:52px;row-gap:var(--s3);padding-block:var(--s3)} html.no-js .wm .bar nav{display:flex;flex-wrap:wrap;order:5;width:100%;column-gap:var(--s5);row-gap:var(--s2)} }
+@container wm (max-width:639px){ html.no-js .wm .bar .bar-search{width:auto;flex:1 1 160px;justify-content:flex-start;padding:0 var(--s3)} html.no-js .wm .bar .bar-search .q{display:block} }
 html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 /* Honor the tree controller's filter/fold state over the token row layout. */
 .wm .tree [data-tree-target="row"][hidden] { display:none!important; }
