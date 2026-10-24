@@ -136,6 +136,8 @@ module WoodsMap
     end
 
     def lifecycle_count
+      return (type == 'job' ? 1 : Array(@metadata['actions']).size.nonzero?) if EntryLifecycle.applies?(type)
+
       Array(@metadata['callbacks']).count { |cb| !cb['filter'].to_s.match?(Lifecycle::INTERNAL) }.nonzero? ||
         Array(@metadata['filters']).size.nonzero?
     end

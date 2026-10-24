@@ -7,21 +7,30 @@ module WoodsMap
     # The page-aware actions (design study, section 11). Each one is a prompt
     # template stored in the gem; a host overrides one by writing
     # `config/woods_map/prompts/<key>.md`. Templates take `{{context}}` (the
-    # page's context block) and `{{question}}` (anything typed with it).
+    # page's context block), `{{question}}` (anything typed with it) and,
+    # for an action on an answer, `{{answer}}` (that answer's Markdown).
     module Actions
       # key => label and where it is offered. `pages` names page kinds
-      # (:code, :unit, :lifecycle, :passage, :impact, :range); `types` limits
-      # unit types; `needs` names context the action cannot run without.
+      # (:code, :unit, :lifecycle, :passage, :graph, :trail, :impact, :range); `types`
+      # limits unit types; `needs` names context the action cannot run
+      # without: :lines (selected code), :nodes (units selected on a graph),
+      # :board (a Trail entry or pins) or :answer (an earlier answer, for the
+      # actions an answer offers).
       LIST = {
-        'explain_unit' => { label: 'explain this unit', pages: %i[code unit lifecycle passage] },
+        'explain_unit' => { label: 'explain this unit', pages: %i[code unit lifecycle passage graph] },
         'explain_method' => { label: 'explain this method', pages: %i[code], needs: :lines },
         'why_fail' => { label: 'why might this fail?', pages: %i[code unit lifecycle passage],
                         types: %w[job mailer controller model] },
         'plan_feature' => { label: 'plan a feature here', pages: %i[code unit] },
-        'blast_radius' => { label: 'summarise blast radius', pages: %i[code unit impact] },
+        'blast_radius' => { label: 'summarise blast radius', pages: %i[code unit graph impact] },
         'explain_lifecycle' => { label: 'explain lifecycle', pages: %i[lifecycle] },
         'explain_passage' => { label: 'explain this passage', pages: %i[passage] },
-        'review_change' => { label: 'review this change', pages: %i[impact range] }
+        'review_change' => { label: 'review this change', pages: %i[impact range] },
+        'explain_selection' => { label: 'explain the selected units', pages: %i[graph], needs: :nodes },
+        'explain_investigation' => { label: 'explain this investigation', pages: %i[trail], needs: :board },
+        # Offered under an answer, never in the page's row: the draft is text
+        # to copy; the map never posts it anywhere.
+        'draft_issue' => { label: 'draft an issue', pages: [], needs: :answer }
       }.freeze
 
       # The gem's own templates.
@@ -57,10 +66,14 @@ module WoodsMap
       # @param key [String, nil] an action key, or nil for a free question
       # @param context [String] the context block
       # @param question [String] what the person typed, possibly empty
+      # @param answer [String, nil] the earlier answer an answer action works from
       # @return [String]
-      def prompt(key, context:, question:)
+      def prompt(key, context:, question:, answer: nil)
         template = key ? template(key) : "{{context}}\n\nQuestion: {{question}}\n"
-        template.gsub('{{context}}', context.to_s).gsub('{{question}}', question.to_s.strip.presence || '(none)')
+        # One pass, so text a value carries is never read as another placeholder.
+        values = { 'context' => context.to_s, 'question' => question.to_s.strip.presence || '(none)',
+                   'answer' => answer.to_s.strip.presence || '(none)' }
+        template.gsub(/\{\{(context|question|answer)\}\}/) { values.fetch(Regexp.last_match(1)) }
       end
 
       # @param key [String]

@@ -11,7 +11,8 @@ module WoodsMap
   # A turn streams once. A reconnect, which EventSource makes on its own
   # after the stream ends, gets the finished turn again instead of a second
   # model run. Proxies must not buffer this response (X-Accel-Buffering,
-  # docs/DEPLOYMENT.md).
+  # docs/DEPLOYMENT.md); while an answer runs, a heartbeat comment keeps a
+  # quiet stream alive (`guide_heartbeat_seconds`).
   class GuideStreamsController < ApplicationController
     include ActionController::Live
     include WoodsMap::GuideSession
@@ -25,7 +26,7 @@ module WoodsMap
 
       start_stream
       claimed = store.claim(turn['id'])
-      claimed ? answer(store, claimed) : replay(turn)
+      claimed ? with_heartbeat { answer(store, claimed) } : replay(turn)
     rescue WoodsMap::Guide::Runner::Disconnected
       nil
     ensure
@@ -42,8 +43,21 @@ module WoodsMap
       write_event('open', {})
     end
 
+    def with_heartbeat
+      @heartbeat = WoodsMap::Guide::Heartbeat.new(interval: woods_map_config.guide_heartbeat_seconds,
+                                                  lock: stream_lock, write: ->(text) { response.stream.write(text) })
+                                             .start
+      yield
+    ensure
+      @heartbeat&.stop
+    end
+
+    def stream_lock
+      @stream_lock ||= Mutex.new
+    end
+
     def answer(store, turn)
-      session = WoodsMap::Guide.open_session(woods_map_config)
+      session = WoodsMap::Guide.open_session(woods_map_config, generation_key: generation_key)
       budget = WoodsMap::Guide::Budget.new(woods_map_config, tokens_spent: store.tokens)
       WoodsMap::Guide::Runner.new(store: store, turn: turn, session: session, emit: method(:emit), budget: budget).run
     rescue StandardError => e
@@ -56,6 +70,14 @@ module WoodsMap
       emit('failed', failed || turn)
     end
 
+    # The generation the answer reads, so a pooled Index MCP server of an
+    # older generation is not reused.
+    def generation_key
+      WoodsMap::Repository.open(&:generation_key)
+    rescue WoodsMap::Repository::Unavailable
+      nil
+    end
+
     def replay(turn)
       if FINISHED.include?(turn['state'])
         emit(turn['state'], turn)
@@ -64,30 +86,39 @@ module WoodsMap
       end
     end
 
-    # Finished turns carry their rendered answer; links come from the
-    # generation current when the answer ends.
+    # Finished turns carry their rendered answer and its Trail links; links
+    # come from the generation current when the answer ends.
     def emit(event, payload)
-      payload = payload.merge('html' => answer_html(payload)) if FINISHED.include?(event)
+      payload = payload.merge(rendered(payload)) if FINISHED.include?(event)
       write_event(event, payload)
     end
 
-    def answer_html(turn)
+    def rendered(turn)
       text = turn['answer'].to_s
-      return '' if text.empty?
+      return { 'html' => '', 'trail' => {} } if text.empty?
 
       WoodsMap::Repository.open do |repository|
-        WoodsMap::Guide::Answer.new(text, identifiers: repository.identifier_index,
-                                          link: lambda { |identifier, type|
-                                            woods_map.unit_path(type: type, identifier: identifier)
-                                          })
-                               .to_html
+        answer = WoodsMap::Guide::Answer.new(text, identifiers: repository.identifier_index,
+                                                   link: lambda { |identifier, type|
+                                                     woods_map.unit_path(type: type, identifier: identifier)
+                                                   })
+        trail = WoodsMap::Guide::Handoff.links(turn, answer: answer,
+                                                     generation: repository.generation_number) do |query|
+          woods_map.trail_path(query)
+        end
+        { 'html' => answer.to_html, 'trail' => trail }
       end
     rescue WoodsMap::Repository::Unavailable
-      WoodsMap::Guide::Answer.new(text, identifiers: {}, link: ->(*) { '#' }).to_html
+      { 'html' => WoodsMap::Guide::Answer.new(text, identifiers: {}, link: ->(*) { '#' }).to_html, 'trail' => {} }
     end
 
     def write_event(event, payload)
-      response.stream.write("event: #{event}\ndata: #{JSON.generate(payload)}\n\n")
+      raise WoodsMap::Guide::Runner::Disconnected if @heartbeat&.gone?
+
+      stream_lock.synchronize do
+        response.stream.write("event: #{event}\ndata: #{JSON.generate(payload)}\n\n")
+        @heartbeat&.wrote
+      end
     rescue IOError, Errno::EPIPE, ActionController::Live::ClientDisconnected
       raise WoodsMap::Guide::Runner::Disconnected
     end

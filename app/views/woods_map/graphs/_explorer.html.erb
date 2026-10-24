@@ -26,6 +26,7 @@
 <% range = local_assigns[:emphasis] == :range %>
 <% blast_legend = range ? [['changed in this range', 0], ['affected directly', 1], ['affected transitively', 2]] : [['a change here reaches it directly', 1], ['transitively', 2]] %>
 <% page = local_assigns.fetch(:page, false) %>
+<% pick = guide_status == :ready %>
 <% filters = { types: params[:types].presence, via: params[:via].presence } %>
 <% flow_link = ->(**opts) { link.call(direction: n.direction, depth: n.depth, blast: (blast && !range ? '1' : nil), **filters, **opts) } %>
 <% graph_label = "Neighbourhood of #{identifier} at depth #{n.depth}, #{n.direction}: units and their edges, each edge labelled with its mechanism. Arrow keys move along the edges, Enter opens a unit's graph; the list below has the same edges." %>
@@ -35,7 +36,8 @@
      data-graph-url-value="<%= woods_map.neighbourhood_path(centre: identifier, type: type, depth: n.depth, direction: n.direction, **filters) %>"
      data-graph-unit-url-value="<%= unit_url %>"
      data-graph-generation-value="<%= @repository.generation_number %>"
-     data-graph-cache-value="<%= cache_key %>"<% if clusters.any? %>
+     data-graph-cache-value="<%= cache_key %>"<% if pick %>
+     data-graph-pick-value="true"<% end %><% if clusters.any? %>
      data-graph-clusters-value="<%= clusters.to_json %>"<% if params[:group] == 'clusters' %> data-graph-mode-value="clusters"<% end %><% end %><% if blast_units %>
      data-graph-blast-value="<%= blast_units.to_json %>"<% end %><% if range %>
      data-graph-emphasis-value="range"<% end %><% if flow&.found? %>
@@ -65,7 +67,7 @@
         <div class="pad1"><span class="seg" role="group" aria-label="Layout"><% (%w[butterfly radial] + (clusters.any? ? %w[clusters] : [])).each do |mode| %><button type="button" aria-pressed="<%= mode == 'butterfly' %>" data-layout="<%= mode %>" data-graph-target="layout" data-action="graph#layout"><%= mode %></button><% end %></span></div>
         <p class="cap padx">Positions you drag are kept per generation in this browser. <button class="tool" type="button" data-action="graph#forget">reset positions</button></p>
       </div>
-      <% if flows %><% if params[:flow].present? %><input type="hidden" name="flow" value="<%= params[:flow] %>"><% end %><%= render 'woods_map/graphs/flows_rail', flows: flows, flow: flow, link: flow_link %><% end %>
+      <% if timeline&.author %><input type="hidden" name="author" value="<%= timeline.author %>"><% end %><% if flows %><% if params[:flow].present? %><input type="hidden" name="flow" value="<%= params[:flow] %>"><% end %><%= render 'woods_map/graphs/flows_rail', flows: flows, flow: flow, link: flow_link %><% end %>
       <%= local_assigns[:rail_extra] %>
     </form>
   </nav>
@@ -80,7 +82,7 @@
           <button class="tool" type="button" aria-pressed="false" aria-controls="graph-flowchart" data-graph-target="flowchart" data-action="graph#flowchart">flowchart</button>
         </span></div>
         <div class="gcanvas" tabindex="0" role="application" aria-roledescription="graph" aria-label="<%= graph_label %>" aria-describedby="graph-status" data-graph-target="canvas"></div>
-        <p class="gstatus" id="graph-status" role="status" data-graph-target="status">Tab to the canvas: arrow keys move along the edges, Enter opens a unit's graph, + and − zoom, 0 fits.</p>
+        <p class="gstatus" id="graph-status" role="status" data-graph-target="status">Tab to the canvas: arrow keys move along the edges, Enter opens a unit's graph, + and − zoom, 0 fits.<% if pick %> Space or Shift+click adds a unit to the guide's context.<% end %></p>
         <% legend = n.type_counts.keys.map { |t| [tag.i(class: 'sw gsw', data: { gtype: t }), t.to_s.tr('_', ' ')] } +
                     [[tag.span('──', class: 'ar'), 'association'], [tag.span('┄┄', class: 'ar'), 'other mechanisms'],
                      [tag.i(class: 'sw self'), 'this unit']] %>

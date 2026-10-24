@@ -13,7 +13,7 @@ HTML. The text is byte for byte what the panel draws, plus a final newline.
 | Diagram | URL | Parameters (closed choices; unknown values fall back to the page's default) |
 |---|---|---|
 | Schema ER | `/woods/units/:type/:identifier/schema.mmd` | — |
-| Lifecycle | `/woods/units/:type/:identifier/lifecycle.mmd` | `event` = create, update or destroy; `view` = flowchart or lanes (the sequence when omitted) |
+| Lifecycle | `/woods/units/:type/:identifier/lifecycle.mmd` | `event` = create, update or destroy; `view` = flowchart or lanes (the sequence when omitted). On a controller, job or mailer: `action_name` (the first action when omitted) and `view` = flowchart or lanes ([entry lifecycle](entry-lifecycle.md)) |
 | State machine | `/woods/units/state_machine/:identifier/lifecycle.mmd` | — (a state machine unit's lifecycle is its state diagram) |
 | Graph neighbourhood | `/woods/units/:type/:identifier/graph.mmd` | `depth` = 1 or 2; `direction` = both, dependents or dependencies; `types[]`, `via[]` |
 | Passage | `/woods/units/:type/:identifier/passage.mmd` | `action_name` |

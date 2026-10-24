@@ -250,13 +250,14 @@ proxy (`limit_req` in nginx) for a hard ceiling.
 
 ## 8. Streaming (the M7 guide) behind proxies
 
-The guide panel (M7) will stream answers as server-sent events from
-`ActionController::Live`. The open item in the decision log asks for proxy
-settings; until M7 lands, these are the ones known to matter:
+The guide panel (M7) streams each answer as server-sent events from
+`ActionController::Live`, read by the browser's `EventSource`. These are the
+settings that matter between the browser and Puma:
 
 - **nginx** buffers responses by default, which holds every event until the
-  answer ends. Turn buffering off for the mount (a streaming response can
-  also send `X-Accel-Buffering: no`, which M7 should set):
+  answer ends. The guide's stream sends `X-Accel-Buffering: no`, which nginx
+  honours; turning buffering off for the mount also covers other proxies'
+  configurations:
 
   ```nginx
   location /woods/ {
@@ -273,11 +274,22 @@ settings; until M7 lands, these are the ones known to matter:
   stream. Exclude `text/event-stream`.
 - **Puma:** each open stream holds one thread for its whole duration. Keep
   `max_threads` above the number of concurrent guide sessions you expect,
-  plus the page traffic.
+  plus the page traffic. Each worker keeps up to `config.guide_mcp_servers`
+  `woods-mcp` processes (2 by default) for its answers; a worker forked from
+  a parent that already started some starts its own and leaves the parent's
+  alone. More concurrent answers than that wait up to
+  `guide_mcp_wait_seconds`, then fail with a message.
 - **CDNs and tunnels:** Cloudflare and some ingress controllers buffer or
-  time out idle streams. Use a long read timeout and a heartbeat comment.
-  The design falls back to polling Turbo Frames where a stream cannot open
-  (design study, M7).
+  time out idle streams. Use a long read timeout. While an answer runs, the
+  stream writes an SSE comment line (`: heartbeat`) after every
+  `config.guide_heartbeat_seconds` (15 by default) without other events, so
+  a quiet model turn or tool call is not taken for an idle connection; set
+  it below your proxy's idle timeout, or 0 to send none.
+- **When a stream cannot open:** the panel says the answer stream was
+  interrupted; an answer that finished is kept and shows on the next page.
+  There is no polling fallback;
+  [woods-map#101](https://github.com/lost-in-the/woods-map/issues/101) decides
+  whether to build one.
 - **Policy:** `connect-src 'self'` already admits the guide's
   `EventSource`. No change is needed.
 

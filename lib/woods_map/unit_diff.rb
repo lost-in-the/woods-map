@@ -5,8 +5,8 @@ module WoodsMap
   # report records it (`Woods::Impact::Report.compare`, W-12, through
   # {ImpactRange}). The map never diffs payloads itself: it finds this unit's
   # record in the report's `changed` list and shows its status, the facets and
-  # categories that moved, the metadata keys and the source sizes. Changed
-  # line ranges are not in the schema 1 report (woods#802).
+  # categories that moved, the metadata keys and the source sizes, and draws
+  # Woods' unified source diff of the unit ({SourceDiff}, woods#802).
   class UnitDiff
     # @return [Integer] the older generation
     attr_reader :from
@@ -36,6 +36,7 @@ module WoodsMap
     # @param from [Integer]
     # @param to [Integer]
     def initialize(repository, unit, from, to)
+      @index_dir = repository.index_dir
       @unit = unit
       @from = from
       @to = to
@@ -72,6 +73,11 @@ module WoodsMap
        ['source', source_sizes(stats['source_before'], stats['source_after'])]].filter_map do |label, value|
         [label, value] if value.present?
       end
+    end
+
+    # @return [SourceDiff] Woods' unified diff of the unit's source between the two generations
+    def source
+      @source ||= SourceDiff.new(@index_dir, identifier: @unit['identifier'], type: @unit['type'], from: @from, to: @to)
     end
 
     # @return [Hash] the report's coverage, as published

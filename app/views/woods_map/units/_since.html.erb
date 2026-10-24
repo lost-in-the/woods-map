@@ -11,7 +11,7 @@
 <% elsif (change = s.change(page.identifier, page.type)) %>
   <%= render 'woods_map/components/banner', severity: :mod, lead: "#{change['status'].capitalize} since gen #{s.from_generation}.",
         text: safe_join(["Facets moved: #{Array(change['facets']).join(', ').presence || 'none'}; metadata keys: #{Array(change['metadata_keys']).join(', ').presence || 'none'}. ",
-                         'Notes and rows that read a key that moved are marked M; which lines changed is not in the report (woods#802). ', range, '.']),
+                         since_lines_sentence(s, page), range, '.']),
         tools: safe_join([report_link, clear], ' ') %>
 <% elsif (reach = s.reach(page.identifier, page.type)) %>
   <%= render 'woods_map/components/banner', severity: :mod, lead: "Affected since gen #{s.from_generation}.",

@@ -46,7 +46,7 @@ when settled, with the issue link.
 |---|---|
 | F-1 | Mounting is explicit: `mount WoodsMap::Engine => "/woods"`. The Railtie injects nothing. |
 | F-2 | Names: gem `woods-map`, module `WoodsMap`, mount path `/woods`. |
-| F-3 | Reference spans are stored inline in unit JSON; a per-type sidecar only if payload size grows more than about 15 percent on a 5 000-unit application. |
+| F-3 | Reference spans are stored inline in unit JSON; a per-type sidecar only if payload size grows more than about 15 percent on a 5 000-unit application. Measured on `woods-testbed` `rails-8.0-large` with the span kinds, method targets and method tables of [woods#808](https://github.com/lost-in-the/woods/pull/808): unit JSON +2.25%, the whole published payload +2.19% (3,546,468 to 3,624,067 bytes, 449 units), so spans stay inline and no sidecar is built ([woods#751](https://github.com/lost-in-the/woods/issues/751)). |
 | F-4 | Guide conversations are file-backed and ephemeral; no default model name, the host configures RubyLLM. |
 | F-5 | The design study is committed to this repository for handoff; the full design is produced from it and tracked issue by issue. |
 
@@ -103,11 +103,27 @@ Settled by the maintainer on [woods-map#57](https://github.com/lost-in-the/woods
 |---|---|---|---|
 | D-25 | What the Share menu offers | The Share menu offers the focus URL and the Mermaid text of the page's diagrams. It offers no Markdown or JSON report, even text handed through unchanged from Woods. Its audience is agents pulling charts into automated code review on pull requests, and people sharing architecture feedback. | Impact reports in Markdown and JSON stay with Woods (D-1): `woods:impact`, its CI comment and the `change_impact` MCP tool. The boards' *Markdown for PR* button is dropped. The `CLAUDE.md` rule "never render Markdown or JSON reports here" stands as written. Because agents are a primary audience, two things must hold: a focus URL is stable and carries no token, and every diagram's Mermaid text can be fetched without scraping HTML. |
 
+## Staging hardening (24 October 2026)
+
+Settled by the maintainer on [woods-map#59](https://github.com/lost-in-the/woods-map/issues/59); the engine shipped each option with M8 ([woods-map#10](https://github.com/lost-in-the/woods-map/issues/10)).
+
+| # | Question | Decision | Consequence |
+|---|---|---|---|
+| D-26 | What a rate-limited request sees | The 403 panel's plain page: no frame and no index facts. It has an HTTP 429 eyebrow, the budget, the wait and the configuration snippet, with `Retry-After`. JSON clients get a JSON body, and the palette shows its message in the status line. | The limit runs inside the gate, before the repository opens a generation, so the page needs nothing from the index. It is not an empty state in the frame, which would have shown "no index". |
+| D-27 | Token-less loopback mode | Besides a loopback peer, it requires a loopback `Host` header: `localhost`, `127.0.0.1` or `::1`. The check uses `Woods::MCP::OriginPolicy`, the same policy `woods-mcp-http` enforces. `config.allowed_origins` adds names such as `http://myapp.test`. | This blocks DNS rebinding, where a page reaches the map through the developer's browser under its own host name. It does not rely on Rails' `config.hosts`, which is empty in production and staging. A refused request gets a 403 panel that names the reason. |
+| D-28 | Inline styles | Views and helpers write no `style` attribute, and `style-src` never allows `'unsafe-inline'`. Varying geometry uses bounded classes in `map.css`, column widths use the `width` hint, swatches are SVG fills, and Pele's and Cytoscape's styles are applied through the CSSOM. | A spec fails if a view or helper writes a `style` attribute. New views follow the same rule. |
+
+## Editor links (24 October 2026)
+
+Settled with the reading settings ([notes/settings.md](notes/settings.md)), which built it in M1.
+
+| # | Question | Decision | Consequence |
+|---|---|---|---|
+| D-29 | Editor deep links | The editor scheme (a preset or a custom template with `{path}`, `{file}` and `{line}`) and the checkout path are per-browser settings, kept in browser storage; the map never guesses either from the index or the host. | *In editor at L…* appears only in a browser that names an editor whose template can be filled, and never without JavaScript; the index and the server hold no editor or checkout path. |
+
 ## Open
 
-- Editor deep links: scheme and checkout path are per-browser settings; never guessed from the index.
-- Server-sent events behind proxies: document Puma and nginx settings; fall back to polling Turbo Frames when the stream cannot open. The known settings are in [DEPLOYMENT.md](../DEPLOYMENT.md#8-streaming-the-m7-guide-behind-proxies); M7 verifies them.
-- Reference span size (F-3) must be measured on `woods-testbed` `rails-8.0-large` before M0 closes.
+- Server-sent events behind proxies: the settings are in [DEPLOYMENT.md](../DEPLOYMENT.md#8-streaming-the-m7-guide-behind-proxies), and the guide stream sends a heartbeat comment (`guide_heartbeat_seconds`). Whether to build a fallback for a stream that cannot open (the study's polling Turbo Frames) is [woods-map#101](https://github.com/lost-in-the/woods-map/issues/101), `needs-decision`.
 - Boundary-row labels in flow tables (`⇒ async hop, new process: …`) are placeholders; the real label comes from the job or mailer unit named by the flow.
 - The ☰ sheet and tree strip have token and layout rules but no interaction prototype yet; verify with keyboard and screen reader on the testbed before M1 closes.
 - Light-mode diagram renders on the B6 boards still use the dark Mermaid theme. The engine draws with Pele from the `--pele-*` tokens in every theme (D-21, [woods-map#5](https://github.com/lost-in-the/woods-map/issues/5)); only the boards' static renders remain.

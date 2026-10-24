@@ -20,6 +20,15 @@ module WoodsMap
                          refusal: @lifecycle.refusal(@event, view: @view))
     end
 
+    # An entry's flow in the requested view (woods-map#91).
+    def render_entry_lifecycle_mermaid
+      lifecycle = @entry_lifecycle
+      return render_text(:not_found, "#{@page.identifier} has no action to draw.") unless lifecycle.entry
+
+      render_tab_mermaid(lifecycle.diagram(@view), "lifecycle #{lifecycle.action} #{@view}",
+                         refusal: lifecycle.refusal(@view))
+    end
+
     # The passage's sequence, or with ?view=dynamic its C4 dynamic view (B-23).
     def render_passage_mermaid
       return render_tab_mermaid(@passage.mermaid, "#{@passage.action} passage") unless params[:view] == 'dynamic'
