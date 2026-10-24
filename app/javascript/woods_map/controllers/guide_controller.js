@@ -29,6 +29,7 @@ export default class extends Controller {
   }
 
   toggle() {
+    if (!this.hasPanelTarget) return
     this.panelTarget.hidden ? this.open(true) : this.close()
   }
 

@@ -43,6 +43,36 @@ end
 - `config.authorize` runs before any token check and can refuse on its own.
 - `config.require_token = true` refuses loopback too.
 
+### The guide (optional)
+
+The guide is a RubyLLM agent docked beside every page. It answers through the
+Woods Index MCP server, using only its read-only tools. It is off by default
+and needs Ruby 3.2 and `ruby_llm` 2.1 in the host bundle. On an older Ruby,
+or without the gem, the bar shows a disabled Guide button with the reason.
+
+```ruby
+# Gemfile
+gem "ruby_llm", "~> 2.1"
+
+# config/initializers/woods_map.rb
+RubyLLM.configure { |c| c.anthropic_api_key = ENV["ANTHROPIC_API_KEY"] }   # any RubyLLM provider
+WoodsMap.configure do |config|
+  config.guide_enabled = true
+  config.guide_chat_options = { model: "your-model" }  # optional; RubyLLM's default otherwise
+  # config.guide_mcp_url = "https://mcp.example.com/" # a woods-mcp-http instead of stdio
+  # config.guide_mcp_token = ENV["WOODS_MCP_HTTP_TOKEN"]
+  # Limits: guide_tool_calls (12 per answer), guide_turns (10), guide_seconds (120),
+  # guide_token_budget (60_000 per browser session). Conversations are written
+  # under <index_dir>/explorer/chats unless guide_chats_dir says otherwise.
+end
+```
+
+By default the guide starts `bundle exec woods-mcp <index_dir>` over stdio for
+each answer (`config.guide_mcp_command` overrides the command). Its action
+prompts live in `lib/woods_map/guide/prompts/`. A host overrides one with
+`config/woods_map/prompts/<action>.md`. The panel streams with server-sent
+events, so proxies must not buffer `/woods/guide/questions/*/stream`.
+
 ## Pages
 
 Press `?` or use the primary bar’s help button for contextual shortcuts.

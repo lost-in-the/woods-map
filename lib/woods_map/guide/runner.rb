@@ -15,6 +15,9 @@ module WoodsMap
     # as plain user and assistant messages, so no chat object outlives a
     # request.
     class Runner
+      # Arguments a card shows bare, first: `lookup(Post)`, `dependents(Post, depth 1)`.
+      PRIMARY_ARGUMENTS = %w[identifier query name entry_point unit].freeze
+
       # Raised by the emitter when the browser has gone; the answer stops.
       class Disconnected < StandardError; end
 
@@ -132,10 +135,11 @@ module WoodsMap
       # A short rendering of the arguments for the card: `Post`, `Post, depth 1`.
       def arguments(arguments)
         values = arguments.respond_to?(:to_h) ? arguments.to_h : {}
+        values = values.sort_by { |key, _| PRIMARY_ARGUMENTS.include?(key.to_s) ? 0 : 1 }
         values.map do |key, value|
           value = value.to_s
           value = "#{value[0, 60]}…" if value.size > 60
-          %w[identifier query name entry_point unit].include?(key.to_s) ? value : "#{key} #{value}"
+          PRIMARY_ARGUMENTS.include?(key.to_s) ? value : "#{key} #{value}"
         end.join(', ')
       end
 
