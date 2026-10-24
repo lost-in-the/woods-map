@@ -44,6 +44,9 @@ module WoodsMap
        'runtime values, query plans, latency, authorization, rendered output, external services']
     ].freeze
 
+    # Unresolved renders around a radius are read from every involved unit;
+    # at a hub that is most of the generation, so they are kept per
+    # generation and involved set.
     # Unit types a test can be expected to cover.
     TESTABLE = %w[model controller mailer job service poro concern view_template component view_component
                   serializer].freeze
@@ -150,17 +153,8 @@ module WoodsMap
       end
     end
 
-    # Woods' render-target resolver publishes +{ name:, reason: }+ for a component render that names no
-    # component (+render Ghost.new+), on controllers and components alike.
     def unresolved_renders
-      @radius.involved.flat_map do |id|
-        renders = Array(@repository.unit(id, type: @radius.type_of(id))&.dig('metadata', 'unresolved_renders'))
-        renders.grep(Hash).map do |render|
-          reason = render['reason'] && " (#{render['reason'].tr('_', ' ')})"
-          Unknown.new(kind: 'render by name', where: id, why: "render #{render['name']}#{reason}",
-                      resolves: 'a component class the index knows')
-        end
-      end
+      UnresolvedRenders.for(@repository, @radius)
     end
 
     def unresolvable_routes

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'woods_map/generation_memo'
 require 'woods_map/version'
 require 'woods_map/rate_limiter'
 require 'woods_map/public_url'
@@ -79,6 +80,7 @@ require 'woods_map/hotspots'
 require 'woods_map/components'
 require 'woods_map/domain_mindmap'
 require 'woods_map/impact_review'
+require 'woods_map/unresolved_renders'
 require 'woods_map/impact_range'
 require 'woods_map/unit_diff'
 require 'woods_map/source_diff'
