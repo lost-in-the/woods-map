@@ -11,10 +11,11 @@ module WoodsMap
     # for an action on an answer, `{{answer}}` (that answer's Markdown).
     module Actions
       # key => label and where it is offered. `pages` names page kinds
-      # (:code, :unit, :lifecycle, :passage, :graph, :impact, :range); `types`
+      # (:code, :unit, :lifecycle, :passage, :graph, :trail, :impact, :range); `types`
       # limits unit types; `needs` names context the action cannot run
-      # without: :lines (selected code), :nodes (units selected on a graph)
-      # or :answer (an earlier answer, for the actions an answer offers).
+      # without: :lines (selected code), :nodes (units selected on a graph),
+      # :board (a Trail entry or pins) or :answer (an earlier answer, for the
+      # actions an answer offers).
       LIST = {
         'explain_unit' => { label: 'explain this unit', pages: %i[code unit lifecycle passage graph] },
         'explain_method' => { label: 'explain this method', pages: %i[code], needs: :lines },
@@ -26,6 +27,7 @@ module WoodsMap
         'explain_passage' => { label: 'explain this passage', pages: %i[passage] },
         'review_change' => { label: 'review this change', pages: %i[impact range] },
         'explain_selection' => { label: 'explain the selected units', pages: %i[graph], needs: :nodes },
+        'explain_investigation' => { label: 'explain this investigation', pages: %i[trail], needs: :board },
         # Offered under an answer, never in the page's row: the draft is text
         # to copy; the map never posts it anywhere.
         'draft_issue' => { label: 'draft an issue', pages: [], needs: :answer }

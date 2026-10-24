@@ -369,6 +369,55 @@ RSpec.describe 'Guide', type: :request do
       end
     end
 
+    describe 'the Trail hand-off' do
+      let(:board_context) do
+        { page: 'trail', entry: 'UsersController#show', pins: ['model:User', 'model:Ghost'], gen: '1', hops: '2' }
+      end
+
+      def finished_on(context, text: 'User has many Micropost records.')
+        WoodsMap.configuration.guide_chat_factory = -> { WoodsMap::FakeGuideChat.new([{ text: text }]) }
+        ask(context: context)
+        get response.parsed_body['stream']
+        events.last.last
+      end
+
+      it 'offers explain this investigation on a board, with its entry and pins as context' do
+        get '/woods/trail?entry=UsersController%23show&pin[]=model:User'
+        expect(action_labels).to eq(['explain this investigation'])
+        expect(panel.at_css('.ctx').text).to include('UsersController#show').and include('pinned')
+        expect(panel.css('input[name="context[pins][]"]').pluck('value')).to eq(['model:User'])
+      end
+
+      it 'sends the board the generation knows to the investigation prompt' do
+        prompts = []
+        WoodsMap.configuration.guide_chat_factory = lambda {
+          WoodsMap::FakeGuideChat.new([{ text: 'ok' }]).tap { |chat| prompts << chat }
+        }
+        ask(action_key: 'explain_investigation', question: '', context: board_context)
+        get response.parsed_body['stream']
+        prompt = prompts.last.messages.first.content
+        expect(prompt).to include('- trail entry: UsersController#show, async hop budget 2')
+          .and include('- pinned on the trail board: User (model)')
+        expect(prompt).not_to include('Ghost')
+      end
+
+      it 'links pin to the board asked on, with the cited units added, and open as investigation' do
+        trail = finished_on(board_context)['trail']
+        expect(CGI.unescape(trail['pin'])).to start_with('/woods/trail?')
+          .and include('entry=UsersController#show').and include('pin[]=model:User')
+          .and include('pin[]=model:Micropost').and include('gen=1')
+        expect(CGI.unescape(trail['investigation'])).to include('pin[]=model:User').and include('pin[]=model:Micropost')
+      end
+
+      it 'offers only open as investigation off a board, and both again on the next page' do
+        expect(finished_on({ page: 'code', type: 'model', identifier: 'User' })['trail'].keys).to eq(['investigation'])
+        get '/woods/units/model/User'
+        tools = html_response_document.at_css('#wm-guide .answer .answer-tools')
+        expect(tools.css('a.tool, button.tool').map(&:text)).to eq(['open as investigation', '⎘ copy',
+                                                                    'draft an issue'])
+      end
+    end
+
     it 'rate-limits questions like the other expensive endpoints' do
       WoodsMap.configuration.rate_limit = 1
       ask

@@ -72,26 +72,30 @@ module WoodsMap
       end
     end
 
-    # Finished turns carry their rendered answer; links come from the
-    # generation current when the answer ends.
+    # Finished turns carry their rendered answer and its Trail links; links
+    # come from the generation current when the answer ends.
     def emit(event, payload)
-      payload = payload.merge('html' => answer_html(payload)) if FINISHED.include?(event)
+      payload = payload.merge(rendered(payload)) if FINISHED.include?(event)
       write_event(event, payload)
     end
 
-    def answer_html(turn)
+    def rendered(turn)
       text = turn['answer'].to_s
-      return '' if text.empty?
+      return { 'html' => '', 'trail' => {} } if text.empty?
 
       WoodsMap::Repository.open do |repository|
-        WoodsMap::Guide::Answer.new(text, identifiers: repository.identifier_index,
-                                          link: lambda { |identifier, type|
-                                            woods_map.unit_path(type: type, identifier: identifier)
-                                          })
-                               .to_html
+        answer = WoodsMap::Guide::Answer.new(text, identifiers: repository.identifier_index,
+                                                   link: lambda { |identifier, type|
+                                                     woods_map.unit_path(type: type, identifier: identifier)
+                                                   })
+        trail = WoodsMap::Guide::Handoff.links(turn, answer: answer,
+                                                     generation: repository.generation_number) do |query|
+          woods_map.trail_path(query)
+        end
+        { 'html' => answer.to_html, 'trail' => trail }
       end
     rescue WoodsMap::Repository::Unavailable
-      WoodsMap::Guide::Answer.new(text, identifiers: {}, link: ->(*) { '#' }).to_html
+      { 'html' => WoodsMap::Guide::Answer.new(text, identifiers: {}, link: ->(*) { '#' }).to_html, 'trail' => {} }
     end
 
     def write_event(event, payload)

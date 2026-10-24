@@ -5,6 +5,7 @@ require 'woods_map/guide/budget'
 require 'woods_map/guide/store'
 require 'woods_map/guide/context'
 require 'woods_map/guide/answer'
+require 'woods_map/guide/handoff'
 require 'woods_map/guide/runner'
 require 'woods_map/guide/server_pool'
 

@@ -12,9 +12,16 @@ module WoodsMap
     prepend_before_action :json_response
     woods_map_rate_limit :guide, only: :create
 
-    CONTEXT_KEYS = %i[page type identifier lines action_name focus from to].freeze
+    CONTEXT_KEYS = %i[page type identifier lines action_name focus from to entry gen hops].freeze
     MAX_QUESTION = 2000
     TURN = /\A[0-9a-f]{16}\z/
+
+    # Why an action that needs page context cannot run without it.
+    MISSING = {
+      lines: 'Select lines in the code first.',
+      nodes: 'Select units on the graph first: Shift+click them, or Space on the canvas.',
+      board: 'Choose an entry or pin a unit on the board first.'
+    }.freeze
 
     def create
       store = guide_store
@@ -95,12 +102,10 @@ module WoodsMap
     def missing_context(key, context)
       return unless key
 
-      case needs(key)
-      when :lines then 'Select lines in the code first.' if context.lines.nil?
-      when :nodes then if context.nodes.empty?
-                         'Select units on the graph first: Shift+click them, or Space on the canvas.'
-                       end
-      end
+      present = { lines: context.lines, nodes: context.nodes.presence,
+                  board: context.entry || context.pins.presence }
+      need = needs(key)
+      MISSING[need] if present.key?(need) && present[need].nil?
     end
 
     # The finished answer an answer action works from, in this conversation.
@@ -118,7 +123,7 @@ module WoodsMap
       raw = params[:context]
       return {} unless raw.respond_to?(:permit)
 
-      raw.permit(*CONTEXT_KEYS, focus: [], nodes: []).to_h
+      raw.permit(*CONTEXT_KEYS, focus: [], nodes: [], pins: []).to_h
     end
 
     def json_response

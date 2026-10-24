@@ -27,9 +27,10 @@ Scope: M7 ([woods-map#9](https://github.com/lost-in-the/woods-map/issues/9)), FR
   | Graph tab, full-screen graph | explain this unit, summarise blast radius, explain the selected units (needs a selection) |
   | Impact | summarise blast radius, review this change |
   | Range | review this change |
-  | Under each answer | draft an issue |
+  | Trail board | explain this investigation (needs an entry or a pin) |
+  | Under each answer | pin (asked on a Trail board), open as investigation, draft an issue |
 
-  The issue names eight actions; all eight are built, plus *explain the selected units* and *draft an issue*. Prompts are Markdown templates in `lib/woods_map/guide/prompts/`. A host overrides one with `config/woods_map/prompts/<key>.md`.
+  The issue names eight actions; all eight are built, plus *explain the selected units*, *explain this investigation* and *draft an issue*. Prompts are Markdown templates in `lib/woods_map/guide/prompts/`. A host overrides one with `config/woods_map/prompts/<key>.md`.
 - **Answers.**
   - Each answer shows "guide, n tool calls, s seconds", then a card per tool call as it starts (◌) and ends (✓, or ✕ when it fails), with its arguments and duration.
   - The text streams with the cursor. When the answer ends, the server-rendered answer replaces it: raw HTML stripped, Markdown link targets dropped, and links only to identifiers of the pinned generation.
@@ -86,9 +87,18 @@ B8-Guide draws a *history* button in the panel header and no list. The list is d
 - A draft offers only *⎘ copy issue*, with "Paste it into your tracker; the map posts nothing." The map holds no GitHub credentials and makes no request beyond the provider and the Index MCP server.
 - **D-25 and the impact rule.** D-25 keeps Markdown and JSON impact reports with Woods, and `CLAUDE.md` says never to render Markdown or JSON reports here. A draft is the guide's own answer text. It renders through the same `Answer` subset as every answer, and it is copied raw. It is not a Woods report, and nothing from `Woods::Impact::Report` is rendered or relayed, so the rule stands as written and no decision was needed. The design study already says *plan a feature here* writes "Markdown ready for an issue".
 
+## Pin and open as investigation (Trail, M6)
+
+B8-Guide puts *pin* and *open as investigation* under every answer; the design study says they hand the answer's units to Trail. The Trail board is its URL (C-3, [Trail note](trail.md)), so both are links to `/woods/trail`, built by `WoodsMap::Guide::Handoff` from identifiers, types and numbers only.
+
+- **The units an answer cites** are the ones its rendering links: identifiers of the generation, in the order the answer first names them, typed by `Repository#identifier_index` (`Answer#cited`). A name the index does not know is neither a link nor a pin.
+- **Open as investigation** starts a board: the cited units as `pin[]` (at most 24, the Trail's limit; the page's unit when the answer cites none), the generation the answer was linked against as `gen`, and an `entry` when the question's context names one: a job's `#perform`, the controller or mailer action asked about, or the board's own entry. With none, the board is pins only.
+- **Pin** is offered on answers asked on a Trail board. It links that board (entry, pins, `gen`, `hops`, from the turn's context) with the cited units it lacks added. When the answer adds nothing, *pin* is not shown.
+- **Explain this investigation** is the Trail page's action. The page sends its entry, pins, generation and hop budget; the server keeps the entry when the generation has its unit and the pins it has, and the prompt walks the lifecycle with `trace_flow`.
+- Notes on a board stay in the browser, as the Trail note says; the guide never sees them.
+
 ## Not built here
 
-- **Pin** and **open as investigation**: they hand units to Trail, and M6 Trail ([woods-map#8](https://github.com/lost-in-the/woods-map/issues/8)) is not on `main`. The answer row leaves them out rather than drawing controls that do nothing; they join it when Trail's board can take units.
 - `acts_as_chat` persistence.
 - Personalised PageRank ordering.
 - A real provider run: no key is available here, so #9's exit criterion stays open.

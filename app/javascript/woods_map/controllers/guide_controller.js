@@ -244,8 +244,9 @@ export default class extends Controller {
   }
 
   // The row under a finished answer, as the server renders it on the next
-  // page: copy the Markdown, and draft an issue from it (or, for a draft,
-  // copy the issue and say the map posts nothing).
+  // page: pin to the Trail board it was asked on and open as investigation
+  // (links the server built), copy the Markdown, and draft an issue from it
+  // (or, for a draft, copy the issue and say the map posts nothing).
   answerTools(answer, turn) {
     answer.querySelector(".answer-tools")?.remove()
     const tools = document.createElement("div")
@@ -267,6 +268,16 @@ export default class extends Controller {
       note.textContent = "Paste it into your tracker; the map posts nothing."
       tools.appendChild(note)
     } else {
+      const link = (label, href, description) => {
+        const element = document.createElement("a")
+        element.className = "tool"
+        element.href = href
+        element.textContent = label
+        element.setAttribute("aria-label", description)
+        tools.appendChild(element)
+      }
+      if (turn.trail?.pin) link("pin", turn.trail.pin, "Pin the units this answer cites to this Trail board")
+      if (turn.trail?.investigation) link("open as investigation", turn.trail.investigation, "Open the units this answer cites as a Trail investigation")
       button("⎘ copy", copy)
       const draft = button("draft an issue", { "data-action": "guide#draftIssue", "data-guide-source-param": turn.id || "" })
       if (this.exhausted) draft.disabled = true

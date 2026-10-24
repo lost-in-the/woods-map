@@ -18,7 +18,7 @@
   <p class="cap guide-nojs">The guide streams its answers with JavaScript, which is off in this browser.</p>
   <div class="ctx"><span class="eyebrow">context</span><% Array(context&.chips).each do |bold, plain| %><span class="sel-chip"><b><%= bold %></b> <%= plain %></span><% end %><span class="sel-chip" data-guide-target="lines" hidden></span><span class="sel-chip" data-guide-target="nodes" hidden></span><span class="dim">gen <%= current_repository&.generation_number %><% if @generation&.dig('git_sha') %>, <%= short_sha(@generation['git_sha']) %><% end %>, read-only tools</span></div>
   <% if actions.any? %>
-    <div class="acts" role="group" aria-label="Guide actions"><% actions.each do |key| %><button class="btn" type="button" data-action="guide#run" data-guide-key-param="<%= key %>"<% case WoodsMap::Guide::Actions::LIST[key][:needs] when :lines %> data-guide-target="needsLines" disabled title="Select lines in the code first"<% when :nodes %> data-guide-target="needsNodes" disabled title="Shift+click units on the graph, or press Space on the canvas, first"<% end %><%= ' disabled'.html_safe if exhausted %>><%= WoodsMap::Guide::Actions.label(key) %></button><% end %></div>
+    <div class="acts" role="group" aria-label="Guide actions"><% actions.each do |key| %><button class="btn" type="button" data-action="guide#run" data-guide-key-param="<%= key %>"<% case WoodsMap::Guide::Actions::LIST[key][:needs] when :lines %> data-guide-target="needsLines" disabled title="Select lines in the code first"<% when :nodes %> data-guide-target="needsNodes" disabled title="Shift+click units on the graph, or press Space on the canvas, first"<% when :board %><%= ' disabled title="Choose an entry or pin a unit first"'.html_safe unless context&.entry || context&.pins&.any? %><% end %><%= ' disabled'.html_safe if exhausted %>><%= WoodsMap::Guide::Actions.label(key) %></button><% end %></div>
   <% end %>
   <section class="history" id="wm-guide-history" aria-labelledby="wm-guide-history-title" hidden data-guide-target="history">
     <div class="hh"><h3 class="t3" id="wm-guide-history-title">Conversations</h3><button class="tool" type="button" data-action="guide#closeHistory">back</button></div>
@@ -29,7 +29,7 @@
   </div>
   <% if exhausted %><div class="finding note limit" data-guide-target="exhausted"><b>Budget spent.</b> This session has used its <%= guide_tokens(woods_map_config.guide_token_budget) %> tokens; the guide answers again in a new browser session.</div><% end %>
   <form class="ask" data-guide-target="form" data-action="submit->guide#ask">
-    <% values.each do |key, value| %><input type="hidden" name="context[<%= key %>]" value="<%= value %>"><% end %>
+    <% values.each do |key, value| %><% Array(value).each do |item| %><input type="hidden" name="context[<%= key %>]<%= '[]' if value.is_a?(Array) %>" value="<%= item %>"><% end %><% end %>
     <input type="hidden" name="context[lines]" value="" data-guide-target="linesField">
     <span data-guide-target="nodesFields" hidden></span>
     <label class="sr-only" for="wm-guide-question">Ask the guide</label>

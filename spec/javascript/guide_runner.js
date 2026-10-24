@@ -76,9 +76,11 @@ async function runGuideRegression() {
     const answer = guide.answerShell()
     guide.threadTarget.appendChild(answer)
     guide.current = { answer, calls: 0 }
-    guide.finish(answer, 'done', { id: '0123456789abcdef', answer: 'User has many Posts.', html: '<p>User has many Posts.</p>', tool_calls: [], elapsed: 1.2 })
-    const tools = [...answer.querySelectorAll('.answer-tools button')].map((b) => b.textContent)
-    check(JSON.stringify(tools) === JSON.stringify(['⎘ copy', 'draft an issue']), `answer tools (${tools})`)
+    guide.finish(answer, 'done', { id: '0123456789abcdef', answer: 'User has many Posts.', html: '<p>User has many Posts.</p>', tool_calls: [], elapsed: 1.2,
+      trail: { pin: '/woods/trail?entry=UsersController%23show&pin%5B%5D=model%3AUser', investigation: '/woods/trail?pin%5B%5D=model%3AUser&gen=1' } })
+    const tools = [...answer.querySelectorAll('.answer-tools .tool')].map((b) => b.textContent)
+    check(JSON.stringify(tools) === JSON.stringify(['pin', 'open as investigation', '⎘ copy', 'draft an issue']), `answer tools (${tools})`)
+    check(answer.querySelector('.answer-tools a.tool').getAttribute('href').startsWith('/woods/trail?entry='), 'pin links the board')
     check(answer.querySelector('[data-controller="copy"]').dataset.copyTextValue === 'User has many Posts.', 'copy carries the Markdown')
     check(answer.querySelector('[data-action="guide#draftIssue"]').dataset.guideSourceParam === '0123456789abcdef', 'the draft names its source answer')
     const draft = guide.answerShell()
