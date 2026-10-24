@@ -122,6 +122,20 @@ RSpec.describe 'History', type: :request do
       expect(WoodsMap::SourceDiff).to have_received(:new).with(anything, hash_including(from: 1, to: 2))
     end
 
+    it 'marks the commits that arrived after the ?since= generation, on the tab and the timeline' do
+      data = { 'schema_version' => 1, 'parameters' => {}, 'coverage' => {}, 'changed' => [], 'affected' => [],
+               'flows' => [], 'unknowns' => [],
+               'range' => { 'from' => { 'generation' => 2 }, 'to' => { 'generation' => 3 } } }
+      range = instance_double(WoodsMap::ImpactRange, state: :available, data: data, message: nil)
+      allow(WoodsMap::ImpactRange).to receive(:new).and_return(range)
+      get '/woods/units/job/ApplicationJob/history', params: { since: 'gen:2' }
+      rows = doc.css('table[aria-label="Commits"] tbody tr:not(.sub)')
+      expect(rows.map { |tr| tr['class'].to_s.include?('chg') }).to eq([true, false, false])
+      expect(rows.first.at_css('.sr-only').text).to include('arrived after gen 2')
+      get '/woods/history', params: { units: %w[job:ApplicationJob], since: 'gen:2' }
+      expect(doc.css('table[aria-label="Commits"] tbody tr.chg').size).to eq(1)
+    end
+
     it 'groups the strip by generation, each bar linking to the commits it first carried' do
       get '/woods/units/job/ApplicationJob/history', params: { by: 'generation' }
       bars = doc.css('svg.strip-svg a').map { |a| [a['aria-label'], a['href']] }
