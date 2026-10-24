@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- The page keys controller mounts once, on the body. The Passage tab and both impact pages mounted it a second time on their body element, so every page key ran its handler twice (`y` wrote once only because the first handler marked the key handled). Regression specs cover the single mount, `on:`-scoped callbacks listed under their own event only, and the existing path-extension, palette and copy-key fixes.
+
 - Diagrams paste into a GitHub pull-request comment and draw there (closes woods-map#76; D-25 amended; docs/design/notes/pr-comment-share.md).
   - **GitHub's Mermaid:** 11.16.1, from the latest `info` check on record (GitHub Community discussion #70672). `spec/diagrams/github_mermaid_spec.rb` parses all 229 generated texts with that exact build, vendored for the spec only and run in Node in CI. With `WOODS_MAP_BROWSER` it also renders them in Chromium. Every type parses, and no GitHub variant is needed.
   - **Lanes:** the lanes view (`swimlane-beta`) loses its "may not render on GitHub" mark, because 11.16.1 knows it. The mark is now kept for Mermaid 12's `usecase-beta` and `agentflow-beta`.
