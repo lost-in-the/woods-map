@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+- State machine transition callbacks per transition (woods#796).
+  - The Lifecycle tab's transitions table gains before, around and after columns. Each callback sits on the transitions its literal scope admits, with its method linked to its line (W-2 method table) and the side effects Woods analysed (`after_failure` reads "on failure").
+  - The state diagram, and its `.mmd` text, labels the transitions that carry callbacks.
+  - Callbacks whose scope is not literal are listed apart.
+  - Generations from before woods#796 keep the raw DSL lines.
+
 - Links back to the current page keep an identifier's trailing slash. On the pages of the root route (`GET /`) the author filters, the Share URL, the `?since=` clear link, the token exchange and a refused `.mmd`'s page link were built from Rails' normalized path and led to 404s. Found by the final sweep on rails-6.0.
 - M3 close-out (woods-map#5).
   - **Exit check:** `spec/support/m3_exit_check.rb` compares every entry Lifecycle (sequence, flowchart, lanes), model event chain and Schema ER with Woods' flow documents and model metadata. It runs on the fixture in CI, and on any index with `WOODS_MAP_EXIT_INDEX`. The testbed run is in docs/design/notes/m3-exit-check.md.

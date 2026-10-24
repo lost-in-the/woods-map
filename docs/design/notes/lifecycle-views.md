@@ -70,12 +70,32 @@ The rail gets a `transitions` group, as on the board.
 - `StateMachineView::STATE_BUDGET` (150 states plus transitions) is the
   budget.
 
-The board's callbacks, side-effects and finding columns are not drawn per
-transition. Woods publishes each transition callback only as a raw DSL line,
-not tied to a transition, and the map does not parse DSL. These lines are
-listed under "Transition callbacks".
-[woods#796](https://github.com/lost-in-the/woods/issues/796) asks for
-structured entries.
+### Transition callbacks
+
+Woods publishes each transition callback as a structured entry,
+`metadata.transition_callbacks` ([woods#796](https://github.com/lost-in-the/woods/issues/796)):
+`kind`, the literal `on`/`from`/`to` scope, `method` or `block`, and
+`side_effects`.
+
+The transitions table gains `before`, `around` and `after` columns. A
+callback sits on every transition its literal scope admits; an empty field
+admits any value. `after_failure` callbacks join the `after` column, marked
+"on failure". Each entry shows:
+
+- the method, linked to its line when the model's method table (W-2) places it, and to the model page otherwise;
+- the side effects Woods analysed, in the steps table's verbs ("writes slug", "enqueues NotifySubscribersJob");
+- or, for a block or a method Woods did not analyse, the reason it gives.
+
+The state diagram adds the callbacks to the label of each transition that
+carries them: `publish / before set_slug, after notify_subscribers`.
+
+A callback whose scope is not literal (Woods names the field in `unresolved`
+and never evaluates it), or whose scope matches no published transition, is
+listed under "Callbacks not tied to a transition".
+
+A generation from before woods#796 publishes only the raw DSL lines. The tab
+then keeps the three-column transitions table and lists those lines under
+"Transition callbacks". The map never parses them.
 
 ## Verification
 

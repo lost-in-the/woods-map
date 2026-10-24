@@ -11,6 +11,46 @@ module WoodsMap
     # transitions without events, as Statesman does), its ends and its guard.
     Transition = Struct.new(:event, :from, :to, :guard, keyword_init: true)
 
+    # One structured transition callback (woods#796): its kind, its literal
+    # scope (empty is any; a field named in +unresolved+ was not literal),
+    # the method or a block, and the side effects Woods analysed.
+    Callback = Struct.new(:kind, :on, :from, :to, :method_name, :block, :side_effects, :unanalysed, :unresolved,
+                          keyword_init: true) do
+      # @return [String] before, around, after or after_failure
+      def phase
+        kind.to_s.delete_suffix('_transition')
+      end
+
+      # @param transition [Transition]
+      # @return [Boolean] whether its literal scope admits the transition
+      def applies_to?(transition)
+        unresolved.empty? && admits?(on, transition.event) && admits?(from, transition.from) &&
+          admits?(to, transition.to)
+      end
+
+      # @return [String] the method, or "block"
+      def label
+        method_name || 'block'
+      end
+
+      # @return [Array<String>] "enqueues X", "writes y" phrases (Lifecycle's verbs)
+      def effects
+        Lifecycle::EFFECT_VERBS.filter_map do |key, verb|
+          values = Array((side_effects || {})[key])
+          "#{verb} #{values.join(', ')}" if values.any?
+        end
+      end
+
+      private
+
+      def admits?(scope, value)
+        scope.empty? || (value && scope.include?(value))
+      end
+    end
+
+    # Callback columns of the transitions table, in the order they run.
+    PHASES = %w[before around after after_failure].freeze
+
     # State budget (R-4), states plus transitions, the same as a flowchart.
     STATE_BUDGET = 150
 
@@ -76,9 +116,38 @@ module WoodsMap
     end
 
     # @return [Array<String>] transition callbacks as the extractor recorded
-    #   them (a line of the DSL each); not tied to a transition in the index
+    #   them (a line of the DSL each), the fallback for a generation without
+    #   {#transition_callbacks}
     def callbacks
       Array(@metadata['callbacks']).map(&:to_s)
+    end
+
+    # @return [Boolean] whether the unit publishes structured transition callbacks (woods#796)
+    def structured?
+      @metadata['transition_callbacks'].is_a?(Array)
+    end
+
+    # @return [Array<Callback>] in declaration order
+    def transition_callbacks
+      @transition_callbacks ||= Array(@metadata['transition_callbacks']).grep(Hash).map do |record|
+        Callback.new(kind: record['kind'].to_s, on: list(record['on']), from: list(record['from']),
+                     to: list(record['to']), method_name: record['method'].presence&.to_s,
+                     block: record['block'] == true,
+                     side_effects: record['side_effects'], unanalysed: record['unanalysed'],
+                     unresolved: list(record['unresolved']))
+      end
+    end
+
+    # @param transition [Transition]
+    # @return [Hash{String => Array<Callback>}] phase => the callbacks its literal scope admits
+    def callbacks_for(transition)
+      transition_callbacks.select { |callback| callback.applies_to?(transition) }.group_by(&:phase)
+    end
+
+    # @return [Array<Callback>] callbacks no transition can carry: a scope
+    #   that is not literal, or one no published transition matches
+    def unplaced_callbacks
+      transition_callbacks.reject { |callback| transitions.any? { |t| callback.applies_to?(t) } }
     end
 
     # Mermaid state diagram text: every state declared under an alias (so a
@@ -112,10 +181,18 @@ module WoodsMap
 
     private
 
-    # The event, then its guard in brackets; a colon would end the label early.
+    # The event, then its guard in brackets, then the callbacks it carries
+    # by phase; a colon would end the label early.
     def edge_label(transition)
       text = [transition.event, (transition.guard ? "[#{transition.guard}]" : nil)].compact.join(' ')
-      text.empty? ? '' : " : #{text.tr(':', ' ')}"
+      carried = callbacks_for(transition).sort_by { |phase, _| PHASES.index(phase) || PHASES.size }
+                                         .map { |phase, list| "#{phase.tr('_', ' ')} #{list.map(&:label).join(', ')}" }
+      text = [text.presence, carried.join(', ').presence].compact.join(' / ')
+      text.empty? ? '' : " : #{text.tr(':;#', '   ')}"
+    end
+
+    def list(value)
+      Array(value).map(&:to_s).reject(&:empty?)
     end
 
     def transition(record, event)

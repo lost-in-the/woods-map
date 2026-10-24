@@ -39,13 +39,31 @@
       <section class="sec" aria-labelledby="<%= heading %>">
         <header><h2 class="t2" id="<%= heading %>">State machine transitions <%= count_tag("#{machine.events.size} #{'event'.pluralize(machine.events.size)}, #{machine.states.size} #{'state'.pluralize(machine.states.size)}") %></h2><%= unit_link(machine.identifier, 'state_machine') %></header>
         <% state_text = machine.mermaid %>
-        <%= render 'woods_map/components/diagram', title: 'State', facts: [machine.identifier, machine.gem].compact, name: "#{machine.identifier} state", mermaid_url: woods_map.unit_lifecycle_mmd_path(type: 'state_machine', identifier: machine.identifier), mermaid: state_text, label: "State diagram of #{machine.identifier}: #{machine.states.size} states and the events that move between them", refusal: (machine.refusal && "#{machine.refusal}; the transitions below list every one."), legend: [['label', 'the event, then its guard in brackets'], ['●', 'enters the initial state']], provenance: ['state_machine unit', "gen #{@repository.generation_number}"] %>
-        <%= render 'woods_map/components/table', label: "Transitions of #{machine.identifier}", min_width: '560px', columns: [{ label: 'event', width: '180px', cell_class: 'nw id' }, { label: 'from → to' }, { label: 'guard', width: '200px' }],
-              rows: machine.transitions.map { |t| { cells: [t.event || empty_value(applicable: false), "#{t.from} → #{t.to}", t.guard || empty_value(applicable: false)] } } %>
+        <%= render 'woods_map/components/diagram', title: 'State', facts: [machine.identifier, machine.gem].compact, name: "#{machine.identifier} state", mermaid_url: woods_map.unit_lifecycle_mmd_path(type: 'state_machine', identifier: machine.identifier), mermaid: state_text, label: "State diagram of #{machine.identifier}: #{machine.states.size} states and the events that move between them", refusal: (machine.refusal && "#{machine.refusal}; the transitions below list every one."), legend: [['label', 'the event, its guard in brackets, then after / the callbacks the transition carries'], ['●', 'enters the initial state']], provenance: ['state_machine unit', "gen #{@repository.generation_number}"] %>
+        <% if machine.structured? %>
+          <%= render 'woods_map/components/table', label: "Transitions of #{machine.identifier}", min_width: '980px', columns: [{ label: 'event', width: '140px', cell_class: 'nw id' }, { label: 'from → to', width: '170px' }, { label: 'guard', width: '120px' }, { label: 'before', cell_class: 'inline-links' }, { label: 'around', cell_class: 'inline-links' }, { label: 'after', cell_class: 'inline-links' }],
+                rows: machine.transitions.map { |t|
+                  carried = machine.callbacks_for(t)
+                  { cells: [t.event || empty_value(applicable: false), "#{t.from} → #{t.to}", t.guard || empty_value(applicable: false),
+                            transition_callbacks_cell(carried['before'], @unit), transition_callbacks_cell(carried['around'], @unit),
+                            transition_callbacks_cell(Array(carried['after']) + Array(carried['after_failure']), @unit)] }
+                } %>
+        <% else %>
+          <%= render 'woods_map/components/table', label: "Transitions of #{machine.identifier}", min_width: '560px', columns: [{ label: 'event', width: '180px', cell_class: 'nw id' }, { label: 'from → to' }, { label: 'guard', width: '200px' }],
+                rows: machine.transitions.map { |t| { cells: [t.event || empty_value(applicable: false), "#{t.from} → #{t.to}", t.guard || empty_value(applicable: false)] } } %>
+        <% end %>
       </section>
-      <% if machine.callbacks.any? %>
+      <% unplaced = machine.structured? ? machine.unplaced_callbacks : [] %>
+      <% if unplaced.any? %>
+        <section class="sec" aria-labelledby="<%= heading %>up">
+          <header><h2 class="t2" id="<%= heading %>up">Callbacks not tied to a transition <%= count_tag(unplaced.size) %><%= info_tip('Their scope is not literal (Woods names the field and never evaluates it), or no published transition matches it, so no row can carry them.') %></h2></header>
+          <%= render 'woods_map/components/table', label: "Callbacks of #{machine.identifier} not tied to a transition", min_width: '700px', columns: [{ label: 'kind', width: '160px', cell_class: 'nw' }, { label: 'scope, as declared', width: '260px' }, { label: 'callback', cell_class: 'inline-links' }],
+                rows: unplaced.map { |c| { cells: [c.kind, [("on #{c.on.join(', ')}" if c.on.any?), ("from #{c.from.join(', ')}" if c.from.any?), ("to #{c.to.join(', ')}" if c.to.any?), ("#{c.unresolved.join(', ')} not literal" if c.unresolved.any?)].compact.join('; ').presence || 'any transition', transition_callback_entry(c, @unit)] } } %>
+        </section>
+      <% end %>
+      <% if !machine.structured? && machine.callbacks.any? %>
         <section class="sec" aria-labelledby="<%= heading %>cb">
-          <header><h2 class="t2" id="<%= heading %>cb">Transition callbacks <%= count_tag(machine.callbacks.size) %><%= info_tip('As the extractor recorded each line of the DSL. The index does not tie a callback to its transitions or record its side effects (woods#796), so the diagram does not draw them.') %></h2></header>
+          <header><h2 class="t2" id="<%= heading %>cb">Transition callbacks <%= count_tag(machine.callbacks.size) %><%= info_tip('As the extractor recorded each line of the DSL. This generation predates structured transition callbacks (woods#796): re-extract to tie each one to its transitions with its side effects.') %></h2></header>
           <%= render 'woods_map/components/table', label: "Transition callbacks of #{machine.identifier}", min_width: '560px', columns: [{ label: 'callback, as declared', cell_class: 'id' }, { label: 'source', width: '200px' }],
                 rows: machine.callbacks.map { |line| { cells: [line, layer_chip('state machine DSL')] } } %>
         </section>
