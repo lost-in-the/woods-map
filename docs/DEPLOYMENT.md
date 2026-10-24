@@ -273,7 +273,11 @@ settings; until M7 lands, these are the ones known to matter:
   stream. Exclude `text/event-stream`.
 - **Puma:** each open stream holds one thread for its whole duration. Keep
   `max_threads` above the number of concurrent guide sessions you expect,
-  plus the page traffic.
+  plus the page traffic. Each worker keeps up to `config.guide_mcp_servers`
+  `woods-mcp` processes (2 by default) for its answers; a worker forked from
+  a parent that already started some starts its own and leaves the parent's
+  alone. More concurrent answers than that wait up to
+  `guide_mcp_wait_seconds`, then fail with a message.
 - **CDNs and tunnels:** Cloudflare and some ingress controllers buffer or
   time out idle streams. Use a long read timeout and a heartbeat comment.
   The design falls back to polling Turbo Frames where a stream cannot open

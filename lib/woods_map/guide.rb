@@ -5,7 +5,9 @@ require 'woods_map/guide/budget'
 require 'woods_map/guide/store'
 require 'woods_map/guide/context'
 require 'woods_map/guide/answer'
+require 'woods_map/guide/handoff'
 require 'woods_map/guide/runner'
+require 'woods_map/guide/server_pool'
 
 module WoodsMap
   # The guide (M7, FR-8): a RubyLLM agent over the Woods Index MCP server,
@@ -74,14 +76,16 @@ module WoodsMap
       nil
     end
 
-    # One answer's chat and the MCP connection it holds open.
-    Session = Struct.new(:chat, :servers) do
-      # Stop the stdio server (or end the HTTP session) the answer used.
+    # One answer's chat and the MCP server it borrowed.
+    Session = Struct.new(:chat, :servers, :pool) do
+      # Hand the server back to the pool, or stop it: after an answer that
+      # did not end cleanly, and always when there is no pool.
       #
+      # @param reuse [Boolean] whether the answer ended cleanly
       # @return [void]
-      def close
+      def close(reuse: false)
         servers.each do |server|
-          server.close
+          pool ? pool.checkin(server, reuse: reuse) : server.close
         rescue StandardError
           nil
         end
@@ -89,18 +93,87 @@ module WoodsMap
     end
 
     # A chat for one answer: the host's factory, or the agent with the
-    # configured chat options and the Index MCP server attached.
+    # configured chat options and an Index MCP server attached, borrowed from
+    # the process's {ServerPool} for this index and generation.
     #
     # @param config [WoodsMap::Configuration]
+    # @param generation_key [Array, nil] the pinned generation's identity
+    #   ({WoodsMap::Repository#generation_key}); a new one restarts the servers
     # @return [Session]
-    def open_session(config = WoodsMap.configuration)
-      return Session.new(config.guide_chat_factory.call, []) if config.guide_chat_factory
+    def open_session(config = WoodsMap.configuration, generation_key: nil)
+      return Session.new(config.guide_chat_factory.call, [], nil) if config.guide_chat_factory
 
       agent = backend
-      server = WoodsMap::Guide::IndexMcp.for(config).new
-      chat = agent.chat(**config.guide_chat_options.to_h.transform_keys(&:to_sym))
-      chat.with_mcp(server)
-      Session.new(chat, [server])
+      server_class = WoodsMap::Guide::IndexMcp.for(config)
+      pool = server_pool(config)
+      server = pool ? pool.checkout(server_key(config, generation_key)) { server_class.new } : server_class.new
+      begin
+        chat = agent.chat(**config.guide_chat_options.to_h.transform_keys(&:to_sym))
+        chat.with_mcp(server)
+      rescue StandardError
+        pool ? pool.checkin(server, reuse: true) : server.close
+        raise
+      end
+      Session.new(chat, [server], pool)
     end
+
+    # The process's pool of Index MCP servers, or nil when
+    # `guide_mcp_servers` is 0. A change to the pool settings stops the old
+    # pool's servers and starts a new pool.
+    #
+    # @param config [WoodsMap::Configuration]
+    # @return [ServerPool, nil]
+    def server_pool(config = WoodsMap.configuration)
+      settings = [config.guide_mcp_servers.to_i, config.guide_mcp_idle_seconds.to_f, config.guide_mcp_wait_seconds.to_f]
+      POOL_LOCK.synchronize do
+        if @pool_settings != settings
+          @pool&.shutdown
+          @pool_settings = settings
+          @pool = if settings.first.positive?
+                    ServerPool.new(size: settings[0], idle: settings[1],
+                                   wait: settings[2])
+                  end
+          register_shutdown
+        end
+        @pool
+      end
+    end
+
+    # Stop the pooled servers: the idle ones now and the busy ones when their
+    # answers end, or, with `force` (at exit), all of them now.
+    #
+    # @param force [Boolean]
+    # @return [void]
+    def shutdown_servers(force: false)
+      pool = POOL_LOCK.synchronize do
+        current = @pool
+        @pool = nil
+        @pool_settings = nil
+        current
+      end
+      pool&.shutdown(force: force)
+    end
+
+    # The key a pooled server serves: the transport and the generation.
+    #
+    # @param config [WoodsMap::Configuration]
+    # @param generation_key [Array, nil]
+    # @return [Array]
+    def server_key(config, generation_key)
+      transport = config.guide_mcp_url ? ['url', config.guide_mcp_url.to_s] : ['stdio', *IndexMcp.command_for(config)]
+      [transport, Array(generation_key)]
+    end
+
+    POOL_LOCK = Mutex.new
+    private_constant :POOL_LOCK
+
+    # @return [void]
+    def register_shutdown
+      return if @shutdown_registered
+
+      @shutdown_registered = true
+      at_exit { WoodsMap::Guide.shutdown_servers(force: true) }
+    end
+    private_class_method :register_shutdown
   end
 end

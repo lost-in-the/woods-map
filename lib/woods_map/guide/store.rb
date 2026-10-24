@@ -12,10 +12,24 @@ module WoodsMap
     # payload, so extraction and the exporters never see it; F-4): the
     # tokens the session has spent and the current conversation's turns.
     # "new" starts another conversation and keeps the spend, so the budget
-    # holds for the whole session. Nothing is written to the host database.
+    # holds for the whole session; the conversation it leaves joins the
+    # session's history, the newest {HISTORY} kept, and can be opened again.
+    # Nothing is written to the host database.
     class Store
       # A session id: 32 hex characters, generated here, never a path.
       ID = /\A[0-9a-f]{32}\z/
+
+      # A conversation id: 16 hex characters, generated here.
+      CONVERSATION = /\A[0-9a-f]{16}\z/
+
+      # Earlier conversations kept per session; the oldest is dropped.
+      HISTORY = 20
+
+      # The longest title a history row shows.
+      TITLE = 80
+
+      # Raised when the current conversation is still answering.
+      class Busy < StandardError; end
 
       # Raised for an id that is not one this store issued.
       class InvalidId < ArgumentError; end
@@ -111,14 +125,58 @@ module WoodsMap
         change { |record| record['tokens'] = record['tokens'].to_i + count.to_i }
       end
 
-      # Start a new conversation; the session's spend stays.
+      # Start a new conversation; the session's spend stays and the one left
+      # joins the history.
       #
       # @return [void]
       def reset!
         change do |record|
+          archive(record)
           record['turns'] = []
           record['conversation'] = SecureRandom.hex(8)
         end
+      end
+
+      # @return [String] the current conversation's id
+      def conversation
+        data['conversation'].to_s
+      end
+
+      # The session's conversations, the current one first, then the
+      # history newest first: id, title, turn count, when it started and
+      # when it last changed. A conversation with no turns is left out.
+      #
+      # @return [Array<Hash>]
+      def conversations
+        record = data
+        current = Array(record['turns']).any? ? [summary(record['conversation'], record['turns'], current: true)] : []
+        current + Array(record['history']).map { |entry| summary(entry['id'], entry['turns'], current: false) }
+      end
+
+      # Make an earlier conversation the current one again; the current one
+      # joins the history.
+      #
+      # @param conversation_id [String]
+      # @return [Boolean] false when the session has no such conversation
+      # @raise [Busy] while the current conversation is answering
+      def open!(conversation_id)
+        return false unless conversation_id.to_s.match?(CONVERSATION)
+
+        opened = false
+        change do |record|
+          raise Busy, 'An answer is still streaming.' if answering?(record)
+          next opened = true if record['conversation'] == conversation_id
+
+          entry = Array(record['history']).find { |candidate| candidate['id'] == conversation_id }
+          next unless entry
+
+          record['history'] = Array(record['history']) - [entry]
+          archive(record)
+          record['conversation'] = entry['id']
+          record['turns'] = Array(entry['turns'])
+          opened = true
+        end
+        opened
       end
 
       private
@@ -133,6 +191,31 @@ module WoodsMap
         JSON.parse(File.read(path, encoding: 'UTF-8'))
       rescue JSON::ParserError
         blank
+      end
+
+      def archive(record)
+        turns = Array(record['turns'])
+        return if turns.empty?
+
+        id = record['conversation'].to_s
+        entry = { 'id' => id.match?(CONVERSATION) ? id : SecureRandom.hex(8), 'turns' => turns }
+        record['history'] = ([entry] + Array(record['history'])).first(HISTORY)
+      end
+
+      def answering?(record)
+        Array(record['turns']).any? { |turn| %w[pending running].include?(turn['state']) }
+      end
+
+      def summary(id, turns, current:)
+        turns = Array(turns)
+        first = turns.first || {}
+        title = first['label'] || first['question']
+        title = "#{title}: #{first['question']}" if first['label'] && first['question'].to_s != ''
+        title = title.to_s.strip
+        title = "#{title[0, TITLE - 1]}…" if title.size > TITLE
+        { 'id' => id.to_s, 'title' => title, 'summary' => first.dig('context', 'summary').to_s,
+          'turns' => turns.size, 'started_at' => first['created_at'], 'updated_at' => turns.last&.dig('created_at'),
+          'current' => current }
       end
 
       def blank
