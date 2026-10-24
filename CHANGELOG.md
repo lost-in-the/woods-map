@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Dependents counts say what they count. The impact page's focus row counts the distinct typed units with an edge to the unit in this generation's graph ("6 typed units"). The hub notes, wherever they appear, carry graph_analysis' own per-identifier count ("hub, 19 dependents by identifier"). The two used to sit side by side with no label and read as a contradiction.
+
 - Navigation and the files sheet at any size of index and any width.
   - **The file tree is no longer in every page.** The sheet fetches it the first time it opens, one response per generation that the browser keeps. On a generated index of 4,500 units the status page went from 1.75 MB to 11.5 KB.
   - The tree leaves out framework and gem source files.
