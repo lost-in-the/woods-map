@@ -22,6 +22,7 @@ opens the file tree.
 |---|---|---|---|---|
 | `/woods` | Status page (generation, HEAD, freshness, extractors, host) | FR-1 | [B8-States](boards/B8-States.html) (stale panel) | final |
 | `/woods?token=` refused, no index, drifted, stale, degraded, empty results, guide unavailable | States and banners | FR-1, D-4, R-1, E-10 | [B8-States](boards/B8-States.html) | final |
+| 429 pacing, DNS-rebinding refusal | Rate-limit and loopback-Host states (M8) | D-4 | [M8 staging note](notes/m8-staging.md), the 403 panel of [B8-States](boards/B8-States.html) | note; [woods-map#59](https://github.com/lost-in-the/woods-map/issues/59) |
 | `/woods/units` | Units index, grouped by actual type with distinct typed counts | FR-3 | [M1 navigation note](notes/m1-indexed-navigation.md) | shared components; mounted acceptance separate |
 | search palette, `/woods/search` | Name, path and full-text code search, completeness | FR-2, B-12 | [B8-Search](boards/B8-Search.html) | final |
 | `/woods/units/model/Post` Code | Two lenses, outline, marginalia, peek, confidence marks, folds, concerns inlined | FR-3, FR-4, B-1, B-2, B-7 to B-11, B-15 | [B8-Code](boards/B8-Code.html) | final, amended by D-24: the view scrolls as one region ([woods-map#29](https://github.com/lost-in-the/woods-map/issues/29)) |

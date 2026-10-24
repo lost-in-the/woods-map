@@ -102,3 +102,74 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .share-panel .sh-dia[hidden]{display:none}
 .wm .share-panel .sh-url{font-family:var(--ff-data);font-size:var(--fs-11);overflow-wrap:anywhere;user-select:all}
 @container wm (max-width:959px){ .wm .share-panel{right:auto;left:0} }
+
+/* The Content-Security-Policy (M8) refuses style attributes, so what views once wrote inline is a
+   class here. Geometry that varies takes a bounded class: tree level, step depth, table minimum. */
+.wm .gap-top{margin-top:var(--s4)}
+.wm .gap-top3{margin-top:var(--s3)}
+.wm .gap-top5{margin-top:var(--s5)}
+.wm .gap-left{margin-left:var(--s4)}
+.wm .pad1{padding:var(--s1) var(--s5)}
+.wm .pad2{padding:var(--s2) var(--s5)}
+.wm .pad3{padding:var(--s3) var(--s5)}
+.wm .pad4{padding:var(--s4) var(--s5)}
+.wm .padx{padding:0 var(--s5)}
+.wm .main.inset{margin-left:var(--s5)}
+.wm .frame-facts{margin:var(--s4) var(--s5) 0}
+.wm .contents{display:contents}
+.wm .regular{font-weight:400}
+.wm .det.framed{border:1px solid var(--rule2);border-radius:var(--r-ctl)}
+.wm .det.status-det{max-width:720px}
+.wm .crumbs .path.trail{margin-left:auto}
+.wm .sh .eyebrow.aside{margin-left:var(--s5);color:var(--dim)}
+.wm .cv .peek .ph .tool.close{text-decoration:none}
+.wm .cv .peek .ph.meta{font-family:var(--ff-data);font-size:var(--fs-11)}
+.wm .cv .peek .ph.meta .lyr{margin:0}
+.wm .grp.flush{border:0;padding-top:var(--s2)}
+.wm .legend .sw.self{border-color:var(--select)}
+.wm .legend .sw.changed{background:var(--mod-tint);border-color:var(--mod)}
+.wm .dia .cmd.bare{margin:0;border:0;background:none}
+.wm .event-pick{margin-bottom:var(--s3);display:flex;gap:var(--s3);align-items:center}
+.wm .empty-state.refusal-panel{padding:var(--s6) var(--s5)}
+.wm .refusal-panel > .eyebrow{margin-bottom:var(--s3)}
+.wm .token-form{margin-top:var(--s4);display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap}
+.wm .token-form .filter{width:28ch;border:1px solid var(--rule2);border-radius:var(--r-ctl)}
+.wm .filter.focus-input{width:min(100%,420px)}
+.wm .filter.auto{width:auto}
+.wm .tbl.fixed{table-layout:fixed}
+.wm .tbl.fit{min-width:max-content}
+.wm .tbl.min-560{--tbl-min:560px} .wm .tbl.min-640{--tbl-min:640px} .wm .tbl.min-720{--tbl-min:720px} .wm .tbl.min-760{--tbl-min:760px}
+.wm .tbl.min-820{--tbl-min:820px} .wm .tbl.min-860{--tbl-min:860px} .wm .tbl.min-900{--tbl-min:900px} .wm .tbl.min-980{--tbl-min:980px}
+.wm .tree [data-level="0"]{--l:0} .wm .tree [data-level="1"]{--l:1} .wm .tree [data-level="2"]{--l:2} .wm .tree [data-level="3"]{--l:3} .wm .tree [data-level="4"]{--l:4} .wm .tree [data-level="5"]{--l:5} .wm .tree [data-level="6"]{--l:6} .wm .tree [data-level="7"]{--l:7} .wm .tree [data-level="8"]{--l:8} .wm .tree [data-level="9"]{--l:9} .wm .tree [data-level="10"]{--l:10} .wm .tree [data-level="11"]{--l:11} .wm .tree [data-level="12"]{--l:12} .wm .tree [data-level="13"]{--l:13} .wm .tree [data-level="14"]{--l:14} .wm .tree [data-level="15"]{--l:15} .wm .tree [data-level="16"]{--l:16} .wm .tree [data-level="17"]{--l:17} .wm .tree [data-level="18"]{--l:18} .wm .tree [data-level="19"]{--l:19} .wm .tree [data-level="20"]{--l:20} .wm .tree [data-level="21"]{--l:21} .wm .tree [data-level="22"]{--l:22} .wm .tree [data-level="23"]{--l:23} .wm .tree [data-level="24"]{--l:24}
+.wm .tree .deep{--l:24}
+.wm .st[data-depth="0"]{--d:0} .wm .st[data-depth="1"]{--d:1} .wm .st[data-depth="2"]{--d:2} .wm .st[data-depth="3"]{--d:3} .wm .st[data-depth="4"]{--d:4} .wm .st[data-depth="5"]{--d:5} .wm .st[data-depth="6"]{--d:6} .wm .st[data-depth="7"]{--d:7} .wm .st[data-depth="8"]{--d:8} .wm .st[data-depth="9"]{--d:9} .wm .st[data-depth="10"]{--d:10} .wm .st[data-depth="11"]{--d:11} .wm .st[data-depth="12"]{--d:12}
+/* The same rule for the guidelines specimens. */
+.wm .spec .t3.h-first{margin-bottom:var(--s3)}
+.wm .spec .t3.h-next{margin:var(--s5) 0 var(--s3)}
+.wm .spec .row.one{grid-template-columns:minmax(0,1fr)}
+.wm .spec .narrow.w960{width:960px} .wm .spec .narrow.w640{width:640px} .wm .spec .narrow.w390{width:390px}
+.wm .spec .pad-in{padding:var(--s4)}
+.wm .spec .pad-in3{padding:var(--s3)}
+.wm .spec .inset4{margin:var(--s4)}
+.wm .spec .inset5{margin:var(--s5)}
+.wm .spec .spacer5{height:var(--s5)}
+.wm .spec .box.strip{max-width:120px}
+.wm .spec .ctl-row{display:flex;gap:var(--s3);flex-wrap:wrap;align-items:center}
+.wm .spec .ctl-row.wide{gap:var(--s4)}
+.wm .spec .btn.dimmed{opacity:.5}
+.wm .spec .lead.loose{line-height:2;max-width:none}
+.wm .spec .placeholder{height:160px;border:1px dashed var(--rule2);border-radius:var(--r-ctl);display:flex;align-items:center;justify-content:center;color:var(--dim);font-family:var(--ff-ui);font-size:var(--fs-12)}
+.wm .spec .ts-24{font-size:var(--fs-24);font-weight:700;color:var(--bright)}
+.wm .spec .ts-18{font-size:var(--fs-18);font-weight:700;color:var(--bright)}
+.wm .spec .ts-15{font-size:var(--fs-15);color:var(--mut)}
+.wm .spec .ts-12{font-size:var(--fs-12);color:var(--mut)}
+.wm .spec .w500{font-weight:500} .wm .spec .w700{font-weight:700}
+.wm .spec .c-select{color:var(--select)} .wm .spec .c-hot{color:var(--hot)} .wm .spec .c-risk{color:var(--risk);font-weight:700}
+.wm .spec .phi{display:flex;gap:var(--s5);align-items:flex-end}
+.wm .spec .phi > span{display:inline-flex;flex-direction:column;align-items:center;gap:var(--s2)}
+.wm .spec .phi svg{display:block}
+.wm .spec .phi rect{fill:var(--select);opacity:.75}
+.wm .spec .phi .mut{font-size:var(--fs-11)}
+.wm .spec .irail.lanes{display:inline-flex;gap:var(--s2)}
+.wm .spec .tgl.lane{font-size:12px}
+.wm .spec .tgl.lane.on{background:var(--bright);color:var(--bg)}

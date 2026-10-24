@@ -1,0 +1,12 @@
+<% content_for :title, 'Woods Map · too many requests' %>
+<div class="empty-state refusal-panel">
+  <div class="eyebrow">HTTP 429</div>
+  <h1 class="t2">Woods Map is pacing requests</h1>
+  <%= { search: 'Search and the palette', graph: 'The graph', impact: 'The impact page' }.fetch(@rate_group, 'This page') %> answered <%= pluralize(@rate_decision.limit, 'request') %> from this client in the last <%= woods_map_config.rate_limit_period.to_i %> seconds, the budget the host set. Try again in <%= @rate_decision.retry_after %> <%= @rate_decision.retry_after == 1 ? 'second' : 'seconds' %>; every other page still opens.
+  <pre class="cmd" tabindex="0" role="region" aria-label="Budget configuration"># config/initializers/woods_map.rb
+WoodsMap.configure do |c|
+  c.rate_limit = 240        # per client and group
+  c.rate_limit_period = 60  # seconds; nil turns it off
+end</pre>
+  <div class="cap">Counted in this server process only. No index data appears on this page; it is served before the map opens anything.</div>
+</div>

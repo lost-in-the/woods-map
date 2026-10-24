@@ -10,4 +10,4 @@
 <%= render 'woods_map/shared/ident', title: local_assigns.fetch(:title, page.identifier), subtitle: local_assigns.fetch(:subtitle, page.subtitle), controls: safe_join([local_assigns[:controls], render('woods_map/shared/share'), primary].compact, ' ') %>
 <%= render 'woods_map/shared/tabs', tabs: unit_tabs(page, tab) %>
 <% tiles = local_assigns[:tiles] || page.tiles.map { |tile| { eyebrow: tile[:eyebrow], rows: tile[:rows].map { |label, value| [label, tile_value(value)] } } } %>
-<% if tiles.any? %><div style="margin:var(--s4) var(--s5) 0"><%= render 'woods_map/components/facts', tiles: tiles %></div><% end %>
+<% if tiles.any? %><div class="frame-facts"><%= render 'woods_map/components/facts', tiles: tiles %></div><% end %>

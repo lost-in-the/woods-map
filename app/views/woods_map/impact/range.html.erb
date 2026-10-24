@@ -2,7 +2,7 @@
 <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
 <%= render 'woods_map/impact/frame', title: 'Impact range', subtitle: 'retained generation evidence', crumb: 'range', controls: render('woods_map/shared/share') %>
 <div class="body">
-  <div class="main" style="margin-left:var(--s5)">
+  <div class="main inset">
     <section class="sec" aria-labelledby="range-selectors">
       <h2 class="t2" id="range-selectors">Compare retained generations</h2>
       <p>Use gen:N, now, or an unambiguous retained commit SHA. Woods resolves both endpoints once. The bar above describes the current index, not historical evidence.</p>

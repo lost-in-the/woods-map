@@ -100,4 +100,99 @@ RSpec.describe 'Authentication', type: :request do
     expect(response).to have_http_status(:forbidden)
     expect(response.body).to include('config.authorize')
   end
+
+  describe 'the token-less loopback mode and DNS rebinding' do
+    it 'refuses a loopback request that names a host other than loopback' do
+      host! 'rebound.example'
+      get '/woods'
+      expect(response).to have_http_status(:forbidden)
+      expect(response.body).to include('DNS-rebinding').and include('config.allowed_origins')
+      expect(response.body).not_to include('rebound.example')
+      expect(response.body).not_to include('Post')
+    end
+
+    it 'judges the raw Host header, not X-Forwarded-Host' do
+      host! 'rebound.example'
+      get '/woods', headers: { 'X-Forwarded-Host' => 'localhost' }
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'serves loopback names with a port' do
+      %w[localhost:3000 127.0.0.1:3106].each do |name|
+        host! name
+        get '/woods'
+        expect(response).to have_http_status(:ok), name
+      end
+    end
+
+    it 'accepts a host named in config.allowed_origins' do
+      WoodsMap.configuration.allowed_origins = ['http://map.test']
+      host! 'map.test'
+      get '/woods'
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'leaves token holders alone: a rebound page has neither the token nor the cookie' do
+      WoodsMap.configuration.token = 'secret-token'
+      host! 'map.example.com'
+      get '/woods', headers: { 'Authorization' => 'Bearer secret-token' }
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe 'the origin guard on state-changing routes' do
+    before { WoodsMap.configuration.token = 'secret-token' }
+
+    let(:remote) { { 'REMOTE_ADDR' => '203.0.113.9' } }
+
+    def post_session(headers)
+      post '/woods/session', params: { token: 'secret-token' }, headers: headers, env: remote
+    end
+
+    it 'accepts the map’s own origin, by Origin or by Referer' do
+      post_session('Origin' => 'http://localhost')
+      expect(response).to have_http_status(:found)
+      post_session('Referer' => 'http://localhost/woods/session/new')
+      expect(response).to have_http_status(:found)
+    end
+
+    {
+      'a foreign Origin' => { 'Origin' => 'https://evil.example' },
+      'an opaque Origin' => { 'Origin' => 'null' },
+      'a foreign Referer without Origin' => { 'Referer' => 'https://evil.example/form' },
+      'the same host on another port' => { 'Origin' => 'http://localhost:8080' },
+      'another scheme' => { 'Origin' => 'https://localhost' },
+      'a cross-site fetch with no Origin or Referer' => { 'Sec-Fetch-Site' => 'cross-site' },
+      'a same-site fetch with no Origin or Referer' => { 'Sec-Fetch-Site' => 'same-site' }
+    }.each do |name, headers|
+      it "refuses #{name}" do
+        post_session(headers)
+        expect(response).to have_http_status(:forbidden)
+        expect(response.body).to include('another origin')
+        expect(response.cookies[WoodsMap.configuration.cookie_name]).to be_nil
+      end
+    end
+
+    it 'lets the Origin decide over a same-origin Referer' do
+      post_session('Origin' => 'https://evil.example', 'Referer' => 'http://localhost/woods/session/new')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'guards sign-out too' do
+      headers = { 'Origin' => 'https://evil.example', 'Authorization' => 'Bearer secret-token' }
+      delete '/woods/session', headers: headers, env: remote
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'accepts an origin named in config.allowed_origins' do
+      WoodsMap.configuration.allowed_origins = ['https://map.example.com']
+      post_session('Origin' => 'https://map.example.com')
+      expect(response).to have_http_status(:found)
+    end
+
+    it 'lets a non-browser client through to the token check' do
+      post_session({})
+      expect(response).to have_http_status(:found)
+    end
+  end
 end

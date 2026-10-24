@@ -103,6 +103,8 @@ Run this before a milestone issue is opened and again before it closes.
 | Passage and impact coverage: unresolved render targets and partials stay incomplete (M2 B-17, B-18; M4b E-5) | [woods-map#47](https://github.com/lost-in-the/woods-map/issues/47), fixed by [woods-map#51](https://github.com/lost-in-the/woods-map/pull/51) |
 | D-24 Code view scrolls as one region, not a line at a time (settled, amends B8-Code) | [woods-map#29](https://github.com/lost-in-the/woods-map/issues/29) |
 | D-25 Share menu: focus URL and Mermaid only, no Markdown or JSON (settled) | [woods-map#57](https://github.com/lost-in-the/woods-map/issues/57) |
+| M8 first slice: CSP, rate limits, origin guard and loopback Host, tested under Puma; the threat model and deployment guide follow on #10 | [woods-map#10](https://github.com/lost-in-the/woods-map/issues/10), [note](notes/m8-staging.md) |
+| M8 open choices: the 429 state, the loopback Host rule, no style attributes (needs-decision) | [woods-map#59](https://github.com/lost-in-the/woods-map/issues/59) |
 | D-10 Source of truth for visual tokens | [woods-map#12](https://github.com/lost-in-the/woods-map/issues/12) |
 | D-11 Colour meaning | [woods-map#13](https://github.com/lost-in-the/woods-map/issues/13) |
 | D-12 Typefaces | [woods-map#14](https://github.com/lost-in-the/woods-map/issues/14) |

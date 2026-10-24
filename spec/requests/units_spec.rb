@@ -109,7 +109,7 @@ RSpec.describe 'Unit pages', type: :request do
     title = '<h1 class="t1">UsersController#edit<span class="sub">GET /users/:id/edit</span></h1>'
     expect(response.body).to include(title).and include('Filter matrix')
     expect(response.body).to include('href="/woods/units/controller/UsersController#L2">logged_in_user</a>')
-    expect(response.body).to include('<th class="c cur" style="width:66px">edit</th>')
+    expect(response.body).to include('<th class="c cur" width="66">edit</th>')
     expect(response.body).to include('Callback ladder, <a href="/woods/units/model/User">User</a>')
   end
 

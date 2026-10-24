@@ -5,5 +5,5 @@
   <button class="tool files" type="button" aria-label="Open files" data-action="sheet#open" data-needs-js><span aria-hidden="true">☰</span> files</button>
   <span><% crumbs.each_with_index do |(label, href), index| %><% if index.positive? %> › <% end %><% if href %><a href="<%= href %>"><%= label %></a><% else %><span class="bright"><%= label %></span><% end %><% end %></span>
   <% if local_assigns[:path] %><span class="path"><%= path %> <button class="tool" type="button" aria-label="Copy path" data-controller="copy" data-copy-text-value="<%= path %>" data-action="copy#copy" data-needs-js>⎘</button></span><% end %>
-  <% if local_assigns[:trail] %><span class="path" style="margin-left:auto"><%= trail %></span><% end %>
+  <% if local_assigns[:trail] %><span class="path trail"><%= trail %></span><% end %>
 </div>

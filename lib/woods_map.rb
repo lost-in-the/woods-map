@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 require 'woods_map/version'
+require 'woods_map/rate_limiter'
 require 'woods_map/configuration'
+require 'woods_map/content_security_policy'
 require 'woods_map/assets'
 require 'woods_map/glyphs'
 require 'woods_map/importmap'

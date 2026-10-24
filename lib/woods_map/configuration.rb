@@ -30,13 +30,63 @@ module WoodsMap
     # @return [String] cookie name holding the exchanged token digest.
     attr_accessor :cookie_name
 
+    # @return [Proc, false, nil] the engine's Content-Security-Policy. Nil
+    #   (the default) sends the engine's own strict policy on every engine
+    #   response; a callable receives that policy (an
+    #   `ActionDispatch::ContentSecurityPolicy`) and the request to amend it,
+    #   for example with a `report_uri`; false sends no engine header, so the
+    #   host's own policy middleware applies instead. See docs/DEPLOYMENT.md.
+    attr_accessor :content_security_policy
+
+    # @return [Integer, nil] requests one client may make to each expensive
+    #   group (search and palette, graph JSON, impact) per {#rate_limit_period};
+    #   nil or 0 turns the limit off. Counted in this process only.
+    attr_accessor :rate_limit
+
+    # @return [Numeric] the window, in seconds, that {#rate_limit} counts over.
+    attr_accessor :rate_limit_period
+
+    # @return [Proc] maps the request to the client the budget is counted
+    #   for; the remote IP by default. A host behind SSO may key by user.
+    attr_accessor :rate_limit_key
+
+    # @return [Array<String>] extra origins (`https://map.example.com`) whose
+    #   Host the token-less loopback mode accepts and whose Origin the write
+    #   routes accept, besides the request's own origin. Loopback host names
+    #   are always accepted.
+    attr_accessor :allowed_origins
+
     def initialize
       @index_dir = default_index_dir
+      @rate_limiter_mutex = Mutex.new
       @token = ENV.fetch('WOODS_MAP_TOKEN', nil)
       @authorize = nil
       @require_token = false
       @guide_enabled = false
       @cookie_name = 'woods_map_session'
+      @content_security_policy = nil
+      @rate_limit = 120
+      @rate_limit_period = 60
+      @rate_limit_key = ->(request) { request.remote_ip }
+      @allowed_origins = []
+    end
+
+    # @return [Boolean] whether expensive endpoints are rate limited
+    def rate_limited?
+      rate_limit.to_i.positive? && rate_limit_period.to_f.positive?
+    end
+
+    # The in-process counter behind {#rate_limit}, built on first use so a
+    # budget set in a host initializer is the one counted.
+    #
+    # @return [WoodsMap::RateLimiter]
+    def rate_limiter
+      @rate_limiter_mutex.synchronize do
+        if @rate_limiter.nil? || !@rate_limiter.configured_for?(rate_limit, rate_limit_period)
+          @rate_limiter = RateLimiter.new(limit: rate_limit.to_i, period: rate_limit_period.to_f)
+        end
+        @rate_limiter
+      end
     end
 
     # @return [Boolean] whether a usable token is configured
