@@ -9,14 +9,14 @@
              safe_join([tag.span('group', class: 'mut'),
                         tag.span(safe_join(WoodsMap::Components::GROUPS.map { |key, label| link_to(label, woods_map.landscape_path(tab: 'components', group: key), 'aria-current': (@components.group == key ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'Group components by')], ' ')
            end %>
-<% texts = { 'context' => [['⤓ context .mmd', "#{request.base_url}#{woods_map.landscape_diagram_mmd_path(diagram: 'context')}"]] +
-                           (l.attributed? ? WoodsMap::LandscapeExport::FORMATS.except('mermaid').map { |_, (ext, name)| ["⤓ #{name} .#{ext}, with the context view", "#{request.base_url}#{woods_map.public_send(:"landscape_#{ext}_path")}"] } : []),
-             'containers' => (l.attributed? ? WoodsMap::LandscapeExport::FORMATS.map { |format, (ext, name)| ["⤓ #{name} .#{ext}", "#{request.base_url}#{woods_map.public_send(:"landscape_#{ext}_path")}"] } : []),
-             'components' => (@components.limit ? [] : [['⤓ components .mmd', "#{request.base_url}#{woods_map.landscape_diagram_mmd_path(diagram: 'components', group: @components.group)}"]]),
-             'domains' => (@clusters.any? ? [['⤓ mindmap .mmd', "#{request.base_url}#{woods_map.landscape_diagram_mmd_path(diagram: 'mindmap')}"]] : []),
-             'hotspots' => [(@hotspots.churn? ? ['⤓ quadrant .mmd', "#{request.base_url}#{woods_map.landscape_diagram_mmd_path(diagram: 'quadrant')}"] : nil),
-                            (@hotspots.code_sizes.any? ? ['⤓ treemap .mmd', "#{request.base_url}#{woods_map.landscape_diagram_mmd_path(diagram: 'treemap', size: (@hotspots.metric == 'loc' ? nil : @hotspots.metric))}"] : nil),
-                            (@hotspots.forward_flow.any? ? ['⤓ sankey .mmd', "#{request.base_url}#{woods_map.landscape_diagram_mmd_path(diagram: 'sankey')}"] : nil)].compact }.fetch(@tab, []) %>
+<% texts = { 'context' => [['⤓ context .mmd', public_url_for(woods_map.landscape_diagram_mmd_path(diagram: 'context'))]] +
+                           (l.attributed? ? WoodsMap::LandscapeExport::FORMATS.except('mermaid').map { |_, (ext, name)| ["⤓ #{name} .#{ext}, with the context view", public_url_for(woods_map.public_send(:"landscape_#{ext}_path"))] } : []),
+             'containers' => (l.attributed? ? WoodsMap::LandscapeExport::FORMATS.map { |format, (ext, name)| ["⤓ #{name} .#{ext}", public_url_for(woods_map.public_send(:"landscape_#{ext}_path"))] } : []),
+             'components' => (@components.limit ? [] : [['⤓ components .mmd', public_url_for(woods_map.landscape_diagram_mmd_path(diagram: 'components', group: @components.group))]]),
+             'domains' => (@clusters.any? ? [['⤓ mindmap .mmd', public_url_for(woods_map.landscape_diagram_mmd_path(diagram: 'mindmap'))]] : []),
+             'hotspots' => [(@hotspots.churn? ? ['⤓ quadrant .mmd', public_url_for(woods_map.landscape_diagram_mmd_path(diagram: 'quadrant'))] : nil),
+                            (@hotspots.code_sizes.any? ? ['⤓ treemap .mmd', public_url_for(woods_map.landscape_diagram_mmd_path(diagram: 'treemap', size: (@hotspots.metric == 'loc' ? nil : @hotspots.metric)))] : nil),
+                            (@hotspots.forward_flow.any? ? ['⤓ sankey .mmd', public_url_for(woods_map.landscape_diagram_mmd_path(diagram: 'sankey'))] : nil)].compact }.fetch(@tab, []) %>
 <%= render 'woods_map/shared/ident', title: l.system_name, subtitle: subtitle,
       controls: safe_join([group, render('woods_map/shared/share', texts: texts), link_to('Open graph', woods_map.graph_path, class: 'btn primary')].compact, ' ') %>
 <%= render 'woods_map/shared/tabs', label: 'Landscape tabs', tabs: [

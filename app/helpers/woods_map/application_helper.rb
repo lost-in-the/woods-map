@@ -45,12 +45,13 @@ module WoodsMap
 
     # The focus URL of this page (E-6): its absolute address with the query
     # it was opened with, less any `token` (D-4 exchanges it for a cookie, and
-    # a shared link must never carry it).
+    # a shared link must never carry it). It starts at `config.public_url`
+    # when one is set (woods-map#76).
     #
     # @return [String]
     def focus_url
       query = request.query_parameters.except('token')
-      "#{request.base_url}#{raw_request_path}#{"?#{query.to_query}" if query.any?}"
+      "#{WoodsMap::PublicUrl.base(request)}#{raw_request_path}#{"?#{query.to_query}" if query.any?}"
     end
 
     # A relative date in git's shorthand with the long form in the tooltip
