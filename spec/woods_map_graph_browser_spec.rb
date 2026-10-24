@@ -104,6 +104,11 @@ RSpec.describe WoodsMap do
     expect(drawing.dig('tinted', 'facts')).to include('a change here reaches 3 units, 2 drawn')
   end
 
+  it 'fills the units a range report records as changed and names them in the facts' do
+    expect(drawing['ranges']).to include('changed' => ['n_1'], 'direct' => ['n_2'])
+    expect(drawing.dig('ranges', 'facts')).to include('1 changed and 1 affected in the report, 2 drawn')
+  end
+
   it 'encodes a re-centring identifier as a query value on the full-screen page' do
     expect(drawing['recentre']).to eq('/woods/graph?centre=GET%20%2Fusers%2F%3Aid%3Fx%3D1%26y&type=route&depth=2')
   end

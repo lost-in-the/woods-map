@@ -5,6 +5,7 @@ require 'active_support/core_ext/module/delegation'
 require 'woods/published_index'
 require 'woods/mcp/index_reader'
 require 'woods/source_inputs/status'
+require_relative 'repository_history'
 
 module WoodsMap
   # One pinned generation per request.
@@ -15,6 +16,8 @@ module WoodsMap
   # deleting a payload mid-render. Every read below goes through the index
   # reader of that one generation; nothing is resolved from a path.
   class Repository
+    include RepositoryHistory
+
     # Raised when no published generation can be opened at the configured root.
     class Unavailable < StandardError; end
 
@@ -103,6 +106,17 @@ module WoodsMap
       Array(nodes_by_identifier[identifier]).filter_map { |node| node['type']&.to_s }.uniq
     end
 
+    # Every identifier of this generation with the type of its primary node:
+    # the set the guide may link (design study, section 11).
+    #
+    # @return [Hash{String => String}]
+    def identifier_index
+      @identifier_index ||= nodes_by_identifier.each_with_object({}) do |(identifier, nodes), index|
+        type = nodes.first && nodes.first['type']
+        index[identifier] = type.to_s if type
+      end
+    end
+
     # @param identifier [String]
     # @param type [String, nil] the unit type; nil selects the primary node
     # @return [Hash, nil] the matching graph node, or nil when that typed unit is absent
@@ -110,6 +124,9 @@ module WoodsMap
       nodes = Array(nodes_by_identifier[identifier])
       type ? nodes.find { |node| node['type'].to_s == type.to_s } : nodes.first
     end
+
+    # @return [Pathname] the index root this repository was opened at
+    delegate :index_dir, to: :@index
 
     # @return [Hash] the raw dependency graph (nodes, edges, reverse, reverse_via, pagerank, file_map)
     def graph

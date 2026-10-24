@@ -21,6 +21,7 @@ module WoodsMap
   class ApplicationController < ActionController::Base
     include WoodsMap::Authentication
     include WoodsMap::MermaidText
+    include WoodsMap::SinceParam
 
     protect_from_forgery with: :exception
     layout 'woods_map/application'
@@ -33,7 +34,10 @@ module WoodsMap
     # The `.mmd` text routes (D-25) are paced like the JSON endpoints.
     before_action(if: :mermaid_request?) { enforce_rate_limit!(:mermaid) }
 
-    helper_method :woods_map_config, :current_repository, :woods_map, :primary_nav
+    helper_method :woods_map_config, :current_repository, :woods_map, :primary_nav, :guide_page_values
+
+    # Page kinds the guide offers actions for, by unit tab.
+    GUIDE_TABS = { 'show' => 'code', 'lifecycle' => 'lifecycle', 'passage' => 'passage' }.freeze
 
     # Count the named actions against the per-client budget of a group.
     # Named apart from Rails 7.2's `rate_limit`, which the floor lacks.
@@ -61,11 +65,14 @@ module WoodsMap
     # The global bar's pages that exist, in the order the boards give them
     # (coverage.md: Units, Landscape, Graph, ERD, Impact, History).
     #
-    # @param current [String, Symbol, nil] the page being shown: its label or :units, :graph, :erd, :impact
+    # @param current [String, Symbol, nil] the page being shown: its label or :units, :graph, :erd, :impact, :history
     # @return [Array<Array(String, String, Boolean)>] label, href, current?
     def primary_nav(current = nil)
       [['Units', woods_map.units_path], ['Graph', woods_map.graph_path], ['ERD', woods_map.erd_path],
-       ['Impact', woods_map.impact_path]].map { |label, href| [label, href, label.casecmp?(current.to_s)] }
+       ['Impact', woods_map.impact_path], ['History', woods_map.history_path]].map do |label, href|
+        [label, href,
+         label.casecmp?(current.to_s)]
+      end
     end
 
     # @return [WoodsMap::Configuration]
@@ -88,6 +95,24 @@ module WoodsMap
         @repository = repository
         @generation = repository.generation_facts
         yield repository
+      end
+    end
+
+    # What this page names for the guide (M7): its kind and the unit, the
+    # action, the impact focus or range. The guide rebuilds the context from
+    # these against the pinned generation.
+    #
+    # @return [Hash{String => String}]
+    def guide_page_values
+      if @page
+        { 'page' => GUIDE_TABS.fetch(@tab.to_s, 'unit'), 'type' => @page.type, 'identifier' => @page.identifier,
+          'action_name' => @passage&.action }.compact
+      elsif @range
+        { 'page' => 'range', 'from' => @range.first, 'to' => @range.last }
+      elsif @radius.present?
+        { 'page' => 'impact', 'focus' => @radius.focus.join(',') }
+      else
+        {}
       end
     end
 

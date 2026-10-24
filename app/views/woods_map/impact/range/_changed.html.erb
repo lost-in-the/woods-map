@@ -1,0 +1,51 @@
+<%# Changed (B8-Impact-Changed) in range mode: Woods' changed records with
+    the facets and metadata keys that moved, each opening to the affected
+    units its witness paths reach; then the tables and templates the report
+    involves. The focus URL's units are lit and opened. Locals: rr, range_url. %>
+<% size = ->(stats) { stats ? "#{stats['lines']} lines, #{stats['bytes']} B" : tag.span('none', class: 'mut') } %>
+<section class="sec" aria-labelledby="chg" data-controller="rows">
+  <header><h2 class="t2" id="chg">Changed units <%= count_tag(rr.changed.size) %><%= info_tip('Woods compares the two retained payloads per typed unit: source, metadata and dependency hashes (facets), and the metadata keys that moved. Which lines changed is not in the report yet (woods#802). Open a row for the units its witness paths reach.') %></h2><button class="tool goto" type="button" data-action="rows#expandAll" data-needs-js>expand all</button></header>
+  <% if rr.changed.empty? %>
+    <%= render 'woods_map/components/empty_state', title: 'No changed units recorded', text: 'Woods found no typed unit whose source, metadata or dependency hash moved between these payloads. Read coverage and the Unknown tab before taking that as a zero.' %>
+  <% else %>
+    <% rows = rr.changed.each_with_index.map do |c, i| %>
+      <% reached = rr.reached_from(c) %>
+      <% detail = tag.dl(safe_join([
+           tag.dt('metadata keys'), tag.dd(Array(c['metadata_keys']).join(', ').presence || 'none moved'),
+           tag.dt('source sizes'), tag.dd(safe_join([size.call(c.dig('diff_stats', 'source_before')), ' → ', size.call(c.dig('diff_stats', 'source_after')), ' ', layer_chip('whole source, not changed lines; woods#802')])),
+           tag.dt("reaches #{reached.size}"), tag.dd(reached.any? ? safe_join(reached.first(12).map { |a| safe_join([impact_identity(a, rr), ' ', tag.span("#{a['distance']} #{'hop'.pluralize(a['distance'].to_i)}", class: 'mut')]) }, ', ') : 'no witness path recorded', class: 'p')
+         ]), class: 'det') %>
+      <% { id: "changed-#{i + 1}", current: rr.focused?(c), open: rr.focused?(c), classes: (rr.focused?(c) ? 'focus' : nil), detail: detail,
+           cells: [impact_identity(c, rr, generation: rr.generation_of_change(c), since: rr.from_generation), c['type'].to_s.tr('_', ' '), c['status'].to_s, Array(c['facets']).join(', ').presence || empty_value, Array(c['categories']).join(', ').presence || empty_value, "gen #{rr.generation_of_change(c)}"] } %>
+    <% end %>
+    <%= render 'woods_map/components/table', label: 'Changed units', min_width: '860px', grouped: true,
+               columns: [{ label: 'unit', cell_class: 'id' }, { label: 'type', width: '130px', cell_class: 'nw mut' }, { label: 'status', width: '100px', cell_class: 'nw' }, { label: 'facets moved', width: '190px' }, { label: 'categories', width: '160px' }, { label: 'payload', width: '90px', cell_class: 'nw mut' }],
+               rows: rows %>
+  <% end %>
+</section>
+<section class="sec" aria-labelledby="aff" data-controller="rows">
+  <header><h2 class="t2" id="aff">Affected <%= count_tag("#{rr.affected.size} within depth #{rr.depth || 'unrecorded'}") %><%= info_tip('Woods\' bounded propagation from the changed units over each endpoint\'s reverse edges (E-3). Open a row for its witness paths. An unavailable weight is not zero.') %></h2><button class="tool goto" type="button" data-action="rows#expandAll" data-needs-js>expand all</button></header>
+  <% if rr.affected.empty? %>
+    <%= render 'woods_map/components/empty_state', title: 'No affected units recorded', text: 'Woods recorded no unit reached from the changes; check coverage, which may say the propagation was not computed or was bounded.' %>
+  <% else %>
+    <% rows = rr.affected.first(300).map do |a| %>
+      <% detail = tag.dl(safe_join(Array(a['paths']).first(3).flat_map { |path| [tag.dt("from #{path.dig('root', 'identifier')}"), tag.dd(impact_path(path), class: 'p')] }), class: 'det') %>
+      <% { detail: (Array(a['paths']).any? ? detail : nil), cells: [impact_identity(a, rr), a['type'].to_s.tr('_', ' '), a['distance'] == 1 ? 'direct' : "#{a['distance']} hops", impact_weight(a['weight']), impact_context(a)] } %>
+    <% end %>
+    <%= render 'woods_map/components/table', label: 'Affected units', min_width: '760px', grouped: true,
+               columns: [{ label: 'unit', cell_class: 'id' }, { label: 'type', width: '130px', cell_class: 'nw mut' }, { label: 'distance', width: '100px', cell_class: 'nw' }, { label: 'weight', width: '100px', cell_class: 'num' }, { label: 'endpoint', width: '120px', cell_class: 'nw' }],
+               rows: rows, caption: (rr.affected.size > 300 ? "first 300 of #{rr.affected.size}; the rest are in the report" : nil) %>
+  <% end %>
+</section>
+<% [['tables', 'Tables', 'tbls'], ['templates', 'Templates', 'tpls']].each do |key, label, anchor| %>
+  <% records = rr.public_send(key) %>
+  <section class="sec" aria-labelledby="<%= anchor %>">
+    <header><h2 class="t2" id="<%= anchor %>"><%= label %> <%= count_tag(records.size) %><%= info_tip("The #{key} Woods' report involves, with the evidence kind it recorded for each; coverage: #{rr.coverage[key] || 'not recorded'}.") %></h2></header>
+    <% if records.empty? %>
+      <p class="mut">None recorded (coverage: <%= rr.coverage[key] || 'not recorded' %>).</p>
+    <% else %>
+      <%= render 'woods_map/components/table', label: label, min_width: '640px', columns: [{ label: 'unit', cell_class: 'id' }, { label: 'evidence', width: '260px' }, { label: 'endpoint', width: '120px', cell_class: 'nw' }],
+            rows: records.first(100).map { |t| { current: rr.focused?(t), classes: (rr.focused?(t) ? 'focus' : nil), cells: [impact_identity(t, rr), Array(t['evidence']).map { |e| e.is_a?(Hash) ? e['kind'] : e }.compact.uniq.join(', ').presence || empty_value, impact_context(t)] } } %>
+    <% end %>
+  </section>
+<% end %>

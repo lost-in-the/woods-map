@@ -15,14 +15,27 @@ WoodsMap::Engine.routes.draw do
   get 'graph', to: 'graphs#show', as: :graph
   get 'graph/neighbourhood', to: 'neighbourhoods#show', as: :neighbourhood, defaults: { format: :json }
 
+  # The guide (M7): ask, stream an answer as server-sent events, stop it, start over.
+  post 'guide/questions', to: 'guide#create', as: :guide_questions, defaults: { format: :json }
+  get 'guide/questions/:id/stream', to: 'guide_streams#show', as: :guide_stream, constraints: { id: /[0-9a-f]{16}/ }
+  post 'guide/questions/:id/cancel', to: 'guide#cancel', as: :guide_cancel, constraints: { id: /[0-9a-f]{16}/ },
+                                     defaults: { format: :json }
+  delete 'guide/conversation', to: 'guide#destroy', as: :guide_conversation, defaults: { format: :json }
+
   # The impact page (M4b): a focus set with no range is the blast radius; a range delegates to Woods' report (W-12).
   # The Mermaid text of a page's diagram as text/plain (D-25); see docs/design/notes/mermaid-text-urls.md.
   get 'impact.mmd', to: 'impact#show', as: :impact_mmd, defaults: { mmd: '1' }, format: false
   get 'impact', to: 'impact#show', as: :impact
+  # A saved report (E-6): the SHA-256 ID woods:impact printed, read through Woods' store.
+  get 'impacts/:id', to: 'impact#saved', as: :saved_impact, constraints: { id: /[0-9a-f]{64}/ }, format: false
 
   # The whole database by chunk (M3, B6-ERD): a chunk number, never a table name or path.
   get 'erd.mmd', to: 'erd#show', as: :erd_mmd, defaults: { mmd: '1' }, format: false
   get 'erd(/:chunk)', to: 'erd#show', as: :erd, constraints: { chunk: /[1-9][0-9]{0,5}/ }, format: false
+
+  # The cross-unit timeline (M4): typed identifiers in the query, never a path.
+  get 'history.mmd', to: 'history#show', as: :history_mmd, defaults: { mmd: '1' }, format: false
+  get 'history', to: 'history#show', as: :history
 
   get 'units', to: 'units#index', as: :units
   # File paths are exact admitted file_map keys, never host filesystem paths.
@@ -33,7 +46,7 @@ WoodsMap::Engine.routes.draw do
   # from the pinned generation; never a file path.
   scope 'units/:type', constraints: { type: /[a-z0-9_]+/ }, format: false do
     # The tabs' Mermaid text (D-25), ahead of the glob routes that would take `.mmd` as part of an identifier.
-    %w[schema passage lifecycle graph].each do |tab|
+    %w[schema passage lifecycle graph history].each do |tab|
       get "*identifier/#{tab}.mmd", to: "units##{tab}", as: :"unit_#{tab}_mmd", defaults: { mmd: '1' }
     end
     get '*identifier/schema', to: 'units#schema', as: :unit_schema

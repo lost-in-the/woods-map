@@ -25,6 +25,7 @@ Metrics/BlockLength:
     - 'config/routes.rb'
     - 'spec/**/*'
     - '*.gemspec'
+    - 'config/routes.rb'
 
 # The same posture as Woods: presenters shape index data into rows and tiles,
 # which reads better as one method than as ten.

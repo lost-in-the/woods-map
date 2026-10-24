@@ -8,7 +8,7 @@
 <% skipped = p.filters - applying %>
 <% filter_text = ->(f) { safe_join([code_line_link(f.file, f.line, text: f.name), (f.scope == 'every action' ? nil : " #{f.scope}")].compact) } %>
 <% templates = p.action_templates; partials = p.templates - templates %>
-<% template_link = ->(t) { t.unit ? unit_link(t.identifier, 'view_template') : tag.span(t.identifier, class: 'dim', title: 'not in the index') } %>
+<% template_link = ->(t) { moved = current_since&.change(t.identifier, 'view_template'); t.unit ? safe_join([(moved ? safe_join([chip(:modified), tag.span(" #{moved['status']} since gen #{current_since.from_generation}: ", class: 'sr-only')]) : nil), unit_link(t.identifier, 'view_template', since: (moved ? current_since.selector : nil))].compact, ' ') : tag.span(t.identifier, class: 'dim', title: 'not in the index') } %>
 <% ivars = p.instance_variables_read %>
 <% facts = p.facts; flags = p.flags; missing = p.missing_template_facts; unresolved = p.unresolved_renders; complete = p.coverage_complete? %>
 <% unresolved_text = ->(u) { safe_join([tag.code(u.name), u.render_target? ? " in #{u.where}" : " in #{u.where}, #{u.kind}", (u.candidates.any? ? ", candidates #{u.candidates.join(', ')}" : nil), (u.line ? ' ' : nil), (u.line ? code_line_link(u.file, u.line, text: "L#{u.line}") : nil)].compact) } %>

@@ -6,7 +6,8 @@
       columns: Array of Hash with :label, :width (px or % length, or nil), :class
                (th class or nil), :abbr (long form for an abbreviated head)
       rows:    Array of Hash with :cells (Array of HTML), :detail (HTML or nil),
-               :checkbox (String label or nil), :classes (String or nil),
+               :checkbox (String label or nil), :classes (String or nil), :id (the
+               row's anchor), :current (true for the row a focus URL selects),
                :data (Hash of data attributes for the row, or nil)
       grouped: Boolean (the 34px toggle column), sticky: Boolean, cards: Boolean,
       min_width: one of TABLE_MIN_WIDTHS in px, below which the wrap scrolls past the cliff,
@@ -20,7 +21,7 @@
       <% rows.each_with_index do |row, index| %>
         <% parity = index.odd? ? 'odd' : '' %>
         <% open = row[:open] %>
-        <tr class="<%= [parity, ('xr' if row[:checkbox]), ('grp' if open), ('chk' if row[:checked]), row[:classes]].compact.reject(&:empty?).join(' ') %>"<% (row[:data] || {}).each do |key, value| %> data-<%= key.to_s.dasherize %>="<%= value %>"<% end %>>
+        <tr class="<%= [parity, ('xr' if row[:checkbox]), ('grp' if open), ('chk' if row[:checked]), row[:classes]].compact.reject(&:empty?).join(' ') %>"<%= " id=\"#{ERB::Util.html_escape(row[:id])}\"".html_safe if row[:id] %><%= ' aria-current="true"'.html_safe if row[:current] %><% (row[:data] || {}).each do |key, value| %> data-<%= key.to_s.dasherize %>="<%= value %>"<% end %>>
           <% if grouped %>
             <td class="tg"><div class="tgc<%= ' one' unless row[:checkbox] %>">
               <% if row[:checkbox] %><input type="checkbox" aria-label="<%= row[:checkbox] %>" data-action="rows#check"<%= ' checked'.html_safe if row[:checked] %>><% end %>

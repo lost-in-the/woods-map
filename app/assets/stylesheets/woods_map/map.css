@@ -15,8 +15,8 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .tree [data-tree-target="row"][hidden] { display:none!important; }
 /* Inline links: a cue besides colour (D-22, WCAG 1.4.1, axe link-in-text-block). Standalone
    links stay bare; a link sitting among other text gets a faint underline in its own hue. */
-.wm .crumbs a,.wm .empty-state a,.wm .cap a,.wm .lead a,.wm .det dd a,.wm .facts dd a,.wm .banner .txt a,.wm .legend a,.wm .st a,.wm .mg a,.wm .rail li a,.wm .tip a,.wm .finding a,.wm .status a,.wm .psg .rows a,.wm .sec > header .t2 a,.wm .tbl tr.bnd a{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--link) 55%,transparent);text-underline-offset:3px}
-.wm .crumbs a:hover,.wm .empty-state a:hover,.wm .cap a:hover,.wm .lead a:hover,.wm .det dd a:hover,.wm .facts dd a:hover,.wm .banner .txt a:hover,.wm .legend a:hover,.wm .st a:hover,.wm .mg a:hover,.wm .rail li a:hover,.wm .tip a:hover,.wm .finding a:hover,.wm .status a:hover,.wm .psg .rows a:hover,.wm .sec > header .t2 a:hover,.wm .tbl tr.bnd a:hover{text-decoration-color:var(--link)}
+.wm .crumbs a,.wm .empty-state a,.wm .cap a,.wm .lead a,.wm .det dd a,.wm .facts dd a,.wm .banner .txt a,.wm .legend a,.wm .st a,.wm .mg a,.wm .rail li a,.wm .tip a,.wm .finding a,.wm .status a,.wm .psg .rows a,.wm .sec > header .t2 a,.wm .tbl tr.bnd a,.wm .guide .msg .text a{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--link) 55%,transparent);text-underline-offset:3px}
+.wm .crumbs a:hover,.wm .empty-state a:hover,.wm .cap a:hover,.wm .lead a:hover,.wm .det dd a:hover,.wm .facts dd a:hover,.wm .banner .txt a:hover,.wm .legend a:hover,.wm .st a:hover,.wm .mg a:hover,.wm .rail li a:hover,.wm .tip a:hover,.wm .finding a:hover,.wm .status a:hover,.wm .psg .rows a:hover,.wm .sec > header .t2 a:hover,.wm .tbl tr.bnd a:hover,.wm .guide .msg .text a:hover{text-decoration-color:var(--link)}
 /* Native explanation controls retain the inline glyph styling; tabs use the existing scroll cliff. */
 .wm button.info{font-size:inherit;line-height:inherit;padding:0;border:0;background:none}
 .wm .page-tabs .tab{flex-shrink:0;white-space:nowrap}
@@ -60,10 +60,6 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .keyboard-help section{margin-top:var(--s5)}
 .wm .keyboard-help dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--s2) var(--s4)}
 .wm .keyboard-help dd{margin:0;overflow-wrap:anywhere}
-/* The current rail item sits on --select-tint, where --dim misses AA in the light theme (4.23:1). */
-.wm .rail li[aria-current=true] .own{color:var(--mut)}
-/* The ERD rail numbers its chunks; the number sits on the same tint. */
-.wm .rail li[aria-current=true] .k{color:var(--mut)}
 /* The hover card on a reference (B-3), inside the one tooltip (D-16). */
 .wm .tip .hcard{min-width:220px}
 .wm .hcard .hch{display:flex;gap:var(--s2);align-items:baseline;margin-bottom:var(--s1)}
@@ -181,6 +177,49 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .spec .tgl.lane{font-size:12px}
 .wm .spec .tgl.lane.on{background:var(--bright);color:var(--bg)}
 
+/* The guide (M7, B8-Guide): docked right of the page under the bar. While it is open the frame
+   becomes one screen tall and the page scrolls beside it; below 960 it covers the page. */
+.wm .page-row{display:flex;flex:1 0 auto;min-width:0;align-items:stretch}
+.wm .page-row > .page-main{flex:1 1 auto;min-width:0}
+.wm .aside.guide-dock{flex:0 0 460px;max-width:460px;display:flex;flex-direction:column;min-height:0}
+.wm .aside.guide-dock[hidden]{display:none}
+.wm.page.guide-open{height:100vh;overflow:hidden}
+.wm.page.guide-open .page-row{flex:1 1 auto;min-height:0}
+.wm.page.guide-open .page-row > .page-main{overflow:auto;container-type:inline-size;container-name:wm}
+.wm .guide .gh .t3{margin:0;font-size:inherit;font-weight:inherit}
+.wm .guide .gh .model{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wm .guide .gh .tools{flex-shrink:0}
+.wm .guide .gh .tool.close{text-decoration:none}
+html.js .wm .guide .guide-nojs{display:none}
+.wm .guide .guide-nojs{margin:0;padding:var(--s3) var(--s4)}
+.wm .guide .thread{flex:1 1 auto;min-height:0;overflow:auto}
+.wm .guide .thread .empty{margin:0;padding:var(--s4)}
+.wm .guide .msg ol,.wm .guide .msg ul{margin:0 0 var(--s3);padding-left:1.2em}
+.wm .guide .msg pre.cmd{margin:0 0 var(--s3);overflow:auto}
+.wm .guide .msg .finding,.wm .guide > .finding{margin:var(--s3) 0 0}
+.wm .guide > .finding{margin:0;border-radius:0}
+.wm .guide .answer-tools{display:flex;gap:var(--s4);margin-top:var(--s3)}
+.wm .guide .call .g.fail{color:var(--risk)}
+.wm .guide .ask .in{color:var(--text);font:inherit;resize:vertical;box-sizing:border-box}
+.wm .guide .ask .in::placeholder{color:var(--mut)}
+.wm .guide .ask .in:disabled{opacity:.6}
+.wm .guide .budget{flex-wrap:wrap;row-gap:var(--s1);white-space:normal}
+.wm .guide .budget .end{margin-left:auto}
+.wm .guide .sel-chip[hidden],.wm .guide .btn[hidden]{display:none}
+.wm .bar .btn.guide-toggle:disabled,.wm .guide .btn:disabled{opacity:.5;cursor:not-allowed}
+@media (max-width:959px){
+  .wm .aside.guide-dock:not([hidden]){display:flex;position:fixed;inset:0;z-index:40;max-width:none;width:auto}
+  .wm.page.guide-open .page-row > .page-main{overflow:visible;container-type:normal}
+}
+/* The hover card on a reference (B-3), inside the one tooltip (D-16). */
+.wm .tip .hcard{min-width:220px}
+.wm .hcard .hch{display:flex;gap:var(--s2);align-items:baseline;margin-bottom:var(--s1)}
+.wm .hcard .hch b{font-family:var(--ff-data);overflow-wrap:anywhere}
+.wm .hcard .hch span{color:var(--mut)}
+.wm .hcard dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:2px var(--s3);margin:0;font-family:var(--ff-data);font-size:var(--fs-11)}
+.wm .hcard dt{color:var(--dim)}.wm .hcard dd{margin:0;overflow-wrap:anywhere}
+.wm .hcard .hcf{margin-top:var(--s1);color:var(--mut);font-size:var(--fs-11)}
+.wm .hcard .hcf .lyr{margin:0}
 /* The Graph tab's Cytoscape canvas (M5): one tab stop with the selection's focus ring, a fixed
    height in spacing steps, and the status line naming the selected unit. Each unit type's tint is
    --g on [data-gtype]: the graph controller reads it through a probe and mixes it into --panel,
@@ -206,6 +245,42 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .legend i.gblast[data-distance="2"]{border-color:var(--mod)}
 /* Cytoscape's container rule, which it would otherwise inject as an inline <style> the policy refuses. */
 .wm .__________cytoscape_container{position:relative}
+/* The impact Graph tab and ?since= (E-3, E-8): a changed unit is filled with --mod, as the canvas draws it. */
+.wm .legend i.gblast[data-distance="0"]{background:color-mix(in srgb,var(--mod) 22%,var(--panel));border-color:var(--mod)}
+/* A row the focus URL selects (E-6): lit with the selection tint and a select rule. */
+.wm .tbl tbody tr.focus > td{background:var(--select-tint)}
+.wm .tbl tbody tr.focus > td:first-child{box-shadow:inset 3px 0 0 var(--select)}
+/* A table row ?since= marks changed (E-8): a --mod rule, the M chip in its first cell. */
+.wm .tbl tbody tr.chg > td:first-child{box-shadow:inset 3px 0 0 var(--mod)}
+/* History (M4, B6-History, notes/history.md): the commit strip is an SVG in viewBox units, bars
+   neutral, the last four weeks hot (D-11), a selected bar in the selection colour, generation marks
+   dashed in the modified hue. Axis labels are SVG text at percentage positions, so no style attribute
+   is needed (CSP). The cross-unit timeline draws one lane per unit at the --s6 row height. */
+.wm .strip{padding:var(--s3) var(--s4) var(--s2)}
+.wm .strip-svg{display:block;width:100%;height:var(--s7)}
+.wm .strip-svg .bar{fill:var(--mut)}
+.wm .strip-svg .bar.zero{fill:var(--rule2)}
+.wm .strip-svg .bar.recent{fill:var(--hot)}
+.wm .strip-svg .bar.sel,.wm .strip-svg a:hover .bar,.wm .strip-svg a:focus .bar{fill:var(--select)}
+.wm .strip-svg a:focus-visible{outline:2px solid var(--select)}
+.wm .strip-svg .gm{stroke:var(--mod);stroke-width:1;stroke-dasharray:2 2;vector-effect:non-scaling-stroke}
+.wm .strip-axis{display:block;overflow:visible}
+.wm .strip-axis text{fill:var(--mut);font-family:var(--ff-data);font-size:var(--fs-11)}
+.wm .legend .sw-bar{color:var(--mut)} .wm .legend .sw-recent{color:var(--hot)} .wm .legend .sw-gen{color:var(--mod)}
+.wm .legend .sw-dot{color:var(--mut)} .wm .legend .sw-pair{color:var(--select)}
+.wm .tl{display:grid;grid-template-columns:minmax(10ch,max-content) minmax(0,1fr);gap:0 var(--s4);overflow-x:auto;padding:var(--s3) 0}
+.wm .tl-names{list-style:none;margin:0;padding:0;font-family:var(--ff-data);font-size:var(--fs-12)}
+.wm .tl-names li{height:var(--s6);display:flex;align-items:center;gap:var(--s2);white-space:nowrap}
+.wm .tl-plot{min-width:calc(var(--s7) * 6)}
+.wm .tl-svg{display:block}
+.wm .tl-svg .tl-rule{stroke:var(--rule);stroke-width:1}
+.wm .tl-svg .tl-pair{stroke:var(--select);stroke-width:2}
+.wm .tl-svg .tl-dot{fill:var(--mut);stroke:var(--panel);stroke-width:1}
+.wm .tl-svg .tl-dot.pair{fill:var(--select)}
+.wm .tl-svg a:hover .tl-dot,.wm .tl-svg a:focus .tl-dot{fill:var(--hot)}
+.wm .tl-svg a:focus-visible{outline:2px solid var(--select)}
+.wm .pick-units fieldset{border:0;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(28ch,1fr));gap:var(--s2) var(--s5)}
+.wm .pick-units .f{display:flex;gap:var(--s2);align-items:center;font-family:var(--ff-data);font-size:var(--fs-12)}
 
 /* Code references by confidence (W-1): a static link is dashed, an ambiguous
    reference is a button with a dotted rule that opens its candidates. */

@@ -11,8 +11,10 @@
     'ERD' => [['[ / ]', 'Previous / next chunk']],
     'Graph and Impact' => [['1 / 2', 'Choose graph or impact depth'], ['3', 'Choose depth 3 on Impact']],
     'Copy tools' => [['y', 'Copy what the status bar names: the diagram\'s Mermaid, or the focus URL on impact pages']],
+    'Guide' => [['g', 'Open or close the guide'], ['Enter / Shift+Enter', 'Ask / new line in the question'], ['Escape', 'Close the guide while focus is inside it']],
     'This dialog' => [['Tab / Shift+Tab', 'Keep focus on Close'], ['Escape', 'Close and return focus to the opener']]
   } %>
+  <% groups.delete('Guide') unless guide_status == :ready %>
   <% groups.each do |name, rows| %>
     <section><h3 class="eyebrow"><%= name %></h3><dl><% rows.each do |key, meaning| %><dt><kbd class="kbd"><%= key %></kbd></dt><dd><%= meaning %></dd><% end %></dl></section>
   <% end %>

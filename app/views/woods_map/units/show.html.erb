@@ -10,7 +10,7 @@
   <% groups = [{ label: 'nothing to outline', count: '', items: [{ key: '·', text: 'the index records no members for this unit' }] }] if groups.empty? %>
   <%= render 'woods_map/components/rail', heading: 'Outline, as Rails runs it', groups: groups %>
   <div class="main">
-    <%= render 'woods_map/units/code_view', code: @code, page: @page %>
+    <%= render 'woods_map/units/code_view', code: @code, page: @page, heat: @heat, concern_paths: @concern_paths %>
     <%= render 'woods_map/units/disambiguation', ambiguities: @code.ambiguities %>
     <%= render 'woods_map/units/callers', callers: @callers, page: @page %>
     <% @cards.each do |card| %><template data-card-target="card" data-href="<%= woods_map.unit_path(type: card.type, identifier: card.identifier) %>"><%= render 'woods_map/units/card', card: card %></template><% end %>

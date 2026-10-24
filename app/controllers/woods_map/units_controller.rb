@@ -9,6 +9,7 @@ module WoodsMap
   class UnitsController < ApplicationController
     include WoodsMap::MethodLinks
     include WoodsMap::UnitMermaid
+    include WoodsMap::UnitHistory
 
     LENS_COOKIE = 'woods_map_lens'
 
@@ -33,6 +34,8 @@ module WoodsMap
         @lifecycle = lifecycle_for(@unit)
         @callers = WoodsMap::Callers.for(@repository).by_method(@unit['identifier'], @unit['type'])
         @code = code_view(@unit, lens, @lifecycle, callers: @callers)
+        @heat = @repository.git_commits && WoodsMap::PathHeat.new(@repository.git_commits)
+        @concern_paths = WoodsMap::UnitPaths.concern_files(@repository, @unit)
         @outline = WoodsMap::Outline.new(@unit, lifecycle: @lifecycle, concern_methods: concern_methods(@unit),
                                                 method_href: method_href(@unit), callers: @callers)
         @cards = WoodsMap::HoverCard.for(@repository, @code.linked_targets)
@@ -107,13 +110,6 @@ module WoodsMap
         next render_graph_mermaid if mermaid_request?
 
         render :graph
-      end
-    end
-
-    def history
-      with_unit do
-        @history = WoodsMap::HistoryView.new(@unit)
-        render :history
       end
     end
 
