@@ -2,8 +2,11 @@
 
 Scope: FR-7 (history part), B-6, B-14, C-5, A-6. M4, [woods-map#6](https://github.com/lost-in-the/woods-map/issues/6).
 Data: the generation's commit table, `git_commits.json`, from Woods W-3
-([woods#753](https://github.com/lost-in-the/woods/issues/753)). It is read only
-through `Woods::PublishedIndex#git_commits`, and the map runs no git.
+([woods#753](https://github.com/lost-in-the/woods/issues/753)), with per-file line
+counts and hunks ([woods#804](https://github.com/lost-in-the/woods/issues/804)). It is
+read only through `Woods::PublishedIndex#git_commits`, and the map runs no git.
+Unified diffs and the facets that moved come from `Woods::Impact::UnitDiff`
+([woods#802](https://github.com/lost-in-the/woods/issues/802)); the map diffs nothing.
 
 [B6-History](../boards/B6-History.html) designs the History tab. Three pieces have
 no board, and this note sets them:
@@ -14,7 +17,7 @@ no board, and this note sets them:
 
 ## History tab
 
-`GET /woods/units/:type/:identifier/history?range=&week=&all=1&from=&to=`
+`GET /woods/units/:type/:identifier/history?range=&by=&week=&gen=&all=1&from=&to=`
 
 - **Files covered.**
   - The unit's own file.
@@ -25,12 +28,15 @@ no board, and this note sets them:
   - The last four weeks are drawn in `--hot`.
   - A dashed mark in `--mod` shows where a retained generation was extracted.
   - Each bar with commits links to `?week=` and lists its commits.
+  - *By generation* (`?by=generation`, the board's *by generation | commit* control): one bar per retained generation with a table, holding the commits that generation first carried (`WoodsMap::GenerationStrip` over `CommitLedger`). The pinned generation is drawn hot; the oldest retained table's bar says its commits are only known to be at or before it. A bar links to `?by=generation&gen=N`, which lists only those commits. *Commit* is the default and keeps the time strip.
   - The strip is an SVG in viewBox units. Its axis labels are SVG text at percentage positions, so the page needs no `style` attribute (CSP, M8).
 - **Commits table** (D-17).
-  - Columns: *when, sha, author, message* (the champion), *files, units* and *gen*.
+  - Columns: *when, sha, author, message* (the champion), *files, units*, *gen* and *facets moved*.
   - The latest 10 are shown; *all N* lists the window.
-  - Each detail block holds the description, the files with their status (`new`, `deleted`, `type changed`; unindexed files muted), *co-changed with* (the units of this generation that own the other files), and the parents of a merge.
+  - Each detail block holds the description, the files with their `+a −d` counts and status (`new`, `deleted`, `type changed`; unindexed files muted; `binary` for a binary file), *hunks*, *co-changed with* (the units of this generation that own the other files), and the parents of a merge.
+  - *Hunks* are each file's new-side ranges (`L3–4`, `after L5` for a pure deletion), in the commit's own coordinates. Only when the commit is the file's latest touch do those lines still address the current file, so only then does a range link to the owning unit's Code view at `#L<start>`. A file past Woods' per-file or table-wide hunk budget adds *and more*. A table without line stats says so in the block and in the limits.
 - **Gen column.** The retained generation whose commit table first lists the commit (`WoodsMap::CommitLedger`). It compares the sha lists of retained tables and nothing else. A commit already in the oldest retained table reads `≤ N`.
+- **Facets moved column.** Woods' record of this unit between the commit's generation and the retained generation before it (`Woods::Impact::UnitDiff` through `WoodsMap::GenerationFacets`): the report categories that moved (`behaviour, edges`), `added`/`removed` with them, or `unchanged`. A commit between extractions is attributed to the next generation, as the board's ⓘ says. A `≤ N` commit has no value. One unit diff per generation pair is read and cached per index identity. The column is left out when the Woods has no unit diff or fewer than two generations are retained.
 - **Rail.**
   - *Generations touching the unit*: the generations that introduced its commits, with their head sha.
   - *People*: commits and last date in the window.
@@ -74,13 +80,12 @@ impact report (`Woods::Impact::Report.compare` through `WoodsMap::ImpactRange`, 
 - facets;
 - categories;
 - metadata keys;
-- source lines before and after.
+- source lines before and after;
+- then Woods' unified diff of the unit's annotated source (`Woods::Impact::UnitDiff`, woods#802, through `WoodsMap::SourceDiff`), drawn with the B8-Impact-Changed diff component (`components/_diff`): an eyebrow with the added and removed counts, each hunk's `@@` header, both endpoints' line numbers, `+`/`−` rows tinted and named for screen readers. Line numbers are the annotated source the Code view shows. A diff past Woods' bounds says *truncated* or *too large*; a Woods without the API, an unretained generation and an unreadable payload each say so, never an empty diff.
 
 If the report lists no change, the section says so. An unavailable report shows its
 reason. *Full range report* opens `/woods/impact?from=gen:N&to=gen:M`. The map does
-not diff payloads. Changed line ranges wait on
-[woods#802](https://github.com/lost-in-the/woods/issues/802). The comparison counts
-against the impact rate limit.
+not diff payloads. The comparison counts against the impact rate limit.
 
 ## `/woods/history`
 
@@ -101,8 +106,7 @@ never takes a path.
 
 ## Limits
 
-- **No line counts or hunks.** The board's `+6 −1` and *hunks* need per-file line counts and hunks in the commit table ([woods#804](https://github.com/lost-in-the/woods/issues/804)). Until then the detail block says so.
-- **No facets-moved column.** It would need a report per generation pair. The unit diff shows the facets for one chosen pair.
-- **No *by generation / commit* toggle.** It is not built; the strip groups by time.
+- **Hunks link only from a file's latest commit.** Older hunks are in their commit's coordinates, which the current Code view no longer shows.
+- **Facets moved are per generation, not per commit.** Commits a generation first carried share its value.
 - **No *git graph* export.** Branch topology is not published; only `parents` is.
 - **Unmerged branches absent.** The table is HEAD-reachable.

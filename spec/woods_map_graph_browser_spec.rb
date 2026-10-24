@@ -114,6 +114,10 @@ RSpec.describe WoodsMap do
     expect(drawing.dig('ranges', 'facts')).to include('1 changed and 1 affected in the report, 2 drawn')
   end
 
+  it 'draws the loop of a self edge on the tallest, widest unit' do
+    expect(drawing['loop']).to eq('height' => 56, 'wide' => true, 'refused' => false)
+  end
+
   it 'outlines the drawn steps of a flow and the edge between them, and plays it from the first step (A-4)' do
     flow = drawing['flow']
     expect([flow['nodes'], flow['edges'], flow['current']]).to eq([flow['expected'], [flow['edge']], [flow['source']]])
@@ -127,6 +131,14 @@ RSpec.describe WoodsMap do
     expect(timeline).to include('shown' => true, 'window' => %w[n_0 n_1], 'one' => ['n_0'], 'cleared' => 0)
     expect(timeline['windowText']).to eq('2 commits, 2026-09-01 to 2026-10-01: 2 units drawn changed')
     expect(timeline['oneText']).to eq('bbbbbbb, 2026-10-01, two: 1 unit drawn changed')
+  end
+
+  it 'adds units to the guide context with Space and Shift+click, opens on a plain click, and clears (M7)' do
+    pick = drawing['pick']
+    expect(pick['events']).to eq([['model:Post'], %w[model:Post concern:Generated::Unit4], []])
+    expect(pick['classes']).to eq(%w[n_0 n_4])
+    expect(pick['status']).to include("added to the guide's context, 2 units selected")
+    expect(pick).to include('openedOnTap' => true, 'cleared' => 0, 'offHandled' => false, 'offEvents' => 0)
   end
 
   it 'encodes a re-centring identifier as a query value on the full-screen page' do

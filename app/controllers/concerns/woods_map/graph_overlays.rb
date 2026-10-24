@@ -7,6 +7,7 @@ module WoodsMap
   # request's pinned generation; neither runs when the explorer is not shown.
   module GraphOverlays
     extend ActiveSupport::Concern
+    include AuthorFilter
 
     private
 
@@ -18,7 +19,7 @@ module WoodsMap
       @flows = WoodsMap::GraphFlow.entries(repository, identifier, type)
       entry = params[:flow].to_s
       @flow = WoodsMap::GraphFlow.new(repository, neighbourhood, entry) unless entry.empty?
-      @timeline = WoodsMap::GraphTimeline.new(repository, neighbourhood)
+      @timeline = WoodsMap::GraphTimeline.new(repository, neighbourhood, author: author_param)
     end
   end
 end

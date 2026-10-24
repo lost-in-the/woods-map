@@ -54,8 +54,8 @@ RSpec.describe WoodsMap::HistoryView do
   it 'counts people over the window and names its limits' do
     view('Micropost', 'model') do |history|
       expect(history.people.map { |p| [p.name, p.commits] }).to eq([['Leah Armstrong', 2], ['Sam Okafor-Whitfield', 1]])
-      expect(history.limits).to include('line counts and hunks are not in the commit table (woods#804)',
-                                        'heat is per file, not per line')
+      expect(history.limits).to include('heat is per file, not per line')
+      expect(history.limits.join.include?('woods#804')).to eq(!WoodsLineStats.supported?)
     end
   end
 
@@ -76,6 +76,22 @@ RSpec.describe WoodsMap::HistoryView do
       expect([history.table?, history.strip, history.co_changes]).to eq([false, nil, []])
       expect(history.limits.first).to eq('1 of 1 commits per unit: this generation has no commit table ' \
                                          '(no readable git history at extraction)')
+    end
+  end
+
+  # woods-map#92, design-study scenario 2 step 4: the author as git recorded it.
+  it 'narrows the commits to one author and keeps every author in the people list' do
+    view('ApplicationJob', 'job', author: 'Sam Okafor-Whitfield') do |history|
+      expect(history.commits.map(&:author).uniq).to eq(['Sam Okafor-Whitfield'])
+      expect(history.total).to eq(1)
+      expect(history.people.map(&:name)).to include('Leah Armstrong', 'Sam Okafor-Whitfield')
+    end
+  end
+
+  it 'shows nothing for an author no commit in the window carries, rather than guessing' do
+    view('ApplicationJob', 'job', author: 'Nobody') do |history|
+      expect(history.commits).to eq([])
+      expect(history.author).to eq('Nobody')
     end
   end
 end

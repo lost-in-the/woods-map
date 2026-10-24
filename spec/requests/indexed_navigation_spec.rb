@@ -62,6 +62,13 @@ RSpec.describe 'Indexed navigation', type: :request do
     current = html_response_document.css('.tree [aria-current="true"]')
     expect(current.pluck('data-path')).to eq(['spec/report.rb'])
     expect(response.body).to include('href="/woods/units/factory/Report"')
+    expect(response.body).to include('Indexed file, 1 unit, gen')
+  end
+
+  it 'lays the ownership sections out in the page body, like the units index' do
+    get WoodsMap::Engine.routes.url_helpers.file_path(path: path, script_name: '/woods')
+    sections = html_response_document.css('.page-main > .body > .main > section.sec').pluck('aria-labelledby')
+    expect(sections).to eq(%w[file-owners file-unresolved])
   end
 
   it 'publishes exact typed owner keys for client filtering without file-map guesses' do

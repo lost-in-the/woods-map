@@ -11,7 +11,7 @@ module WoodsMap
   #   lines, and each inlined concern de-commented under an "included from"
   #   fold with `c:N` numbers.
   class CodeView
-    Row = Struct.new(:kind, :number, :label, :html, :note, :fold, :concern, keyword_init: true)
+    Row = Struct.new(:kind, :number, :label, :html, :note, :fold, :concern, :composite, keyword_init: true)
 
     LENSES = %w[written effective].freeze
 
@@ -71,7 +71,7 @@ module WoodsMap
       highlighted = highlight(@composite.file_lines, links)
       @composite.file_lines.zip(highlighted).map do |line, html|
         file_line = line.label.to_i
-        Row.new(kind: :line, number: file_line, label: line.label, html: html,
+        Row.new(kind: :line, number: file_line, label: line.label, html: html, composite: line.number,
                 note: @marginalia.for_line(line.text) || caller_note(file_line))
       end
     end
@@ -84,12 +84,16 @@ module WoodsMap
       @composite.concerns.each do |name, lines|
         rows << Row.new(kind: :fold, html: "included from #{ERB::Util.html_escape(name)}, #{lines.size} lines",
                         fold: :concern, concern: name)
-        highlight(lines).each_with_index do |html, index|
-          rows << Row.new(kind: :line, label: lines[index].label, html: html,
-                          note: @marginalia.for_line(lines[index].text), concern: name)
-        end
+        rows.concat(concern_rows(name, lines))
       end
       rows
+    end
+
+    def concern_rows(name, lines)
+      highlight(lines).zip(lines).map do |html, line|
+        Row.new(kind: :line, label: line.label, html: html, composite: line.number,
+                note: @marginalia.for_line(line.text), concern: name)
+      end
     end
 
     # file line => method name, for the unit's own definitions (W-2)

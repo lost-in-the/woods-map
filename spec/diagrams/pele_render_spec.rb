@@ -3,6 +3,7 @@
 require 'json'
 require 'open3'
 require_relative '../support/large_schema_index'
+require_relative '../support/trail_index'
 
 # The headless render spec (mermaid-diagram-types.md, constraint 4): every
 # Mermaid text the map generates from the fixture index is drawn with the
@@ -11,6 +12,8 @@ require_relative '../support/large_schema_index'
 # the engine never runs it. Without Node the spec skips, unless
 # WOODS_MAP_RENDER_SPEC=1 (set in CI) makes a missing Node a failure.
 RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disable RSpec/DescribeClass
+  include TrailIndex
+
   let(:root) { File.expand_path('../..', __dir__) }
 
   def node_available?
@@ -24,7 +27,23 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
     erds = [FIXTURE_INDEX, WoodsMap::LargeSchemaIndex.path].each_with_index.flat_map do |dir, i|
       WoodsMap::Repository.open(dir) { |repository| erd_diagrams(repository, i.zero? ? 'fixture' : '300') }
     end
-    unit_diagrams + landscape_diagrams + history_diagrams + erds
+    unit_diagrams + landscape_diagrams + history_diagrams + erds + trail_diagrams
+  end
+
+  # The Trail's lanes for each kind of entry, and the pinned graph and ERD,
+  # over the scenario-2 index (notes/trail.md).
+  def trail_diagrams
+    WoodsMap::Repository.open(trail_root) do |repository|
+      pins = %w[job:NotifySubscribersJob mailer:MailingListMailer model:Post model:User]
+      pinned = WoodsMap::PinnedViews.new(repository, WoodsMap::TrailBoard.new(pins: pins).pins)
+      entries = %w[NotifySubscribersJob Post@create Post#set_slug MailingListMailer#new_post]
+      unless WoodsMap::RepositoryAssembledFlows.capabilities[:model_events]
+        entries.reject! { |entry| entry.include?('@') }
+      end
+      entries.map do |entry|
+        ['flowchart', "trail #{entry}", WoodsMap::LifecycleBuilder.new(repository, entry).mermaid]
+      end + [['flowchart', 'trail pinned graph', pinned.graph_mermaid], ['er', 'trail pinned erd', pinned.erd_mermaid]]
+    end
   end
 
   def unit_diagrams

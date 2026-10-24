@@ -25,9 +25,14 @@ import { Controller } from "@hotwired/stimulus"
 // Home returns to this unit, + / − zoom and 0 fits. The list below the canvas
 // is the screen-reader equivalent; ↑ / ↓ move between its rows and a row in
 // focus lights its edge on the canvas.
+//
+// Guide context (M7): while the guide is ready (pick value), Shift+click (or
+// Ctrl / Cmd+click) and Space on the canvas add a unit to, or take it from,
+// the set the guide panel sends as context; a "woods-map:graph-pick" event
+// carries the set and "woods-map:graph-pick-clear" empties it.
 export default class extends Controller {
   static targets = ["panel", "canvas", "facts", "status", "message", "fallback", "flowchart", "layouts", "layout", "list", "play", "scrub", "scrubFrom", "scrubTo", "window"]
-  static values = { url: String, unitUrl: String, label: String, generation: Number, cache: String, blast: Array, emphasis: String, clusters: Array, mode: String, flow: Object, timeline: Array }
+  static values = { url: String, unitUrl: String, label: String, generation: Number, cache: String, blast: Array, emphasis: String, clusters: Array, mode: String, flow: Object, timeline: Array, pick: Boolean }
 
   static LAYOUT_KEY = "woods-map:graph-layout"
   static POSITIONS_KEY = "woods-map:graph-positions"
@@ -39,6 +44,9 @@ export default class extends Controller {
   static DETAIL_ZOOM = 0.7
 
   connect() {
+    this.picked = new Map()
+    this.onPickClear = () => this.clearPicks()
+    if (this.pickValue) document.addEventListener("woods-map:graph-pick-clear", this.onPickClear)
     this.onListKey = this.onListKey.bind(this)
     this.onListFocus = this.onListFocus.bind(this)
     if (this.hasListTarget) {
@@ -69,6 +77,7 @@ export default class extends Controller {
   }
 
   disconnect() {
+    document.removeEventListener("woods-map:graph-pick-clear", this.onPickClear)
     if (this.flowTimer) clearTimeout(this.flowTimer)
     this.themeObserver?.disconnect()
     if (this.hasListTarget) {
@@ -231,7 +240,11 @@ export default class extends Controller {
         })
       })
     }
-    this.cy.on("tap", "node", (event) => this.open(event.target.id()))
+    this.cy.on("tap", "node", (event) => {
+      const pointer = event.originalEvent
+      if (this.pickValue && pointer && (pointer.shiftKey || pointer.ctrlKey || pointer.metaKey)) this.togglePick(event.target.id())
+      else this.open(event.target.id())
+    })
     this.cy.on("mouseover", "node", (event) => { this.canvasTarget.style.cursor = "pointer"; this.light(event.target) })
     this.cy.on("mouseout", "node", () => { this.canvasTarget.style.cursor = ""; this.light(this.cy.nodes(".sel")) })
     this.cy.on("dragfree", "node", () => this.remember())
@@ -240,6 +253,7 @@ export default class extends Controller {
     this.tint()
     this.overlayFlow()
     this.showScrub()
+    this.picked.forEach((_, id) => this.cy.getElementById(id).addClass("pick"))
 
     marks.cytoscape = performance.now() - started
     this.facts()
@@ -398,6 +412,7 @@ export default class extends Controller {
       { selector: "node.flow", style: { "border-color": t.link, "border-width": 2.5 } },
       { selector: "node.flowcur", style: { "border-color": t.link, "border-width": 4, "overlay-color": t.link, "overlay-opacity": 0.16, "overlay-padding": 5, color: t.bright } },
       { selector: "node.sel", style: { "border-color": t.select, "border-width": 3, "overlay-color": t.select, "overlay-opacity": 0.12, "overlay-padding": 4, color: t.bright } },
+      { selector: "node.pick", style: { "border-style": "double", "border-color": t.select, "border-width": 5 } },
       { selector: "edge", style: { width: 1, "line-color": t.dim, "curve-style": "haystack", "haystack-radius": 0 } },
       { selector: "edge.detail", style: {
         "target-arrow-color": t.dim, "target-arrow-shape": "triangle", "arrow-scale": 0.8,
@@ -409,7 +424,10 @@ export default class extends Controller {
       { selector: "edge.detail.taxi", style: { "curve-style": "taxi", "taxi-direction": "horizontal", "taxi-turn": "50%" } },
       { selector: "edge.detail.ls", style: { label: "", "source-label": "data(label)", "source-text-offset": "data(off)", "source-text-margin-y": "data(dy)" } },
       { selector: "edge.detail.lt", style: { label: "", "target-label": "data(label)", "target-text-offset": "data(off)", "target-text-margin-y": "data(dy)" } },
-      { selector: "edge:loop", style: { "curve-style": "bezier", "target-arrow-shape": "triangle", "target-arrow-color": t.dim, "loop-direction": "-45deg", "loop-sweep": "-60deg", "control-point-step-size": 72 } },
+      // A loop's step grows with its node: on the tallest (heaviest) nodes a
+      // fixed 72px put the control points inside the node and Cytoscape
+      // refused to draw the loop (a self redirect_to, seen at depth 1).
+      { selector: "edge:loop", style: { "curve-style": "bezier", "target-arrow-shape": "triangle", "target-arrow-color": t.dim, "loop-direction": "-45deg", "loop-sweep": "-60deg", "control-point-step-size": (edge) => Math.max(72, Math.round(edge.source().height() * 2)) } },
       { selector: "edge.flow", style: { width: 2.5, "line-color": t.link, "target-arrow-color": t.link, "z-index": 9 } },
       { selector: "edge.flowcur", style: { width: 4, "line-color": t.link, "target-arrow-color": t.link, color: t.bright, "z-index": 11 } },
       { selector: "edge.lit", style: { width: 2, "line-color": t.select, "target-arrow-color": t.select, color: t.bright, "z-index": 10 } }
@@ -782,6 +800,8 @@ tintWindow(from, to) {
       else this.announce(this.selectedId, "nothing further that way")
     } else if (event.key === "Enter") {
       this.open(this.selectedId)
+    } else if (event.key === " " && this.pickValue) {
+      this.togglePick(this.selectedId)
     } else if (event.key === "Home") {
       this.select(this.focusId)
     } else if (event.key === "+" || event.key === "=") {
@@ -874,6 +894,36 @@ tintWindow(from, to) {
     return null
   }
 
+  // Add a unit to the guide's context, or take it out, and tell the panel.
+  togglePick(id) {
+    const d = this.byId?.get(id)
+    if (!this.cy || !d || !d.identifier) return
+    const node = this.cy.getElementById(id)
+    const added = !this.picked.has(id)
+    if (added) {
+      if (this.picked.size >= 20) { this.announce(id, "the guide takes at most 20 units"); return }
+      this.picked.set(id, { identifier: d.identifier, type: d.type })
+    } else {
+      this.picked.delete(id)
+    }
+    node.toggleClass("pick", added)
+    this.firePick()
+    const count = this.picked.size
+    this.announce(id, `${added ? "added to" : "taken from"} the guide's context, ${count} ${count === 1 ? "unit" : "units"} selected`)
+  }
+
+  clearPicks() {
+    if (this.picked.size === 0) return
+    this.cy?.nodes(".pick").removeClass("pick")
+    this.picked.clear()
+    this.firePick()
+    if (this.hasStatusTarget) this.statusTarget.textContent = "Graph selection cleared from the guide's context."
+  }
+
+  firePick() {
+    document.dispatchEvent(new CustomEvent("woods-map:graph-pick", { detail: { units: [...this.picked.values()] } }))
+  }
+
   open(id) {
     const d = this.byId?.get(id)
     if (!d || d.focus) return
@@ -901,7 +951,7 @@ tintWindow(from, to) {
     const edges = this.payload.elements.edges.length
     const query = this.payload.query || {}
     const facts = [
-      `${query.centre}, depth ${query.depth}, ${query.direction}`,
+      query.summary || `${query.centre}, depth ${query.depth}, ${query.direction}`,
       `${nodes} ${nodes === 1 ? "unit" : "units"}`,
       `${edges} ${edges === 1 ? "edge" : "edges"}`
     ]

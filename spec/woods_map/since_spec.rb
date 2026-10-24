@@ -43,4 +43,30 @@ RSpec.describe WoodsMap::Since do
     since = described_class.from_param('gen:9', index_dir: 'x', repository: repository)
     expect([since.available?, since.message]).to eq([false, 'Selector "gen:9" does not identify one retained payload'])
   end
+
+  describe '#line_marks' do
+    def since_with(changes, to: 1)
+      data = range_report_data
+      data['range']['to']['generation'] = to
+      record = range_report_changes.first.merge('source_changes' => changes)
+      stub_range_report(data.merge('changed' => [record]))
+      described_class.from_param('gen:1', index_dir: 'x', repository: repository)
+    end
+
+    it "reads the report's after-side ranges as changed lines and removal points" do
+      hunks = [{ 'before' => [3, 2], 'after' => [3, 3] }, { 'before' => [9, 1], 'after' => [9, 0] },
+               { 'before' => [1, 1], 'after' => [0, 0] }]
+      marks = since_with({ 'hunks' => hunks, 'added_lines' => 3, 'removed_lines' => 4, 'coverage' => 'truncated' })
+              .line_marks('User', 'model')
+      expect(marks.changed.to_a.sort).to eq([3, 4, 5])
+      expect([marks.removed_count(9), marks.removed_count(3), marks.coverage]).to eq([1, 0, 'truncated'])
+    end
+
+    it 'marks nothing past the bounds, without ranges, or when now is another generation' do
+      ranges = { 'hunks' => [{ 'before' => [1, 1], 'after' => [1, 1] }], 'coverage' => 'complete' }
+      expect(since_with(ranges.merge('coverage' => 'too_large')).line_marks('User', 'model')).to be_nil
+      expect(since_with(nil).line_marks('User', 'model')).to be_nil
+      expect(since_with(ranges, to: 2).line_marks('User', 'model')).to be_nil
+    end
+  end
 end

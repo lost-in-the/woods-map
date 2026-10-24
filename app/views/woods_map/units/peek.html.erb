@@ -1,9 +1,12 @@
-<%# The peek drawer (B8-Code): the first lines around a unit's definition. %>
+<%# The peek drawer (B8-Code): the first lines around a unit's definition,
+    or around the line a method-level link names (?line=). %>
 <% rows = @code.rows.select { |r| r.kind == :line } %>
-<% start = [((@code.definition_line || 1) - 1), 0].max %>
+<% line = params[:line].to_s.match?(/\A[1-9][0-9]{0,6}\z/) && params[:line].to_i <= rows.size ? params[:line].to_i : nil %>
+<% at = line || @code.definition_line || 1 %>
+<% start = [at - 1, 0].max %>
 <% shown = rows.drop(start).first(8) %>
 <div class="peek">
-  <div class="ph"><span class="eyebrow">peek</span><b><%= @page.identifier %></b><span><%= @page.path %>:<%= @code.definition_line || 1 %></span><span class="tools"><%= link_to('open', woods_map.unit_path(type: @page.type, identifier: @page.identifier)) %><button class="tool close" type="button" aria-label="Close" data-action="peek#close">✕</button></span></div>
+  <div class="ph"><span class="eyebrow">peek</span><b><%= @page.identifier %></b><span><%= @page.path %>:<%= at %></span><span class="tools"><%= link_to('open', woods_map.unit_path(type: @page.type, identifier: @page.identifier, anchor: ("L#{line}" if line))) %><button class="tool close" type="button" aria-label="Close" data-action="peek#close">✕</button></span></div>
   <div class="ph meta"><span><%= @page.subtitle %></span><span class="lyr">gen <%= @repository.generation_number %></span></div>
   <div class="pl codeview"><% shown.each do |row| %><span><%= row.label %></span><span><%= row.html.html_safe %></span><% end %></div>
 </div>

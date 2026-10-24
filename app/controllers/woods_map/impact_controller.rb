@@ -95,13 +95,23 @@ module WoodsMap
     end
 
     def render_range
-      selectors = [params.fetch(:from, ''), params.fetch(:to, 'now')]
+      selectors = [params.fetch(:from, ''), params.fetch(:to, 'now')].map { |selector| generation_selector(selector) }
       selectors[1] = 'now' if selectors.last == ''
       @range = selectors.map { |selector| selector.is_a?(String) ? selector : '' }
       if selectors.first.present? || selectors.any? { |selector| !selector.is_a?(String) }
         @report = WoodsMap::ImpactRange.new(woods_map_config.index_path, from: selectors.first, to: selectors.last)
       end
       render_report(@repository)
+    end
+
+    # A bare generation number (`3`) names `gen:3`: a commit SHA has at least
+    # seven characters, so one to six digits can mean nothing else. Anything
+    # else goes to Woods as typed.
+    #
+    # @param selector [Object]
+    # @return [Object]
+    def generation_selector(selector)
+      selector.is_a?(String) && selector.strip.match?(/\A[1-9][0-9]{0,5}\z/) ? "gen:#{selector.strip}" : selector
     end
 
     # The range tabs (Overview first) over an available report, or the

@@ -26,11 +26,21 @@ module WoodsMap
         @markdown = markdown.to_s
         @identifiers = identifiers
         @link = link
+        @cited = []
       end
 
       # @return [String] HTML, safe to emit as is
       def to_html
-        blocks.join
+        @to_html ||= blocks.join
+      end
+
+      # The units the answer links, in the order it first names them: what
+      # *pin* and *open as investigation* hand to the Trail.
+      #
+      # @return [Array<Array(String, String)>] identifier and type
+      def cited
+        to_html
+        @cited.uniq
       end
 
       private
@@ -130,6 +140,7 @@ module WoodsMap
       end
 
       def anchor((identifier, type), inner)
+        @cited << [identifier, type]
         %(<a href="#{escape(@link.call(identifier, type))}">#{inner}</a>)
       end
 

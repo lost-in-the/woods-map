@@ -103,6 +103,16 @@ Settled by the maintainer on [woods-map#57](https://github.com/lost-in-the/woods
 |---|---|---|---|
 | D-25 | What the Share menu offers | The Share menu offers the focus URL and the Mermaid text of the page's diagrams. It offers no Markdown or JSON report, even text handed through unchanged from Woods. Its audience is agents pulling charts into automated code review on pull requests, and people sharing architecture feedback. | Impact reports in Markdown and JSON stay with Woods (D-1): `woods:impact`, its CI comment and the `change_impact` MCP tool. The boards' *Markdown for PR* button is dropped. The `CLAUDE.md` rule "never render Markdown or JSON reports here" stands as written. Because agents are a primary audience, two things must hold: a focus URL is stable and carries no token, and every diagram's Mermaid text can be fetched without scraping HTML. |
 
+## Staging hardening (24 October 2026)
+
+Settled by the maintainer on [woods-map#59](https://github.com/lost-in-the/woods-map/issues/59); the engine shipped each option with M8 ([woods-map#10](https://github.com/lost-in-the/woods-map/issues/10)).
+
+| # | Question | Decision | Consequence |
+|---|---|---|---|
+| D-26 | What a rate-limited request sees | The 403 panel's plain page: no frame and no index facts. It has an HTTP 429 eyebrow, the budget, the wait and the configuration snippet, with `Retry-After`. JSON clients get a JSON body, and the palette shows its message in the status line. | The limit runs inside the gate, before the repository opens a generation, so the page needs nothing from the index. It is not an empty state in the frame, which would have shown "no index". |
+| D-27 | Token-less loopback mode | Besides a loopback peer, it requires a loopback `Host` header: `localhost`, `127.0.0.1` or `::1`. The check uses `Woods::MCP::OriginPolicy`, the same policy `woods-mcp-http` enforces. `config.allowed_origins` adds names such as `http://myapp.test`. | This blocks DNS rebinding, where a page reaches the map through the developer's browser under its own host name. It does not rely on Rails' `config.hosts`, which is empty in production and staging. A refused request gets a 403 panel that names the reason. |
+| D-28 | Inline styles | Views and helpers write no `style` attribute, and `style-src` never allows `'unsafe-inline'`. Varying geometry uses bounded classes in `map.css`, column widths use the `width` hint, swatches are SVG fills, and Pele's and Cytoscape's styles are applied through the CSSOM. | A spec fails if a view or helper writes a `style` attribute. New views follow the same rule. |
+
 ## Open
 
 - Editor deep links: scheme and checkout path are per-browser settings; never guessed from the index.
