@@ -29,6 +29,10 @@ RSpec.describe 'The filter chain on the Passage tab', type: :request do
           allow(repository).to receive(:identifier_types).and_wrap_original do |types, identifier|
             identifier == 'Authenticating' ? ['concern'] : types.call(identifier)
           end
+          # A link needs the typed unit in the generation, not only its type name.
+          allow(repository).to receive(:graph_node).and_wrap_original do |node, identifier, **options|
+            identifier == 'Authenticating' ? { 'type' => 'concern' } : node.call(identifier, **options)
+          end
           block.call(repository)
         end
       end

@@ -177,12 +177,61 @@ function drawing(cytoscape) {
   const ranges = { changed: ranged.cy.nodes(".chg").map((n) => n.id()), direct: ranged.cy.nodes(".br1").map((n) => n.id()),
     facts: ranged.factsTarget.textContent }
 
+  // A self edge on the heaviest, so tallest, unit (a controller that redirects to itself):
+  // Cytoscape refused the loop while its step was a fixed 72px.
+  const selfish = neighbourhood(6, 6)
+  Object.assign(selfish.elements.nodes[0].data, { pagerank: 1, identifier: "PasswordResetsController", label: "PasswordResetsController", type: "controller" })
+  selfish.elements.edges.push({ data: { id: "e_self", source: "n_0", target: "n_0", via: "redirect_to", depth: 1, through: null, cross_database: null } })
+  const looped = mount("looped")
+  looped.draw(cytoscape, selfish)
+  looped.cy.renderer().render()
+  const loop = { height: looped.cy.getElementById("n_0").height(), wide: looped.cy.getElementById("n_0").width() > 150, refused: looped.cy.getElementById("e_self")._private.rscratch.badLine === true }
+// Flow overlay (A-4): the drawn steps and the edge between them are outlined; a step the
+// neighbourhood does not draw is left to the page's list; play lights the first step at once.
+const flowed = mount("flowed")
+const ident = (id) => { const d = small.elements.nodes.find((n) => n.data.id === id).data; return [d.identifier, d.type] }
+const e0 = small.elements.edges[0].data
+const [from, to] = [ident(e0.source), ident(e0.target)]
+flowed.flowValue = { entry_point: "PostsController#create", total: 3, steps: [
+  { position: 1, identifier: from[0], type: from[1], from: null, to: null },
+  { position: 2, identifier: to[0], type: to[1], from, to },
+  { position: 3, identifier: "Elsewhere", type: "model", from: null, to: null }] }
+flowed.hasFlowValue = true
+flowed.draw(cytoscape, small)
+flowed.playFlow()
+const flow = { nodes: flowed.cy.nodes(".flow").map((n) => n.id()).sort(), edges: flowed.cy.edges(".flow").map((e) => e.id()),
+  expected: [e0.source, e0.target].sort(), edge: e0.id, source: e0.source, current: flowed.cy.nodes(".flowcur").map((n) => n.id()),
+  status: flowed.statusTarget.textContent, facts: flowed.factsTarget.textContent }
+flowed.stopFlow()
+flow.stopped = flowed.cy.elements(".flowcur").length === 0
+
+// Timeline (A-6): a window of commits fills the units they touched; a single commit narrows it; clear empties it.
+const timed = mount("timed")
+const scrub = document.createElement("div")
+scrub.hidden = true
+scrub.innerHTML = '<input type="range" min="0" max="1" value="0"><input type="range" min="0" max="1" value="1"><output></output>'
+timed.element.appendChild(scrub)
+Object.assign(timed, { scrubTarget: scrub, hasScrubTarget: true, scrubFromTarget: scrub.children[0], scrubToTarget: scrub.children[1],
+  windowTarget: scrub.children[2], hasTimelineValue: true, timelineValue: [
+    { sha: "aaaaaaa", date: "2026-09-01", message: "one", units: [{ identifier: "Generated::Unit1", type: "controller" }] },
+    { sha: "bbbbbbb", date: "2026-10-01", message: "two", units: [{ identifier: "Post", type: "model" }, { identifier: "Elsewhere", type: "model" }] }] })
+timed.draw(cytoscape, small)
+const timeline = { shown: !scrub.hidden }
+timed.scrub()
+timeline.window = timed.cy.nodes(".tl").map((n) => n.id()).sort()
+timeline.windowText = timed.windowTarget.textContent
+timed.pickCommit({ currentTarget: { dataset: { commit: "1" } } })
+timeline.one = timed.cy.nodes(".tl").map((n) => n.id())
+timeline.oneText = timed.windowTarget.textContent
+timed.clearWindow()
+timeline.cleared = timed.cy.nodes(".tl").length
+
   // On the full-screen page a node re-centres the page: the identifier is a query value.
   blasted.unitUrlValue = "/woods/graph?centre=__identifier__&type=__type__&depth=2"
   const recentre = blasted.unitUrl({ type: "route", identifier: "GET /users/:id?x=1&y" })
 
   return {
-    restored, forgotten, tinted, ranges, recentre, clusters,
+    restored, forgotten, tinted, ranges, recentre, clusters, flow, timeline, loop,
     ms: Number(big.element.dataset.graphRenderMs), wall, calibrationMs, warmMs, timings: big.timings, radialMs, radialMoved,
     drawn: big.element.dataset.graphDrawn === "true",
     nodes: big.cy.nodes().length, edges: big.cy.edges().length,

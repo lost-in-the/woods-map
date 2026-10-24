@@ -20,8 +20,8 @@
   <%= render 'woods_map/components/rail', heading: "History, HEAD-reachable, #{h.days}d", groups: groups %>
   <div class="main">
     <% if @diff %>
-      <section class="sec" aria-labelledby="diff" id="diff">
-        <header><h2 class="t2" id="diff">Unit diff <%= count_tag("gen #{@diff.from} → #{@diff.to}") %><%= info_tip('This unit\'s record in Woods\' change impact report between two retained generations (Woods::Impact::Report, W-12): which facets moved, the categories and metadata keys, the source size; then Woods\' unified diff of its annotated source (Woods::Impact::UnitDiff). Line numbers are the source the map shows, concerns and schema header included.') %></h2><%= link_to('full range report', woods_map.impact_path(from: "gen:#{@diff.from}", to: "gen:#{@diff.to}"), class: 'tool goto') %></header>
+      <section class="sec" aria-labelledby="diff-title" id="diff">
+        <header><h2 class="t2" id="diff-title">Unit diff <%= count_tag("gen #{@diff.from} → #{@diff.to}") %><%= info_tip('This unit\'s record in Woods\' change impact report between two retained generations (Woods::Impact::Report, W-12): which facets moved, the categories and metadata keys, the source size; then Woods\' unified diff of its annotated source (Woods::Impact::UnitDiff). Line numbers are the source the map shows, concerns and schema header included.') %></h2><%= link_to('full range report', woods_map.impact_path(from: "gen:#{@diff.from}", to: "gen:#{@diff.to}"), class: 'tool goto') %></header>
         <% case @diff.state %>
         <% when :changed %>
           <%= render 'woods_map/components/detail', rows: @diff.rows, framed: true %>
@@ -53,14 +53,14 @@
                  body: render('woods_map/history/strip', strip: strip, bar_url: bar_url, selected: (by_gen ? h.gen : h.week), label: strip_label),
                  legend: legend, provenance: [exports].compact %>
     <% end %>
-    <section class="sec" aria-labelledby="commits" id="commits" data-controller="rows">
+    <section class="sec" aria-labelledby="commits-title" id="commits" data-controller="rows">
       <% shown = h.commits %>
       <% heading = if h.gen && h.table? then "#{shown.size} first carried by gen #{h.gen}"
                    elsif h.week then "#{shown.size} in the #{h.commit_strip&.step == 1 ? 'day' : 'week'} of #{h.week.iso8601}"
                    elsif h.all? || shown.size == h.total then "#{h.total} in #{h.days}d"
                    else "latest #{shown.size} of #{h.total}"
                    end %>
-      <header><h2 class="t2" id="commits">Commits <%= count_tag(heading) %><%= info_tip(h.table? ? 'Every HEAD-reachable commit in the window that touched this unit\'s file or a file it inlines, from the generation\'s commit table (Woods W-3). Open a row for its description, files, hunks and the units that changed with it. Facets moved is Woods\' record of this unit between the generation that first carried the commit and the retained generation before it (Woods::Impact::UnitDiff); a commit between extractions is attributed to the next generation.' : 'The last commits the extractor recorded for this unit (metadata.git); this generation has no commit table.') %></h2>
+      <header><h2 class="t2" id="commits-title">Commits <%= count_tag(heading) %><%= info_tip(h.table? ? 'Every HEAD-reachable commit in the window that touched this unit\'s file or a file it inlines, from the generation\'s commit table (Woods W-3). Open a row for its description, files, hunks and the units that changed with it. Facets moved is Woods\' record of this unit between the generation that first carried the commit and the retained generation before it (Woods::Impact::UnitDiff); a commit between extractions is attributed to the next generation.' : 'The last commits the extractor recorded for this unit (metadata.git); this generation has no commit table.') %></h2>
         <span class="goto tools"><% if h.gen && h.table? %><%= link_to('all generations', history_tab_url(@page, gen: nil, anchor: 'commits'), class: 'tool') %><% elsif h.week %><%= link_to('all weeks', history_tab_url(@page, week: nil, anchor: 'commits'), class: 'tool') %><% elsif h.table? && !h.all? && shown.size < h.total %><%= link_to("all #{h.total}", history_tab_url(@page, all: '1', anchor: 'commits'), class: 'tool') %><% end %><% if h.table? && shown.any? %> <button class="tool" type="button" data-action="rows#expandAll" data-needs-js>expand all</button><% end %><% if h.table? %> <%= link_to('timeline with what moves with it', woods_map.history_path(units: (["#{@page.type}:#{@page.identifier}"] + h.co_changes.first(3).map { |c| "#{c.type}:#{c.identifier}" }), range: h.range), class: 'tool') %><% end %></span></header>
       <% if shown.any? %>
         <% own = [@page.identifier, @page.type] %>

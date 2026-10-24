@@ -10,13 +10,18 @@ html,body{margin:0;min-height:100%}
 .wm[data-theme=light]{color-scheme:light}
 /* Without JavaScript every detail block is open and the controls that need a script are gone. */
 html.no-js .wm .tgl,html.no-js .wm [data-needs-js]{display:none}
+/* Below 960 the site nav and the search move into the ☰ sheet, which needs a script. Without
+   one the bar wraps instead and keeps both, so every page can still reach Units, Graph, ERD,
+   Impact and search. */
+@container wm (max-width:959px){ html.no-js .wm .bar{flex-wrap:wrap;height:auto;min-height:52px;row-gap:var(--s3);padding-block:var(--s3)} html.no-js .wm .bar nav{display:flex;flex-wrap:wrap;order:5;width:100%;column-gap:var(--s5);row-gap:var(--s2)} }
+@container wm (max-width:639px){ html.no-js .wm .bar .bar-search{width:auto;flex:1 1 160px;justify-content:flex-start;padding:0 var(--s3)} html.no-js .wm .bar .bar-search .q{display:block} }
 html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 /* Honor the tree controller's filter/fold state over the token row layout. */
 .wm .tree [data-tree-target="row"][hidden] { display:none!important; }
 /* Inline links: a cue besides colour (D-22, WCAG 1.4.1, axe link-in-text-block). Standalone
    links stay bare; a link sitting among other text gets a faint underline in its own hue. */
-.wm .crumbs a,.wm .empty-state a,.wm .cap a,.wm .lead a,.wm .det dd a,.wm .facts dd a,.wm .banner .txt a,.wm .legend a,.wm .st a,.wm .mg a,.wm .rail li a,.wm .tip a,.wm .finding a,.wm .status a,.wm .psg .rows a,.wm .sec > header .t2 a,.wm .tbl tr.bnd a,.wm .guide .msg .text a,.wm .matrix .mut a{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--link) 55%,transparent);text-underline-offset:3px}
-.wm .crumbs a:hover,.wm .empty-state a:hover,.wm .cap a:hover,.wm .lead a:hover,.wm .det dd a:hover,.wm .facts dd a:hover,.wm .banner .txt a:hover,.wm .legend a:hover,.wm .st a:hover,.wm .mg a:hover,.wm .rail li a:hover,.wm .tip a:hover,.wm .finding a:hover,.wm .status a:hover,.wm .psg .rows a:hover,.wm .sec > header .t2 a:hover,.wm .tbl tr.bnd a:hover,.wm .guide .msg .text a:hover,.wm .matrix .mut a:hover{text-decoration-color:var(--link)}
+.wm .crumbs a,.wm .empty-state a,.wm .cap a,.wm .lead a,.wm .det dd a,.wm .facts dd a,.wm .banner .txt a,.wm .legend a,.wm .st a,.wm .mg a,.wm .rail li a,.wm .tip a,.wm .finding a,.wm .status a,.wm .psg .rows a,.wm .sec > header .t2 a,.wm .tbl tr.bnd a,.wm .guide .msg .text a,.wm .matrix .mut a,.wm .tbl td.uses a{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--link) 55%,transparent);text-underline-offset:3px}
+.wm .crumbs a:hover,.wm .empty-state a:hover,.wm .cap a:hover,.wm .lead a:hover,.wm .det dd a:hover,.wm .facts dd a:hover,.wm .banner .txt a:hover,.wm .legend a:hover,.wm .st a:hover,.wm .mg a:hover,.wm .rail li a:hover,.wm .tip a:hover,.wm .finding a:hover,.wm .status a:hover,.wm .psg .rows a:hover,.wm .sec > header .t2 a:hover,.wm .tbl tr.bnd a:hover,.wm .guide .msg .text a:hover,.wm .matrix .mut a:hover,.wm .tbl td.uses a:hover{text-decoration-color:var(--link)}
 /* Native explanation controls retain the inline glyph styling; tabs use the existing scroll cliff. */
 .wm button.info{font-size:inherit;line-height:inherit;padding:0;border:0;background:none}
 .wm .page-tabs .tab{flex-shrink:0;white-space:nowrap}
@@ -329,3 +334,13 @@ html.no-js .wm .amb-pop[hidden]{display:block}
 .wm .amb-pop ul{list-style:none;margin:0;padding:0;display:grid;gap:var(--s2)}
 .wm .amb-pop li{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:baseline}
 .wm .amb-pop li .dim{font-family:var(--ff-data);overflow-wrap:anywhere}
+/* The graph's flow overlay (A-4) and timeline (A-6): a flow step is outlined in the link colour, a unit
+   a commit in the window touched is filled with --mod as the range tint draws it; the scrubber's two range
+   inputs sit on one line and wrap at narrow widths. */
+.wm .legend i.gflow{background:var(--panel);border:2px solid var(--link)}
+.wm .legend i.gtl{background:color-mix(in srgb,var(--mod) 22%,var(--panel));border:2px solid var(--mod)}
+.wm .rail ol.flows a[aria-current]{color:var(--bright);font-weight:600}
+.wm .gtimeline .scrub{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3) var(--s5);margin:0 0 var(--s4)}
+.wm .gtimeline .scrub input[type=range]{width:min(100%,28ch);accent-color:var(--select)}
+.wm .gtimeline .scrub output{flex:1 1 30ch;min-width:0}
+.wm .gcommits summary{cursor:pointer;color:var(--link);font-size:var(--fs-12);margin-bottom:var(--s3)}

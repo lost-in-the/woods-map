@@ -15,7 +15,7 @@ three sections built from the existing table and empty-state partials:
 | --- | --- | --- |
 | Routes | route, action, helpers, routes.rb line, finding | controller `metadata.routes`, joined by `VERB path` to route units; `route_dispatch` route units the metadata omits are added; findings are graph analysis's `unresolvable_routes` for this controller |
 | Action sources | action, defined in, source line, route count | `metadata.action_sources`; gem-defined actions from `inherited_gem_actions`, labelled `gem` |
-| Reached by a route helper | unit, type, via | `link_to`, `redirect_to` and `form_action` reverse edges |
+| Reached by a route helper | unit, type, via, helper → action | `link_to`, `redirect_to` and `form_action` reverse edges; each unit's `metadata.route_helper_references` (woods#795) for this controller and mechanism |
 
 - **Route column:** links to the route unit when the generation has one. Otherwise it reads `no route unit` in the line column.
 - **Action column:** links to that action's Passage.
@@ -25,7 +25,7 @@ three sections built from the existing table and empty-state partials:
 
 Limits are named on the page, not derived:
 
-- **Helper references are controller-level.** The index records that a template reaches the controller, not which helper or action it uses ([woods#795](https://github.com/lost-in-the/woods/issues/795)).
+- **Helper references are controller-level on older generations.** Each referencing unit's `route_helper_references` ([woods#795](https://github.com/lost-in-the/woods/issues/795)) names the helpers it calls and the action each reaches; the column links that action's Passage. A unit from a generation extracted before them shows *not in this generation*, and the limit is named in the rail.
 - **Some routes have no route unit.** The rail counts declared routes that have none in the generation.
 
 Nothing is parsed from host source and no route is resolved at request time.

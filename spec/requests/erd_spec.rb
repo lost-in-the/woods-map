@@ -40,7 +40,7 @@ RSpec.describe 'The ERD page', type: :request do
   end
 
   it 'refuses anything but a chunk number in the route' do
-    expect { get '/woods/erd/users' }.to raise_error(ActionController::RoutingError)
+    expect_no_route('/woods/erd/users')
   end
 
   describe 'on a 300-model index' do

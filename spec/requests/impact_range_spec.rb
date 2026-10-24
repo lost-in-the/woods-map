@@ -36,12 +36,30 @@ RSpec.describe 'Impact range', type: :request do
     expect(data['affected'].pluck('generation')).to eq([4, 5])
   end
 
+  it 'links every affected unit when the overview shows only the first six' do
+    many = (1..8).map { |n| { 'identifier' => "Unit#{n}", 'type' => 'model', 'endpoint' => 'to', 'generation' => 5 } }
+    report = instance_double(WoodsMap::ImpactRange, state: :available, data: data.merge('affected' => many))
+    allow(WoodsMap::ImpactRange).to receive(:new).and_return(report)
+    get '/woods/impact', params: { from: 'gen:4', to: 'now' }
+    link = html_response_document.css('a').find { |a| a.text == 'All 8 affected units' }
+    expect(link['href']).to include('lens=changed').and end_with('#aff')
+  end
+
   it 'does not interpret deferred empty sections as a conclusive zero' do
     empty = data.merge('changed' => [], 'affected' => [], 'flows' => [])
     allow(WoodsMap::ImpactRange).to receive(:new).and_return(instance_double(WoodsMap::ImpactRange,
                                                                              state: :available, data: empty))
     get '/woods/impact', params: { from: 'gen:4' }
     expect(response.body).to include('not a conclusive zero', 'not_computed', 'node_budget')
+  end
+
+  it 'reads a bare generation number as gen:N and leaves a SHA-length number to Woods' do
+    allow(WoodsMap::ImpactRange).to receive(:new).and_return(instance_double(WoodsMap::ImpactRange,
+                                                                             state: :invalid, message: 'Invalid range'))
+    get '/woods/impact', params: { from: '3', to: ' 4 ' }
+    expect(WoodsMap::ImpactRange).to have_received(:new).with(anything, from: 'gen:3', to: 'gen:4')
+    get '/woods/impact', params: { from: '1234567', to: 'now' }
+    expect(WoodsMap::ImpactRange).to have_received(:new).with(anything, from: '1234567', to: 'now')
   end
 
   it 'renders invalid input locally without claiming the published index is missing' do
