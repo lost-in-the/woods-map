@@ -15,9 +15,22 @@ module WoodsMap
 
     # @param repository [Repository]
     # @param neighbourhood [Neighbourhood] what the explorer draws
-    def initialize(repository, neighbourhood)
+    # @param author [String, nil] only commits whose author, as git recorded it, is exactly this
+    def initialize(repository, neighbourhood, author: nil)
       @repository = repository
       @neighbourhood = neighbourhood
+      @author = author.to_s.presence
+    end
+
+    # @return [String, nil] the author the commits are narrowed to (woods-map#92)
+    attr_reader :author
+
+    # @return [Array<String>] authors of the commits that touched a drawn unit, most commits first
+    def authors
+      return [] unless table?
+
+      rows = @repository.git_commits.commits_for(*path_owners.keys)
+      rows.group_by { |row| row['author'] }.sort_by { |name, list| [-list.size, name.to_s] }.map(&:first).compact
     end
 
     # @return [Symbol] the commit table's state (Repository#commit_table_state)
@@ -67,6 +80,7 @@ module WoodsMap
       table = @repository.git_commits
       owners = path_owners
       rows = table.commits_for(*owners.keys)
+      rows = rows.select { |row| row['author'] == @author } if @author
       @total = rows.size
       rows.first(LIMIT).map { |row| commit_for(row, owners) }
     end

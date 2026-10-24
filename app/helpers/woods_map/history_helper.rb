@@ -8,16 +8,26 @@ module WoodsMap
     # modified file shows none.
     FILE_STATUS = { 'added' => 'new', 'deleted' => 'deleted', 'type_changed' => 'type changed' }.freeze
 
-    # The History tab's URL with the current range, week, all and diff
-    # parameters, overridden by +changes+ (nil removes one).
+    # The History tab's URL with the current range, week, all, author and
+    # diff parameters, overridden by +changes+ (nil removes one).
     #
     # @param page [WoodsMap::UnitPage]
     # @param changes [Hash{Symbol => Object}]
     # @return [String]
     def history_tab_url(page, **changes)
-      query = request.query_parameters.slice('range', 'week', 'all', 'from', 'to', 'by', 'gen').symbolize_keys
+      query = request.query_parameters.slice('range', 'week', 'all', 'from', 'to', 'by', 'gen', 'author').symbolize_keys
                      .merge(changes).compact
       woods_map.unit_history_path(type: page.type, identifier: page.identifier, **query)
+    end
+
+    # This page's URL with its query, less any `token`, overridden by
+    # +changes+ (nil removes one): the graph timeline's author links.
+    #
+    # @param changes [Hash{Symbol => Object}]
+    # @return [String]
+    def current_page_url(**changes)
+      query = request.query_parameters.except('token').merge(changes.stringify_keys).compact
+      query.empty? ? request.path : "#{request.path}?#{query.to_query}"
     end
 
     # @param status [String]
