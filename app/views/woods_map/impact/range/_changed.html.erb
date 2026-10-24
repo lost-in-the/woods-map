@@ -3,8 +3,15 @@
     units its witness paths reach; then the tables and templates the report
     involves. The focus URL's units are lit and opened. Locals: rr, range_url. %>
 <% size = ->(stats) { stats ? "#{stats['lines']} lines, #{stats['bytes']} B" : tag.span('none', class: 'mut') } %>
+<% lines = lambda do |change|
+     sc = change['source_changes']
+     next empty_value(applicable: false) unless sc
+     next tag.span('too large', class: 'mut', title: 'Woods did not diff this source line by line') if sc['coverage'] == 'too_large'
+
+     tag.span(line_delta(sc['added_lines'], sc['removed_lines']), title: "#{sc['added_lines']} added, #{sc['removed_lines']} removed#{', ranges truncated' if sc['coverage'] == 'truncated'}")
+   end %>
 <section class="sec" aria-labelledby="chg" data-controller="rows">
-  <header><h2 class="t2" id="chg">Changed units <%= count_tag(rr.changed.size) %><%= info_tip('Woods compares the two retained payloads per typed unit: source, metadata and dependency hashes (facets), and the metadata keys that moved. Which lines changed is not in the report yet (woods#802). Open a row for the units its witness paths reach.') %></h2><button class="tool goto" type="button" data-action="rows#expandAll" data-needs-js>expand all</button></header>
+  <header><h2 class="t2" id="chg">Changed units <%= count_tag(rr.changed.size) %><%= info_tip('Woods compares the two retained payloads per typed unit: source, metadata and dependency hashes (facets), and the metadata keys that moved. Lines counts the added and removed lines Woods found in each modified source (woods#802). Open a row for the units its witness paths reach; a focused row also shows Woods\' unified diff.') %></h2><button class="tool goto" type="button" data-action="rows#expandAll" data-needs-js>expand all</button></header>
   <% if rr.changed.empty? %>
     <%= render 'woods_map/components/empty_state', title: 'No changed units recorded', text: 'Woods found no typed unit whose source, metadata or dependency hash moved between these payloads. Read coverage and the Unknown tab before taking that as a zero.' %>
   <% else %>
@@ -12,14 +19,15 @@
       <% reached = rr.reached_from(c) %>
       <% detail = tag.dl(safe_join([
            tag.dt('metadata keys'), tag.dd(Array(c['metadata_keys']).join(', ').presence || 'none moved'),
-           tag.dt('source sizes'), tag.dd(safe_join([size.call(c.dig('diff_stats', 'source_before')), ' → ', size.call(c.dig('diff_stats', 'source_after')), ' ', layer_chip('whole source, not changed lines; woods#802')])),
+           tag.dt('source sizes'), tag.dd(safe_join([size.call(c.dig('diff_stats', 'source_before')), ' → ', size.call(c.dig('diff_stats', 'source_after'))])),
+           tag.dt('diff'), tag.dd(changed_diff(c, rr, range_url)),
            tag.dt("reaches #{reached.size}"), tag.dd(reached.any? ? safe_join(reached.first(12).map { |a| safe_join([impact_identity(a, rr), ' ', tag.span("#{a['distance']} #{'hop'.pluralize(a['distance'].to_i)}", class: 'mut')]) }, ', ') : 'no witness path recorded', class: 'p')
          ]), class: 'det') %>
       <% { id: "changed-#{i + 1}", current: rr.focused?(c), open: rr.focused?(c), classes: (rr.focused?(c) ? 'focus' : nil), detail: detail,
-           cells: [impact_identity(c, rr, generation: rr.generation_of_change(c), since: rr.from_generation), c['type'].to_s.tr('_', ' '), c['status'].to_s, Array(c['facets']).join(', ').presence || empty_value, Array(c['categories']).join(', ').presence || empty_value, "gen #{rr.generation_of_change(c)}"] } %>
+           cells: [impact_identity(c, rr, generation: rr.generation_of_change(c), since: rr.from_generation), c['type'].to_s.tr('_', ' '), c['status'].to_s, Array(c['facets']).join(', ').presence || empty_value, Array(c['categories']).join(', ').presence || empty_value, lines.call(c), "gen #{rr.generation_of_change(c)}"] } %>
     <% end %>
     <%= render 'woods_map/components/table', label: 'Changed units', min_width: '860px', grouped: true,
-               columns: [{ label: 'unit', cell_class: 'id' }, { label: 'type', width: '130px', cell_class: 'nw mut' }, { label: 'status', width: '100px', cell_class: 'nw' }, { label: 'facets moved', width: '190px' }, { label: 'categories', width: '160px' }, { label: 'payload', width: '90px', cell_class: 'nw mut' }],
+               columns: [{ label: 'unit', cell_class: 'id' }, { label: 'type', width: '130px', cell_class: 'nw mut' }, { label: 'status', width: '100px', cell_class: 'nw' }, { label: 'facets moved', width: '190px' }, { label: 'categories', width: '160px' }, { label: 'lines', width: '90px', cell_class: 'num nw' }, { label: 'payload', width: '90px', cell_class: 'nw mut' }],
                rows: rows %>
   <% end %>
 </section>

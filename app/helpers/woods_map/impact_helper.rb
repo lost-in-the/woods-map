@@ -71,6 +71,14 @@ module WoodsMap
       edges.any? ? safe_join(edges, tag.br) : tag.span('no edges recorded', class: 'mut')
     end
 
+    # @param added [Integer, nil]
+    # @param removed [Integer, nil]
+    # @return [String] "+2 −1", "+14" or "−3", the board's count shorthand; "0" when neither moved
+    def line_delta(added, removed)
+      parts = [("+#{added}" if added.to_i.positive?), ("−#{removed}" if removed.to_i.positive?)].compact
+      parts.empty? ? '0' : parts.join(' ')
+    end
+
     private
 
     def impact_facts(value)
@@ -78,6 +86,31 @@ module WoodsMap
         safe_join([tag.dt(key.tr('_', ' ')), tag.dd(impact_evidence(item))])
       end
       tag.dl(safe_join(facts), class: 'det impact-evidence')
+    end
+
+    # The diff of one changed record on the range Changed tab: Woods' unified
+    # diff (woods#802) for a focused row, a focus link otherwise, so a page
+    # of many changes does not open every payload twice.
+    #
+    # @param change [Hash] a `changed` record
+    # @param report [WoodsMap::RangeReport]
+    # @param range_url [#call] the page's URL with overrides
+    # @return [ActiveSupport::SafeBuffer, String]
+    def changed_diff(change, report, range_url)
+      return tag.span('no source on both sides', class: 'mut') unless change['source_changes']
+      unless report.focused?(change)
+        return link_to('show the diff', range_url.call(focus: change['identifier'], lens: 'changed', anchor: 'chg'))
+      end
+
+      diff = SourceDiff.new(woods_map_config.index_path, identifier: change['identifier'], type: change['type'],
+                                                         from: report.from_generation, to: report.to_generation)
+      diff.state == :available ? source_diff_block(change['identifier'], diff) : tag.span(diff.message, class: 'mut')
+    end
+
+    def source_diff_block(name, diff)
+      counts = diff.changes
+      eyebrow = "diff, #{name}, #{line_delta(counts['added_lines'], counts['removed_lines'])}"
+      render('woods_map/components/diff', name: name, hunks: diff.hunks, coverage: counts['coverage'], eyebrow: eyebrow)
     end
   end
 end

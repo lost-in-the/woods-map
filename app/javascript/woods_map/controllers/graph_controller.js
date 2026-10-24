@@ -424,7 +424,10 @@ export default class extends Controller {
       { selector: "edge.detail.taxi", style: { "curve-style": "taxi", "taxi-direction": "horizontal", "taxi-turn": "50%" } },
       { selector: "edge.detail.ls", style: { label: "", "source-label": "data(label)", "source-text-offset": "data(off)", "source-text-margin-y": "data(dy)" } },
       { selector: "edge.detail.lt", style: { label: "", "target-label": "data(label)", "target-text-offset": "data(off)", "target-text-margin-y": "data(dy)" } },
-      { selector: "edge:loop", style: { "curve-style": "bezier", "target-arrow-shape": "triangle", "target-arrow-color": t.dim, "loop-direction": "-45deg", "loop-sweep": "-60deg", "control-point-step-size": 72 } },
+      // A loop's step grows with its node: on the tallest (heaviest) nodes a
+      // fixed 72px put the control points inside the node and Cytoscape
+      // refused to draw the loop (a self redirect_to, seen at depth 1).
+      { selector: "edge:loop", style: { "curve-style": "bezier", "target-arrow-shape": "triangle", "target-arrow-color": t.dim, "loop-direction": "-45deg", "loop-sweep": "-60deg", "control-point-step-size": (edge) => Math.max(72, Math.round(edge.source().height() * 2)) } },
       { selector: "edge.flow", style: { width: 2.5, "line-color": t.link, "target-arrow-color": t.link, "z-index": 9 } },
       { selector: "edge.flowcur", style: { width: 4, "line-color": t.link, "target-arrow-color": t.link, color: t.bright, "z-index": 11 } },
       { selector: "edge.lit", style: { width: 2, "line-color": t.select, "target-arrow-color": t.select, color: t.bright, "z-index": 10 } }
@@ -948,7 +951,7 @@ tintWindow(from, to) {
     const edges = this.payload.elements.edges.length
     const query = this.payload.query || {}
     const facts = [
-      `${query.centre}, depth ${query.depth}, ${query.direction}`,
+      query.summary || `${query.centre}, depth ${query.depth}, ${query.direction}`,
       `${nodes} ${nodes === 1 ? "unit" : "units"}`,
       `${edges} ${edges === 1 ? "edge" : "edges"}`
     ]

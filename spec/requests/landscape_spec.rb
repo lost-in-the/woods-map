@@ -23,6 +23,13 @@ RSpec.describe 'Landscape', type: :request do
       expect(hrefs).to eq(%w[/woods/landscape.mmd /woods/landscape.dsl /woods/landscape.c4])
     end
 
+    it 'gives the container diagram one copy tool and one .mmd link, the panel\'s own' do
+      get '/woods/landscape'
+      tools = html_response_document.at_css('.dia .dh .tools')
+      expect(tools.css('[data-controller="copy"]').size).to eq(1)
+      expect(tools.css('a[data-mermaid-url]').pluck('href')).to eq(['/woods/landscape.mmd'])
+    end
+
     it 'serves the container diagram as Mermaid, Structurizr DSL and LikeC4 text' do
       { 'mmd' => 'flowchart LR', 'dsl' => 'workspace "Blog"', 'c4' => 'specification {' }.each do |ext, start|
         get "/woods/landscape.#{ext}"

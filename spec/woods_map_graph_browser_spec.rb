@@ -114,6 +114,10 @@ RSpec.describe WoodsMap do
     expect(drawing.dig('ranges', 'facts')).to include('1 changed and 1 affected in the report, 2 drawn')
   end
 
+  it 'draws the loop of a self edge on the tallest, widest unit' do
+    expect(drawing['loop']).to eq('height' => 56, 'wide' => true, 'refused' => false)
+  end
+
   it 'outlines the drawn steps of a flow and the edge between them, and plays it from the first step (A-4)' do
     flow = drawing['flow']
     expect([flow['nodes'], flow['edges'], flow['current']]).to eq([flow['expected'], [flow['edge']], [flow['source']]])

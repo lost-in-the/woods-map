@@ -22,6 +22,7 @@ module WoodsMap
     include WoodsMap::Authentication
     include WoodsMap::MermaidText
     include WoodsMap::SinceParam
+    include WoodsMap::PathExtension
 
     protect_from_forgery with: :exception
     layout 'woods_map/application'
@@ -63,14 +64,15 @@ module WoodsMap
     end
 
     # The global bar's pages that exist, in the order the boards give them
-    # (coverage.md: Units, Landscape, Graph, ERD, Impact, History).
+    # (coverage.md: Units, Landscape, Graph, ERD, Impact, History), then the Trail.
     #
-    # @param current [String, Symbol, nil] the page being shown: its label or :units, :graph, :erd, :impact, :history
+    # @param current [String, Symbol, nil] the page being shown: its label or :units, :graph, :erd, :impact,
+    #   :history, :trail
     # @return [Array<Array(String, String, Boolean)>] label, href, current?
     def primary_nav(current = nil)
       pages = [['Units', woods_map.units_path], ['Landscape', woods_map.landscape_path],
                ['Graph', woods_map.graph_path], ['ERD', woods_map.erd_path], ['Impact', woods_map.impact_path],
-               ['History', woods_map.history_path]]
+               ['History', woods_map.history_path], ['Trail', woods_map.trail_path]]
       pages.map { |label, href| [label, href, label.casecmp?(current.to_s)] }
     end
 

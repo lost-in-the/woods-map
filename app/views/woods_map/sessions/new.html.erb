@@ -2,7 +2,7 @@
 <div class="empty-state refusal-panel">
   <div class="eyebrow">Token required</div>
   <h1 class="t2">Enter the Woods Map token</h1>
-  This mount is not on loopback. Paste the value of <code>WOODS_MAP_TOKEN</code> to open a session in this browser; it becomes an <code>HttpOnly</code> cookie and the token is not kept in the address bar.
+  <%= loopback_request? ? 'This mount is configured with a token, so loopback alone does not open it.' : 'This mount is not on loopback.' %> Paste the value of <code>WOODS_MAP_TOKEN</code> to open a session in this browser; it becomes an <code>HttpOnly</code> cookie and the token is not kept in the address bar.
   <% if flash[:alert] %><div class="finding gap-top"><b>⚑ <%= flash[:alert] %></b></div><% end %>
   <%= form_with url: woods_map.session_path, method: :post, local: true, html: { class: 'token-form' } do |form| %>
     <%= form.label :token, 'Token', class: 'eyebrow' %>
