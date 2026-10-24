@@ -4,10 +4,10 @@ module WoodsMap
   # Helpers for the component partials: glyphs, chips, counts, people and the
   # ⓘ explanation.
   module ComponentsHelper
-    # Table minimum widths, in px, that map.css has a class for. The policy
-    # (M8) refuses style attributes, so a table's minimum is a class, not a
-    # custom property set inline.
-    TABLE_MIN_WIDTHS = [640, 720, 760, 860, 900, 980].freeze
+    # Table minimum widths, in px, that map.css has a class for: every 20 px
+    # from 480 to 1200. The policy (M8) refuses style attributes, so a
+    # table's minimum is a class, not a custom property set inline.
+    TABLE_MIN_WIDTHS = (480..1200).step(20).to_a.freeze
 
     # @param value [String, nil] a minimum width such as `"900px"`
     # @return [String, nil] the class that sets it

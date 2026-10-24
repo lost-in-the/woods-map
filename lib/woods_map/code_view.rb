@@ -36,6 +36,12 @@ module WoodsMap
       @rows ||= @lens == 'written' ? written_rows : effective_rows
     end
 
+    # @return [Array<Array(String, String)>] identifier and type of every linked unit, in first-link order
+    def linked_targets
+      rows
+      @linked_targets || []
+    end
+
     # @return [Integer] lines in the file itself
     def line_count
       @composite.file_lines.size
@@ -48,6 +54,7 @@ module WoodsMap
 
     def written_rows
       links = @references.by_source_line(@composite.file_lines)
+      @linked_targets = links.sort.flat_map { |_, list| list.map { |link| [link.identifier, link.type] } }.uniq
       highlighted = highlight(@composite.file_lines, links)
       @composite.file_lines.zip(highlighted).map do |line, html|
         file_line = line.label.to_i
