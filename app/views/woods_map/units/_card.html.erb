@@ -1,0 +1,16 @@
+<%# The hover card on a reference (B-3): type, path, PageRank, last author and
+    churn, shown inside the one tooltip (D-16). Plain text only: a nested
+    abbr or ⓘ would open a tooltip of its own. Locals: card (HoverCard). %>
+<% c = card %>
+<% label = WoodsMap::UnitPage::TYPE_LABELS.fetch(c.type) { c.type.tr('_', ' ') } %>
+<% time = c.last_modified && parse_time(c.last_modified) %>
+<div class="hcard">
+  <div class="hch"><b><%= c.identifier %></b> <span><%= label %></span></div>
+  <dl>
+    <dt>path</dt><dd><%= c.path || 'no file in the index' %></dd>
+    <dt>PageRank</dt><dd><%= c.rank ? "##{c.rank} of #{c.ranked}, #{format('%.4f', c.pagerank)}" : 'not scored' %></dd>
+    <dt>last</dt><dd><%= c.last_author ? safe_join([c.last_author, (time ? ", #{relative_date(time, Time.now.utc).last}" : nil)].compact) : 'not recorded' %></dd>
+    <dt>churn</dt><dd><% if c.commit_count %><%= c.commit_count %> <%= 'commit'.pluralize(c.commit_count) %><% if c.change_frequency == 'hot' %> <%= chip(:hot) %><% elsif c.change_frequency %>, <%= c.change_frequency %><% end %><% else %>not recorded<% end %></dd>
+  </dl>
+  <div class="hcf"><span class="lyr">graph node, metadata.git</span> gen <%= @repository.generation_number %></div>
+</div>

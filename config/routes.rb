@@ -27,6 +27,7 @@ WoodsMap::Engine.routes.draw do
   # from the pinned generation; never a file path.
   scope 'units/:type', constraints: { type: /[a-z0-9_]+/ }, format: false do
     get '*identifier/schema', to: 'units#schema', as: :unit_schema
+    get '*identifier/routes', to: 'units#routes', as: :unit_routes
     get '*identifier/passage', to: 'units#passage', as: :unit_passage
     get '*identifier/lifecycle', to: 'units#lifecycle', as: :unit_lifecycle
     get '*identifier/graph', to: 'units#graph', as: :unit_graph

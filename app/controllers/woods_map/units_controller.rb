@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module WoodsMap
-  # A unit's pages: the Code tab (two lenses, D-6), Passage, Schema,
+  # A unit's pages: the Code tab (two lenses, D-6), Routes, Passage, Schema,
   # Lifecycle, Graph and History, and the peek fragment the code view opens inline. Every
   # action reads one pinned generation and renders inside it, so the payload
   # lock covers the whole response; the identifier and the type come from the
@@ -30,6 +30,7 @@ module WoodsMap
         @lifecycle = lifecycle_for(@unit)
         @code = code_view(@unit, lens, @lifecycle)
         @outline = WoodsMap::Outline.new(@unit, lifecycle: @lifecycle, concern_methods: concern_methods(@unit))
+        @cards = WoodsMap::HoverCard.for(@repository, @code.linked_targets)
         render :show
       end
     end
@@ -54,6 +55,19 @@ module WoodsMap
         @ladder = @ladder_model && lifecycle_for(@ladder_model)
         @ladder_event = ladder_event(@ladder)
         render :passage
+      end
+    end
+
+    # The routes, helpers and action sources of a controller (FR-3); any
+    # other type goes to its Code tab.
+    def routes
+      with_unit do
+        unless @page.tabs.include?('routes')
+          next redirect_to(woods_map.unit_path(type: @page.type, identifier: @page.identifier))
+        end
+
+        @routes = WoodsMap::RoutesView.new(@repository, @unit)
+        render :routes
       end
     end
 
