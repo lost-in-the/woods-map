@@ -13,7 +13,7 @@ RSpec.describe WoodsMap::ImpactRange do
   before { allow(described_class).to receive(:backend).and_return(backend) }
 
   it 'delegates the range to Woods and retains coverage without completing empty sections' do
-    allow(backend).to receive(:compare).with(FIXTURE_INDEX, from: 'gen:1', to: 'now')
+    allow(backend).to receive(:compare).with(FIXTURE_INDEX, hash_including(from: 'gen:1', to: 'now'))
                                        .and_return(double(to_h: data))
     result = described_class.new(FIXTURE_INDEX, from: 'gen:1')
     expect(result.state).to eq(:available)
@@ -91,54 +91,21 @@ RSpec.describe WoodsMap::ImpactRange do
     end
   end
 
-  describe 'the per-generation cache' do
-    let(:index) { Pathname(Dir.mktmpdir('woods-map-range')).join('index') }
+  describe "Woods' report cache" do
+    before { allow(backend).to receive(:compare).and_return(double(to_h: data)) }
 
-    before do
-      FileUtils.cp_r(FIXTURE_INDEX, index)
-      allow(backend).to receive(:compare).and_return(double(to_h: data))
+    it 'passes one cache to every comparison in the process' do
+      stub_const('Woods::Impact::ReportCache', Class.new { def initialize(size:) = (@size = size) })
+      2.times { described_class.new(FIXTURE_INDEX, from: 'gen:1') }
+      cache = described_class.report_cache
+      expect(cache).to be_a(Woods::Impact::ReportCache)
+      expect(backend).to have_received(:compare).with(FIXTURE_INDEX, from: 'gen:1', to: 'now', cache: cache).twice
     end
 
-    after { FileUtils.rm_rf(index.dirname) }
-
-    def publish(token)
-      marker = JSON.parse(index.join('generation.json').read).merge('token' => token)
-      index.join('generation.json').write(JSON.generate(marker))
-    end
-
-    it 'compares a range once while the published generation stays put' do
-      2.times { described_class.new(index, from: 'gen:1') }
-      described_class.new(index, from: 'gen:1', to: 'gen:1')
-      expect(backend).to have_received(:compare).twice
-    end
-
-    it 'compares again once another generation is published' do
-      described_class.new(index, from: 'gen:1')
-      publish('republished')
-      expect(described_class.new(index, from: 'gen:1').data).to equal(data)
-      expect(backend).to have_received(:compare).twice
-    end
-
-    it 'keeps no report computed while the marker moved' do
-      allow(backend).to receive(:compare) { publish(SecureRandom.hex(4)).then { double(to_h: data) } }
-      2.times { described_class.new(index, from: 'gen:1') }
-      expect(backend).to have_received(:compare).twice
-    end
-
-    it 'keeps no failure' do
-      allow(backend).to receive(:compare).and_raise(IOError)
-      2.times { described_class.new(index, from: 'gen:1') }
-      expect(backend).to have_received(:compare).twice
-    end
-
-    it 'keeps the most recently used ranges' do
-      ranges = (1..described_class::CACHE_SIZE).map { |n| "gen:#{n}" }
-      ranges.each { |from| described_class.new(index, from: from) }
-      described_class.new(index, from: ranges.first)
-      described_class.new(index, from: 'gen:9')
-      described_class.new(index, from: ranges.first)
-      described_class.new(index, from: ranges[1])
-      expect(backend).to have_received(:compare).exactly(described_class::CACHE_SIZE + 2).times
+    it 'compares without one on a Woods that has none' do
+      hide_const('Woods::Impact::ReportCache')
+      described_class.new(FIXTURE_INDEX, from: 'gen:1')
+      expect(backend).to have_received(:compare).with(FIXTURE_INDEX, from: 'gen:1', to: 'now')
     end
   end
 

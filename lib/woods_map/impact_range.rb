@@ -4,12 +4,11 @@ module WoodsMap
   # Reads Woods' authoritative retained-generation report without deriving impact.
   # Historical identities deliberately have no links into the current generation.
   class ImpactRange
-    # Reports kept per process. A range over a large application takes
-    # seconds to compare, and every lens, page, unit diff and `?since=` view
-    # of that range asks for the same report.
+    # Ranges whose comparison Woods keeps per process (`Woods::Impact::ReportCache`).
+    # A range over a large application takes seconds to compare, and every
+    # lens, page, unit diff and `?since=` view of that range asks for it.
     CACHE_SIZE = 4
 
-    @cache = {}
     @mutex = Mutex.new
 
     MESSAGES = {
@@ -30,48 +29,22 @@ module WoodsMap
     end
 
     class << self
-      # The report for a range, compared once per published generation.
-      # Retained payloads never change, and what `now` or a commit SHA
-      # resolves to changes only when a generation is published or pruned,
-      # so the key is the selectors, the published marker and the retained
-      # generations. A report computed while the marker moved is not kept.
+      # Woods' comparison cache, shared by every range this process reads.
+      # It keys on the payloads a range resolves to, so `gen:N`, a commit SHA
+      # and `now` naming one pair share a comparison, and a new publish or a
+      # prune is a new key. nil on a Woods without one: each view compares.
       #
-      # @param index_dir [Pathname, String]
-      # @param from [String]
-      # @param to [String]
-      # @yieldreturn [Hash] the report, computed on a miss
-      # @return [Hash]
-      def cached(index_dir, from, to)
-        key = cache_key(index_dir, from, to)
-        hit = key && @mutex.synchronize { @cache[key] = @cache.delete(key) if @cache.key?(key) }
-        return hit if hit
+      # @return [Woods::Impact::ReportCache, nil]
+      def report_cache
+        return nil unless defined?(Woods::Impact::ReportCache)
 
-        data = yield
-        remember(key, data) if key && key == cache_key(index_dir, from, to)
-        data
+        @mutex.synchronize { @report_cache ||= Woods::Impact::ReportCache.new(size: CACHE_SIZE) }
       end
 
       # Drop the cache (specs).
       # @return [void]
       def reset!
-        @mutex.synchronize { @cache.clear }
-      end
-
-      private
-
-      def cache_key(index_dir, from, to)
-        root = File.expand_path(index_dir.to_s)
-        marker = Woods::Generation.new(output_dir: root).current
-        return nil if marker.token.nil? && marker.number.to_i.zero?
-
-        [root, from, to, marker.number, marker.token, Woods::PublishedIndex.available_generations(root)]
-      end
-
-      def remember(key, data)
-        @mutex.synchronize do
-          @cache.shift while @cache.size >= CACHE_SIZE
-          @cache[key] = data
-        end
+        @mutex.synchronize { @report_cache = nil }
       end
     end
 
@@ -112,7 +85,9 @@ module WoodsMap
       @state = :unavailable
       return unless backend
 
-      @data = self.class.cached(index_dir, from, to) { backend.compare(index_dir, from: from, to: to).to_h }
+      cache = self.class.report_cache
+      options = cache ? { cache: cache } : {}
+      @data = backend.compare(index_dir, from: from, to: to, **options).to_h
       @state = valid_envelope? ? :available : :error
     rescue ArgumentError => e
       @state = :invalid

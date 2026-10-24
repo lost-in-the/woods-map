@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-- A retained range is compared once per published generation. The impact page's lenses and pages, the unit diff and `?since=` views of one range now share one report from a small per-process cache, instead of each running Woods' comparison of both payloads again. The key holds the selectors, the published marker and the retained generations, so `now` and commit SHAs follow a new publish or a prune. Failures are not kept.
+- A retained range is compared once per process, with Woods' `ReportCache` (woods#835) when the installed Woods has one. The impact page's lenses and pages, the unit diff and `?since=` views of one range share one comparison. Woods keys it on the payloads the range resolves to, so `gen:N`, a commit SHA and `now` naming one pair share it, and a new publish or prune is a new key. On a Woods without the cache, each view still compares.
 
 - Correctness fixes across the unit and impact pages.
   - **Unknown action:** a Passage or Lifecycle URL naming an action the unit does not have answers 404 with the unit's actions as links (plain text on `.mmd`), instead of silently showing the first action.
