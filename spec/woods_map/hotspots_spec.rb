@@ -55,4 +55,39 @@ RSpec.describe WoodsMap::Hotspots do
       expect(h.sankey_mermaid).to start_with("sankey-beta\n\n") if flow.any?
     end
   end
+
+  context 'with source sizes (woods#810)' do
+    def package_hotspots
+      WoodsMap::Repository.open(WoodsMap::PackageIndex.path) do |repository|
+        h = described_class.new(repository)
+        yield h, repository
+      end
+    end
+
+    it 'sizes each package by type from graph_analysis.json, largest first' do
+      package_hotspots do |h|
+        expect(h).to be_sized_by_package
+        expect(h.code_sizes).to eq('.' => { 'controller' => 80, 'model' => 120 },
+                                   'packs/posts' => { 'controller' => 20, 'model' => 30 })
+        expect(h.treemap_mermaid).to start_with(%(treemap-beta\n"."\n    "models": 120\n    "controllers": 80))
+      end
+    end
+
+    it 'sizes the application as one block from the nodes without packages, each file once' do
+      package_hotspots do |_, repository|
+        allow(repository).to receive(:graph_analysis).and_return({})
+        h = described_class.new(repository)
+        expect(h).not_to be_sized_by_package
+        expect(h.code_sizes.keys).to eq(['application'])
+        files = repository.graph['nodes'].values.select { |node| node['loc'] }.pluck('file_path').uniq
+        expect(h.code_sizes['application'].values.sum).to eq(files.size * 10)
+      end
+    end
+
+    it 'has no treemap when the generation publishes no sizes' do
+      hotspots do |h|
+        expect([h.code_sizes, h.treemap_mermaid]).to eq([{}, nil])
+      end
+    end
+  end
 end

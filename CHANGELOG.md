@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Landscape Context and treemap (woods-map#5, docs/design/notes/landscape.md).
+  - **Context (C4 level 1)** is its own tab at `/woods/landscape/context`. It shows the host's people (`config.landscape_actors`), the system, and the external systems the index records: mail delivery and object storage from the BehavioralProfile unit, and declared external consumers. The Pele diagram has its Mermaid at `/woods/landscape/context.mmd`. The Structurizr DSL and LikeC4 exports now carry the people and a system context view. The page names its limits: services the code calls are not published (woods#814).
+  - **Where the code is** on Hotspots: a Pele treemap of lines of code by Packwerk package and unit type, from `graph_analysis.json` `package_sizes` (woods#810), or the application as one block from node `loc` without packages. Its Mermaid is at `/woods/landscape/treemap.mmd`, which answers 422 without source sizes.
 - Lifecycle tab on controllers, jobs and mailers (FR-6, woods-map#91, docs/design/notes/entry-lifecycle.md). The tab draws one entry point's flow with the model chain's sequence, flowchart and lanes views: a controller or mailer action from a picker (`?action_name=`), or a job's `perform`. The flow is the precomputed document when the generation has one (W-14), assembled otherwise.
   - The steps cross async hops, as the Trail's do. They list every operation with its line and the steps' flags.
   - A controller's save runs the model event the Passage ladder reads (`PostsController#create` → `Post@create`), marked "save implies". The Trail does the same.

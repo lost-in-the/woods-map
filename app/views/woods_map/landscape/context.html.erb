@@ -1,0 +1,68 @@
+<% content_for :title, "#{@landscape.system_name} · Context · Landscape · Woods Map" %>
+<% l = @landscape %>
+<% ctx = @context %>
+<%= render 'woods_map/landscape/frame', crumb: 'context' %>
+<div class="body" data-controller="trail">
+  <div class="main landscape">
+    <section class="sec">
+      <header>
+        <h2 class="t2">Context <%= count_tag("#{ctx.people.size} #{'person'.pluralize(ctx.people.size)}, 1 system, #{ctx.externals.size} external #{'system'.pluralize(ctx.externals.size)}") %><%= info_tip('C4 level 1. People are the host\'s to name (config.landscape_actors); the index does not know who uses the system. External systems are what the index publishes: mail delivery and object storage from the BehavioralProfile unit, and the declared external consumers of the application\'s tables.') %></h2>
+        <span class="goto">export: <%= link_to('Mermaid', woods_map.landscape_diagram_mmd_path(diagram: 'context'), type: 'text/plain', rel: 'alternate') %><% if l.attributed? %>, <%= link_to('Structurizr DSL', woods_map.landscape_dsl_path, type: 'text/plain', rel: 'alternate') %>, <%= link_to('LikeC4', woods_map.landscape_c4_path, type: 'text/plain', rel: 'alternate') %><% end %></span>
+      </header>
+      <div class="c4grid">
+        <div class="c4col" aria-label="People">
+          <div class="eyebrow">people, from host config</div>
+          <% if ctx.people.any? %>
+            <% ctx.people.each do |person| %>
+              <div class="c4box person"><span class="st">«person»</span><b><%= person.name %></b><% if person.description.present? %><span class="tech"><%= person.description %></span><% end %><ul><li><span class="k" aria-hidden="true">→</span><span><%= l.system_name %>, <%= person.uses.presence || 'uses' %></span></li></ul></div>
+            <% end %>
+          <% else %>
+            <p class="cap">None declared. People are the host's to name: <code>config.landscape_actors</code>.</p>
+          <% end %>
+        </div>
+        <div class="c4col" aria-label="The system">
+          <div class="eyebrow">software system</div>
+          <div class="c4box web">
+            <span class="st">«software system»</span>
+            <b><%= l.system_name %></b>
+            <% if l.rails %><span class="tech"><%= l.rails %></span><% end %>
+            <span class="cnts"><%= l.unit_count %> application <%= 'unit'.pluralize(l.unit_count) %>, <%= link_to("#{l.processes.size} #{'process'.pluralize(l.processes.size)} and #{l.stores.size} #{'store'.pluralize(l.stores.size)}", woods_map.landscape_path(tab: 'containers')) %></span>
+            <% out = ctx.links.select { |link| link.from == 'system' } %>
+            <% if out.any? %><ul><% out.each do |link| %><li><span class="k" aria-hidden="true">→</span><span><%= l.name_of(link.to) %>, <%= link.label %></span></li><% end %></ul><% end %>
+          </div>
+        </div>
+        <div class="c4col" aria-label="External systems">
+          <div class="eyebrow">external systems</div>
+          <% if ctx.externals.any? %><% ctx.externals.each do |box| %><%= render 'woods_map/landscape/box', box: box, landscape: l %><% end %><% else %><p class="cap">None the index records.</p><% end %>
+        </div>
+      </div>
+      <%= render 'woods_map/landscape/ladder', current: 1 %>
+    </section>
+    <section class="sec">
+      <%= render 'woods_map/components/diagram', title: 'System context diagram', facts: ["#{ctx.people.size} people", "#{ctx.externals.size} external systems", "#{ctx.links.size} relationships"],
+            name: 'landscape context', mermaid_url: woods_map.landscape_diagram_mmd_path(diagram: 'context'), mermaid: ctx.mermaid,
+            label: "C4 system context of #{l.system_name}: #{ctx.people.size} people and #{ctx.externals.size} external systems; the relationships table below has every arrow",
+            legend: [[tag.span('( )', class: 'ar'), 'person'], [tag.span('[ ]', class: 'ar'), 'the system'], [tag.span('[[ ]]', class: 'ar'), 'external system']],
+            provenance: ['config.landscape_actors', 'BehavioralProfile', 'external_consumer units', "gen #{@repository.generation_number}"] %>
+    </section>
+    <section class="sec">
+      <header><h2 class="t2">Relationships <%= count_tag(ctx.links.size) %><%= info_tip('People to the system come from the host\'s configuration; the system to mail delivery and object storage from the BehavioralProfile unit; a declared external consumer reads the tables named in its declaration.') %></h2></header>
+      <% if ctx.links.any? %>
+        <%= render 'woods_map/components/table', label: 'Context relationships', min_width: '560px', columns: [{ label: 'from', width: '26%' }, { label: 'what', width: '26%' }, { label: 'to', width: '26%' }, { label: 'source' }],
+              rows: ctx.links.map { |link| name = ->(id) { id == 'system' ? l.system_name : (ctx.people.find { |p| p.id == id }&.name || l.name_of(id)) }
+                                    { cells: [tag.b(name.call(link.from)), link.label, name.call(link.to), tag.span(link.source, class: 'dim')] } } %>
+      <% else %>
+        <p class="cap">No person is declared and the index records no external system.</p>
+      <% end %>
+    </section>
+    <section class="sec">
+      <header><h2 class="t2">What the index does not say <%= info_tip('Limits of level 1 from a Woods index. Each is named rather than guessed.') %></h2></header>
+      <ul class="limits">
+        <li>Who uses the system: people come only from <code>config.landscape_actors</code>.</li>
+        <li>Which services the code calls over the network. <% if ctx.gemfile? %>The Gemfile unit lists <%= ctx.runtime_gems.size %> runtime <%= 'gem'.pluralize(ctx.runtime_gems.size) %><%= " (#{ctx.runtime_gems.first(6).map { |g| g['name'] }.join(', ')}#{', …' if ctx.runtime_gems.size > 6})" if ctx.runtime_gems.any? %>, but Woods does not publish which of them reach another system, so none is drawn here (<%= link_to 'woods#814', 'https://github.com/lost-in-the/woods/issues/814' %>).<% else %>This generation has no Gemfile unit, and Woods does not publish the services the code calls (<%= link_to 'woods#814', 'https://github.com/lost-in-the/woods/issues/814' %>).<% end %></li>
+        <li>Inbound callers other than declared table consumers: webhooks and API clients are not recorded.</li>
+      </ul>
+    </section>
+    <%= render 'woods_map/shared/status', items: ["actors from config.landscape_actors, #{ctx.people.size} declared", 'externals from BehavioralProfile and external_consumer units', "gen #{@repository.generation_number}"], keys: [[%w[/], 'search']] %>
+  </div>
+</div>
