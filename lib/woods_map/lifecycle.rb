@@ -12,9 +12,13 @@ module WoodsMap
     SEQUENCE_BUDGET = 150
 
     # The renderings of one chain, in the order the view control offers them
-    # (B6-Lifecycle): the sequence first, then the branching flowchart and
-    # the lanes. C4-dynamic needs container attribution (W-9) and is a limit.
-    VIEWS = %w[sequence flowchart lanes].freeze
+    # (B6-Lifecycle): the sequence first, then the branching flowchart, the
+    # lanes, and the C4 dynamic view (B-23), which needs container
+    # attribution (W-9) and is offered only when the generation has it.
+    VIEWS = %w[sequence flowchart lanes dynamic].freeze
+
+    # Views drawn as a flowchart, held to {FLOWCHART_BUDGET} in nodes.
+    NODE_VIEWS = %w[flowchart lanes dynamic].freeze
 
     # Flowchart and lanes budget (R-4), nodes: the same as the neighbourhood.
     FLOWCHART_BUDGET = 150
@@ -86,7 +90,11 @@ module WoodsMap
 
     # @param unit [Hash] a model unit
     # @param concern_methods [Hash{String => Array<String>}] concern name => method names it defines
-    def initialize(unit, concern_methods: {})
+    # @param dynamic [DynamicView, nil] the C4 dynamic renderer; without one, or without
+    #   container attribution, the view is not offered
+    def initialize(unit, concern_methods: {}, dynamic: nil)
+      @unit = unit
+      @dynamic = dynamic
       defined = unit['source_code'].to_s.scan(DEFINITION).flatten.to_set | concern_methods.values.flatten.to_set
       all = Array(unit.dig('metadata', 'callbacks')).reject { |cb| cb['filter'].to_s.match?(INTERNAL) }
       @callbacks, @framework = all.partition { |cb| defined.include?(cb['filter'].to_s) }
@@ -149,6 +157,19 @@ module WoodsMap
       chart(event).lanes
     end
 
+    # @return [Array<String>] the views this chain offers: {VIEWS}, the dynamic one only with containers
+    def views
+      @dynamic&.attributed? ? VIEWS : VIEWS - %w[dynamic]
+    end
+
+    # The C4 dynamic view of one event (see {DynamicView#lifecycle}).
+    #
+    # @param event [String] create, update or destroy
+    # @return [String]
+    def dynamic(event)
+      @dynamic.lifecycle(@unit, steps(event), event)
+    end
+
     # The text for one view of one event.
     #
     # @param view [String] one of {VIEWS}
@@ -158,6 +179,7 @@ module WoodsMap
       case view
       when 'flowchart' then flowchart(event)
       when 'lanes' then lanes(event)
+      when 'dynamic' then dynamic(event)
       else mermaid(event)
       end
     end
@@ -170,6 +192,7 @@ module WoodsMap
       case view
       when 'flowchart' then chart(event).flowchart_size
       when 'lanes' then chart(event).lanes_size
+      when 'dynamic' then DynamicView.size(dynamic(event))
       else sequence_size(event)
       end
     end
@@ -177,7 +200,7 @@ module WoodsMap
     # @param view [String] one of {VIEWS}
     # @return [Integer] the budget (R-4) that view is held to
     def budget(view)
-      %w[flowchart lanes].include?(view) ? FLOWCHART_BUDGET : SEQUENCE_BUDGET
+      NODE_VIEWS.include?(view) ? FLOWCHART_BUDGET : SEQUENCE_BUDGET
     end
 
     # @param event [String] create, update or destroy
@@ -200,7 +223,7 @@ module WoodsMap
     def refusal(event, view: 'sequence')
       return nil unless over_budget?(event, view: view)
 
-      sequence = %w[flowchart lanes].exclude?(view)
+      sequence = NODE_VIEWS.exclude?(view)
       "#{size(view, event)} #{sequence ? 'participants and messages' : 'nodes'} is over the " \
         "#{sequence ? 'sequence' : 'flowchart'} budget of #{budget(view)}"
     end

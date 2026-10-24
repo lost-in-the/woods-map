@@ -1,0 +1,33 @@
+<%# The flow overlay's side list (A-4): every step of the selected flow in
+    order, whether the canvas draws its unit and the edge that reached it.
+    Steps the canvas cannot show are listed here, never invented. Locals:
+    flow (GraphFlow), n (Neighbourhood). %>
+<section class="sec" aria-labelledby="graph-flow-title">
+  <header>
+    <h2 class="t2" id="graph-flow-title">Flow <code><%= flow.entry_point %></code> <%= count_tag(flow.found? ? "#{flow.steps.size} #{'step'.pluralize(flow.steps.size)}, #{flow.drawn.size} drawn" : 'not listed') %><%= info_tip('A precomputed flow document from Woods (W-13): the units its assembly expanded, in order, to its own depth. Each move is drawn along a graph edge between the two units when the canvas has one; otherwise the step is listed as having no graph edge. It does not prove a request takes this path.') %></h2>
+    <% if flow.found? && flow.drawn.any? %><span class="tools"><button class="tool" type="button" data-graph-target="play" data-action="graph#playFlow" data-needs-js>▶ play the flow</button></span><% end %>
+  </header>
+  <% if flow.found? %>
+    <p class="cap"><%= [flow.route, (flow.max_depth && "assembled to depth #{flow.max_depth}"), "at depth #{n.depth} the canvas draws #{flow.drawn.size} of its units"].compact.join('; ') %>.</p>
+    <% via = ->(step) { step.edge && "#{step.edge.via}, #{step.edge.from} → #{step.edge.to}" } %>
+    <%= render 'woods_map/components/table', label: "Steps of #{flow.entry_point}", min_width: '640px',
+          columns: [{ label: '#', width: '48px' }, { label: 'step', width: '34%' }, { label: 'operations', width: '96px' }, { label: 'canvas', width: '18%' }, { label: 'reached by' }],
+          rows: flow.steps.map { |step|
+            reached = case step.move
+                      when :first then 'the entry point'
+                      when :same then 'the same unit'
+                      when :edge then via.call(step)
+                      else tag.span('no graph edge from the step before', class: 'mut')
+                      end
+            { classes: (flow.unmatched.include?(step) ? 'nomatch' : nil),
+              data: { flow_step: step.position },
+              cells: [step.position.to_s,
+                      safe_join([unit_link(step.identifier, step.type), (step.unit == step.identifier ? nil : tag.span(" #{step.unit.delete_prefix(step.identifier)}", class: 'own'))].compact),
+                      step.operations.to_s,
+                      step.drawn ? 'drawn' : tag.span("not drawn at depth #{n.depth}", class: 'mut'),
+                      reached] }
+          } %>
+  <% else %>
+    <p class="cap">This generation lists no flow <code><%= flow.entry_point %></code>. Pick one of the flows in the rail.</p>
+  <% end %>
+</section>

@@ -20,6 +20,23 @@ module WoodsMap
                          refusal: @lifecycle.refusal(@event, view: @view))
     end
 
+    # The passage's sequence, or with ?view=dynamic its C4 dynamic view (B-23).
+    def render_passage_mermaid
+      return render_tab_mermaid(@passage.mermaid, "#{@passage.action} passage") unless params[:view] == 'dynamic'
+
+      @dynamic = WoodsMap::DynamicView.new(@repository)
+      return render_text(:not_found, 'This generation has no container attribution (W-9).') unless @dynamic.attributed?
+
+      text = passage_dynamic
+      render_tab_mermaid(text, "#{@passage.action} passage dynamic", refusal: WoodsMap::DynamicView.refusal(text))
+    end
+
+    # @return [String] the passage's C4 dynamic text, with its ladder model's chain when it has one
+    def passage_dynamic
+      steps = @ladder && @ladder_event ? @ladder.steps(@ladder_event) : []
+      @dynamic.passage(@passage, @ladder && @ladder_model, steps, @ladder && @ladder_event)
+    end
+
     def render_graph_mermaid
       render_tab_mermaid(@neighbourhood.mermaid, "neighbourhood depth #{@neighbourhood.depth}",
                          refusal: @neighbourhood.refusal)

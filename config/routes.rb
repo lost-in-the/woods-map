@@ -11,13 +11,15 @@ WoodsMap::Engine.routes.draw do
   # Search (M1): the results page and the palette's hits.
   get 'search', to: 'search#show', as: :search
   get 'search/palette', to: 'search#palette', as: :palette, defaults: { format: :json }
-  # The Landscape (B8-Landscape, B6-Overview): C4 containers, hotspots and domains of one
-  # generation; the container diagram is also plain text for agents and other tools (D-25).
+  # The Landscape (B8-Landscape, B6-Overview): C4 containers, components, hotspots and domains
+  # of one generation; every diagram is also plain text for agents and other tools (D-25).
   get 'landscape.mmd', to: 'landscape#export', as: :landscape_mmd, defaults: { export: 'mermaid' }, format: false
   get 'landscape.dsl', to: 'landscape#export', as: :landscape_dsl, defaults: { export: 'structurizr' }, format: false
   get 'landscape.c4', to: 'landscape#export', as: :landscape_c4, defaults: { export: 'likec4' }, format: false
-  get 'landscape(/:tab)', to: 'landscape#show', as: :landscape, constraints: { tab: /containers|hotspots|domains/ },
-                          format: false
+  get 'landscape/:diagram.mmd', to: 'landscape#diagram', as: :landscape_diagram_mmd,
+                                constraints: { diagram: /components|quadrant|sankey/ }, format: false
+  get 'landscape(/:tab)', to: 'landscape#show', as: :landscape,
+                          constraints: { tab: /containers|components|hotspots|domains/ }, format: false
 
   # The full-screen graph (M5): a centre by identifier and type, never a path.
   get 'graph', to: 'graphs#show', as: :graph

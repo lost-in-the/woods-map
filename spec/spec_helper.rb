@@ -5,6 +5,8 @@ require File.expand_path('dummy/config/environment', __dir__)
 require 'rspec/rails'
 require_relative 'support/html_response'
 require_relative 'support/landscape_index'
+require_relative 'support/flow_index'
+require_relative 'support/package_index'
 require_relative 'support/fake_guide_chat'
 
 RSpec::Matchers.define_negated_matcher :not_include, :include

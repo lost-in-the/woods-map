@@ -1,0 +1,10 @@
+<%# Flows the generation could not assemble (W-14, best effort), for the controllers in the radius: named, never dropped. %>
+<% gaps = @repository.flow_failures.select { |f| r.involved.include?(f['controller'].to_s) } %>
+<% if gaps.any? %>
+  <section class="sec" aria-labelledby="flgaps">
+    <header><h2 class="t2" id="flgaps">Flows not assembled <%= count_tag(gaps.size) %><%= info_tip('Woods extracted with precompute_flows = :best_effort and recorded these actions in skipped_files.json instead of aborting (W-14). Their flows are not in the index, so nothing that passes only through them is listed as affected.') %></h2></header>
+    <%= render 'woods_map/components/table', label: 'Flows not assembled', min_width: '640px',
+               columns: [{ label: 'entry point', width: '280px', cell_class: 'id' }, { label: 'why the flow is missing', cell_class: 'p' }, { label: 'layer', width: '150px', cell_class: 'nw' }],
+               rows: gaps.map { |f| { cells: [link_to(f['entry_point'].to_s, woods_map.unit_passage_path(type: 'controller', identifier: f['controller'].to_s, action_name: f['action'].to_s)), f['error'].to_s, layer_chip(f['reason'].to_s)] } } %>
+  </section>
+<% end %>
