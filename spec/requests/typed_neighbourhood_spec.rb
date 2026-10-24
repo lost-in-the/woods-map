@@ -26,4 +26,15 @@ RSpec.describe 'Typed graph pages', type: :request do
     expect(response.body).to include('code_reference', 'href="/woods/units/factory/Report"')
     expect(response.body).to include('Report (model)', 'Report (factory)')
   end
+
+  it 'centres the full-page graph on the typed unit type= names, not the first unit with that identifier' do
+    get '/woods/graph', params: { centre: 'Report', type: 'model' }
+    model = html_response_document
+    get '/woods/graph', params: { centre: 'Report', type: 'factory' }
+    factory = html_response_document
+    expect(model.at_css('.ident .sub').text).to start_with('model')
+    expect(factory.at_css('.ident .sub').text).to start_with('factory')
+    expect(model.at_css('[data-controller~=graph]')['data-graph-url-value']).to include('type=model')
+    expect(factory.at_css('[data-controller~=graph]')['data-graph-url-value']).to include('type=factory')
+  end
 end

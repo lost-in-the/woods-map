@@ -1,0 +1,19 @@
+<%# A passage or lifecycle URL naming an action the unit does not have (404):
+    the frame with the tab, what was asked for and the unit's actions as
+    links, instead of another action's page. %>
+<% content_for :title, "#{@page.identifier}##{@requested_action} · not an action · Woods Map" %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<% tab_path = ->(action) { @tab == 'passage' ? woods_map.unit_passage_path(type: @page.type, identifier: @page.identifier, action_name: action) : woods_map.unit_lifecycle_path(type: @page.type, identifier: @page.identifier, action_name: action) } %>
+<%= render 'woods_map/units/frame', page: @page, tab: @tab, definition: @definition %>
+<div class="body">
+  <div class="main">
+    <%= render 'woods_map/components/empty_state',
+          title: "No action #{@requested_action} on #{@page.identifier}",
+          text: (if @actions.any?
+                   safe_join(['gen ', @repository.generation_number.to_s, ' lists ', pluralize(@actions.size, 'action'), ' for this ', @page.type.tr('_', ' '), ': ', safe_join(@actions.map { |a| link_to(a, tab_path.call(a)) }, ', '), '.'])
+                 else
+                   safe_join(['gen ', @repository.generation_number.to_s, ' lists no actions for this ', @page.type.tr('_', ' '), '.'])
+                 end),
+          cap: safe_join(['The link may predate an extraction that renamed or removed the action. ', link_to('search names', woods_map.search_path(q: "#{@page.identifier}##{@requested_action}", in: 'name'))]) %>
+  </div>
+</div>

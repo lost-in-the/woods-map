@@ -66,9 +66,14 @@ module WoodsMap
       @reached ||= collect
     end
 
+    # Nearest first; within a distance by PageRank weight, heaviest first, so
+    # units nothing depends on (documentation that mentions the focus) sink
+    # below the ones a change would ripple through; then by type and name.
+    #
     # @return [Array<Affected>] after the type, mechanism and show filters
     def affected
-      reached.select { |a| keep?(a) }
+      @affected ||= reached.select { |a| keep?(a) }
+                           .sort_by { |a| [a.distance, -weight(a.identifier), a.type, a.identifier] }
     end
 
     # @return [Array<Affected>] one edge away from the focus
@@ -128,6 +133,7 @@ module WoodsMap
       lines = ['flowchart LR']
       involved.uniq.each { |id| lines << "  #{node_id(id)}[\"#{id}\"]" }
       affected.each { |a| lines << "  #{node_id(a.from)} -- #{a.via} --> #{node_id(a.identifier)}" }
+      lines << '  classDef focus stroke-width:3px' if focus.any?
       focus.each { |id| lines << "  class #{node_id(id)} focus" }
       lines.join("\n")
     end

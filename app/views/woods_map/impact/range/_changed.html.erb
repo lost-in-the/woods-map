@@ -13,9 +13,15 @@
 <section class="sec" aria-labelledby="chg" data-controller="rows">
   <header><h2 class="t2" id="chg">Changed units <%= count_tag(rr.changed.size) %><%= info_tip('Woods compares the two retained payloads per typed unit: source, metadata and dependency hashes (facets), and the metadata keys that moved. Lines counts the added and removed lines Woods found in each modified source (woods#802). Open a row for the units its witness paths reach; a focused row also shows Woods\' unified diff.') %></h2><button class="tool goto" type="button" data-action="rows#expandAll" data-needs-js>expand all</button></header>
   <% if rr.changed.empty? %>
-    <%= render 'woods_map/components/empty_state', title: 'No changed units recorded', text: 'Woods found no typed unit whose source, metadata or dependency hash moved between these payloads. Read coverage and the Unknown tab before taking that as a zero.' %>
+    <% if rr.same_payload? %>
+      <%= render 'woods_map/components/empty_state', title: "Nothing changed: both endpoints are gen #{rr.from_generation}", text: 'The range starts and ends at one retained payload, so Woods compared nothing. Pick an older generation or commit for from.' %>
+    <% else %>
+      <%= render 'woods_map/components/empty_state', title: 'No changed units recorded', text: 'Woods found no typed unit whose source, metadata or dependency hash moved between these payloads. Read coverage and the Unknown tab before taking that as a zero.' %>
+    <% end %>
   <% else %>
-    <% rows = rr.changed.each_with_index.map do |c, i| %>
+    <% changed_page = impact_page(rr.changed, :cpage, WoodsMap::RangeReport::PAGE['changed'], at: rr.first_focused_change) %>
+    <% offset = (changed_page.number - 1) * changed_page.size %>
+    <% rows = changed_page.records.each_with_index.map do |c, i| %>
       <% reached = rr.reached_from(c) %>
       <% detail = tag.dl(safe_join([
            tag.dt('metadata keys'), tag.dd(Array(c['metadata_keys']).join(', ').presence || 'none moved'),
@@ -23,12 +29,13 @@
            tag.dt('diff'), tag.dd(changed_diff(c, rr, range_url)),
            tag.dt("reaches #{reached.size}"), tag.dd(reached.any? ? safe_join(reached.first(12).map { |a| safe_join([impact_identity(a, rr), ' ', tag.span("#{a['distance']} #{'hop'.pluralize(a['distance'].to_i)}", class: 'mut')]) }, ', ') : 'no witness path recorded', class: 'p')
          ]), class: 'det') %>
-      <% { id: "changed-#{i + 1}", current: rr.focused?(c), open: rr.focused?(c), classes: (rr.focused?(c) ? 'focus' : nil), detail: detail,
+      <% { id: "changed-#{offset + i + 1}", current: rr.focused?(c), open: rr.focused?(c), classes: (rr.focused?(c) ? 'focus' : nil), detail: detail,
            cells: [impact_identity(c, rr, generation: rr.generation_of_change(c), since: rr.from_generation), c['type'].to_s.tr('_', ' '), c['status'].to_s, Array(c['facets']).join(', ').presence || empty_value, Array(c['categories']).join(', ').presence || empty_value, lines.call(c), "gen #{rr.generation_of_change(c)}"] } %>
     <% end %>
     <%= render 'woods_map/components/table', label: 'Changed units', min_width: '860px', grouped: true,
                columns: [{ label: 'unit', cell_class: 'id' }, { label: 'type', width: '130px', cell_class: 'nw mut' }, { label: 'status', width: '100px', cell_class: 'nw' }, { label: 'facets moved', width: '190px' }, { label: 'categories', width: '160px' }, { label: 'lines', width: '90px', cell_class: 'num nw' }, { label: 'payload', width: '90px', cell_class: 'nw mut' }],
                rows: rows %>
+    <%= impact_pager(changed_page, 'chg') %>
   <% end %>
 </section>
 <section class="sec" aria-labelledby="aff" data-controller="rows">
@@ -36,13 +43,15 @@
   <% if rr.affected.empty? %>
     <%= render 'woods_map/components/empty_state', title: 'No affected units recorded', text: 'Woods recorded no unit reached from the changes; check coverage, which may say the propagation was not computed or was bounded.' %>
   <% else %>
-    <% rows = rr.affected.first(300).map do |a| %>
+    <% affected_page = impact_page(rr.affected, :apage, WoodsMap::RangeReport::PAGE['affected']) %>
+    <% rows = affected_page.records.map do |a| %>
       <% detail = tag.dl(safe_join(Array(a['paths']).first(3).flat_map { |path| [tag.dt("from #{path.dig('root', 'identifier')}"), tag.dd(impact_path(path), class: 'p')] }), class: 'det') %>
       <% { detail: (Array(a['paths']).any? ? detail : nil), cells: [impact_identity(a, rr), a['type'].to_s.tr('_', ' '), a['distance'] == 1 ? 'direct' : "#{a['distance']} hops", impact_weight(a['weight']), impact_context(a)] } %>
     <% end %>
     <%= render 'woods_map/components/table', label: 'Affected units', min_width: '760px', grouped: true,
                columns: [{ label: 'unit', cell_class: 'id' }, { label: 'type', width: '130px', cell_class: 'nw mut' }, { label: 'distance', width: '100px', cell_class: 'nw' }, { label: 'weight', width: '100px', cell_class: 'num' }, { label: 'endpoint', width: '120px', cell_class: 'nw' }],
-               rows: rows, caption: (rr.affected.size > 300 ? "first 300 of #{rr.affected.size}; the rest are in the report" : nil) %>
+               rows: rows %>
+    <%= impact_pager(affected_page, 'aff') %>
   <% end %>
 </section>
 <% [['tables', 'Tables', 'tbls'], ['templates', 'Templates', 'tpls']].each do |key, label, anchor| %>

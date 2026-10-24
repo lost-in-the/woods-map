@@ -44,6 +44,29 @@ module WoodsMap
     # One route helper a unit calls: the helper as written and the action it reaches.
     Use = Struct.new(:helper, :action, :verb, :path, keyword_init: true)
 
+    # How many routes the tab lists, without building them: the routes the
+    # controller's metadata declares plus the route units dispatching to it
+    # that the metadata omits. The unit page's tab count uses it, so the tab,
+    # the section header and the table agree.
+    #
+    # @param repository [WoodsMap::Repository]
+    # @param unit [Hash] the controller unit
+    # @return [Integer]
+    def self.count_for(repository, unit)
+      declared = Array(unit.dig('metadata', 'routes')).flat_map do |_action, list|
+        Array(list).map { |route| "#{route['verb']} #{route['path']}" }
+      end
+      extra = dispatch_sources(repository, unit['identifier'].to_s) - declared
+      declared.size + extra.count { |id| repository.graph_node(id, type: 'route') }
+    end
+
+    # @return [Array<String>] route units with a `route_dispatch` edge to the controller
+    def self.dispatch_sources(repository, identifier)
+      Array(repository.graph.dig('reverse_via', identifier)).filter_map do |edge|
+        edge['source'].to_s if edge['via'].to_s == 'route_dispatch' && edge['source_type'].to_s == 'route'
+      end.uniq
+    end
+
     # @param repository [WoodsMap::Repository]
     # @param unit [Hash] the controller unit
     def initialize(repository, unit)

@@ -1,4 +1,4 @@
-# Full-screen graph
+# Graph page
 
 Scope: FR-5, A-2 to A-6 and E-9 tinting. Relates to #7.
 The layout is the butterfly (D-30, #63). The flow overlay (A-4) and the timeline (A-6)
@@ -13,7 +13,7 @@ that tab's explorer unchanged:
 
 The page itself adds:
 
-- the canvas over the height of the viewport;
+- the canvas over the height of the viewport below the bar and crumbs (the page keeps its chrome; it is not the browser's full-screen mode, and the engine no longer calls it full-screen);
 - the centre's title block with *Open unit*;
 - a *blast radius* control.
 
@@ -27,7 +27,7 @@ takes identifiers, a unit type and filter values only.
 - Without a centre, the page lists the first 24 hubs from `graph_analysis.json`. Each one opens the page centred on it.
 - An unknown centre names the miss.
 - Clicking a node, or Enter on the canvas, re-centres the page. The identifier goes into the query string as a component.
-- The Graph tab links here as *full-screen graph*, keeping depth and direction.
+- The Graph tab links here as *graph page*, keeping depth and direction.
 
 ## Blast radius
 
