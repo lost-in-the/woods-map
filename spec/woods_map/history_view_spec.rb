@@ -54,8 +54,8 @@ RSpec.describe WoodsMap::HistoryView do
   it 'counts people over the window and names its limits' do
     view('Micropost', 'model') do |history|
       expect(history.people.map { |p| [p.name, p.commits] }).to eq([['Leah Armstrong', 2], ['Sam Okafor-Whitfield', 1]])
-      expect(history.limits).to include('line counts and hunks are not in the commit table (woods#804)',
-                                        'heat is per file, not per line')
+      expect(history.limits).to include('heat is per file, not per line')
+      expect(history.limits.join).not_to include('woods#804')
     end
   end
 

@@ -12,6 +12,8 @@ module WoodsMap
   # readable git history) it falls back to the five commits per unit in
   # `metadata.git` and says so. Nothing here runs git.
   class HistoryView
+    include HistoryGenerations
+
     Commit = CommitRows::Commit
     FileChange = CommitRows::FileChange
     # One author over the window.
@@ -19,6 +21,7 @@ module WoodsMap
     CoChange = UnitCoChanges::CoChange
 
     RANGES = { '30d' => 30, '365d' => 365 }.freeze
+    BY = %w[commit generation].freeze
     # Why there is no table, as the limits rail says it.
     TABLE_STATES = { absent: 'this generation has no commit table (no readable git history at extraction)',
                      unreadable: 'the commit table could not be read',
@@ -31,7 +34,9 @@ module WoodsMap
     # @param unit [Hash]
     # @param now [Time]
     # @param filters [Hash] `range:` one of {RANGES} (365d by default); `week:`
-    #   an ISO date, only the bar starting that day; `all:` every commit in the
+    #   an ISO date, only the bar starting that day; `by:` commit (bars per
+    #   week or day) or generation (bars per retained generation); `gen:` only
+    #   the commits a generation first carried; `all:` every commit in the
     #   window rather than the latest {SHOWN}
     def initialize(repository, unit, now: Time.now.utc, **filters)
       @repository = repository
@@ -42,7 +47,14 @@ module WoodsMap
       @days = RANGES.fetch(filters[:range].to_s) { RANGES.fetch('365d') }
       @week = parse_date(filters[:week])
       @all = filters[:all] ? true : false
+      @by = BY.include?(filters[:by].to_s) ? filters[:by].to_s : BY.first
+      @gen = filters[:gen].to_s.match?(/\A[1-9][0-9]{0,8}\z/) ? filters[:gen].to_i : nil
     end
+
+    # @return [String] commit or generation: what one bar of the strip is
+    attr_reader :by
+    # @return [Integer, nil] the generation the list is narrowed to
+    attr_reader :gen
 
     # @return [Integer] the window in days
     attr_reader :days
@@ -109,22 +121,13 @@ module WoodsMap
     #
     # @return [Array<Commit>]
     def commits
-      list = window_commits
-      list = list.select { |c| in_week?(c) } if @week && table?
-      @all || @week ? list.first(ALL_LIMIT) : list.first(SHOWN)
+      list = table? ? narrow(window_commits) : window_commits
+      @all || @week || @gen ? list.first(ALL_LIMIT) : list.first(SHOWN)
     end
 
     # @return [Integer] commits in the window, or the unit's commit count without a table
     def total
       table? ? window_commits.size : @git['commit_count'].to_i
-    end
-
-    # @return [CommitStrip, nil] nil without a table
-    def strip
-      return nil unless table?
-
-      marks = ledger.generations.map { |generation| [generation.number, generation.extracted_at] }
-      @strip ||= CommitStrip.new(window_commits.map(&:date), days: @days, now: @now, generations: marks)
     end
 
     # @return [Array<Person>] most commits first
@@ -147,23 +150,6 @@ module WoodsMap
       @co_changes ||= UnitCoChanges.new(@repository, @table, paths, own: own_key).top(CO_CHANGES_SHOWN)
     end
 
-    # @return [CommitLedger]
-    def ledger
-      @ledger ||= CommitLedger.for(@repository)
-    end
-
-    # @return [Array<CommitLedger::Generation>] retained generations that carried this unit's commits, newest first
-    def generations
-      return [] unless table?
-
-      ledger.touching(@table.commits_for(*paths).pluck('sha'))
-    end
-
-    # @return [Array<Integer>] the generations a diff can compare
-    def generation_numbers
-      @repository.generations.select(&:positive?)
-    end
-
     # @return [String, nil] the last change's date
     def last_modified
       table? ? window_commits.first&.date || @git['last_modified'] : @git['last_modified']
@@ -174,7 +160,10 @@ module WoodsMap
       list = []
       list << table_limit unless table?
       if table?
-        list << 'line counts and hunks are not in the commit table (woods#804)'
+        list << 'line counts and hunks are not in this commit table (woods#804)' unless @table.line_stats?
+        if ledger.generations.size >= 2 && !facets.available?
+          list << 'facets moved need Woods::Impact::UnitDiff (woods#802)'
+        end
         list << 'heat is per file, not per line'
         list << "the table keeps the latest #{@table.max_commits} commits" if @table.truncated?
       end
@@ -187,7 +176,8 @@ module WoodsMap
       return nil unless any?
 
       title = "#{@unit['identifier']} history, #{@days}d"
-      view == 'xychart' && strip ? HistoryMermaid.xychart(title, strip) : HistoryMermaid.timeline(title, window_commits)
+      chart = view == 'xychart' && commit_strip
+      chart ? HistoryMermaid.xychart(title, commit_strip) : HistoryMermaid.timeline(title, window_commits)
     end
 
     private
@@ -207,9 +197,15 @@ module WoodsMap
       "#{shown} of #{@git['commit_count'].to_i} commits per unit: #{reason}"
     end
 
+    def narrow(list)
+      list = list.select { |c| in_week?(c) } if @week
+      list = list.select { |c| c.generation&.number == @gen } if @gen
+      list
+    end
+
     def in_week?(commit)
       date = time(commit.date)&.to_date
-      date && date >= @week && date < @week + (strip&.step || 7)
+      date && date >= @week && date < @week + (commit_strip&.step || 7)
     end
 
     def time(value)

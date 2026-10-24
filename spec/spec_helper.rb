@@ -24,6 +24,7 @@ RSpec.configure do |config|
   config.before do
     WoodsMap.reset_configuration!
     WoodsMap.configuration.index_dir = FIXTURE_INDEX
+    WoodsMap::GenerationFacets.reset!
   end
 
   # The token-less loopback mode requires a loopback Host (DNS rebinding,
