@@ -42,6 +42,13 @@ end
   `Authorization: Bearer …`.
 - `config.authorize` runs before any token check and can refuse on its own.
 - `config.require_token = true` refuses loopback too.
+- Every engine response carries a strict Content-Security-Policy; search,
+  the palette, graph JSON and impact are rate limited per client; writes must
+  come from the map's own origin. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+  for tokens, `config.authorize` with Devise or an SSO header, reverse
+  proxies, the host-policy interaction and streaming, and
+  [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md) for what the map exposes and
+  how each threat is met.
 
 ## Pages
 
