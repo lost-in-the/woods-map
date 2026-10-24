@@ -30,10 +30,12 @@ viewport.
 | --- | --- | --- |
 | Focus URL with `⎘ copy URL` | `focus_url`: the page's absolute address and query, less any `token` (D-4). On opening it gains the `#L…` line the address targets | the URL text; the copy tool is hidden |
 | `⎘ <diagram name>` and `⤓ .mmd` under *Mermaid*, one per distinct diagram export | each `components/mermaid_tools` copy tool (`data-mermaid-name`, `data-mermaid-href`): the Mermaid text the page already carries, unchanged, and the diagram's absolute, token-free `.mmd` URL (D-25) | absent; each panel shows its Mermaid text and its own `.mmd` link instead |
+| `⎘ for PR comment` after each diagram's `.mmd` | the panel's `⎘ copy for PR comment` (`data-pr-comment`): the text in a ```` ```mermaid ```` fence and one line linking this view, its generation and its `.mmd` URL (woods-map#76, [pr-comment-share.md](pr-comment-share.md)). A comment over GitHub's 65,536 characters is listed by name with the reason (`data-pr-comment-refusal`), never offered | absent; the panel's `.mmd` URL with `.md` for `.mmd` is the same text |
 
 **What the menu does not do:**
 
-- It never renders, parses, derives or hands through a Markdown or JSON report (D-25), and the boards' *Markdown for PR* button is dropped.
+- It never renders, parses, derives or hands through a Markdown or JSON report (D-25), and the boards' *Markdown for PR* button is dropped. The PR comment is a diagram, not a report: the Mermaid in a fence and one line of links, nothing derived (D-25 as amended).
+- Its absolute URLs start at `config.public_url` when one is set.
 - It does not render Mermaid itself: it lists the exports the diagram tools already offer. The `.mmd` routes are paced like the JSON endpoints (M8) and answer a 429 as plain text.
 - The `y` key keeps copying the page's own first copy tool, skipping the Share menu's.
 
