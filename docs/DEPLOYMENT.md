@@ -182,6 +182,39 @@ server {
   surface. Keep the token set, so the hop from the proxy to the app still
   needs a credential.
 
+### Links reviewers can open: `config.public_url`
+
+The map hands out absolute links:
+
+- the Share menu's focus URL;
+- each diagram's `.mmd` URL;
+- the links in a diagram copied for a pull-request comment, and its `.md` text;
+- the page link in a refused `.mmd`.
+
+By default each link starts at the request's own origin. Behind a proxy that
+rewrites `Host`, or on a staging host reached under another name, that origin
+can be an internal address reviewers cannot open. Set the address they use:
+
+```ruby
+# config/initializers/woods_map.rb
+WoodsMap.configure do |config|
+  config.public_url = 'https://staging.example.com'   # or ENV WOODS_MAP_PUBLIC_URL
+end
+```
+
+- **Format.** An absolute `http` or `https` URL, with or without a trailing
+  slash. A proxy that serves the host app under a prefix it strips
+  (`https://example.com/tools` → the app's `/`) takes the prefix too, and links
+  become `https://example.com/tools/woods/…`.
+- **Refused at boot.** A value with credentials, a query or a fragment, or one
+  that is not absolute, raises when the configuration is read. A shared link
+  must never carry a secret.
+- **Links only.** It changes no check. The origin guard and the token-less
+  loopback mode still compare against the request and
+  `config.allowed_origins` (§4). If browsers reach the map under this name and
+  the proxy does not forward the `Host`, list it there too.
+- **Tokens.** Links never carry one, with or without this setting (D-4).
+
 ## 6. Content-Security-Policy
 
 Every response under the mount carries the engine's policy. Host pages are
@@ -300,5 +333,6 @@ settings that matter between the browser and Puma:
 - [ ] TLS terminates at a proxy that preserves `Host`, sets `X-Forwarded-Proto` and `X-Forwarded-For`, and strips identity headers clients send.
 - [ ] `config.authorize` names who may read the source.
 - [ ] `config.allowed_origins` lists only names you serve the map under.
+- [ ] Behind a proxy or on a staging host, `config.public_url` (or `WOODS_MAP_PUBLIC_URL`) is the address reviewers open, so shared links and pull-request comments reach the map.
 - [ ] Opening `/woods` from outside without credentials shows the 403 panel; with the token it shows the status page.
 - [ ] `curl -sI https://…/woods` shows the engine's `Content-Security-Policy`, and the browser console shows no policy violations.

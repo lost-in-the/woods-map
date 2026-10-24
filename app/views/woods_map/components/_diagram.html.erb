@@ -16,7 +16,7 @@
 <% drawn = mermaid && !refusal %>
 <% export = mermaid && local_assigns.fetch(:export, true) %>
 <div class="dia"<% if drawn %> data-controller="diagram" data-diagram-label-value="<%= local_assigns[:label] || title %>"<% end %>>
-  <div class="dh"><b><%= title %></b><% facts.each do |fact| %><span><%= fact %></span><% end %><% if local_assigns[:tools] || drawn || export %><span class="tools"><%= local_assigns[:tools] %><% if export %><%= render 'woods_map/components/mermaid_tools', text: mermaid, name: local_assigns[:name] || title, url: local_assigns[:mermaid_url], key: local_assigns[:key] %><% end %><% if drawn %><button class="tool" type="button" hidden data-diagram-target="toggle" data-action="diagram#toggle" aria-pressed="false">Mermaid text</button><% end %></span><% end %></div>
+  <div class="dh"><b><%= title %></b><% facts.each do |fact| %><span><%= fact %></span><% end %><% if local_assigns[:tools] || drawn || export %><span class="tools"><%= local_assigns[:tools] %><% if export %><%= render 'woods_map/components/mermaid_tools', text: mermaid, name: local_assigns[:name] || title, url: local_assigns[:mermaid_url], key: local_assigns[:key], refused: refusal.present? %><% end %><% if drawn %><button class="tool" type="button" hidden data-diagram-target="toggle" data-action="diagram#toggle" aria-pressed="false">Mermaid text</button><% end %></span><% end %></div>
   <% if mermaid %>
     <div class="dw hscroll" data-controller="cliff" data-diagram-target="scroller">
       <% if refusal %><p class="cap refusal"><%= refusal %></p><% else %><p class="cap refusal" role="status" data-diagram-target="message" hidden></p><% end %>

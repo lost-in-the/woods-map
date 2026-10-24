@@ -39,16 +39,32 @@ async function runShareRegression() {
     check(details.open, 'the summary opens the menu')
     const url = details.querySelector('.sh-url').textContent
     check(url.endsWith('/schema#L3') && details.querySelector('[data-share-target="copyUrl"]').dataset.copyTextValue === url, 'the focus URL carries the targeted line')
-    const copies = [...details.querySelectorAll('[data-share-target="diagrams"] button')]
+    const buttons = [...details.querySelectorAll('[data-share-target="diagrams"] button')]
+    const copies = buttons.filter(button => !/PR comment/.test(button.textContent))
+    const comments = buttons.filter(button => /PR comment/.test(button.textContent))
     // The Schema tab carries the ER diagram and the class diagram (woods-map#5).
     check(copies.length === 2 && copies[0].dataset.copyTextValue === source && copies[0].dataset.controller === 'copy' && /^classDiagram/.test(copies[1].dataset.copyTextValue), 'one Mermaid copy per diagram, with the panel\'s own text')
     check(/User schema/.test(copies[0]?.getAttribute('aria-label') || ''), 'the Mermaid copy names its diagram')
+    // Each diagram's row ends with its pull-request comment, the panel's own (woods-map#76).
+    const panelComments = [...doc.querySelectorAll('.dia [data-pr-comment]')].map(button => button.dataset.copyTextValue)
+    check(comments.length === 2 && comments.every((button, i) => button.dataset.controller === 'copy' && button.dataset.copyTextValue === panelComments[i]), 'one PR comment copy per diagram, with the panel\'s own comment')
+    check(comments[0]?.dataset.copyTextValue.startsWith('```mermaid\n' + source + '\n```\n[Woods Map, User schema, gen 1](http') && /for PR comment: copy User schema/.test(comments[0]?.getAttribute('aria-label') || ''), 'the PR comment fences the text and names its diagram')
     const mmd = details.querySelector('[data-share-target="diagrams"] a')
     check(mmd && /\/woods\/units\/model\/User\/schema\.mmd$/.test(mmd.getAttribute('href')) && /^https?:/.test(mmd.getAttribute('href')), 'each diagram links its absolute .mmd URL')
     const box = details.querySelector('.share-panel').getBoundingClientRect()
     check(box.left >= 0 && box.right <= width, `the panel fits the viewport (${Math.round(box.left)}..${Math.round(box.right)})`)
     summary.click(); summary.click(); await wait(40)
-    check(details.querySelectorAll('[data-share-target="diagrams"] button').length === 2 && details.querySelectorAll('[data-share-target="diagrams"] a').length === 2, 'reopening does not duplicate the Mermaid copies')
+    check(details.querySelectorAll('[data-share-target="diagrams"] button').length === 4 && details.querySelectorAll('[data-share-target="diagrams"] a').length === 2, 'reopening does not duplicate the Mermaid copies')
+
+    // A text over GitHub's limit lists the reason in its row instead of a copy.
+    const tooLong = doc.querySelector('.dia [data-pr-comment]')
+    const note = doc.createElement('span')
+    Object.assign(note.dataset, { prCommentRefusal: 'Too long for a GitHub comment.', mermaidName: tooLong.dataset.mermaidName, mermaidHref: tooLong.dataset.mermaidHref })
+    tooLong.replaceWith(note)
+    summary.click(); summary.click(); await wait(40)
+    const row = details.querySelector('[data-share-target="diagrams"]')
+    check(row.querySelectorAll('button').length === 3 && row.querySelector('.lyr')?.textContent === 'User schema: Too long for a GitHub comment.', 'a comment GitHub cannot hold is named, not offered')
+    note.replaceWith(tooLong)
 
     copies[0].focus()
     details.querySelector('.share-panel').dispatchEvent(new win.KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))

@@ -8,9 +8,14 @@ RSpec.describe WoodsMap::MermaidExport do
     expect(described_class.filename('x' * 200).length).to eq(84)
   end
 
-  it 'marks only diagram types newer than GitHub\'s Mermaid' do
-    expect(described_class).to be_newer_than_github("swimlane-beta TB\n  subgraph a [A]\n  end")
-    %w[erDiagram sequenceDiagram stateDiagram-v2].push('flowchart LR').each do |start|
+  it 'names the pull-request comment file .md' do
+    expect(described_class.filename('User schema', extension: 'md')).to eq('user-schema.md')
+  end
+
+  it 'marks only diagram types newer than GitHub\'s Mermaid 11.16.1, which knows the swimlanes (woods-map#76)' do
+    expect(described_class::GITHUB_MERMAID_VERSION).to eq('11.16.1')
+    expect(described_class).to be_newer_than_github("usecase-beta\n  actor A")
+    %w[erDiagram sequenceDiagram stateDiagram-v2 swimlane-beta].push('flowchart LR').each do |start|
       expect(described_class).not_to be_newer_than_github("#{start}\n  x")
     end
   end
