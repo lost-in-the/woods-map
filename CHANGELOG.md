@@ -9,6 +9,12 @@
   - the toolbar has zoom, fit, copy Mermaid and a *flowchart* toggle.
 
   The Pele flowchart and the list stay the page without JavaScript and when the fetch fails.
+- M5 full-screen graph (`/woods/graph`, docs/design/notes/graph-page.md): the Graph tab's explorer, extracted to `graphs/_explorer`, over the full viewport.
+  - Without a centre it lists the published hubs. Clicking a node re-centres the page.
+  - `blast=1` tints the units `BlastRadius` reaches, directly or transitively.
+  - Dragged positions are kept per generation and query in `localStorage`, with a reset (A-3).
+  - `Graph` joins the primary bar.
+  - Domain clusters wait on woods#799.
 
 - Add contextual keyboard help (`?` and a primary-bar button), focus containment and return, typing/modal guards and Chromium keyboard regressions (NFR-3, #34). Remove the unimplemented source-line j/k hint.
 

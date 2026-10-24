@@ -27,9 +27,11 @@ import { Controller } from "@hotwired/stimulus"
 // focus lights its edge on the canvas.
 export default class extends Controller {
   static targets = ["panel", "canvas", "facts", "status", "message", "fallback", "flowchart", "layouts", "layout", "list"]
-  static values = { url: String, unitUrl: String, label: String, generation: Number }
+  static values = { url: String, unitUrl: String, label: String, generation: Number, cache: String, blast: Array }
 
   static LAYOUT_KEY = "woods-map:graph-layout"
+  static POSITIONS_KEY = "woods-map:graph-positions"
+  static POSITIONS_KEPT = 24
   static ASSOCIATIONS = new Set(["belongs_to", "has_many", "has_one", "has_and_belongs_to_many", "through", "polymorphic"])
   static TINT = 0.18
   static LABELLED_EDGES = 150
@@ -165,7 +167,7 @@ export default class extends Controller {
       maxZoom: 2.5,
       userZoomingEnabled: false,
       boxSelectionEnabled: false,
-      autoungrabify: true,
+      autoungrabify: false,
       autounselectify: true,
       textureOnViewport: !this.named,
       hideEdgesOnViewport: !this.named
@@ -184,10 +186,13 @@ export default class extends Controller {
     this.cy.on("tap", "node", (event) => this.open(event.target.id()))
     this.cy.on("mouseover", "node", (event) => { this.canvasTarget.style.cursor = "pointer"; this.light(event.target) })
     this.cy.on("mouseout", "node", () => { this.canvasTarget.style.cursor = ""; this.light(this.cy.nodes(".sel")) })
+    this.cy.on("dragfree", "node", () => this.remember())
     if (this.mode === "radial") {
       this.radial()
       this.edgeStyle()
     }
+    this.restore()
+    this.tint()
 
     marks.cytoscape = performance.now() - started
     this.facts()
@@ -328,6 +333,8 @@ export default class extends Controller {
       } },
       { selector: "node.focus", style: { "border-color": t.select, "border-width": 2, color: t.bright } },
       { selector: "node.boundary", style: { "border-style": "dashed" } },
+      { selector: "node.br1", style: { "border-color": t.hot, "border-width": 2.5 } },
+      { selector: "node.br2", style: { "border-color": t.mod, "border-width": 2 } },
       { selector: "node.sel", style: { "border-color": t.select, "border-width": 3, "overlay-color": t.select, "overlay-opacity": 0.12, "overlay-padding": 4, color: t.bright } },
       { selector: "edge", style: {
         width: 1, "line-color": t.dim, "target-arrow-color": t.dim, "target-arrow-shape": "triangle", "arrow-scale": 0.8,
@@ -413,9 +420,77 @@ export default class extends Controller {
     this.mode = mode
     try { window.localStorage.setItem(this.constructor.LAYOUT_KEY, mode) } catch (_error) { /* storage is a convenience */ }
     this.pressLayout()
-    if (mode === "radial") this.radial()
+    this.arrange()
+  }
+
+  arrange() {
+    if (this.mode === "radial") this.radial()
     else this.butterflyLayout()
     this.edgeStyle()
+    this.restore()
+  }
+
+  // Layout stability (A-3): positions the reader dragged are kept in this
+  // browser per generation, query and layout, so a revisit does not
+  // reshuffle; a new generation starts from the computed layout again. The
+  // layouts themselves are deterministic. Storage is a convenience: every
+  // read and write may fail and the page draws the same without it.
+  positionsKey() {
+    return this.hasCacheValue && this.cacheValue ? `${this.constructor.POSITIONS_KEY}:${this.cacheValue}|${this.mode}` : null
+  }
+
+  remember() {
+    const key = this.positionsKey()
+    if (!key || !this.cy) return
+    const positions = {}
+    this.cy.nodes().forEach((node) => { const p = node.position(); positions[node.id()] = [Math.round(p.x), Math.round(p.y)] })
+    try {
+      const storage = window.localStorage
+      const index = JSON.parse(storage.getItem(this.constructor.POSITIONS_KEY) || "[]").filter((k) => k !== key)
+      index.push(key)
+      while (index.length > this.constructor.POSITIONS_KEPT) storage.removeItem(index.shift())
+      storage.setItem(key, JSON.stringify(positions))
+      storage.setItem(this.constructor.POSITIONS_KEY, JSON.stringify(index))
+      this.element.dataset.graphPositions = "kept"
+    } catch (_error) { /* storage is a convenience */ }
+  }
+
+  restore() {
+    const key = this.positionsKey()
+    if (!key || !this.cy) return false
+    let positions = null
+    try { positions = JSON.parse(window.localStorage.getItem(key) || "null") } catch (_error) { return false }
+    if (!positions || !this.cy.nodes().every((node) => Array.isArray(positions[node.id()]))) return false
+    this.cy.nodes().positions((node) => ({ x: positions[node.id()][0], y: positions[node.id()][1] }))
+    this.cy.fit(undefined, 21)
+    this.element.dataset.graphPositions = "restored"
+    return true
+  }
+
+  forget() {
+    const key = this.positionsKey()
+    try { if (key) window.localStorage.removeItem(key) } catch (_error) { /* storage is a convenience */ }
+    delete this.element.dataset.graphPositions
+    if (this.cy) this.arrange()
+  }
+
+  // Blast radius tint (E-9): units a change to this one reaches, from the
+  // page's WoodsMap::BlastRadius over the same generation.
+  tint() {
+    if (!this.cy || !this.hasBlastValue || !this.blastValue.length) return
+    const distance = new Map(this.blastValue.map((unit) => [`${unit.type}\u0000${unit.identifier}`, unit.distance]))
+    let drawn = 0
+    this.cy.batch(() => {
+      this.cy.nodes().forEach((node) => {
+        const d = this.byId.get(node.id())
+        const hops = d && distance.get(`${d.type}\u0000${d.identifier}`)
+        if (!hops) return
+        drawn += 1
+        node.addClass(hops === 1 ? "br1" : "br2")
+      })
+    })
+    this.blastDrawn = drawn
+    this.facts()
   }
 
   storedLayout() {
@@ -535,6 +610,7 @@ export default class extends Controller {
     const parts = [
       `${d.identifier}, ${d.type}${d.focus ? ", this unit" : ""}`,
       marks.length ? `${marks.join(", ")} (graph_analysis, per identifier)` : null,
+      this.cy.getElementById(id).hasClass("br1") ? "a change here reaches it directly" : (this.cy.getElementById(id).hasClass("br2") ? "a change here reaches it transitively" : null),
       `${outgoing} ${outgoing === 1 ? "dependency" : "dependencies"} and ${incoming} ${incoming === 1 ? "dependent" : "dependents"} drawn`,
       extra,
       d.focus ? "arrows move along edges" : "Enter opens its graph"
@@ -555,7 +631,11 @@ export default class extends Controller {
       const ch = String.fromCharCode(byte)
       return byte < 128 && /[A-Za-z0-9\-._~!$&'()*+,;=:@/]/.test(ch) ? ch : `%${byte.toString(16).toUpperCase().padStart(2, "0")}`
     }).join("")
-    return this.unitUrlValue.replace("__type__", escape(d.type)).replace("__identifier__", escape(d.identifier))
+    // In a query string (the full-screen page re-centres) values are components.
+    const query = this.unitUrlValue.indexOf("?")
+    const inQuery = (marker) => query >= 0 && this.unitUrlValue.indexOf(marker) > query
+    const encode = (marker, value) => (inQuery(marker) ? encodeURIComponent(value) : escape(value))
+    return this.unitUrlValue.replace("__type__", encode("__type__", d.type)).replace("__identifier__", encode("__identifier__", d.identifier))
   }
 
   facts() {
@@ -569,6 +649,10 @@ export default class extends Controller {
       `${nodes} ${nodes === 1 ? "unit" : "units"}`,
       `${edges} ${edges === 1 ? "edge" : "edges"}`
     ]
+    if (this.blastDrawn != null) {
+      const total = this.blastValue.length
+      facts.push(`a change here reaches ${total} ${total === 1 ? "unit" : "units"}, ${this.blastDrawn} drawn`)
+    }
     if (t.truncated) facts.push(`${t.omitted_nodes} more units and ${t.omitted_edges} edges hidden past the ${t.node_limit}-unit limit; dashed units have more`)
     const generation = this.payload.provenance?.generation
     if (this.hasGenerationValue && generation != null && generation !== this.generationValue) {
@@ -622,7 +706,7 @@ export default class extends Controller {
   tokens() {
     const style = getComputedStyle(this.canvasTarget)
     const read = (name) => style.getPropertyValue(`--${name}`).trim()
-    return Object.fromEntries(["bg", "panel", "text", "bright", "mut", "dim", "rule2", "select"].map((name) => [name, read(name)]))
+    return Object.fromEntries(["bg", "panel", "text", "bright", "mut", "dim", "rule2", "select", "hot", "mod"].map((name) => [name, read(name)]))
   }
 
   font() {

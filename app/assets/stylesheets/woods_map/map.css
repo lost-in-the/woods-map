@@ -78,3 +78,10 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm [data-gtype=view_template],.wm [data-gtype=component],.wm [data-gtype=view_component],.wm [data-gtype=phlex]{--g:var(--str)}
 .wm [data-gtype=job],.wm [data-gtype=mailer],.wm [data-gtype=scheduled_job]{--g:var(--var)}
 .wm .legend i.gsw{background:color-mix(in srgb,var(--g) 18%,var(--panel))}
+/* The full-screen graph (notes/graph-page.md): the canvas takes the viewport below the chrome;
+   blast-radius swatches match the canvas borders (hot: reached directly, mod: transitively). */
+.wm .graph-page .gcanvas{height:max(calc(var(--s7) * 8), calc(100vh - var(--s7) * 4))}
+@container wm (max-width:639px){ .wm .graph-page .gcanvas{height:calc(var(--s7) * 9)} }
+.wm .legend i.gblast{background:var(--panel);border-width:2px}
+.wm .legend i.gblast[data-distance="1"]{border-color:var(--hot)}
+.wm .legend i.gblast[data-distance="2"]{border-color:var(--mod)}

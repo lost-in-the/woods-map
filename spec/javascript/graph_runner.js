@@ -26,7 +26,7 @@ function neighbourhood(units, edgeCount) {
     } })
   }
   const edges = []
-  const near = 45
+  const near = Math.min(45, Math.floor(units / 3))
   const edge = (source, target, depth) => {
     edges.push({ data: { id: `e_${edges.length}`, source: `n_${source}`, target: `n_${target}`,
       via: vias[edges.length % vias.length], depth, through: null, cross_database: null } })
@@ -68,7 +68,7 @@ function mount(id) {
   const q = (selector) => body.querySelector(selector)
   Object.assign(controller, {
     element: body, urlValue: "", hasUrlValue: true, unitUrlValue: "/woods/units/__type__/__identifier__/graph?depth=2",
-    generationValue: 3, hasGenerationValue: true,
+    generationValue: 3, hasGenerationValue: true, cacheValue: `3|model|Post|${id}`, hasCacheValue: true, blastValue: [], hasBlastValue: true,
     panelTarget: q(".dia.graph"), canvasTarget: q(".gcanvas"), hasCanvasTarget: true, factsTarget: q(".gfacts"), hasFactsTarget: true,
     statusTarget: q(".gstatus"), hasStatusTarget: true, messageTarget: q(".refusal"), hasMessageTarget: true,
     fallbackTarget: q(".fallback"), flowchartTarget: q(".tool"), hasFlowchartTarget: true,
@@ -128,7 +128,34 @@ function drawing(cytoscape) {
   const moved = (id) => big.cy.getElementById(id).position().x !== big.butterflyPositions.get(id).x
   const radialMoved = moved("n_1") || moved("n_2")
 
+  // Layout stability (A-3): a dragged position is kept per generation and query and
+  // restored by the next draw of the same query; forgetting it lays out afresh.
+  const small = neighbourhood(40, 80)
+  const first = mount("kept")
+  first.draw(cytoscape, small)
+  first.cy.getElementById("n_5").position({ x: 4321, y: -1234 })
+  first.remember()
+  const again = mount("kept")
+  again.draw(cytoscape, small)
+  const kept = again.cy.getElementById("n_5").position()
+  const restored = again.element.dataset.graphPositions === "restored" && kept.x === 4321 && kept.y === -1234
+  again.forget()
+  const forgotten = again.cy.getElementById("n_5").position().x !== 4321
+
+  // Blast radius tint: units the page's BlastRadius reaches get their distance's class.
+  const blasted = mount("blasted")
+  blasted.blastValue = [{ identifier: "Generated::Unit1", type: "controller", distance: 1 },
+    { identifier: "Generated::Unit2", type: "view_template", distance: 2 }, { identifier: "Elsewhere", type: "model", distance: 2 }]
+  blasted.draw(cytoscape, small)
+  const tinted = { direct: blasted.cy.nodes(".br1").map((n) => n.id()), transitive: blasted.cy.nodes(".br2").map((n) => n.id()),
+    facts: blasted.factsTarget.textContent }
+
+  // On the full-screen page a node re-centres the page: the identifier is a query value.
+  blasted.unitUrlValue = "/woods/graph?centre=__identifier__&type=__type__&depth=2"
+  const recentre = blasted.unitUrl({ type: "route", identifier: "GET /users/:id?x=1&y" })
+
   return {
+    restored, forgotten, tinted, recentre,
     ms: Number(big.element.dataset.graphRenderMs), wall, calibrationMs, timings: big.timings, radialMs, radialMoved,
     drawn: big.element.dataset.graphDrawn === "true",
     nodes: big.cy.nodes().length, edges: big.cy.edges().length,

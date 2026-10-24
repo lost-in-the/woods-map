@@ -1,0 +1,12 @@
+<% content_for :title, "#{@centre['identifier']} · Graph · Woods Map" %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<% n = @neighbourhood %>
+<% here = ->(**opts) { woods_map.graph_path(centre: @centre['identifier'], type: @centre['type'], **opts.compact) } %>
+<%= render 'woods_map/shared/crumbs', crumbs: [['graph', woods_map.graph_path], [@centre['identifier'], nil]], trail: tag.span('', data: { trail_target: 'list' }) %>
+<%= render 'woods_map/shared/ident', title: @centre['identifier'], subtitle: "#{@centre['type'].tr('_', ' ')}, full-screen graph, gen #{@repository.generation_number}",
+      controls: link_to('Open unit', woods_map.unit_path(type: @centre['type'], identifier: @centre['identifier']), class: 'btn') %>
+<%= render 'woods_map/graphs/explorer', identifier: @centre['identifier'], type: @centre['type'], n: n, page: true, blast: @blast,
+      link: here,
+      unit_url: woods_map.graph_path(centre: '__identifier__', type: '__type__', depth: n.depth, direction: n.direction, blast: (@blast ? '1' : nil)),
+      rail_extra: safe_join([tag.div('clusters', class: 'grp'),
+                             tag.p(safe_join(['Domain clusters are not in the published index yet (', link_to('woods#799', 'https://github.com/lost-in-the/woods/issues/799'), '); the graph draws none rather than guess from namespaces.']), class: 'cap', style: 'padding:0 var(--s5)')]) %>

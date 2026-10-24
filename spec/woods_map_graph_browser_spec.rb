@@ -93,6 +93,19 @@ RSpec.describe WoodsMap do
     expect(drawing['url']).to eq('/woods/units/route/GET%20/users/:id/graph?depth=2')
   end
 
+  it 'keeps dragged positions per generation and query, and forgets them on request (A-3)' do
+    expect(drawing).to include('restored' => true, 'forgotten' => true)
+  end
+
+  it 'tints the units the blast radius reaches by distance and counts those drawn' do
+    expect(drawing['tinted']).to include('direct' => ['n_1'], 'transitive' => ['n_2'])
+    expect(drawing.dig('tinted', 'facts')).to include('a change here reaches 3 units, 2 drawn')
+  end
+
+  it 'encodes a re-centring identifier as a query value on the full-screen page' do
+    expect(drawing['recentre']).to eq('/woods/graph?centre=GET%20%2Fusers%2F%3Aid%3Fx%3D1%26y&type=route&depth=2')
+  end
+
   it 'leaves the flowchart and the list, and says why, when the neighbourhood cannot be fetched' do
     result = GraphBrowserRun.result(failure: true)
     expect(result).to include('panelVisible' => false, 'fallbackVisible' => true, 'messageVisible' => true,

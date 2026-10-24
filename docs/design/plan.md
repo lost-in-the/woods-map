@@ -94,6 +94,8 @@ Run this before a milestone issue is opened and again before it closes.
 | Inline links need a cue besides colour (needs-decision, amends D-11) | [woods-map#26](https://github.com/lost-in-the/woods-map/issues/26) |
 | Token contrast corrections for AA (needs-decision, amends D-11) | [woods-map#27](https://github.com/lost-in-the/woods-map/issues/27) |
 | M3 first slice: the Pele renderer, Schema ER, Lifecycle sequence and Graph neighbourhood panels with their budgets (R-4); other M3 work remains on #5 | [woods-map#5](https://github.com/lost-in-the/woods-map/issues/5), [woods-map#37](https://github.com/lost-in-the/woods-map/pull/37) |
+| M5 full-screen graph page: blast tint, position cache, hubs ([design note](notes/graph-page.md)) | [woods-map#7](https://github.com/lost-in-the/woods-map/issues/7) |
+| Woods Map data: domain clusters in `graph_analysis.json` (M5 full-screen graph) | [woods#799](https://github.com/lost-in-the/woods/issues/799) |
 | M5 Graph tab layouts without fcose or dagre: a computed butterfly and Cytoscape's concentric radial (needs-decision) | [woods-map#63](https://github.com/lost-in-the/woods-map/issues/63) |
 | Passage and impact coverage: unresolved render targets and partials stay incomplete (M2 B-17, B-18; M4b E-5) | [woods-map#47](https://github.com/lost-in-the/woods-map/issues/47) |
 | Code view scrolls as one region, not a line at a time (needs-decision, amends B8-Code) | [woods-map#29](https://github.com/lost-in-the/woods-map/issues/29) |

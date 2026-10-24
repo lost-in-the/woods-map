@@ -18,7 +18,7 @@ module WoodsMap
         @unit_count = @unit_groups.values.sum(&:size)
         @tree = WoodsMap::FileTree.for(repository)
         @freshness = repository.freshness
-        @nav = [['Units', woods_map.units_path, true], ['Impact', woods_map.impact_path, false]]
+        @nav = primary_nav(:units)
         render :index
       end
     end

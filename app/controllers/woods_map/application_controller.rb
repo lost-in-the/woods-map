@@ -25,7 +25,7 @@ module WoodsMap
     before_action :exchange_query_token!
     before_action :authenticate!
 
-    helper_method :woods_map_config, :current_repository, :woods_map
+    helper_method :woods_map_config, :current_repository, :woods_map, :primary_nav
 
     rescue_from WoodsMap::Repository::Unavailable, with: :render_unavailable
 
@@ -36,6 +36,15 @@ module WoodsMap
     # when the same engine is mounted more than once.
     #
     # @return [ApplicationController] route helpers in this request's context
+    # The primary bar's sections as [label, href, current?].
+    #
+    # @param current [Symbol, nil] :units, :graph or :impact
+    # @return [Array<Array(String, String, Boolean)>]
+    def primary_nav(current = nil)
+      [['Units', woods_map.units_path, current == :units], ['Graph', woods_map.graph_path, current == :graph],
+       ['Impact', woods_map.impact_path, current == :impact]]
+    end
+
     def woods_map
       self
     end

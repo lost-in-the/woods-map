@@ -43,7 +43,7 @@ opens the file tree.
 | Landscape Components L3 | Compound graph by package with container frame | B-22 | — | **none** |
 | Landscape Hotspots | Quadrant, coupling matrix, sankey, treemap, structural risk | design study §7 | [B6-Overview](boards/B6-Overview.html) | final |
 | Landscape Domains | Domain clusters | design study §7 | — | **none** |
-| `/woods/graph` | Full-screen graph, domain clusters, list equivalent, flow overlay | FR-5, A-3 to A-6 | B5-Graph (tab only) | **none** for the page |
+| `/woods/graph` | Full-screen graph, domain clusters, list equivalent, flow overlay | FR-5, A-3 to A-6 | B5-Graph (tab only); [design note](notes/graph-page.md) | partial: page, list equivalent, blast tint and position cache built; clusters wait on [woods#799](https://github.com/lost-in-the/woods/issues/799); flow overlay and timeline open |
 | `/woods/erd` | Whole database by chunk, findings | FR-6 | [B6-ERD](boards/B6-ERD.html) | final |
 | `/woods/history` | Cross-unit timeline for a selected set, commit → node | FR-7, A-6 | — | **none** |
 | `/woods/impact` Overview | The PR comment, rendered | E-7 | B5-Impact-Overview | v5 |
@@ -73,7 +73,7 @@ them. Each is a comment on that issue, so the issue owns it.
 - **M4b · Impact (woods-map#4)**: Overview tab at v8; Graph tab; pre-change mode; `?since=` highlighting on Code, Graph, Lifecycle, Passage, ERD and timeline views.
 - **M3 · Diagrams (woods-map#5)**: Landscape Context L1, Components L3, Domains; C4-dynamic in the Lifecycle view control; the renderer decision (woods-map#25).
 - **M4 · History (woods-map#6)**: `/woods/history` cross-unit timeline; generation picker; unit diff entry from the History tab.
-- **M5 · Graph (woods-map#7)**: [neighbourhood JSON contract](notes/neighbourhood-json.md); the Graph tab's Cytoscape canvas, layouts pending [woods-map#63](https://github.com/lost-in-the/woods-map/issues/63); the full-screen graph and flow overlay remain separate.
+- **M5 · Graph (woods-map#7)**: [neighbourhood JSON contract](notes/neighbourhood-json.md); the Graph tab's Cytoscape canvas, layouts pending [woods-map#63](https://github.com/lost-in-the/woods-map/issues/63); the [full-screen graph](notes/graph-page.md) without clusters (woods#799); the flow overlay and timeline remain separate.
 - **M6 · Trail (woods-map#8)**: the board, end to end.
 - **M7 · Guide (woods-map#9)**: chat history, pin and "open as investigation" handoff.
 
