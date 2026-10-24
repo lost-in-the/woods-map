@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Routes tab: *Reached by a route helper* shows each helper a referencing unit calls and the action it reaches, linked to that action's Passage, from the unit's `route_helper_references` (woods#795). On a generation extracted before them the column reads *not in this generation* and the controller-level limit stays named.
 - Passage filters follow Woods' resolved chain (W-8, woods#800; B-16, woods-map#3). The filter matrix is drawn in chain order with each filter's owner, linked when the index holds it and marked `←` for a concern, and the filter stages count the filters that apply and list the skipped ones. A filter with an `if`/`unless` condition is marked conditional: Woods does not evaluate the condition, so its ✓ means it can run. On a generation extracted before W-8 the page keeps the declared `only`/`except` scopes and names the resolved chain as a limit.
 - M7 guide (woods-map#9, FR-8). `config.guide_enabled` (off by default) docks a guide panel beside every framed page (B8-Guide). The panel is a RubyLLM 2.1 agent over the Woods Index MCP server: stdio to `woods-mcp` (D-7) or a deployed `woods-mcp-http`, with the twelve read-only tools only.
   - Eight page-aware actions, as overridable prompt templates, plus free questions, seeded with a server-built context: generation, unit, selected lines, action, impact focus or range.

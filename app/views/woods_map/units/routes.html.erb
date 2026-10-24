@@ -6,6 +6,7 @@
 <% route_text = ->(route) { route.unit ? unit_link(route.unit, 'route', label: "#{route.verb} #{route.path}") : "#{route.verb} #{route.path}" } %>
 <% declared = ->(route) { route.line ? "L#{route.line}" : tag.span('no route unit', class: 'dim') } %>
 <% helpers = ->(route) { route.helpers.any? ? safe_join(route.helpers.map { |h| tag.code(h) }, ', ') : empty_value(applicable: false) } %>
+<% uses = ->(ref) { ref.uses.nil? ? tag.span('not in this generation', class: 'dim') : (ref.uses.any? ? safe_join(ref.uses.map { |u| safe_join([tag.code(u.helper), ' → ', u.action.present? ? passage.call(u.action) : empty_value]) }, tag.br) : empty_value) } %>
 <% finding = ->(route) { route.finding ? safe_join([chip(:note), ' ', route.finding.tr('_', ' ')]) : empty_value(applicable: false) } %>
 <div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
   <%= render 'woods_map/components/rail', heading: 'Routes, as the router declares them', groups: [
@@ -34,10 +35,11 @@
       <% end %>
     </section>
     <section class="sec" aria-labelledby="refsh">
-      <header><h2 class="t2" id="refsh">Reached by a route helper <%= count_tag(r.references.size) %><%= info_tip('Units whose _path or _url helper resolves to a route of this controller (link_to, redirect_to and form_action edges). The index records the controller, not which helper or action.') %></h2></header>
+      <header><h2 class="t2" id="refsh">Reached by a route helper <%= count_tag(r.references.size) %><%= info_tip('Units whose _path or _url helper resolves to a route of this controller (link_to, redirect_to and form_action edges), with each helper they call and the action it reaches, from their route_helper_references (woods#795). A generation extracted before them names only the controller.') %></h2></header>
       <% if r.references.any? %>
-        <%= render 'woods_map/components/table', label: 'Reached by a route helper', min_width: '560px', columns: [{ label: 'unit', cell_class: 'id' }, { label: 'type', width: '150px', cell_class: 'nw' }, { label: 'via', width: '140px', cell_class: 'nw' }],
-              rows: r.references.map { |ref| { cells: [unit_link(ref.source, ref.source_type), ref.source_type.to_s.tr('_', ' '), ref.via] } } %>
+        <%= render 'woods_map/components/table', label: 'Reached by a route helper', min_width: '760px', columns: [{ label: 'unit', cell_class: 'id' }, { label: 'type', width: '150px', cell_class: 'nw' }, { label: 'via', width: '120px', cell_class: 'nw' }, { label: 'helper → action', width: '260px', cell_class: 'uses' }],
+              rows: r.references.map { |ref| { cells: [unit_link(ref.source, ref.source_type), ref.source_type.to_s.tr('_', ' '), ref.via, uses.call(ref)] } },
+              caption: layer_chip('navigation edges + route_helper_references') %>
       <% else %>
         <%= render 'woods_map/components/empty_state', title: 'No helper references', text: 'No unit in this generation references a route helper that points at this controller.' %>
       <% end %>
