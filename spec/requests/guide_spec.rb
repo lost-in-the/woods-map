@@ -124,6 +124,18 @@ RSpec.describe 'Guide', type: :request do
       expect(events.map(&:first)).to start_with('open').and include('tool', 'delta').and end_with('done')
     end
 
+    it 'keeps a quiet stream alive with heartbeat comments while the answer runs' do
+      WoodsMap.configuration.guide_heartbeat_seconds = 0.02
+      enable_guide([{ text: 'User has many Posts.' }])
+      WoodsMap.configuration.guide_chat_factory = lambda {
+        WoodsMap::FakeGuideChat.new([{ text: 'User has many Posts.' }], on_step: ->(_) { sleep 0.12 })
+      }
+      ask
+      get response.parsed_body['stream']
+      expect(response.body).to include(": heartbeat\n\n")
+      expect(events.map(&:first)).to start_with('open').and end_with('done')
+    end
+
     it 'finishes with HTML linked only to known identifiers and the budget spent' do
       ask
       get response.parsed_body['stream']

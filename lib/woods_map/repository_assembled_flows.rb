@@ -41,15 +41,30 @@ module WoodsMap
       end
     end
 
+    # The entry's flow: the generation's precomputed document when it has
+    # one (controller actions, W-14), assembled on demand otherwise.
+    #
     # @param entry [String] a flow entry (`Job#perform`, `Post@create`)
-    # @param max_depth [Integer]
+    # @param max_depth [Integer] the assembly depth; a precomputed document keeps its own
     # @return [Hash] the flow document as `FlowDocument#to_h` gives it, with
-    #   symbol keys (steps, operations), frozen
+    #   symbol keys (steps, operations) and `source` (precomputed or
+    #   assembled), frozen
     def flow(entry, max_depth:)
-      RepositoryAssembledFlows.fetch([generation_key, entry, max_depth]) do
+      precomputed_flow(entry) || RepositoryAssembledFlows.fetch([generation_key, entry, max_depth]) do
         assembler = Woods::FlowAssembler.new(graph: @reader.dependency_graph, extracted_dir: @reader.payload_dir.to_s)
-        assembler.assemble(entry, max_depth: max_depth).to_h.freeze
+        assembler.assemble(entry, max_depth: max_depth).to_h.merge(source: 'assembled').freeze
       end
+    end
+
+    private
+
+    # Read through {RepositoryFlows#flow_document}; nil when the generation
+    # lists no document for the entry, or this Woods has no flow readers.
+    def precomputed_flow(entry)
+      return nil unless respond_to?(:flow_document, true) && entry.include?('#')
+
+      document = flow_document(entry)
+      document && document.deep_symbolize_keys.merge(source: 'precomputed').freeze
     end
   end
 end

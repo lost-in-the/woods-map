@@ -14,7 +14,9 @@ RSpec.describe 'Scroll regions without JavaScript', type: :request do
   end
 
   %w[/woods/units/model/User/schema /woods/units/model/User /woods/units/model/User/lifecycle
-     /woods/units/controller/UsersController/passage?action_name=edit].each do |path|
+     /woods/units/controller/UsersController/passage?action_name=edit
+     /woods/units/controller/UsersController/lifecycle?action_name=create
+     /woods/trail?entry=UsersController%23create].each do |path|
     it "renders every scroll region on #{path} focusable, as a named region" do
       get path
       expect(response).to have_http_status(:ok)

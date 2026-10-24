@@ -11,7 +11,8 @@ module WoodsMap
   # A turn streams once. A reconnect, which EventSource makes on its own
   # after the stream ends, gets the finished turn again instead of a second
   # model run. Proxies must not buffer this response (X-Accel-Buffering,
-  # docs/DEPLOYMENT.md).
+  # docs/DEPLOYMENT.md); while an answer runs, a heartbeat comment keeps a
+  # quiet stream alive (`guide_heartbeat_seconds`).
   class GuideStreamsController < ApplicationController
     include ActionController::Live
     include WoodsMap::GuideSession
@@ -25,7 +26,7 @@ module WoodsMap
 
       start_stream
       claimed = store.claim(turn['id'])
-      claimed ? answer(store, claimed) : replay(turn)
+      claimed ? with_heartbeat { answer(store, claimed) } : replay(turn)
     rescue WoodsMap::Guide::Runner::Disconnected
       nil
     ensure
@@ -40,6 +41,19 @@ module WoodsMap
       response.headers['X-Accel-Buffering'] = 'no'
       response.headers['Last-Modified'] = Time.now.httpdate
       write_event('open', {})
+    end
+
+    def with_heartbeat
+      @heartbeat = WoodsMap::Guide::Heartbeat.new(interval: woods_map_config.guide_heartbeat_seconds,
+                                                  lock: stream_lock, write: ->(text) { response.stream.write(text) })
+                                             .start
+      yield
+    ensure
+      @heartbeat&.stop
+    end
+
+    def stream_lock
+      @stream_lock ||= Mutex.new
     end
 
     def answer(store, turn)
@@ -99,7 +113,12 @@ module WoodsMap
     end
 
     def write_event(event, payload)
-      response.stream.write("event: #{event}\ndata: #{JSON.generate(payload)}\n\n")
+      raise WoodsMap::Guide::Runner::Disconnected if @heartbeat&.gone?
+
+      stream_lock.synchronize do
+        response.stream.write("event: #{event}\ndata: #{JSON.generate(payload)}\n\n")
+        @heartbeat&.wrote
+      end
     rescue IOError, Errno::EPIPE, ActionController::Live::ClientDisconnected
       raise WoodsMap::Guide::Runner::Disconnected
     end

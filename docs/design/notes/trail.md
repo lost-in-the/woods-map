@@ -33,14 +33,15 @@ generation numbers only. It never carries a token, a file path or free text:
 
 ## Lifecycle builder (C-1)
 
-`WoodsMap::LifecycleBuilder` assembles the entry with Woods' `FlowAssembler`, through `Repository#flow`. That is the same assembler `trace_flow` uses, over the pinned generation's graph and payload, which `Woods::MCP::IndexReader` resolves. The flow is assembled on demand and cached per generation and entry, as the design study's storage section asks.
+`WoodsMap::LifecycleBuilder` assembles the entry with Woods' `FlowAssembler`, through `Repository#flow`. That is the same assembler `trace_flow` uses, over the pinned generation's graph and payload, which `Woods::MCP::IndexReader` resolves. The generation's precomputed document is used when it has one for the entry (controller actions, W-14); otherwise the flow is assembled on demand and cached per generation and entry, as the design study's storage section asks.
 
 Woods follows both kinds of async hop. A `perform_later` continues into the job's `perform`. A mail delivery continues into the mailer action, which the operation names as `mailer_action`. The builder then:
 
 1. **Numbers processes.** The entry runs in process 0. A step reached through an `:async` operation, or through a `_later` delivery, starts the next process. A step reached by a call stays in its caller's. The hop budget cuts later processes. A cut step is listed as "beyond the hop budget", never dropped silently.
-2. **Follows the graph where the flow stops.** A unit of the flow can carry a published `job_enqueue` edge to a job the flow did not reach, for example an enqueue in a framework callback or behind a receiverless call. That job's `#perform` is assembled as a new process while the budget lasts, and the hop is marked "from the graph" because no flow operation shows the call site.
-3. **Adds the mailer's templates.** A mailer step gains its action's templates (`Passage#templates`, the same resolution the Passage tab uses) as view steps in the same process.
-4. **Assigns lanes by unit type.** The lanes are request (route, controller), model (model, model event, concern), service (every other application type), job, mailer and view (template, component), in that order. Lanes with no step are left out.
+2. **Runs the model event a controller action's save implies.** A controller step whose flow calls `save`, `create`, `update` or `destroy` adds the model event the Passage ladder reads from the action (`PostsController#create` → `Post@create`), in the same process, marked "save implies" ([entry-lifecycle.md](entry-lifecycle.md)).
+3. **Follows the graph where the flow stops.** A unit of the flow can carry a published `job_enqueue` edge to a job the flow did not reach, for example an enqueue in a framework callback or behind a receiverless call. That job's `#perform` is assembled as a new process while the budget lasts, and the hop is marked "from the graph" because no flow operation shows the call site.
+4. **Adds the mailer's templates.** A mailer step gains its action's templates (`Passage#templates`, the same resolution the Passage tab uses) as view steps in the same process.
+5. **Assigns lanes by unit type.** The lanes are request (route, controller), model (model, model event, concern), service (every other application type), job, mailer and view (template, component), in that order. Lanes with no step are left out.
 
 Receiverless calls and dynamic dispatch stay as the flow labels them. A callback the model does not define (a framework callback or a proc) is a counted limit, not a step. The lanes have gaps where the flow has gaps, and the page says how many.
 
