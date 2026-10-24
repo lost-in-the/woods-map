@@ -14,14 +14,14 @@ module WoodsMap
     # @param operations [Array<Hash>] one step's flow operations
     # @param label [String] the step they belong to
     # @param process [Integer] the step's process
-    # @param reach [Hash{String => Array}] label => [process, via, hop], filled in
+    # @param reach [Hash{String => Array}] label => [process, via, hop, caller label], filled in
     def map_operations(operations, label, process, reach)
       each_operation(operations) do |op|
         case op[:type]&.to_sym
         when :async
           target = op[:target].to_s
           start_process(reach, [target, "#{target}#perform"], [process + 1, :async, true], op, label)
-        when :callback then reach["#{op[:target]}##{op[:method]}"] ||= [process, :call]
+        when :callback then reach["#{op[:target]}##{op[:method]}"] ||= [process, :call, nil, label]
         when :call then map_call(op, label, process, reach)
         end
       end
@@ -33,8 +33,8 @@ module WoodsMap
         start_process(reach, [operation[:mailer_action]], [later ? process + 1 : process, :delivery, later],
                       operation, label)
       elsif operation[:target]
-        reach[operation[:target].to_s] ||= [process, :call]
-        reach["#{operation[:target]}##{operation[:method]}"] ||= [process, :call]
+        reach[operation[:target].to_s] ||= [process, :call, nil, label]
+        reach["#{operation[:target]}##{operation[:method]}"] ||= [process, :call, nil, label]
       end
     end
 
@@ -48,7 +48,7 @@ module WoodsMap
                                         mechanism: "#{operation[:target]}.#{operation[:method]}",
                                         line: operation[:line])
       end
-      labels.each { |label| reach[label] = [process, via, hop] }
+      labels.each { |label| reach[label] = [process, via, hop, from] }
     end
 
     def each_operation(operations, &block)

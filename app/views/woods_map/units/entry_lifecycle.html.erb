@@ -1,0 +1,72 @@
+<%# The Lifecycle tab of a controller, a job or a mailer (FR-6, woods-map#91,
+    notes/entry-lifecycle.md): one entry point's flow across async hops, in
+    the model chain's three views, with the steps, their operations and lines. %>
+<% el = @entry_lifecycle %>
+<% gen = @repository.generation_number %>
+<% content_for :title, "#{@page.identifier} · Lifecycle · Woods Map" %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<% here = ->(action_name: el.action, view: @view) { woods_map.unit_lifecycle_path(type: @page.type, identifier: @page.identifier, action_name: (el.actions.one? ? nil : action_name), view: (view == WoodsMap::EntryLifecycle::VIEWS.first ? nil : view)) } %>
+<% trail = el.entry && woods_map.trail_path(entry: el.entry, pin: ["#{@page.type}:#{@page.identifier}"]) %>
+<% controls = safe_join([
+     (safe_join([tag.span(@page.type == 'job' ? 'entry' : 'action', class: 'lbl'), tag.span(safe_join(el.actions.map { |a| link_to(a, here.call(action_name: a), 'aria-current': (a == el.action ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'action')]) if el.actions.any?),
+     tag.span('view', class: 'lbl'), tag.span(safe_join(WoodsMap::EntryLifecycle::VIEWS.map { |v| link_to(v, here.call(view: v), 'aria-current': (v == @view ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'view'),
+     (link_to('Open in the Trail', trail, class: 'btn') if trail)
+   ].compact, ' ') %>
+<%= render 'woods_map/units/frame', page: @page, tab: 'lifecycle', controls: controls, definition: @definition %>
+<div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
+  <% lc = el.builder %>
+  <%= render 'woods_map/components/rail', heading: 'Lifecycle, as the flow runs it', groups: [
+        ({ label: (@page.type == 'job' ? 'entry' : 'actions'), count: el.actions.size, items: el.actions.map { |a| { key: '·', text: link_to(a, here.call(action_name: a)), current: a == el.action } } } if el.actions.any?),
+        ({ label: 'processes', count: lc.steps.map(&:process).uniq.size, items: lc.steps.group_by(&:process).map { |process, members| { key: process, text: process.zero? ? 'this request' : (members.first.hop ? members.first.hop.label : members.first.label), own: "#{members.size} #{'step'.pluralize(members.size)}" } } } if lc&.steps&.any?),
+        { label: 'limits', count: 'static', items: [
+          { key: '·', text: "flow #{el.source}", own: layer_chip(el.source == 'precomputed' ? 'W-14' : 'FlowAssembler') },
+          *Array(lc&.limits).map { |limit, count| { key: count, text: limit } },
+          ({ key: lc.beyond.size, text: "steps beyond #{lc.hops} async hops", own: (trail ? link_to('Trail', trail) : nil) } if lc&.beyond&.any?),
+          { key: '·', text: 'receiverless calls and dynamic dispatch stay unresolved', own: layer_chip('static') },
+          { key: '·', text: 'nothing here proves a path ran', own: layer_chip('static') }
+        ].compact }
+      ].compact %>
+  <div class="main">
+    <% if el.entry.nil? %>
+      <%= render 'woods_map/components/empty_state', title: "#{@page.identifier} publishes no action", text: tag.p('The Lifecycle tab draws the flow of one action. This unit lists none in its published actions.') %>
+    <% else %>
+      <% steps = el.steps %>
+      <% panel = {
+           'sequence' => { title: 'Sequence', label: "Sequence of #{el.entry}: each step called by the one that reached it, async hops as open arrows, numbered as the steps below",
+                           legend: [[tag.span('→', class: 'ar'), 'call, same process'], [tag.span('⇒', class: 'ar'), 'async hop: a new process'], ['', 'numbers match the steps below']] },
+           'flowchart' => { title: 'Flowchart', label: "Flowchart of #{el.entry}: each step from the step that reached it, dashed across async hops, numbered as the steps below",
+                            legend: [['──', 'call, same process'], ['┄┄', 'async hop, another process'], ['', 'numbers match the steps below']] },
+           'lanes' => { title: 'Lanes', label: "Lanes of #{el.entry}: the steps grouped by unit type, dashed across async hops, numbered as the steps below",
+                        legend: [['', 'one lane per unit type'], ['┄┄', 'async hop, another process'], ['', 'numbers match the steps below']] }
+         }.fetch(@view) %>
+      <section class="sec">
+        <%= render 'woods_map/components/diagram', title: panel[:title], facts: [el.entry, "#{steps.size} steps", "flow #{el.source}"], name: "#{@page.identifier} lifecycle #{el.action} #{@view}",
+              mermaid_url: woods_map.unit_lifecycle_mmd_path(type: @page.type, identifier: @page.identifier, action_name: (el.actions.one? ? nil : el.action), view: (@view == WoodsMap::EntryLifecycle::VIEWS.first ? nil : @view)),
+              mermaid: el.diagram(@view), key: 'y', label: panel[:label], refusal: (el.refusal(@view) && "#{el.refusal(@view)}; the steps below list every one."),
+              legend: panel[:legend], provenance: [el.source == 'precomputed' ? 'precomputed flow' : 'assembled flow', "gen #{gen}"] %>
+      </section>
+      <section class="sec" aria-labelledby="entry-steps">
+        <header><h2 class="t2" id="entry-steps">Steps of <%= el.entry %> <%= count_tag("#{steps.size} steps, in flow order") %><%= info_tip("Woods' flow for this entry, the trace_flow assembler's. Each step lists the operations the flow records, with their lines; a dashed rule is an async hop into another process. The Trail follows the same steps across processes and pins them.") %></h2></header>
+        <% if steps.any? %>
+          <%= render 'woods_map/trails/lanes', lifecycle: lc, board: WoodsMap::TrailBoard.new(entry: el.entry), flags: @flags %>
+          <%= render 'woods_map/components/table', label: "Operations of #{el.entry}", min_width: '860px', columns: [{ label: '#', width: '48px' }, { label: 'step', width: '30%', cell_class: 'id inline-links' }, { label: 'operations, with lines', cell_class: 'inline-links' }, { label: 'flags', width: '26%' }],
+                rows: steps.map { |s|
+                  all_ops = s.operations.flat_map { |op| [op] + %i[nested then_ops else_ops].flat_map { |k| Array(op[k]) } }
+                  ops = all_ops.reject { |op| op[:unexpanded] }
+                  hidden = all_ops.size - ops.size
+                  step_flags = @flags.for_step(s)
+                  { id: "step-#{s.n}",
+                    cells: [s.n.to_s,
+                            safe_join([trail_step_link(s), tag.span(" #{s.lane}, process #{s.process}", class: 'dim'), trail_step_note(s)].compact),
+                            ops.any? || hidden.positive? ? safe_join(ops.map { |op| safe_join([(op[:line] ? code_line_link(op[:file] || s.file_path, op[:line], text: "L#{op[:line]}") : tag.span('—', class: 'dim')), ' ', trail_operation_text(op)]) } + (hidden.positive? ? [tag.span("#{hidden} #{'callback'.pluralize(hidden)} the model does not define, not listed", class: 'dim')] : []), tag.br) : empty_value(applicable: false),
+                            step_flags.any? ? safe_join(step_flags.map { |f| safe_join([trail_flag_chip(f), ' ', f.text]) }, tag.br) : empty_value(applicable: false)] }
+                } %>
+        <% else %>
+          <p class="cap">The flow of <%= el.entry %> has no steps in gen <%= gen %>: the method may be inherited or defined by a macro.</p>
+        <% end %>
+        <% if trail %><p class="cap"><%= link_to("Follow #{el.entry} across processes in the Trail", trail) %>: pins, flags across units, the pinned graph and what changed together.</p><% end %>
+      </section>
+    <% end %>
+    <%= render 'woods_map/shared/status', items: [@view, 'numbers match the steps', "gen #{gen}"], keys: [[%w[s f l], 'view'], [%w[y], 'copy Mermaid'], [%w[/], 'search']] %>
+  </div>
+</div>

@@ -88,17 +88,7 @@ module WoodsMap
     end
 
     def lifecycle
-      with_unit do
-        @lifecycle = lifecycle_for(@unit, dynamic: WoodsMap::DynamicView.new(@repository))
-        @event = params[:event] if WoodsMap::Lifecycle::EVENTS.include?(params[:event])
-        @event ||= @lifecycle.chains.keys.first || 'create'
-        @view = @lifecycle.views.find { |view| view == params[:view] } || WoodsMap::Lifecycle::VIEWS.first
-        @state_machines = []
-        @state_machines = WoodsMap::StateMachineView.for_model(@repository, @page.identifier) if @page.type == 'model'
-        next render_lifecycle_mermaid if mermaid_request?
-
-        render :lifecycle
-      end
+      with_unit { WoodsMap::EntryLifecycle.applies?(@page.type) ? entry_lifecycle : model_lifecycle }
     end
 
     def graph
@@ -153,6 +143,31 @@ module WoodsMap
     def redirect_to_remembered_lens
       cookies[LENS_COOKIE] = { value: params[:lens], expires: 1.year.from_now, same_site: :lax }
       redirect_to woods_map.unit_path(type: params[:type], identifier: routed_identifiers.first)
+    end
+
+    # A model's (or state machine's) Lifecycle tab: its callback chains.
+    def model_lifecycle
+      @lifecycle = lifecycle_for(@unit, dynamic: WoodsMap::DynamicView.new(@repository))
+      @event = params[:event] if WoodsMap::Lifecycle::EVENTS.include?(params[:event])
+      @event ||= @lifecycle.chains.keys.first || 'create'
+      @view = @lifecycle.views.find { |view| view == params[:view] } || WoodsMap::Lifecycle::VIEWS.first
+      @state_machines = []
+      @state_machines = WoodsMap::StateMachineView.for_model(@repository, @page.identifier) if @page.type == 'model'
+      return render_lifecycle_mermaid if mermaid_request?
+
+      render :lifecycle
+    end
+
+    # A controller's, job's or mailer's Lifecycle tab: the flow of one entry
+    # point (FR-6, woods-map#91).
+    def entry_lifecycle
+      @entry_lifecycle = WoodsMap::EntryLifecycle.new(@repository, @unit, action: params[:action_name])
+      @view = WoodsMap::EntryLifecycle::VIEWS.find { |view| view == params[:view] } ||
+              WoodsMap::EntryLifecycle::VIEWS.first
+      return render_entry_lifecycle_mermaid if mermaid_request?
+
+      @flags = WoodsMap::TrailFlags.new(@repository, @entry_lifecycle.steps)
+      render :entry_lifecycle
     end
 
     def lifecycle_for(unit, dynamic: nil)

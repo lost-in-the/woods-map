@@ -61,7 +61,7 @@
                 step_flags = @flags.for_step(s)
                 ops = s.operations
                 { id: "step-#{s.n}",
-                  cells: [s.n.to_s, trail_step_link(s), s.lane, s.process.to_s, ops.size.to_s, step_flags.any? ? safe_join(step_flags.map { |f| safe_join([trail_flag_chip(f), ' ', f.text]) }, tag.br) : empty_value(applicable: false), trail_pin_toggle(board, s.identity) || ''],
+                  cells: [s.n.to_s, safe_join([trail_step_link(s), trail_step_note(s)].compact), s.lane, s.process.to_s, ops.size.to_s, step_flags.any? ? safe_join(step_flags.map { |f| safe_join([trail_flag_chip(f), ' ', f.text]) }, tag.br) : empty_value(applicable: false), trail_pin_toggle(board, s.identity) || ''],
                   detail: ops.any? ? render('woods_map/components/detail', rows: ops.map { |op| [op[:line] ? code_line_link(op[:file] || s.file_path, op[:line]) : '—', trail_operation_text(op)] }) : nil }
               } %>
         <% if lc.beyond.any? || lc.limits.any? %>

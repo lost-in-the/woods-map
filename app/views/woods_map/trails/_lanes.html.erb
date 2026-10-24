@@ -15,7 +15,7 @@
         <tr id="lane-<%= step.n %>">
           <td class="nw"><%= step.n %></td>
           <% lanes.each do |lane| %>
-            <td><% if lane == step.lane %><%= trail_step_link(step) %><% step_flags = flags.for_step(step) %><% if step_flags.any? %> <%= safe_join(step_flags.map { |f| trail_flag_chip(f) }, ' ') %><span class="sr-only">: <%= step_flags.map(&:rule).join(', ') %></span><% end %><% end %></td>
+            <td><% if lane == step.lane %><%= trail_step_link(step) %><% if step.via == :inferred %> <%= layer_chip('save implies') %><% end %><% step_flags = flags.for_step(step) %><% if step_flags.any? %> <%= safe_join(step_flags.map { |f| trail_flag_chip(f) }, ' ') %><span class="sr-only">: <%= step_flags.map(&:rule).join(', ') %></span><% end %><% end %></td>
           <% end %>
         </tr>
       <% end %>

@@ -59,8 +59,9 @@ lib/woods_map/{blast_radius,impact_review}.rb  # the impact page's pre-change mo
 lib/woods_map/{impact_range,range_report,since}.rb  # Woods' range or saved report, its tabs, and ?since= evidence for unit pages (E-6 to E-8)
 lib/woods_map/{impact_flows,retention,repository_flows}.rb  # the Flows tab from W-13 membership and flow documents; retention pins (W-11)
 lib/woods_map/{search_results,palette,file_tree}.rb  # search modes, the palette's groups, the per-generation file tree
-lib/woods_map/{trail_board,lifecycle_builder,lifecycle_reach,trail_lanes,trail_flags,pinned_views,trail_co_changes}.rb  # the Trail (M6): URL board, lifecycle across async hops, flags, pinned graph and ERD, co-change
-lib/woods_map/repository_assembled_flows.rb  # Woods' FlowAssembler over the pinned generation for the Trail, cached per generation and entry
+lib/woods_map/{trail_board,lifecycle_builder,lifecycle_reach,lifecycle_stitching,trail_lanes,trail_flags,pinned_views,trail_co_changes}.rb  # the Trail (M6): URL board, lifecycle across async hops, flags, pinned graph and ERD, co-change
+lib/woods_map/entry_lifecycle.rb  # the Lifecycle tab on controllers, jobs and mailers: one entry point's flow (FR-6, woods-map#91)
+lib/woods_map/repository_assembled_flows.rb  # an entry's flow: the precomputed document when published (W-14), else Woods' FlowAssembler, cached per generation and entry
 lib/woods_map/assets.rb          # engine-served files: roots, content digests, content types
 lib/woods_map/{content_security_policy,rate_limiter}.rb  # M8: the engine's CSP header, the in-process per-client budget
 lib/woods_map/guide.rb + guide/  # M7: status/backend (RubyLLM optional), actions + prompts/, context, store, budget, runner, answer; agent.rb only with ruby_llm

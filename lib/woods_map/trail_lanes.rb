@@ -17,22 +17,32 @@ module WoodsMap
       lines = ['flowchart LR']
       @lanes.each do |lane|
         lines << "  subgraph lane_#{lane} [#{quoted(lane)}]"
-        @steps.select { |s| s.lane == lane }.each { |s| lines << "    s#{s.n}[#{quoted("#{s.n} · #{s.label}")}]" }
+        @steps.select { |s| s.lane == lane }.each { |s| lines << "    s#{s.n}[#{quoted("#{s.n} · #{s.title}")}]" }
         lines << '  end'
       end
-      @steps.each_cons(2) { |a, b| lines << edge(a, b) }
+      @steps.drop(1).each { |step| lines << edge(step) }
       lines.join("\n")
+    end
+
+    # @param step [LifecycleBuilder::Step]
+    # @return [String] the edge's label: how the step was reached
+    def self.reach_label(step)
+      case step.via
+      when :graph then 'job_enqueue edge'
+      when :inferred then 'save implies'
+      else step.hop ? 'async hop' : nil
+      end
     end
 
     private
 
-    # Flow order within a process; an async hop starts from the step that
-    # made it, so the dashed edge joins the caller to the work it hands off.
-    def edge(previous, step)
-      return "  s#{previous.n} --> s#{step.n}" unless step.hop
-
-      from = @steps.find { |s| s.label == step.hop.from } || previous
-      "  s#{from.n} -.->|#{quoted(step.via == :graph ? 'job_enqueue edge' : 'async hop')}| s#{step.n}"
+    # From the step whose operation reached it (the previous step when the
+    # flow does not say); dashed where another process starts.
+    def edge(step)
+      from = @steps.find { |s| s.label == step.caller } || @steps[@steps.index(step) - 1]
+      label = self.class.reach_label(step)
+      arrow = step.hop || step.via == :graph ? '-.->' : '-->'
+      "  s#{from.n} #{arrow}#{"|#{quoted(label)}|" if label} s#{step.n}"
     end
 
     # A quoted Mermaid label; a double quote cannot be escaped inside one.
