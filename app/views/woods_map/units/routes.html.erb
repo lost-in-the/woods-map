@@ -1,0 +1,47 @@
+<% r = @routes %>
+<% content_for :title, "#{@page.identifier} · Routes · Woods Map" %>
+<% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
+<%= render 'woods_map/units/frame', page: @page, tab: 'routes', definition: @definition %>
+<% passage = ->(action) { link_to(action, woods_map.unit_passage_path(type: @page.type, identifier: @page.identifier, action_name: action)) } %>
+<% route_text = ->(route) { route.unit ? unit_link(route.unit, 'route', label: "#{route.verb} #{route.path}") : "#{route.verb} #{route.path}" } %>
+<% declared = ->(route) { route.line ? "L#{route.line}" : tag.span('no route unit', class: 'dim') } %>
+<% helpers = ->(route) { route.helpers.any? ? safe_join(route.helpers.map { |h| tag.code(h) }, ', ') : empty_value(applicable: false) } %>
+<% finding = ->(route) { route.finding ? safe_join([chip(:note), ' ', route.finding.tr('_', ' ')]) : empty_value(applicable: false) } %>
+<div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
+  <%= render 'woods_map/components/rail', heading: 'Routes, as the router declares them', groups: [
+        { label: 'verbs', count: r.count, items: r.routes.group_by(&:verb).map { |verb, list| { key: list.size, text: verb } } },
+        { label: 'actions', count: r.actions.size, items: r.actions.map { |a| { key: a.routes.size, text: a.name, own: (a.routes.empty? ? 'no route' : nil) } } },
+        { label: 'limits', count: r.limits.size, items: r.limits.map { |l| { key: '·', text: l } } }
+      ].reject { |g| g[:items].empty? } %>
+  <div class="main">
+    <section class="sec" aria-labelledby="routesh">
+      <header><h2 class="t2" id="routesh">Routes <%= count_tag(r.count) %><%= info_tip('Each route the controller metadata lists, joined to the route unit of the same verb and path. Findings are graph analysis\'s unresolvable_routes for this controller.') %></h2></header>
+      <% if r.routes.any? %>
+        <%= render 'woods_map/components/table', label: 'Routes', min_width: '820px', columns: [{ label: 'route', cell_class: 'id' }, { label: 'action', width: '130px', cell_class: 'nw' }, { label: 'helpers', width: '250px' }, { label: 'routes.rb', width: '130px', cell_class: 'nw', abbr: 'line in config/routes.rb, from the route unit' }, { label: 'finding', width: '170px' }],
+              rows: r.routes.map { |route| { cells: [route_text.call(route), route.action ? passage.call(route.action) : empty_value, helpers.call(route), declared.call(route), finding.call(route)] } },
+              caption: safe_join([layer_chip('controller routes'), ' ', layer_chip('route units'), ' ', layer_chip('graph analysis')]) %>
+      <% else %>
+        <%= render 'woods_map/components/empty_state', title: 'No routes reach this controller', text: 'The router in this generation declares no route that dispatches here; a controller reached only by another controller\'s render or by a gem has none.' %>
+      <% end %>
+    </section>
+    <section class="sec" aria-labelledby="actionsh">
+      <header><h2 class="t2" id="actionsh">Action sources <%= count_tag(r.actions.size) %><%= info_tip('Where each action method is defined, from the controller\'s action_sources; actions a gem defines come from inherited_gem_actions.') %></h2></header>
+      <% if r.actions.any? %>
+        <%= render 'woods_map/components/table', label: 'Action sources', min_width: '720px', columns: [{ label: 'action', width: '150px', cell_class: 'nw id' }, { label: 'defined in', width: '220px' }, { label: 'source' }, { label: 'routes', width: '80px', cell_class: 'nw' }],
+              rows: r.actions.map { |a| { cells: [passage.call(a.name), a.gem ? safe_join([a.owner.to_s, ' ', layer_chip('gem')]) : (a.defined_in.presence || a.owner.presence || empty_value), a.file ? code_line_link(a.file, a.line) : empty_value, a.routes.empty? ? tag.span('no route', class: 'dim') : a.routes.size] } } %>
+      <% else %>
+        <%= render 'woods_map/components/empty_state', title: 'No actions in the index', text: 'The controller metadata lists no action methods.' %>
+      <% end %>
+    </section>
+    <section class="sec" aria-labelledby="refsh">
+      <header><h2 class="t2" id="refsh">Reached by a route helper <%= count_tag(r.references.size) %><%= info_tip('Units whose _path or _url helper resolves to a route of this controller (link_to, redirect_to and form_action edges). The index records the controller, not which helper or action.') %></h2></header>
+      <% if r.references.any? %>
+        <%= render 'woods_map/components/table', label: 'Reached by a route helper', min_width: '560px', columns: [{ label: 'unit', cell_class: 'id' }, { label: 'type', width: '150px', cell_class: 'nw' }, { label: 'via', width: '140px', cell_class: 'nw' }],
+              rows: r.references.map { |ref| { cells: [unit_link(ref.source, ref.source_type), ref.source_type.to_s.tr('_', ' '), ref.via] } } %>
+      <% else %>
+        <%= render 'woods_map/components/empty_state', title: 'No helper references', text: 'No unit in this generation references a route helper that points at this controller.' %>
+      <% end %>
+    </section>
+    <%= render 'woods_map/shared/status', items: ['routes', 'as declared', "gen #{@repository.generation_number}"], keys: [[%w[/], 'search']] %>
+  </div>
+</div>
