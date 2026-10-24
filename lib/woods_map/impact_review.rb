@@ -101,7 +101,7 @@ module WoodsMap
 
     # @return [Array<Unknown>] what the index reported it could not resolve around the radius
     def unknowns
-      @unknowns ||= unresolved_renders + unresolvable_routes + volatile_dependencies
+      @unknowns ||= unresolved_renders + @ivar_rule.unknowns + unresolvable_routes + volatile_dependencies
     end
 
     # @return [Array<Array(String, String, String)>] layer, true within, not proven
