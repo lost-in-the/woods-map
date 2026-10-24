@@ -57,11 +57,18 @@ module WoodsMap
 
     # @return [Hash] the BehavioralProfile unit's metadata, or an empty hash
     def profile
-      @profile ||= begin
-        entry = @repository.units(type: 'configuration').find { |u| u['identifier'] == 'BehavioralProfile' }
-        unit = entry && @repository.unit(entry['identifier'], type: 'configuration')
-        Hash(unit&.dig('metadata')).then { |m| m['config_type'] == 'behavioral_profile' ? m : {} }
-      end
+      @profile ||= Hash(configuration_unit('BehavioralProfile', 'behavioral_profile')['metadata'])
+    end
+
+    # One configuration unit of the generation, when its `config_type` matches.
+    #
+    # @param identifier [String] e.g. `BehavioralProfile`, `Gemfile`
+    # @param config_type [String] e.g. `behavioral_profile`, `gemfile`
+    # @return [Hash] the published unit, or an empty hash
+    def configuration_unit(identifier, config_type)
+      entry = @repository.units(type: 'configuration').find { |u| u['identifier'] == identifier }
+      unit = entry && @repository.unit(entry['identifier'], type: 'configuration')
+      unit&.dig('metadata', 'config_type') == config_type ? unit : {}
     end
 
     # @return [String, nil] e.g. "Rails 8.0.0"

@@ -15,6 +15,31 @@ module WoodsMap
     # annotated `source_code` (the report's `to` side is now). `changed`
     # holds composite line numbers; `removed_after` maps a line to the count
     # of lines removed just after it.
+    # Which of a unit's members moved: methods by their extent and, through
+    # {#callback?}, callbacks by their method or their declaration.
+    Changed = Struct.new(:methods, :all_methods, :marks, keyword_init: true) do
+      # @param name [String] a callback's method
+      # @param owner [String, nil] where the step says it is defined
+      # @return [Boolean] whether that method's extent holds a change
+      def method?(name, owner = nil)
+        candidates = all_methods.select { |entry| entry['name'] == name }
+        own = candidates.select { |entry| entry['owner'] == owner }
+        candidates = own if own.any?
+        candidates.any? { |entry| methods.include?(entry) }
+      end
+
+      # @param callback [Hash] a published callback entry
+      # @param owner [String, nil]
+      # @return [Symbol, nil] :method when its method body moved, :declaration
+      #   when its declaration did, nil otherwise
+      def callback(callback, owner = nil)
+        return :method if method?(callback['filter'].to_s, owner)
+
+        site = callback['declaration']
+        :declaration if site.is_a?(Hash) && Since.moved?(marks, site['line'], site['end_line'])
+      end
+    end
+
     LineMarks = Struct.new(:changed, :removed_after, :added, :removed, :coverage, keyword_init: true) do
       # @param number [Integer, nil] a composite line
       # @return [Boolean]
@@ -128,6 +153,22 @@ module WoodsMap
       marks
     end
 
+    # Methods of the unit whose published extent (`metadata.methods`, W-2:
+    # `line`..`end_line` in annotated source) holds a changed line or a
+    # removal, and callbacks whose published declaration (`declaration`,
+    # when Woods records it) does.
+    #
+    # @param unit [Hash] the pinned generation's unit
+    # @return [Changed, nil] nil without line marks for the unit
+    def changed_members(unit)
+      marks = line_marks(unit['identifier'], unit['type'])
+      return nil unless marks
+
+      methods = Array(unit.dig('metadata', 'methods')).select { |entry| method_entry?(entry) }
+      Changed.new(methods: methods.select { |entry| moved?(marks, entry['line'], entry['end_line']) },
+                  all_methods: methods, marks: marks)
+    end
+
     # @param identifier [String]
     # @param type [String]
     # @return [Hash, nil] the unit's `source_changes` as Woods recorded it
@@ -145,7 +186,27 @@ module WoodsMap
       @report&.graph_blast
     end
 
+    # Whether lines first..last hold a changed line or a removal point.
+    #
+    # @param marks [LineMarks]
+    # @return [Boolean]
+    def self.moved?(marks, first, last)
+      return false unless first.is_a?(Integer) && last.is_a?(Integer)
+
+      marks.changed.any? { |number| number.between?(first, last) } ||
+        marks.removed_after.keys.any? { |number| number >= first && number < last }
+    end
+
     private
+
+    def moved?(marks, first, last)
+      self.class.moved?(marks, first, last)
+    end
+
+    def method_entry?(entry)
+      entry.is_a?(Hash) && entry['name'].is_a?(String) &&
+        entry['line'].is_a?(Integer) && entry['end_line'].is_a?(Integer)
+    end
 
     def mark(marks, hunk)
       start, length = Array(hunk['after'])

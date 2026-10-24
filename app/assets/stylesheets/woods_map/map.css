@@ -312,6 +312,8 @@ html.js .wm .guide .guide-nojs{display:none}
 .wm .strip-svg .bar{fill:var(--mut)}
 .wm .strip-svg .bar.zero{fill:var(--rule2)}
 .wm .strip-svg .bar.recent{fill:var(--hot)}
+.wm .brush-band{fill:var(--select);fill-opacity:.2;pointer-events:none}
+.wm [data-controller~=brush] > svg:first-of-type{cursor:crosshair;touch-action:pan-y}
 .wm .strip-svg .bar.sel,.wm .strip-svg a:hover .bar,.wm .strip-svg a:focus .bar{fill:var(--select)}
 .wm .strip-svg a:focus-visible{outline:2px solid var(--select)}
 .wm .strip-svg .gm{stroke:var(--mod);stroke-width:1;stroke-dasharray:2 2;vector-effect:non-scaling-stroke}
@@ -338,6 +340,7 @@ html.js .wm .guide .guide-nojs{display:none}
 /* ?since= (E-8): lines removed just after a row, beside tokens.css' changed-line rule */
 .wm .cv .row-rm .ln{box-shadow:inset 0 -2px 0 var(--mod)}
 .wm .cv .row:target .ln,.wm .cv .row:target .cm{color:var(--mut)} /* --dim on the target tint is 4.4:1 */
+.wm .dia svg .chg > rect,.wm .dia svg .chg > polygon,.wm .dia svg .chg > path{stroke:var(--mod);stroke-width:2px}
 .wm .cv .row-chg.row-rm .ln{box-shadow:inset 3px 0 0 var(--mod),inset 0 -2px 0 var(--mod)}
 .wm .diff-block .eyebrow{margin-bottom:var(--s2)}
 .wm .difft{overflow-x:auto}
@@ -367,6 +370,9 @@ html.no-js .wm .amb-pop[hidden]{display:block}
 .wm .gtimeline .scrub input[type=range]{width:min(100%,28ch);accent-color:var(--select)}
 .wm .gtimeline .scrub output{flex:1 1 30ch;min-width:0}
 .wm .gcommits summary{cursor:pointer;color:var(--link);font-size:var(--fs-12);margin-bottom:var(--s3)}
+/* The Context tab's limits (C4 level 1): what the index does not say, as a plain list. */
+.wm .landscape ul.limits{margin:0;padding-left:var(--s5);display:grid;gap:var(--s2);font-size:var(--fs-13);color:var(--text)}
+.wm .landscape ul.limits a{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--link) 55%,transparent);text-underline-offset:3px}
 /* The Trail (M6, notes/trail.md): entry and pin fields, the lanes' async rule, pin notes */
 .wm .trail-form{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);padding:var(--s3) var(--s4)}
 .wm .trail-form label{font-family:var(--ff-ui);font-size:var(--fs-11);color:var(--dim);letter-spacing:.06em;text-transform:uppercase}

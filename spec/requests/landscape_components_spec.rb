@@ -27,6 +27,17 @@ RSpec.describe 'Landscape components, charts and sharing', type: :request do
         .to match([start_with('flowchart LR'), include('L3 · Components')])
     end
 
+    it 'draws where the code is by package, with its .mmd text' do
+      document = page('/woods/landscape/hotspots')
+      expect(document.css('[data-controller~=diagram] pre').map(&:text)).to include(start_with('treemap-beta'))
+      rows = document.css('table[aria-label="Lines of code by block and type"] tbody tr').map do |tr|
+        tr.at_css('td').text
+      end
+      expect(rows).to eq(['.', 'packs/posts'])
+      get '/woods/landscape/treemap.mmd'
+      expect(response.body).to start_with('treemap-beta')
+    end
+
     it 'serves the component diagram as Mermaid text for each grouping' do
       get '/woods/landscape/components.mmd', params: { group: 'package' }
       expect(response.media_type).to eq('text/plain')
@@ -75,8 +86,39 @@ RSpec.describe 'Landscape components, charts and sharing', type: :request do
         .to eq(['/woods/landscape/components.mmd?group=cluster'])
     end
 
+    it 'draws the context with the people the host names and the external systems the index records' do
+      WoodsMap.configuration.landscape_actors = [{ name: 'Author', description: 'writes posts', uses: 'writes posts' }]
+      document = page('/woods/landscape/context')
+      expect(document.css('.c4col[aria-label=People] .c4box b').map(&:text)).to eq(['Author'])
+      expect(document.css('.c4col[aria-label="External systems"] .c4box b').map(&:text)).to include('Mail delivery')
+      expect(document.at_css('.c4ladder [aria-current=page]').text).to include('L1 · Context')
+      expect(document.at_css('ul.limits').text).to include('woods#814')
+    ensure
+      WoodsMap.configuration.landscape_actors = []
+    end
+
+    it 'serves the context as Mermaid, and the DSL and LikeC4 with a context view' do
+      WoodsMap.configuration.landscape_actors = [{ name: 'Author', uses: 'writes posts' }]
+      get '/woods/landscape/context.mmd'
+      expect(response.body).to start_with('flowchart LR').and include('«person»')
+      get '/woods/landscape.dsl'
+      expect(response.body).to include('person_0 = person "Author"', 'systemContext system "Context"',
+                                       'person_0 -> system "writes posts"')
+      get '/woods/landscape.c4'
+      expect(response.body).to include("person_0 = person 'Author'", 'view context {')
+    ensure
+      WoodsMap.configuration.landscape_actors = []
+    end
+
+    it 'names the missing source sizes on Hotspots and answers 422 for the treemap text' do
+      expect(page('/woods/landscape/hotspots').text).to include('No source sizes in this generation')
+      get '/woods/landscape/treemap.mmd'
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.body).to include('woods#810')
+    end
+
     it 'routes no diagram it does not draw' do
-      expect_no_route('/woods/landscape/treemap.mmd')
+      expect_no_route('/woods/landscape/nope.mmd')
     end
   end
 end

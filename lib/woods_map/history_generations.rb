@@ -6,7 +6,8 @@ module WoodsMap
   # retained generations carried the unit's commits ({CommitLedger}) and the
   # facets Woods recorded moving at each generation ({GenerationFacets}).
   # Mixed into {HistoryView}, which supplies `table?`, `paths`,
-  # `window_commits` and the repository.
+  # `window_commits` and the repository; it also reads the bar, generation
+  # and span filters (`read_filters`, `narrow`).
   module HistoryGenerations
     # @return [CommitStrip, GenerationStrip, nil] the strip the `by` filter asks for; nil without a table
     def strip
@@ -58,6 +59,28 @@ module WoodsMap
     # @return [GenerationStrip] one bar per retained generation with a table
     def generation_strip
       @generation_strip ||= GenerationStrip.new(window_commits, ledger, current: @repository.generation_number)
+    end
+
+    private
+
+    def read_filters(filters)
+      @week = parse_date(filters[:week])
+      @by = HistoryView::BY.include?(filters[:by].to_s) ? filters[:by].to_s : HistoryView::BY.first
+      @gen = filters[:gen].to_s.match?(/\A[1-9][0-9]{0,8}\z/) ? filters[:gen].to_i : nil
+      @span = DateSpan.parse(filters[:span])
+    end
+
+    # The window's commits narrowed to the selected bar, generation or span.
+    def narrow(list)
+      list = list.select { |c| in_week?(c) } if @week
+      list = list.select { |c| c.generation&.number == @gen } if @gen
+      list = list.select { |c| DateSpan.cover?(@span, c.date) } if @span
+      list
+    end
+
+    def in_week?(commit)
+      date = time(commit.date)&.to_date
+      date && date >= @week && date < @week + (commit_strip&.step || 7)
     end
   end
 end

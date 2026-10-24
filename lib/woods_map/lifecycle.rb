@@ -42,7 +42,7 @@ module WoodsMap
                      'services_called' => 'calls', 'database_reads' => 'reads' }.freeze
 
     # One step of a chain.
-    Step = Struct.new(:n, :type, :filter, :conditions, :side_effects, :owner, keyword_init: true) do
+    Step = Struct.new(:n, :type, :filter, :conditions, :side_effects, :owner, :changed, keyword_init: true) do
       # @return [Array<String>] "writes x", "enqueues Y" phrases
       def effects
         EFFECT_VERBS.filter_map do |key, verb|
@@ -92,8 +92,11 @@ module WoodsMap
     # @param concern_methods [Hash{String => Array<String>}] concern name => method names it defines
     # @param dynamic [DynamicView, nil] the C4 dynamic renderer; without one, or without
     #   container attribution, the view is not offered
-    def initialize(unit, concern_methods: {}, dynamic: nil)
+    # @param changed [Since::Changed, nil] with `?since=`, what moved in the
+    #   unit's source: a step is marked when its method or declaration did
+    def initialize(unit, concern_methods: {}, dynamic: nil, changed: nil)
       @unit = unit
+      @changed = changed
       @dynamic = dynamic
       defined = unit['source_code'].to_s.scan(DEFINITION).flatten.to_set | concern_methods.values.flatten.to_set
       all = Array(unit.dig('metadata', 'callbacks')).reject { |cb| cb['filter'].to_s.match?(INTERNAL) }
@@ -242,9 +245,10 @@ module WoodsMap
     end
 
     def step(callback, number)
+      owner = owner_of(callback['filter'].to_s)
       Step.new(n: number, type: callback['type'].to_s, filter: callback['filter'].to_s,
                conditions: (callback['conditions'] || {}).except('on'), side_effects: callback['side_effects'],
-               owner: owner_of(callback['filter'].to_s))
+               owner: owner, changed: @changed&.callback(callback, owner))
     end
 
     def owner_of(method_name)
