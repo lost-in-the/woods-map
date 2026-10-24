@@ -25,15 +25,16 @@ module WoodsMap
     # @param selection [Array<String>, String, nil] `type:identifier` or a bare identifier
     # @param days [Integer]
     # @param now [Time]
-    # @param author [String, nil] only commits whose author, as git recorded it, is exactly this
-    # @param span [Range<Date>, nil] only the days a drag picked ({DateSpan})
-    def initialize(repository, selection, days: 365, now: Time.now.utc, author: nil, span: nil)
-      @span = span
+    # @param filters [Hash] `author:` only commits whose author, as git
+    #   recorded it, is exactly this; `span:` only the days a drag picked
+    #   ({DateSpan}, a Range<Date>)
+    def initialize(repository, selection, days: 365, now: Time.now.utc, **filters)
+      @span = filters[:span]
       @repository = repository
       @table = repository.git_commits
       @days = days
       @now = now
-      @author = author.to_s.presence
+      @author = filters[:author].to_s.presence
       @lanes, @unknown = resolve(Array(selection).grep(String).first(MAX_LANES))
     end
 
