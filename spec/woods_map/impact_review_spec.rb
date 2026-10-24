@@ -18,7 +18,7 @@ RSpec.describe WoodsMap::ImpactReview do
   it 'names what the other rules need' do
     v = review('User')
     expect(v.rules.find { |x| x.name == 'foreign key dropped' }.result).to eq('needs a range')
-    expect(v.rules.find { |x| x.name == 'filter chain changed' }.result).to eq('needs W-8 and a range')
+    expect(v.rules.find { |x| x.name == 'filter chain changed' }.result).to eq('needs a range')
   end
 
   it 'runs the unassigned-ivar rule on the per-action facts, from the mailer or from its template' do

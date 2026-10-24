@@ -3,11 +3,12 @@
 module WoodsMap
   # The keys one params method permits, set against what the published model
   # unit names (B-18): its columns, associations, attachments, rich-text fields
-  # and the writers its class body defines. A match names the fact that proves
-  # it. A key that matches none is unverified, never flagged: the index does
-  # not publish every writer a model accepts (+has_secure_password+, the
-  # attribute API, nested attributes, module writers), so absence proves
-  # nothing until it does (woods#797).
+  # and writers. A match names the fact that proves it. When the model publishes
+  # +attribute_writers+ (woods#797), every writer it accepts, a key that matches
+  # none is a mismatch, raised as an advisory flag. An older index publishes
+  # only the class body's writers, so there an unmatched key stays unverified:
+  # +has_secure_password+, the attribute API, nested attributes and module
+  # writers are not in it, and absence proves nothing.
   class PermittedAttributes
     # One permitted key and the model fact that matches it, nil when none does.
     Key = Struct.new(:name, :via, keyword_init: true) do
@@ -51,9 +52,19 @@ module WoodsMap
       @keys ||= Array(@entry['permitted']).map(&:to_s).map { |key| Key.new(name: key, via: model && match(key)) }
     end
 
-    # @return [Array<Key>] the keys no published model fact matches
+    # @return [Boolean] whether the model publishes every attribute writer it accepts (woods#797)
+    def writers_published?
+      !model.nil? && metadata['attribute_writers'].is_a?(Array)
+    end
+
+    # @return [Array<Key>] keys no published fact matches, on a model whose writers are all published
+    def mismatches
+      writers_published? ? keys.reject(&:matched?) : []
+    end
+
+    # @return [Array<Key>] keys no published fact matches, on a model without the full writer list
     def unverified
-      keys.reject(&:matched?)
+      writers_published? ? [] : keys.reject(&:matched?)
     end
 
     # @return [Hash{String => Array<String>}] matched key names grouped by the fact that matches them
@@ -73,14 +84,19 @@ module WoodsMap
     end
 
     def facts_by_name
-      @facts_by_name ||= begin
-        named = [['column', Array(metadata['column_names']).map(&:to_s)],
-                 ['association', associations.map { |a| a['name'].to_s }],
-                 ['association ids', collection_ids], ['attachment', attachments],
-                 ['rich text', Array(metadata['action_text_fields']).map(&:to_s)],
-                 ['writer', writers]]
-        named.reverse.each_with_object({}) { |(via, names), map| names.each { |name| map[name] = via } }
+      @facts_by_name ||= named_facts.reverse.each_with_object({}) do |(via, names), map|
+        names.each { |name| map[name] = via }
       end
+    end
+
+    def named_facts
+      [['column', strings('column_names')], ['association', associations.map { |a| a['name'].to_s }],
+       ['association ids', collection_ids], ['attachment', attachments], ['rich text', strings('action_text_fields')],
+       ['writer', writers], ['attribute writer', strings('attribute_writers')]]
+    end
+
+    def strings(key)
+      Array(metadata[key]).map(&:to_s)
     end
 
     def writers

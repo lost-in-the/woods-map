@@ -77,14 +77,14 @@ Run this before a milestone issue is opened and again before it closes.
 | W-5 model lifecycle entries | [woods#755](https://github.com/lost-in-the/woods/issues/755) |
 | W-6 method-level span targets | [woods#756](https://github.com/lost-in-the/woods/issues/756) |
 | W-7 per-action facts | [woods#757](https://github.com/lost-in-the/woods/issues/757) |
-| W-8 filter applicability | [woods#758](https://github.com/lost-in-the/woods/issues/758) |
+| W-8 filter applicability (merged via [woods#800](https://github.com/lost-in-the/woods/pull/800); the Passage filter matrix consumes it) | [woods#758](https://github.com/lost-in-the/woods/issues/758) |
 | W-9 container attribution | [woods#759](https://github.com/lost-in-the/woods/issues/759) |
 | W-10 facet diff | [woods#760](https://github.com/lost-in-the/woods/issues/760) |
 | W-11 generation pin | [woods#761](https://github.com/lost-in-the/woods/issues/761) |
 | W-12 impact report | [woods#762](https://github.com/lost-in-the/woods/issues/762) |
 | W-13 inverted flow index | [woods#763](https://github.com/lost-in-the/woods/issues/763) |
-| Model attribute writers for the permitted-param flag (B-18) | [woods#797](https://github.com/lost-in-the/woods/issues/797), [design note](notes/passage-mismatch-limits.md) |
-| Partial locals passed and read for the partial-local flag (B-18) | [woods#798](https://github.com/lost-in-the/woods/issues/798), [design note](notes/passage-mismatch-limits.md) |
+| Model attribute writers for the permitted-param flag (B-18) | [woods#797](https://github.com/lost-in-the/woods/issues/797), published by [woods#806](https://github.com/lost-in-the/woods/pull/806), [design note](notes/passage-mismatch-limits.md) |
+| Partial locals passed and read for the partial-local flag (B-18) | [woods#798](https://github.com/lost-in-the/woods/issues/798), published by [woods#806](https://github.com/lost-in-the/woods/pull/806), [design note](notes/passage-mismatch-limits.md) |
 | W-14 best-effort flows | [woods#764](https://github.com/lost-in-the/woods/issues/764) |
 | M4 History: History tab from the commit table (strip, commits with detail blocks, people, co-change), per-file gutter heat, generation picker and unit diff from Woods' report, `/woods/history` timeline, timeline and XY exports | [woods-map#6](https://github.com/lost-in-the/woods-map/issues/6), [note](notes/history.md) |
 | Commit table line counts and hunks (B6-History `+6 −1`, *hunks*) | [woods#804](https://github.com/lost-in-the/woods/issues/804) |
