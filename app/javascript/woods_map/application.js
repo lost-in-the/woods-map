@@ -11,6 +11,7 @@ import SheetController from "./controllers/sheet_controller.js"
 import CopyController from "./controllers/copy_controller.js"
 import PaletteController from "./controllers/palette_controller.js"
 import PeekController from "./controllers/peek_controller.js"
+import CardController from "./controllers/card_controller.js"
 import TrailController from "./controllers/trail_controller.js"
 import KeysController from "./controllers/keys_controller.js"
 import HelpController from "./controllers/help_controller.js"
@@ -25,6 +26,7 @@ application.register("sheet", SheetController)
 application.register("copy", CopyController)
 application.register("palette", PaletteController)
 application.register("peek", PeekController)
+application.register("card", CardController)
 application.register("trail", TrailController)
 application.register("keys", KeysController)
 application.register("help", HelpController)
