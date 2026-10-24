@@ -21,8 +21,10 @@ RSpec.describe 'Entry lifecycle', type: :request do
     html = page_for('/woods/units/job/NotifySubscribersJob/lifecycle')
     expect(response).to have_http_status(:ok)
     rows = operations(html, 'NotifySubscribersJob#perform')
-    expect(rows.first).to include('NotifySubscribersJob#perform', 'L4 if post.published?', 'deliver_later → MailingListMailer#new_post')
-    expect(rows.join("\n")).to include('MailingListMailer#new_post mailer, process 1', 'mailing_list_mailer/new_post.html.erb')
+    expect(rows.first).to include('NotifySubscribersJob#perform', 'L4 if post.published?',
+                                  'deliver_later → MailingListMailer#new_post')
+    expect(rows.join("\n")).to include('MailingListMailer#new_post mailer, process 1',
+                                       'mailing_list_mailer/new_post.html.erb')
     expect(html.at_css('table[aria-label="Lanes of NotifySubscribersJob#perform"] tr.bnd').text)
       .to include('async hop, new process: MailingListMailer#new_post')
   end
