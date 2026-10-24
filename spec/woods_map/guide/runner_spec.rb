@@ -41,7 +41,7 @@ RSpec.describe WoodsMap::Guide::Runner do
   it 'streams the text, finishes once and records the tokens' do
     record = run(two_tools)
     expect(events.map(&:first).count('done')).to eq(1)
-    expect(payloads('delta').map { |payload| payload['text'] }.join).to eq('Post enqueues a job.')
+    expect(payloads('delta').pluck('text').join).to eq('Post enqueues a job.')
     expect(record).to include('state' => 'done', 'answer' => 'Post enqueues a job.', 'tokens' => 1020)
     expect(store.tokens).to eq(1020)
   end

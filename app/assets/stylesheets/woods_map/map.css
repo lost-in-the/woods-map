@@ -15,8 +15,8 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .tree [data-tree-target="row"][hidden] { display:none!important; }
 /* Inline links: a cue besides colour (D-22, WCAG 1.4.1, axe link-in-text-block). Standalone
    links stay bare; a link sitting among other text gets a faint underline in its own hue. */
-.wm .crumbs a,.wm .empty-state a,.wm .cap a,.wm .lead a,.wm .det dd a,.wm .facts dd a,.wm .banner .txt a,.wm .legend a,.wm .st a,.wm .mg a,.wm .rail li a,.wm .tip a,.wm .finding a,.wm .status a,.wm .psg .rows a,.wm .sec > header .t2 a,.wm .tbl tr.bnd a{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--link) 55%,transparent);text-underline-offset:3px}
-.wm .crumbs a:hover,.wm .empty-state a:hover,.wm .cap a:hover,.wm .lead a:hover,.wm .det dd a:hover,.wm .facts dd a:hover,.wm .banner .txt a:hover,.wm .legend a:hover,.wm .st a:hover,.wm .mg a:hover,.wm .rail li a:hover,.wm .tip a:hover,.wm .finding a:hover,.wm .status a:hover,.wm .psg .rows a:hover,.wm .sec > header .t2 a:hover,.wm .tbl tr.bnd a:hover{text-decoration-color:var(--link)}
+.wm .crumbs a,.wm .empty-state a,.wm .cap a,.wm .lead a,.wm .det dd a,.wm .facts dd a,.wm .banner .txt a,.wm .legend a,.wm .st a,.wm .mg a,.wm .rail li a,.wm .tip a,.wm .finding a,.wm .status a,.wm .psg .rows a,.wm .sec > header .t2 a,.wm .tbl tr.bnd a,.wm .guide .msg .text a{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--link) 55%,transparent);text-underline-offset:3px}
+.wm .crumbs a:hover,.wm .empty-state a:hover,.wm .cap a:hover,.wm .lead a:hover,.wm .det dd a:hover,.wm .facts dd a:hover,.wm .banner .txt a:hover,.wm .legend a:hover,.wm .st a:hover,.wm .mg a:hover,.wm .rail li a:hover,.wm .tip a:hover,.wm .finding a:hover,.wm .status a:hover,.wm .psg .rows a:hover,.wm .sec > header .t2 a:hover,.wm .tbl tr.bnd a:hover,.wm .guide .msg .text a:hover{text-decoration-color:var(--link)}
 /* Native explanation controls retain the inline glyph styling; tabs use the existing scroll cliff. */
 .wm button.info{font-size:inherit;line-height:inherit;padding:0;border:0;background:none}
 .wm .page-tabs .tab{flex-shrink:0;white-space:nowrap}
@@ -142,9 +142,10 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .aside.guide-dock[hidden]{display:none}
 .wm.page.guide-open{height:100vh;overflow:hidden}
 .wm.page.guide-open .page-row{flex:1 1 auto;min-height:0}
-.wm.page.guide-open .page-row > .page-main{overflow:auto}
+.wm.page.guide-open .page-row > .page-main{overflow:auto;container-type:inline-size;container-name:wm}
 .wm .guide .gh .t3{margin:0;font-size:inherit;font-weight:inherit}
-.wm .guide .gh .model{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wm .guide .gh .model{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wm .guide .gh .tools{flex-shrink:0}
 .wm .guide .gh .tool.close{text-decoration:none}
 html.js .wm .guide .guide-nojs{display:none}
 .wm .guide .guide-nojs{margin:0;padding:var(--s3) var(--s4)}
@@ -159,9 +160,11 @@ html.js .wm .guide .guide-nojs{display:none}
 .wm .guide .ask .in{color:var(--text);font:inherit;resize:vertical;box-sizing:border-box}
 .wm .guide .ask .in::placeholder{color:var(--mut)}
 .wm .guide .ask .in:disabled{opacity:.6}
+.wm .guide .budget{flex-wrap:wrap;row-gap:var(--s1);white-space:normal}
 .wm .guide .budget .end{margin-left:auto}
-.wm .bar .btn.guide-toggle:disabled{opacity:.5;cursor:not-allowed}
+.wm .guide .sel-chip[hidden],.wm .guide .btn[hidden]{display:none}
+.wm .bar .btn.guide-toggle:disabled,.wm .guide .btn:disabled{opacity:.5;cursor:not-allowed}
 @media (max-width:959px){
   .wm .aside.guide-dock:not([hidden]){display:flex;position:fixed;inset:0;z-index:40;max-width:none;width:auto}
-  .wm.page.guide-open .page-row > .page-main{overflow:visible}
+  .wm.page.guide-open .page-row > .page-main{overflow:visible;container-type:normal}
 }
