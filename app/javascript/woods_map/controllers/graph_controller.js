@@ -158,6 +158,14 @@ export default class extends Controller {
     }
 
     this.cy?.destroy()
+    // Cytoscape injects a <style> for its container unless an element with this
+    // id exists; the policy (M8) refuses inline style elements, so map.css
+    // carries the rule and an inert marker stands in for the injected sheet.
+    if (!document.getElementById("__________cytoscape_stylesheet")) {
+      const marker = document.createElement("meta")
+      marker.id = "__________cytoscape_stylesheet"
+      document.head.appendChild(marker)
+    }
     this.cy = cytoscape({
       container: this.canvasTarget,
       elements,

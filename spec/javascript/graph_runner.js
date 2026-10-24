@@ -182,7 +182,7 @@ async function failure() {
 const output = (result) => { document.getElementById("result").textContent = JSON.stringify(result) }
 try {
   if (location.hash === "#failure") failure().then(output, (error) => output({ error: String(error && error.stack || error) }))
-  else output(drawing(cytoscape))
+  else output({ ...drawing(cytoscape), injectedStyles: document.querySelectorAll("style#__________cytoscape_stylesheet").length })
 } catch (error) {
   output({ error: String(error && error.stack || error) })
 }

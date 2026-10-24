@@ -199,3 +199,5 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .legend i.gblast{background:var(--panel);border-width:2px}
 .wm .legend i.gblast[data-distance="1"]{border-color:var(--hot)}
 .wm .legend i.gblast[data-distance="2"]{border-color:var(--mod)}
+/* Cytoscape's container rule, which it would otherwise inject as an inline <style> the policy refuses. */
+.wm .__________cytoscape_container{position:relative}

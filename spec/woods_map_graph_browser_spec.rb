@@ -69,6 +69,8 @@ RSpec.describe WoodsMap do
     expect(drawing).to include('drawn' => true, 'nodes' => 300, 'edges' => 1000, 'panelVisible' => true,
                                'fallbackVisible' => false, 'layoutsVisible' => true, 'canvases' => be_positive)
     expect(drawing['ms']).to be_positive.and(be <= drawing['wall'])
+    # The policy (M8) refuses inline <style>: Cytoscape must not inject its container sheet.
+    expect(drawing['injectedStyles']).to eq(0)
     budget = ENV.fetch('WOODS_MAP_GRAPH_BUDGET_MS', nil)
     expect(drawing['ms']).to be < Float(budget) if budget
   end
