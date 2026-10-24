@@ -82,6 +82,13 @@ RSpec.describe 'Impact tabs over a range report', type: :request do
     expect(response.body).to include('Saved report unavailable', 'No saved impact report has this ID')
   end
 
+  it 'answers 404 for a saved report ID the index does not hold' do
+    allow(WoodsMap::ImpactRange).to receive(:saved)
+      .and_return(instance_double(WoodsMap::ImpactRange, state: :missing, message: 'No saved impact report.'))
+    get "/woods/impacts/#{'d' * 64}"
+    expect(response).to have_http_status(:not_found)
+  end
+
   it 'gives the pre-change page a Graph tab tinted by the blast radius' do
     get '/woods/impact', params: { focus: 'User', lens: 'graph' }
     body = doc.at_css('.body[data-controller~="graph"]')

@@ -9,7 +9,7 @@ This note is the v8 pass of B5-Impact-Overview, which was a v5 draft and is not 
 A range page shows Woods' schema 1 report from `WoodsMap::ImpactRange`. Three URLs reach it:
 
 - `/woods/impact?from=gen:N&to=now`, through `Woods::Impact::Report.compare`;
-- `/woods/impacts/<sha256>`, a saved report read through `Woods::Impact::Store#read` (E-6);
+- `/woods/impacts/<sha256>`, a saved report read through `Woods::Impact::Store#read` (E-6); an ID the index does not hold answers 404 with the selectors and Woods' reason;
 - either of the above with a `lens` and a `focus`.
 
 The frame is the B8 Impact frame:

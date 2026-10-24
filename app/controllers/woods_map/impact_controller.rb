@@ -104,7 +104,7 @@ module WoodsMap
         centre = @range_report.graph_centre if @lens == 'graph'
         @graph = graph_for(repository, centre) if centre
       end
-      render :range
+      render :range, status: @saved_id && @report&.state == :missing ? :not_found : :ok
     end
   end
 end
