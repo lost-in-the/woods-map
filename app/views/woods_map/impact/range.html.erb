@@ -1,6 +1,6 @@
 <% content_for :title, 'Impact range · Woods Map' %>
 <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
-<%= render 'woods_map/impact/frame', title: 'Impact range', subtitle: 'retained generation evidence', crumb: 'range' %>
+<%= render 'woods_map/impact/frame', title: 'Impact range', subtitle: 'retained generation evidence', crumb: 'range', controls: render('woods_map/shared/share', note: impact_share_note) %>
 <div class="body">
   <div class="main" style="margin-left:var(--s5)">
     <section class="sec" aria-labelledby="range-selectors">

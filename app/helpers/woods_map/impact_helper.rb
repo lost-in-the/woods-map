@@ -3,6 +3,15 @@
 module WoodsMap
   # Escaped, structured evidence from the range report, retaining nested context.
   module ImpactHelper
+    # What the impact Share menu cannot offer yet (E-7): the report formats are
+    # Woods' (D-1), and handing them through is an open decision.
+    #
+    # @return [String]
+    def impact_share_note
+      'Markdown and JSON reports come from Woods\' renderers (D-1); whether this menu may hand them through ' \
+        'unchanged is open in woods-map#57.'
+    end
+
     # @param value [Object] string-keyed JSON value supplied by Woods
     # @return [ActiveSupport::SafeBuffer] nested facts, including explicit nulls
     def impact_evidence(value)

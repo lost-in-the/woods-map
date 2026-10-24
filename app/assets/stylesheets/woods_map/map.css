@@ -60,3 +60,15 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .keyboard-help section{margin-top:var(--s5)}
 .wm .keyboard-help dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--s2) var(--s4)}
 .wm .keyboard-help dd{margin:0;overflow-wrap:anywhere}
+/* The Share menu (E-6, E-7): a disclosure under its button; right-aligned with the controls, left-aligned when they
+   wrap below 960. */
+.wm .share{position:relative}
+.wm .share > summary{list-style:none}
+.wm .share > summary::-webkit-details-marker{display:none}
+.wm .share-panel{position:absolute;right:0;top:calc(100% + var(--s2));z-index:4;width:min(380px,calc(100cqw - 2 * var(--s5)));box-sizing:border-box;padding:var(--s3) var(--s4);background:var(--panel);border:1px solid var(--rule2);border-radius:var(--r-ctl);box-shadow:0 2px 8px rgba(0,0,0,.35);display:grid;gap:var(--s2);color:var(--text);font-size:var(--fs-12)}
+.wm .share-panel .sh-row,.wm .share-panel .sh-dia{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);align-items:center}
+.wm .share-panel .sh-row .tool{margin-left:auto}
+.wm .share-panel .sh-dia[hidden]{display:none}
+.wm .share-panel .sh-url{font-family:var(--ff-data);font-size:var(--fs-11);overflow-wrap:anywhere;user-select:all}
+.wm .share-panel .sh-note{margin:0;color:var(--mut)}
+@container wm (max-width:959px){ .wm .share-panel{right:auto;left:0} }
