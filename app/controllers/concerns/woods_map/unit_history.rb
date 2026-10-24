@@ -6,6 +6,7 @@ module WoodsMap
   # report between two retained generations (B-14).
   module UnitHistory
     extend ActiveSupport::Concern
+    include AuthorFilter
 
     included do
       # A unit diff runs Woods' report over two retained generations: the impact budget.
@@ -18,7 +19,7 @@ module WoodsMap
       with_unit do
         @history = WoodsMap::HistoryView.new(@repository, @unit, range: params[:range], week: params[:week],
                                                                  all: params[:all] == '1', by: params[:by],
-                                                                 gen: params[:gen])
+                                                                 gen: params[:gen], author: author_param)
         next render_history_mermaid if mermaid_request?
 
         @diff = WoodsMap::UnitDiff.for(@repository, @unit, from: params[:from], to: params[:to])

@@ -67,7 +67,7 @@
         <div class="pad1"><span class="seg" role="group" aria-label="Layout"><% (%w[butterfly radial] + (clusters.any? ? %w[clusters] : [])).each do |mode| %><button type="button" aria-pressed="<%= mode == 'butterfly' %>" data-layout="<%= mode %>" data-graph-target="layout" data-action="graph#layout"><%= mode %></button><% end %></span></div>
         <p class="cap padx">Positions you drag are kept per generation in this browser. <button class="tool" type="button" data-action="graph#forget">reset positions</button></p>
       </div>
-      <% if flows %><% if params[:flow].present? %><input type="hidden" name="flow" value="<%= params[:flow] %>"><% end %><%= render 'woods_map/graphs/flows_rail', flows: flows, flow: flow, link: flow_link %><% end %>
+      <% if timeline&.author %><input type="hidden" name="author" value="<%= timeline.author %>"><% end %><% if flows %><% if params[:flow].present? %><input type="hidden" name="flow" value="<%= params[:flow] %>"><% end %><%= render 'woods_map/graphs/flows_rail', flows: flows, flow: flow, link: flow_link %><% end %>
       <%= local_assigns[:rail_extra] %>
     </form>
   </nav>

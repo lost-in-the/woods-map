@@ -25,11 +25,13 @@ module WoodsMap
     # @param selection [Array<String>, String, nil] `type:identifier` or a bare identifier
     # @param days [Integer]
     # @param now [Time]
-    def initialize(repository, selection, days: 365, now: Time.now.utc)
+    # @param author [String, nil] only commits whose author, as git recorded it, is exactly this
+    def initialize(repository, selection, days: 365, now: Time.now.utc, author: nil)
       @repository = repository
       @table = repository.git_commits
       @days = days
       @now = now
+      @author = author.to_s.presence
       @lanes, @unknown = resolve(Array(selection).grep(String).first(MAX_LANES))
     end
 
@@ -39,6 +41,8 @@ module WoodsMap
     attr_reader :unknown
     # @return [Integer]
     attr_reader :days
+    # @return [String, nil] the author the events are narrowed to (woods-map#92)
+    attr_reader :author
 
     # @return [Boolean] whether there is a commit table to draw from
     def table?
@@ -48,21 +52,18 @@ module WoodsMap
     # @return [Boolean] whether no unit was selected
     delegate :empty?, to: :@lanes
 
-    # Commits that touched any selected unit inside the window, newest first.
+    # Commits that touched any selected unit inside the window, newest first,
+    # by {#author} when one is set.
     #
     # @return [Array<Event>]
     def events
-      return [] unless table?
+      @events ||= (@author ? window_events.select { |event| event.author == @author } : window_events)
+                  .first(EVENT_LIMIT)
+    end
 
-      @events ||= begin
-        cutoff = @now - (@days * 86_400)
-        @table.commits_for(*@lanes.flat_map(&:paths)).filter_map do |row|
-          time = parse(row['date'])
-          next unless time && time >= cutoff
-
-          event(row)
-        end.first(EVENT_LIMIT)
-      end
+    # @return [Array<String>] the window's authors, most commits first
+    def authors
+      window_events.group_by(&:author).sort_by { |name, list| [-list.size, name.to_s] }.map(&:first).compact
     end
 
     # Lane pairs that changed together, most shared commits first.
@@ -114,6 +115,20 @@ module WoodsMap
     end
 
     private
+
+    def window_events
+      return [] unless table?
+
+      @window_events ||= begin
+        cutoff = @now - (@days * 86_400)
+        @table.commits_for(*@lanes.flat_map(&:paths)).filter_map do |row|
+          time = parse(row['date'])
+          next unless time && time >= cutoff
+
+          event(row)
+        end
+      end
+    end
 
     def resolve(selection)
       lanes = []

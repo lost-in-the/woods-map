@@ -377,3 +377,8 @@ html.no-js .wm .amb-pop[hidden]{display:block}
 .wm .trail-lanes tr.bnd td{border-top:2px dashed var(--rule2)}
 .wm .trail-limits{margin:var(--s2) var(--s4);padding-left:var(--s5)}
 .wm .ident .t1{overflow-wrap:anywhere;min-width:0}
+
+/* Author names (D-17) inside a table cell clip once, at the cell, and an
+   author that filters the timeline (woods-map#92) is a link, not a tooltip. */
+.wm .tbl td .who{max-width:100%}
+.wm a.who{cursor:pointer}
