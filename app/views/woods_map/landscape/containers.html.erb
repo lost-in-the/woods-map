@@ -47,9 +47,7 @@
     <% if l.attributed? %>
       <section class="sec">
         <%= render 'woods_map/components/diagram', title: 'Container diagram', facts: ["#{l.containers.size} containers", "#{l.relationships.size} relationships"],
-              tools: safe_join([tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: @export.mermaid, action: 'copy#copy', needs_js: true }),
-                                link_to('⤓ .mmd', woods_map.landscape_mmd_path, class: 'tool', type: 'text/plain', rel: 'alternate', data: { mermaid_url: woods_map.landscape_mmd_path })]),
-              mermaid: @export.mermaid, label: "C4 container diagram of #{l.system_name}: #{l.containers.size} containers and #{l.externals.size} external systems; the relationships table below has every arrow",
+              mermaid: @export.mermaid, name: "#{l.system_name} containers", mermaid_url: woods_map.landscape_mmd_path, label: "C4 container diagram of #{l.system_name}: #{l.containers.size} containers and #{l.externals.size} external systems; the relationships table below has every arrow",
               legend: [[tag.span('[ ]', class: 'ar'), 'container'], [tag.span('( )', class: 'ar'), 'data store'], [tag.span('[[ ]]', class: 'ar'), 'external system']],
               provenance: ['metadata.container', 'BehavioralProfile', "gen #{@repository.generation_number}"] %>
       </section>
