@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-// The Passage's filter matrix (B14): one toggle narrows the rows to the
+// The Passage's filter matrix: one toggle narrows the rows to the
 // filters that run on this page's action (a ✓ in its column) and back; the
 // status line says how many rows are shown. Without JavaScript every row shows.
 export default class extends Controller {

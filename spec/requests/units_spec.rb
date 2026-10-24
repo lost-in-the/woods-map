@@ -212,7 +212,7 @@ RSpec.describe 'Unit pages', type: :request do
     expect(response.body).to include('No model named Nope')
   end
 
-  it 'names the file tree and the current file in the sheet without carrying the tree (M10)' do
+  it 'names the file tree and the current file in the sheet without carrying the tree' do
     get '/woods/units/model/User'
     tree = html_response_document.at_css('.sheet [data-sheet-target=tree]')
     expect(tree.to_h).to include('data-src' => '/woods/tree?gen=1', 'data-current' => 'app/models/user.rb')

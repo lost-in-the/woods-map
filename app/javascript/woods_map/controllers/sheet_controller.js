@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 // ☰ at the top left (and *files* in the crumbs) opens a sheet: below 960 the
 // primary nav first, then files, then this page's sections. The file tree is
-// fetched the first time the sheet opens (M10), from a URL that names the
+// fetched the first time the sheet opens, from a URL that names the
 // generation, and the page's own file is marked current there. The sheet
 // borrows the page's nav.rail and gives it back on close, so there is one
 // copy. Escape or a tap outside closes.

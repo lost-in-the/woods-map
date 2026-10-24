@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module WoodsMap
-  # The file tree's rows for the tree component (C3, D-18, M10).
+  # The file tree's rows for the tree component (C3, D-18), fetched by the sheet on first open.
   module TreeHelper
     # Folders above +open_below+ start open; the rest start folded, and every
     # row under a folded folder is hidden, so ▸ never sits above visible
