@@ -5,7 +5,7 @@
 .wm{
   /* surfaces */
   --bg:#222126; --panel:#1B1A1F; --ground2:#28272D; --sheet:#222126;
-  --stripe:rgba(252,252,253,.035); --hover:#3B3942;
+  --stripe:rgba(252,252,253,.035); --hover:#2A292F; /* faint, so every role keeps 4.5:1 on a hovered row; the --rule2 outline is the cue (woods-map#49) */
   /* text */
   --bright:#FCFCFD; --text:#E5E8EB; --mut:#9BA5B0; --dim:#86919E; /* gray, lifted from #6E7987 so 12px de-emphasis text reaches AA on every surface (woods-map#27) */
   /* rules */
@@ -37,7 +37,7 @@
 }
 .wm[data-theme=light]{
   --bg:#FCFCFD; --panel:#F4F5F7; --ground2:#EEF0F2; --sheet:#FFFFFF;
-  --stripe:rgba(20,19,23,.035); --hover:#E5E8EB;
+  --stripe:rgba(20,19,23,.035); --hover:#EEF0F2;
   --bright:#141317; --text:#222126; --mut:#5C6675; --dim:#646E7B; /* darkened from #6E7987 for AA on ground2 (woods-map#27) */
   --rule:#E5E8EB; --rule2:#C9CDD3;
   --select:#7E4384; --select-tint:rgba(126,67,132,.08);
@@ -107,7 +107,7 @@
 .wm .seg{display:inline-flex;border:1px solid var(--rule2);border-radius:var(--r-ctl);overflow:hidden}
 .wm .seg button{font-size:var(--fs-12);height:28px;padding:0 var(--s3);background:var(--ground2);border:0;color:var(--mut);cursor:pointer;border-right:1px solid var(--rule2)}
 .wm .seg button:last-child{border-right:0}
-.wm .seg button[aria-pressed=true]{background:var(--hover);color:var(--bright);font-weight:500;box-shadow:inset 0 -2px 0 var(--select)}
+.wm .seg button[aria-pressed=true]{background:var(--rule);color:var(--bright);font-weight:500;box-shadow:inset 0 -2px 0 var(--select)}
 .wm .tabs{display:flex;gap:var(--s1);border-bottom:1px solid var(--rule)}
 .wm .tab{font-size:var(--fs-13);padding:0 var(--s4);height:36px;color:var(--mut);background:none;border:0;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-1px;display:inline-flex;gap:var(--s3);align-items:center}
 .wm .tab[aria-selected=true]{color:var(--bright);border-bottom-color:var(--select)}
@@ -133,6 +133,7 @@
 .wm .tbl th:last-child,.wm .tbl td:last-child{border-right:0}
 .wm .tbl tbody tr:nth-child(even) td{background:var(--stripe)}
 .wm .tbl tbody tr:hover td{background:var(--hover)}
+.wm .tbl tbody tr:hover{outline:1px solid var(--rule2);outline-offset:-1px}
 .wm .tbl td.id,.wm .tbl td.id a{font-weight:600}
 .wm .tbl td.id.p{font-weight:600;font-family:var(--ff-ui);font-size:var(--fs-13)}
 .wm .tbl td.id{color:var(--bright)}
@@ -170,6 +171,7 @@
 .wm .stpt td{padding:var(--s2) var(--s4);border-bottom:1px solid var(--rule);vertical-align:top}
 .wm .stpt td.n{width:28px;color:var(--mut);text-align:right;padding-right:var(--s3);border-right:1px solid var(--rule);font-variant-numeric:tabular-nums}
 .wm .stpt tr:hover td{background:var(--hover)}
+.wm .stpt tr:not(.bnd):hover{outline:1px solid var(--rule2);outline-offset:-1px}
 .wm .stpt tr.bnd td{padding:var(--s1) var(--s4);color:var(--dim);font-family:var(--ff-ui);font-size:var(--fs-11);letter-spacing:.06em;text-transform:uppercase;border-top:2px solid var(--rule2);border-bottom:0}
 .wm .stpt tr.bnd:hover td{background:none}
 .wm .stpt tr:last-child td{border-bottom:0}
@@ -187,7 +189,7 @@
 .wm .rail .grp .cnt{margin-left:auto}
 .wm .rail ol{list-style:none;margin:0;padding:0}
 .wm .rail li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:0 var(--s3);padding:var(--s2) var(--s5);color:var(--text);line-height:1.45}
-.wm .rail li:hover{background:var(--hover)}
+.wm .rail li:hover{background:var(--hover);outline:1px solid var(--rule2);outline-offset:-1px}
 .wm .rail li .k{color:var(--dim);text-align:right}
 .wm .rail li[aria-current=true]{box-shadow:inset 3px 0 0 var(--select);background:var(--select-tint);color:var(--bright)}
 .wm .rail li .own{color:var(--dim);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -205,6 +207,7 @@
 .wm .tree .f[aria-current=true]{background:var(--select-tint);box-shadow:inset 3px 0 0 var(--select);color:var(--bright)}
 .wm .tree .f.unindexed{color:var(--dim)}
 .wm .tree .f:hover,.wm .tree .d:hover{background:var(--hover)}
+.wm .tree .f:hover:not(:focus-visible),.wm .tree .d:hover:not(:focus-visible){outline:1px solid var(--rule2);outline-offset:-1px}
 .wm .tree.strip{width:28px;flex-basis:28px}
 .wm .tree.strip > *{display:none}
 .wm .tree.strip .th{display:flex;writing-mode:vertical-rl;border:0;padding:var(--s3) var(--s2)}
@@ -487,7 +490,7 @@
 .wm .tool[data-copied]{color:var(--fresh)}
 .wm .seg a{display:inline-block;font-size:var(--fs-12);line-height:28px;padding:0 var(--s3);background:var(--ground2);color:var(--mut);border-right:1px solid var(--rule2);text-decoration:none}
 .wm .seg a:last-child{border-right:0}
-.wm .seg a[aria-current]{background:var(--hover);color:var(--bright);font-weight:500;box-shadow:inset 0 -2px 0 var(--select)}
+.wm .seg a[aria-current]{background:var(--rule);color:var(--bright);font-weight:500;box-shadow:inset 0 -2px 0 var(--select)}
 .wm .tab{white-space:nowrap}
 .wm .bar .bar-search{min-width:0}
 .wm .bar .bar-search input.q{flex:1;min-width:0;width:100%;border:0;background:none;color:var(--text);font:inherit;padding:0;outline:none}
@@ -502,6 +505,10 @@
 .wm .palette-wrap[hidden]{display:none}
 .wm .palette a.hit{text-decoration:none}
 .wm .palette a.hit:hover{background:var(--hover);text-decoration:none}
+.wm .palette a.hit:hover:not(:focus-visible){outline:1px solid var(--rule2);outline-offset:-1px}
+/* de-emphasis text lifts to --mut on a hovered or selected row, where --dim misses 4.5:1 (woods-map#49) */
+.wm .tbl tbody tr:hover,.wm .stpt tr:hover,.wm .rail li:hover,.wm .tree .f:hover,.wm .tree .d:hover,.wm .palette a.hit:hover,
+.wm .rail li[aria-current=true],.wm .tree .f[aria-current=true],.wm .palette .hit[aria-selected=true]{--dim:var(--mut)}
 .wm .cv .row:target .ln{box-shadow:inset 3px 0 0 var(--select)}
 .wm .cv .row:target > div{background:var(--select-tint)}
 .wm .cv .src a{border-bottom-color:var(--rule2)}
