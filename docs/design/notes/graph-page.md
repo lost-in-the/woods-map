@@ -63,13 +63,10 @@ is in `try`/`catch`; without storage the page draws the same and keeps nothing.
 
 ## Not built
 
-**Domain clusters.** The index publishes no clusters:
-
-- `GraphAnalyzer#domain_clusters` runs only behind the MCP tool;
-- `package` is empty without Packwerk.
-
-The rail says clusters are not available and links woods#799; the page draws none.
-It does not derive clusters from namespaces itself.
+**Domain clusters** need a generation from a Woods that publishes them (woods#799).
+With them, `group=clusters` and a *clusters* layout box each cluster's drawn members
+(see [landscape.md](landscape.md)). Without them, the rail links woods#799 and the page
+draws none. It never derives clusters from namespaces itself.
 
 **Flow overlay (A-4) and timeline (A-6).** Both need the flow index (W-13) and the
 History work (M4). They stay on #7.

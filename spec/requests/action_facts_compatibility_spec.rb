@@ -77,4 +77,41 @@ RSpec.describe 'Action facts coverage pages', type: :request do
     get '/woods/impact', params: { focus: 'WidgetsController', lens: 'unknown' }
     expect(response.body).to include('dynamic render', 'render params[:template]', 'unresolved partial')
   end
+
+  def serve_b18_flags
+    model = { 'identifier' => 'Widget', 'type' => 'model', 'file_path' => 'app/models/widget.rb', 'dependencies' => [],
+              'metadata' => { 'column_names' => %w[id name], 'attribute_writers' => %w[id name] } }
+    entry = action_entry(renders: [{ 'template' => 'widgets/show' }])
+    entry['params'] = [{ 'key' => 'widget', 'permitted' => true, 'via' => 'widget_params', 'method' => 'show' }]
+    owner = action_owner(facts: { 'show' => entry })
+    owner['metadata']['permitted_params'] = { 'widget_params' => { 'model' => 'widget',
+                                                                   'permitted' => %w[name nickname] } }
+    page = action_template
+    page['metadata']['partial_renders'] = [{ 'partial' => 'widgets/card', 'target' => 'widgets/_card.html.erb',
+                                             'locals' => %w[widget size], 'dynamic_locals' => false, 'line' => 3 }]
+    page['dependencies'] = [{ 'via' => 'render', 'target' => 'widgets/_card.html.erb' }]
+    card = action_template(identifier: 'widgets/_card.html.erb')
+    card['metadata'].merge!('locals_read' => ['widget'], 'locals_read_dynamic' => false, 'partial_renders' => [])
+    serve_actions(owner, [page, card, model])
+  end
+
+  it 'raises the permitted-param and partial-local flags from published writers and locals (B-18)' do
+    serve_b18_flags
+    get '/woods/units/controller/WidgetsController/passage?action_name=show'
+    expect(response.body).to include('Flags 2', 'no attribute: <span class="iv bad">nickname</span>',
+                                     '<span class="iv bad">nickname</span> is permitted for',
+                                     '<span class="iv bad">size</span> is passed to',
+                                     'reads <span class="iv">widget</span>')
+    expect(response.body).not_to include('Unverified, not flagged', 'Partial locals are not checked', 'woods#797')
+  end
+
+  it 'raises the permitted-param flag only on actions that read the params method' do
+    repository = serve_b18_flags
+    get '/woods/units/controller/WidgetsController/passage?action_name=show'
+    expect(response.body).to include('is permitted for')
+    repository.unit('WidgetsController', type: 'controller')['metadata']['action_facts']['show']['params'] = []
+    get '/woods/units/controller/WidgetsController/passage?action_name=show'
+    expect(response.body).not_to include('is permitted for', 'no attribute: <span class="iv bad">')
+    expect(response.body).to include('no attribute: <span class="iv">nickname</span>')
+  end
 end
