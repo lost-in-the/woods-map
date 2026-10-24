@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Unit and file pages whose identifier or path ends in a registered extension (`config/database.yml`, `en.yml`, a `.json` or `.js` file) no longer answer 500 to a request without an Accept header (curl, crawlers, the testbed smoke). Rails took the format from the extension despite `format: false`; such requests now render HTML.
 - M7 guide (woods-map#9, FR-8). `config.guide_enabled` (off by default) docks a guide panel beside every framed page (B8-Guide). The panel is a RubyLLM 2.1 agent over the Woods Index MCP server: stdio to `woods-mcp` (D-7) or a deployed `woods-mcp-http`, with the twelve read-only tools only.
   - Eight page-aware actions, as overridable prompt templates, plus free questions, seeded with a server-built context: generation, unit, selected lines, action, impact focus or range.
   - Answers stream over server-sent events, with tool cards as calls start and end, and finish as Markdown rendered with links only to known identifiers.

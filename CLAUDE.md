@@ -79,6 +79,7 @@ docs/design/                     # design study, decisions, boards, foundations,
 
 ## Gotchas
 
+- Unit and file routes declare `format: false`, yet without an Accept header Rails reads the format from the path's extension (`config/database.yml` → YAML). `PathExtensionFormat` answers HTML for such requests; a request with an Accept header is negotiated normally.
 - `Woods::MCP::IndexReader#search` answers with symbol keys and rows of identifier, type and match_field only; `Repository#search` stringifies the keys and adds `file_path` from the graph nodes. Read search results through the repository.
 - Freshness is `Woods::SourceInputs::Status` over the index root (`PublishedIndex#index_dir`), never the payload dir; a quick check that finds no changes can still say `unknown` when Woods could not verify the boot boundary, and the bar reports Woods' reasons rather than upgrading the verdict.
 - File navigation uses stable ownership pages through `Repository#file_owners`, matching both `file_path` and `source_paths` across primary nodes and variants. File pages never reconstruct source. `file_owner` is retained for existing source-line links only. A bare identifier alone cannot choose the correct unit type for a file. File-tree caches include the index identity and pinned generation.
