@@ -62,3 +62,12 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .keyboard-help dd{margin:0;overflow-wrap:anywhere}
 /* The current rail item sits on --select-tint, where --dim misses AA in the light theme (4.23:1). */
 .wm .rail li[aria-current=true] .own{color:var(--mut)}
+/* The hover card on a reference (B-3), inside the one tooltip (D-16). */
+.wm .tip .hcard{min-width:220px}
+.wm .hcard .hch{display:flex;gap:var(--s2);align-items:baseline;margin-bottom:var(--s1)}
+.wm .hcard .hch b{font-family:var(--ff-data);overflow-wrap:anywhere}
+.wm .hcard .hch span{color:var(--mut)}
+.wm .hcard dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:2px var(--s3);margin:0;font-family:var(--ff-data);font-size:var(--fs-11)}
+.wm .hcard dt{color:var(--dim)}.wm .hcard dd{margin:0;overflow-wrap:anywhere}
+.wm .hcard .hcf{margin-top:var(--s1);color:var(--mut);font-size:var(--fs-11)}
+.wm .hcard .hcf .lyr{margin:0}
