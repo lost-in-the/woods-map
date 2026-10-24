@@ -98,7 +98,7 @@ non-colour cue or lifts an existing role within its own hue.
 ## Open
 
 - Editor deep links: scheme and checkout path are per-browser settings; never guessed from the index.
-- Server-sent events behind proxies: document Puma and nginx settings; fall back to polling Turbo Frames when the stream cannot open.
+- Server-sent events behind proxies: document Puma and nginx settings; fall back to polling Turbo Frames when the stream cannot open. The known settings are in [DEPLOYMENT.md](../DEPLOYMENT.md#8-streaming-the-m7-guide-behind-proxies); M7 verifies them.
 - Reference span size (F-3) must be measured on `woods-testbed` `rails-8.0-large` before M0 closes.
 - Boundary-row labels in flow tables (`⇒ async hop, new process: …`) are placeholders; the real label comes from the job or mailer unit named by the flow.
 - The ☰ sheet and tree strip have token and layout rules but no interaction prototype yet; verify with keyboard and screen reader on the testbed before M1 closes.
