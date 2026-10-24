@@ -19,7 +19,8 @@ module WoodsMap
     # @param table [Hash, nil]
     # @return [SchemaView]
     def self.for(repository, unit, table: nil)
-      new(unit, table: table, graph_analysis: repository.graph_analysis, tables: repository.model_tables)
+      new(unit, table: table, graph_analysis: repository.graph_analysis, tables: repository.model_tables,
+                repository: repository)
     end
 
     # @param unit [Hash] a model or database_table unit
@@ -28,8 +29,10 @@ module WoodsMap
     # @param tables [Hash{String => String}] model identifier => its table, from
     #   the graph nodes' `table`, so an association's far side is the table the
     #   model reads rather than a guess from its name
-    def initialize(unit, table: nil, graph_analysis: {}, tables: {})
+    # @param repository [Repository, nil] when given, the ER text comes from Woods' builder (woods#826)
+    def initialize(unit, table: nil, graph_analysis: {}, tables: {}, repository: nil)
       @unit = unit
+      @repository = repository
       @tables = tables
       @metadata = unit['metadata'] || {}
       @table = table
@@ -86,9 +89,17 @@ module WoodsMap
 
     # Mermaid erDiagram text for this table and one hop of associations. The
     # table is declared first, so a model without associations still draws.
+    # Woods' own builder draws it when the loaded Woods has one (woods#826).
     #
     # @return [String]
     def mermaid
+      WoodsDiagrams.schema(@repository, @unit) || local_mermaid
+    end
+
+    # The map's own ER text, for a Woods without the diagram builders.
+    #
+    # @return [String]
+    def local_mermaid
       lines = ['erDiagram']
       lines << "  #{entity(table_name)}" if table_name.present?
       er_associations.each do |a|
@@ -163,14 +174,9 @@ module WoodsMap
 
     def finding_for(assoc)
       return 'polymorphic, no FK' if assoc['polymorphic']
-      if assoc.dig('options', 'dependent').to_s.start_with?(
-        'destroy', 'delete'
-      )
-        return "delete radius: dependent #{assoc.dig('options',
-                                                     'dependent')}"
-      end
 
-      nil
+      dependent = assoc.dig('options', 'dependent').to_s
+      "delete radius: dependent #{dependent}" if dependent.start_with?('destroy', 'delete')
     end
 
     def index_for(column)

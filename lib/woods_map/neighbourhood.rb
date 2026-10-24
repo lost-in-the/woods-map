@@ -111,24 +111,31 @@ module WoodsMap
       "#{node_count} units is over the flowchart budget of #{NODE_BUDGET}; narrow the types or mechanisms to draw it"
     end
 
-    # Mermaid flowchart text for the filtered edges: each unit declared once
-    # with its label, the centre first, then the edges by id; the centre
-    # carries the `focus` class, which the text declares.
+    # Mermaid flowchart text for the filtered edges: Woods' own builder when
+    # the loaded Woods has it (woods#826), the same bytes as {#local_mermaid}.
     #
     # @return [String]
     def mermaid
-      @mermaid ||= mermaid_text
+      @mermaid ||= WoodsDiagrams.text(@repository, kind: 'neighbourhood', identifier: @focus.first, type: @focus.last,
+                                                   depth: @depth, direction: @direction, types: @types, via: @via) ||
+                   local_mermaid
     end
 
-    private
-
-    def mermaid_text
+    # The map's own flowchart text: each unit declared once with its label,
+    # the centre first, then the edges by id; the centre carries the `focus`
+    # class, which the text declares.
+    #
+    # @return [String]
+    def local_mermaid
       lines = ['flowchart LR'] + mermaid_nodes.map { |node| "  #{mermaid_node(*node)}" }
       edges.each do |edge|
-        lines << "  #{node_id(edge.from, edge.from_type)} -->|#{edge.via}| #{node_id(edge.to, edge.to_type)}"
+        arrow = edge.via.to_s.empty? ? '-->' : "-->|#{edge.via}|"
+        lines << "  #{node_id(edge.from, edge.from_type)} #{arrow} #{node_id(edge.to, edge.to_type)}"
       end
       (lines + ['  classDef focus stroke-width:3px', "  class #{node_id(*@focus)} focus"]).join("\n")
     end
+
+    private
 
     def node_id(identifier, type)
       (@node_ids ||= {})[[identifier, type]] ||= "n_#{Digest::SHA256.hexdigest([type, identifier].to_json)[0, 16]}"

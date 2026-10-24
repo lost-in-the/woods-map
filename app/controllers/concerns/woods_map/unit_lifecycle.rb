@@ -11,7 +11,7 @@ module WoodsMap
 
     def lifecycle_for(unit, dynamic: nil)
       WoodsMap::Lifecycle.new(unit, concern_methods: concern_methods(unit), dynamic: dynamic,
-                                    changed: current_since&.changed_members(unit))
+                                    changed: current_since&.changed_members(unit), repository: @repository)
     end
 
     # concern name => the instance methods it defines, for each concern the unit inlines
