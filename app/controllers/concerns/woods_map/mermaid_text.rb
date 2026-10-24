@@ -23,8 +23,8 @@ module WoodsMap
     def render_mermaid(text, name:, refusal: nil, page: nil)
       generation_header
       if refusal
-        return render_text(:unprocessable_entity,
-                           "#{refusal}. No diagram is drawn above the budget.#{" The page lists every one: #{page}" if page}")
+        listed = " The page lists every one: #{page}" if page
+        return render_text(:unprocessable_entity, "#{refusal}. No diagram is drawn above the budget.#{listed}")
       end
 
       response.headers['Content-Disposition'] =

@@ -200,7 +200,7 @@ module WoodsMap
     def refusal(event, view: 'sequence')
       return nil unless over_budget?(event, view: view)
 
-      sequence = !%w[flowchart lanes].include?(view)
+      sequence = %w[flowchart lanes].exclude?(view)
       "#{size(view, event)} #{sequence ? 'participants and messages' : 'nodes'} is over the " \
         "#{sequence ? 'sequence' : 'flowchart'} budget of #{budget(view)}"
     end

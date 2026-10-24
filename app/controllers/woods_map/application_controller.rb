@@ -26,7 +26,7 @@ module WoodsMap
     before_action :exchange_query_token!
     before_action :authenticate!
 
-    helper_method :woods_map_config, :current_repository, :woods_map
+    helper_method :woods_map_config, :current_repository, :woods_map, :primary_nav
 
     rescue_from WoodsMap::Repository::Unavailable, with: :render_unavailable
 
@@ -39,6 +39,16 @@ module WoodsMap
     # @return [ApplicationController] route helpers in this request's context
     def woods_map
       self
+    end
+
+    # The global bar's pages that exist, in the order the boards give them
+    # (coverage.md: Units, Landscape, Graph, ERD, Impact, History).
+    #
+    # @param current [String, nil] the label of the page being shown
+    # @return [Array<Array(String, String, Boolean)>] label, href, current?
+    def primary_nav(current = nil)
+      [['Units', woods_map.units_path], ['ERD', woods_map.erd_path], ['Impact', woods_map.impact_path]]
+        .map { |label, href| [label, href, label == current] }
     end
 
     # @return [WoodsMap::Configuration]

@@ -44,7 +44,7 @@ opens the file tree.
 | Landscape Hotspots | Quadrant, coupling matrix, sankey, treemap, structural risk | design study §7 | [B6-Overview](boards/B6-Overview.html) | final |
 | Landscape Domains | Domain clusters | design study §7 | — | **none** |
 | `/woods/graph` | Full-screen graph, domain clusters, list equivalent, flow overlay | FR-5, A-3 to A-6 | B5-Graph (tab only) | **none** for the page |
-| `/woods/erd` | Whole database by chunk, findings | FR-6 | [B6-ERD](boards/B6-ERD.html) | final |
+| `/woods/erd` | Whole database by chunk, findings | FR-6 | [B6-ERD](boards/B6-ERD.html) | final; the engine cuts chunks at the ER budget of 40 tables (R-4), not the board's ~15, lists relations to other chunks instead of drawing their far table, and leaves out the board's commits column and polymorphic candidates (W-23) |
 | `/woods/history` | Cross-unit timeline for a selected set, commit → node | FR-7, A-6 | — | **none** |
 | `/woods/impact` Overview | The PR comment, rendered | E-7 | B5-Impact-Overview | v5 |
 | Impact Changed | Units as subdivided rows, focus detail, diff | E-2, E-6 | [B8-Impact-Changed](boards/B8-Impact-Changed.html) | final |
@@ -55,7 +55,7 @@ opens the file tree.
 | Impact Unknown | Unknowns and what each layer proves | E-4, E-10 | [B8-Impact-Unknown](boards/B8-Impact-Unknown.html) | final |
 | `?since=` on any view | Changed lines, nodes, steps, columns highlighted | E-8 | [B8-States](boards/B8-States.html) (degraded), tree M badges | partial |
 | pre-change mode | Blast radius from a unit or method, no range | E-9 | — | **none** (the impact frame with a focus title; the engine renders it that way from the Changed, Risks, Tests and Unknown boards) |
-| Share menu | Focus URL, Markdown, JSON, Mermaid | E-6, E-7 | buttons only | partial; every diagram panel, the passage and the impact paths copy their Mermaid text and download it as `.mmd` (woods-map#5); Structurizr DSL and LikeC4 need W-9 |
+| Share menu | Focus URL, Markdown, JSON, Mermaid | E-6, E-7 | buttons only | partial; D-25 narrows it to the focus URL and Mermaid. Every diagram panel, the passage and the impact paths copy their Mermaid text and link its `.mmd` URL, served as `text/plain` ([note](notes/mermaid-text-urls.md)). Structurizr DSL and LikeC4 need W-9 |
 | Trail board | Pinned units, lanes, flags, board state, export | C-1 to C-5 | — | **none** (release 0.2, M6) |
 | Guide panel | Context chips, actions, tool cards, streamed answer, budget | FR-8 | [B8-Guide](boards/B8-Guide.html) | final; chat history list not drawn |
 | settings | Editor URL scheme, lens, wrap and font size, per browser | B-15, D-6 | Code toolbar only | partial |

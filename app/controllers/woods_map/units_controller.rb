@@ -7,6 +7,8 @@ module WoodsMap
   # lock covers the whole response; the identifier and the type come from the
   # URL, never a path.
   class UnitsController < ApplicationController
+    include WoodsMap::UnitMermaid
+
     LENS_COOKIE = 'woods_map_lens'
 
     # Every indexed typed identity, including units without a source file.
@@ -18,7 +20,7 @@ module WoodsMap
         @unit_count = @unit_groups.values.sum(&:size)
         @tree = WoodsMap::FileTree.for(repository)
         @freshness = repository.freshness
-        @nav = [['Units', woods_map.units_path, true], ['Impact', woods_map.impact_path, false]]
+        @nav = primary_nav('Units')
         render :index
       end
     end
@@ -98,10 +100,7 @@ module WoodsMap
           direction: params[:direction].to_s, depth: params.fetch(:depth, 1),
           filters: { types: params[:types], via: params[:via] }
         )
-        if mermaid_request?
-          next render_tab_mermaid(@neighbourhood.mermaid, "neighbourhood depth #{@neighbourhood.depth}",
-                                  refusal: @neighbourhood.refusal)
-        end
+        next render_graph_mermaid if mermaid_request?
 
         render :graph
       end
@@ -153,25 +152,6 @@ module WoodsMap
 
     def lens
       cookies[LENS_COOKIE].presence || 'written'
-    end
-
-    # The lifecycle's text for the requested view; a state_machine unit's
-    # lifecycle is its state diagram.
-    def render_lifecycle_mermaid
-      if @page.type == 'state_machine'
-        machine = WoodsMap::StateMachineView.new(@unit)
-        return render_tab_mermaid(machine.mermaid, 'state', refusal: machine.refusal)
-      end
-
-      render_tab_mermaid(@lifecycle.diagram(@view, @event), "lifecycle #{@event} #{@view}",
-                         refusal: @lifecycle.refusal(@event, view: @view))
-    end
-
-    # A tab's Mermaid text; a refused one names the page that lists everything.
-    def render_tab_mermaid(text, what, refusal: nil)
-      page = request.base_url + request.path.delete_suffix('.mmd')
-      page += "?#{request.query_string}" if request.query_string.present?
-      render_mermaid(text, name: "#{@page.identifier} #{what}", refusal: refusal, page: page)
     end
 
     def redirect_to_remembered_lens

@@ -18,6 +18,10 @@ WoodsMap::Engine.routes.draw do
   get 'impact.mmd', to: 'impact#show', as: :impact_mmd, defaults: { mmd: '1' }, format: false
   get 'impact', to: 'impact#show', as: :impact
 
+  # The whole database by chunk (M3, B6-ERD): a chunk number, never a table name or path.
+  get 'erd.mmd', to: 'erd#show', as: :erd_mmd, defaults: { mmd: '1' }, format: false
+  get 'erd(/:chunk)', to: 'erd#show', as: :erd, constraints: { chunk: /[1-9][0-9]{0,5}/ }, format: false
+
   get 'units', to: 'units#index', as: :units
   # File paths are exact admitted file_map keys, never host filesystem paths.
   get 'files', to: 'files#show', format: false

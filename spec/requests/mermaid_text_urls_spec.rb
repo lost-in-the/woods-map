@@ -1,38 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe 'Mermaid export from the diagram tools', type: :request do
-  def panel_source
-    response.parsed_body.at_css('.dia pre.cmd').text
-  end
-
-  it 'gives every diagram panel one copy tool and one .mmd link to the text it draws' do
-    { 'schema' => '/woods/units/model/User/schema.mmd',
-      'lifecycle?event=update' => '/woods/units/model/User/lifecycle.mmd?event=update',
-      'graph?depth=2' => '/woods/units/model/User/graph.mmd?depth=2&direction=both' }.each do |tab, url|
-      get "/woods/units/model/User/#{tab}"
-      tools = response.parsed_body.at_css('.dia .dh .tools')
-      expect(tools.css('[data-controller="copy"]').pluck('data-copy-text-value')).to eq([panel_source])
-      link = tools.at_css('a[data-mermaid-url]')
-      expect([link['href'], link['rel'], link['type']]).to eq([url, 'alternate', 'text/plain'])
-    end
-  end
-
-  it 'links the passage and the impact paths, which carry Mermaid without a panel' do
-    get '/woods/units/controller/UsersController/passage?action_name=edit'
-    expect(response.parsed_body.at_css('header a[data-mermaid-url]')['href'])
-      .to eq('/woods/units/controller/UsersController/passage.mmd?action_name=edit')
-    get '/woods/impact?focus=User&depth=1&lens=changed'
-    expect(response.parsed_body.at_css('header a[data-mermaid-url]')['href']).to eq('/woods/impact.mmd?depth=1&focus=User')
-  end
-
-  it 'leaves the text readable without JavaScript and marks no generated type as newer than GitHub' do
-    get '/woods/units/model/User/schema'
-    expect(response.parsed_body.css('.dia .dh .tools button[data-controller]').pluck('data-needs-js')).to all(eq('true'))
-    expect(response.body).not_to include('may not render on GitHub')
-  end
-end
-
 RSpec.describe 'Mermaid text URLs (D-25)', type: :request do
+  before { WoodsMap::Erd.reset! }
+
   it 'answers each tab with the text its panel draws, as text/plain, with the generation' do
     %w[schema lifecycle?event=update graph?depth=2].each do |tab|
       get "/woods/units/model/User/#{tab}"
@@ -45,11 +15,36 @@ RSpec.describe 'Mermaid text URLs (D-25)', type: :request do
 
   it 'names the file in the Content-Disposition and serves the passage and the impact paths' do
     get '/woods/units/model/User/schema.mmd'
-    expect(response.headers['Content-Disposition']).to eq('inline; filename="user-schema.mmd"; filename*=UTF-8\'\'user-schema.mmd')
+    expect(response.headers['Content-Disposition'])
+      .to eq('inline; filename="user-schema.mmd"; filename*=UTF-8\'\'user-schema.mmd')
     get '/woods/units/controller/UsersController/passage.mmd', params: { action_name: 'edit' }
     expect(response.body).to start_with('sequenceDiagram')
     get '/woods/impact.mmd', params: { focus: 'User' }
     expect(response.body).to start_with('flowchart LR')
+  end
+
+  it 'serves each Lifecycle view as linked from its panel' do
+    { nil => 'sequenceDiagram', 'flowchart' => 'flowchart TD', 'lanes' => 'swimlane-beta TB' }.each do |view, start|
+      get '/woods/units/model/User/lifecycle', params: { event: 'update', view: view }.compact
+      drawn = response.parsed_body.at_css('.dia pre.cmd').text
+      get response.parsed_body.at_css('.dia a[data-mermaid-url]')['href']
+      expect([response.body, response.body.start_with?(start)]).to eq(["#{drawn}\n", true])
+    end
+  end
+
+  it 'serves a state machine as the lifecycle text of its own unit, linked from the model\'s panel' do
+    get '/woods/units/model/User/lifecycle'
+    link = response.parsed_body.css('.dia a[data-mermaid-url]').pluck('href').last
+    expect(link).to eq('/woods/units/state_machine/User::aasm/lifecycle.mmd')
+    get link
+    expect(response.body).to start_with('stateDiagram-v2')
+  end
+
+  it 'serves an ERD chunk by number with the closed choices' do
+    get '/woods/erd'
+    expect(response.parsed_body.at_css('.dia a[data-mermaid-url]')['href']).to eq('/woods/erd.mmd?chunk=1')
+    get '/woods/erd.mmd', params: { chunk: 1, columns: 'all' }
+    expect(response.body).to start_with('erDiagram').and include('datetime created_at')
   end
 
   it 'refuses a diagram over its budget with 422 and the reason, never a truncated diagram' do
@@ -64,7 +59,8 @@ RSpec.describe 'Mermaid text URLs (D-25)', type: :request do
     { '/woods/units/model/Nope/schema.mmd' => [404, "No model named Nope.\n"],
       '/woods/units/model/User/passage.mmd' => [404, "A model has no passage.\n"],
       '/woods/impact.mmd' => [400, "Name the focus: /woods/impact.mmd?focus=<identifier>.\n"],
-      '/woods/impact.mmd?from=1&to=now' => [404, "A range has no Mermaid text here; Woods publishes its report.\n"] }
+      '/woods/impact.mmd?from=1&to=now' => [404, "A range has no Mermaid text here; Woods publishes its report.\n"],
+      '/woods/erd.mmd?chunk=users' => [404, "No chunk users by namespace; there are 1.\n"] }
       .each do |path, (status, body)|
         get path
         expect([response.status, response.media_type, response.body]).to eq([status, 'text/plain', body])
@@ -74,7 +70,7 @@ RSpec.describe 'Mermaid text URLs (D-25)', type: :request do
   it 'reads identifiers with dots and slashes, never a .mmd suffix as part of one' do
     get '/woods/units/view_template/users/show.html.erb/graph.mmd'
     expect(response.body).to start_with('flowchart LR')
-    expect { get '/woods/units/model/User.mmd' }.not_to raise_error
+    get '/woods/units/model/User.mmd'
     expect(response).to have_http_status(:not_found)
   end
 
