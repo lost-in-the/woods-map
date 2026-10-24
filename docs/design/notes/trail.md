@@ -92,4 +92,4 @@ These follow [mermaid-text-urls.md](mermaid-text-urls.md): the same answers, bud
 - Flows are Woods' static flows. Receiverless calls, procs and dynamic dispatch are not resolved.
 - Graph-only hops show no call site.
 - Model events are assembled on demand. Woods precomputes flows for controller actions only.
-- "Explain this investigation" is a guide action (M7, #9) and is not wired here.
+- "Explain this investigation" is the guide's action on this page (M7, #9), offered when the guide is enabled; the guide's answers hand units back with *pin* and *open as investigation* ([M7 note](m7-guide.md)).

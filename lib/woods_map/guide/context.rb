@@ -4,15 +4,20 @@ module WoodsMap
   module Guide
     # The compact context block a page contributes to a question: the
     # generation, the unit's identity and summary facts, the selected lines,
-    # the action or the impact focus. It is rebuilt on the server from the
+    # the units selected on a graph, the action or the impact focus. It is
+    # rebuilt on the server from the
     # pinned generation; what the browser sends only names things, and any
     # name the generation does not know is dropped. Full source is not
     # included: the agent reads it with `lookup` when it needs it.
     class Context
-      PAGES = %i[code unit lifecycle passage impact range].freeze
+      PAGES = %i[code unit lifecycle passage graph trail impact range].freeze
       LINES = /\A(\d{1,6})(?:-(\d{1,6}))?\z/
       SELECTOR = /\A(?:gen:\d{1,9}|now|[0-9a-f]{7,40})\z/
+      # A graph selection names typed units as `type:identifier`.
+      NODE = /\A([a-z0-9_]{1,40}):(.{1,300})\z/
       MAX_FOCUS = 20
+      MAX_NODES = 20
+      GENERATION = /\A[1-9][0-9]{0,8}\z/
 
       # @return [Symbol, nil] the page kind
       attr_reader :page
@@ -26,9 +31,16 @@ module WoodsMap
       attr_reader :focus
       # @return [Array(String, String), nil] range selectors
       attr_reader :range
+      # @return [Array<Array(String, String)>] units selected on a graph, as identifier and type
+      attr_reader :nodes
+      # @return [String, nil] a Trail board's entry (W-5 grammar) whose unit the generation has
+      attr_reader :entry
+      # @return [Array<Array(String, String)>] a Trail board's pins the generation has, as identifier and type
+      attr_reader :pins
 
       # @param repository [WoodsMap::Repository]
-      # @param params [Hash, ActionController::Parameters] page, type, identifier, lines, action_name, focus, from, to
+      # @param params [Hash, ActionController::Parameters] page, type, identifier, lines, action_name, focus,
+      #   nodes, from, to, and a Trail board's entry, pins, gen and hops
       # @return [Context]
       def self.from(repository, params)
         new(repository, params.respond_to?(:to_unsafe_h) ? params.to_unsafe_h : params.to_h)
@@ -44,6 +56,8 @@ module WoodsMap
         @lines = parse_lines(values['lines']) if @unit
         @action_name = values['action_name'].to_s[/\A\w{1,80}\z/] if @unit
         @focus = parse_focus(values['focus'])
+        @nodes = parse_typed(values['nodes'], MAX_NODES)
+        parse_board(values)
         @range = parse_range(values['from'], values['to'])
       end
 
@@ -59,40 +73,45 @@ module WoodsMap
 
       # @return [Array<Array(String, String)>] chips: bold part and plain part
       def chips
-        chips = []
-        chips << [identifier, type.tr('_', ' ')] if @unit
-        chips << [line_label, 'selected'] if @lines
-        chips << [@action_name, 'action'] if @action_name
-        chips << [@focus.first(3).join(', ') + (@focus.size > 3 ? " +#{@focus.size - 3}" : ''), 'focus'] if @focus.any?
-        chips << [@range.join(' → '), 'range'] if @range
-        chips
+        [[identifier, type&.tr('_', ' ')], [line_label, 'selected'], [@action_name, 'action'],
+         [short_list(@focus), 'focus'], [short_list(@nodes.map(&:first)), 'selected'], [@entry, 'entry'],
+         [short_list(@pins.map(&:first)), 'pinned'], [@range&.join(' → '), 'range']].select(&:first)
       end
 
-      # @return [String] one line for the asked turn: "(L61–L62, Post)"
+      # @return [String] one line for the asked turn: "L61–L62, Post" or "Post, 2 graph units"
       def summary
-        [line_label, identifier, @action_name, @focus.first(3).join(', ').presence].compact.join(', ')
+        nodes = "#{@nodes.size} graph #{@nodes.size == 1 ? 'unit' : 'units'}" if @nodes.any?
+        [line_label, identifier, @action_name, @focus.first(3).join(', ').presence, nodes, @entry,
+         ("#{@pins.size} pinned" if @pins.any?)].compact.join(', ')
       end
 
       # @return [String] the block the prompt templates take as {{context}}
       def to_prompt
         facts = @repository.generation_facts
-        lines = ["Page context, Woods generation #{facts['generation']}, HEAD #{facts['git_sha'] || 'unknown'}:"]
-        lines.concat(unit_lines) if @unit
-        lines << "- selected lines: #{line_label} of the unit's source" if @lines
-        lines << "- controller action: #{@action_name}" if @action_name
-        lines << "- impact focus: #{@focus.join(', ')}" if @focus.any?
-        lines << "- range: #{@range.join(' to ')}" if @range
-        lines << '- no unit on this page' if lines.size == 1
-        lines.join("\n")
+        lines = (@unit ? unit_lines : []) + page_lines
+        lines = ['- no unit on this page'] if lines.empty?
+        ["Page context, Woods generation #{facts['generation']}, HEAD #{facts['git_sha'] || 'unknown'}:", *lines]
+          .join("\n")
       end
 
       # @return [Hash] what the turn records
       def to_h
         { 'page' => @page&.to_s, 'type' => type, 'identifier' => identifier, 'lines' => @lines,
-          'action_name' => @action_name, 'focus' => @focus, 'range' => @range, 'summary' => summary }
+          'action_name' => @action_name, 'focus' => @focus, 'nodes' => typed_params(@nodes),
+          'range' => @range, 'summary' => summary }.merge(board_h)
       end
 
       private
+
+      def page_lines
+        [("- selected lines: #{line_label} of the unit's source" if @lines),
+         ("- controller action: #{@action_name}" if @action_name),
+         ("- impact focus: #{@focus.join(', ')}" if @focus.any?),
+         ("- units selected on the graph: #{typed_list(@nodes)}" if @nodes.any?),
+         ("- trail entry: #{@entry}, async hop budget #{@hops}" if @entry),
+         ("- pinned on the trail board: #{typed_list(@pins)}" if @pins.any?),
+         ("- range: #{@range.join(' to ')}" if @range)].compact
+      end
 
       def unit_lines
         page = WoodsMap::UnitPage.new(@repository, @unit)
@@ -108,6 +127,44 @@ module WoodsMap
 
         first, last = @lines
         first == last ? "L#{first}" : "L#{first}–L#{last}"
+      end
+
+      # "A, B, C +2", or nil for none.
+      def short_list(names)
+        names.first(3).join(', ') + (names.size > 3 ? " +#{names.size - 3}" : '') if names.any?
+      end
+
+      def typed_list(units)
+        units.map { |name, kind| "#{name} (#{kind})" }.join(', ')
+      end
+
+      def typed_params(units)
+        units.map { |name, kind| "#{kind}:#{name}" }
+      end
+
+      # Typed units the generation has, in the order given, at most `limit`.
+      def parse_typed(value, limit)
+        names = value.is_a?(Array) ? value : value.to_s.split(',')
+        names.first(limit).filter_map { |name| NODE.match(name.to_s.strip) }.map { |match| [match[2], match[1]] }
+             .uniq.select { |name, kind| @repository.unit(name, type: kind) }
+      end
+
+      # A Trail board (M6): its entry when the generation has the entry's
+      # unit, its pins the generation has, its generation and hop budget.
+      def parse_board(values)
+        entry = values['entry'].to_s
+        match = WoodsMap::TrailBoard::ENTRY.match(entry)
+        @entry = entry if match && @repository.graph_node(match[:unit])
+        @pins = parse_typed(values['pins'], WoodsMap::TrailBoard::MAX_PINS)
+        @board_gen = values['gen'].to_s.match?(GENERATION) ? values['gen'].to_i : nil
+        hops = values['hops'].to_s
+        @hops = hops.match?(/\A[1-3]\z/) ? hops.to_i : WoodsMap::TrailBoard::DEFAULT_HOPS
+      end
+
+      def board_h
+        return {} unless @entry || @pins.any?
+
+        { 'entry' => @entry, 'pins' => typed_params(@pins), 'gen' => @board_gen, 'hops' => @hops }
       end
 
       def find_unit(type, identifier)

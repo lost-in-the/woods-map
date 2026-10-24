@@ -52,11 +52,29 @@ module WoodsMap
       html.html_safe # rubocop:disable Rails/OutputSafety -- Answer escapes every input and emits only its own tags
     end
 
+    # The Trail links a finished answer offers (M6): *pin* to the board this
+    # page shows (else the one it was asked on) and *open as investigation*,
+    # as paths, linked against this page's generation.
+    #
     # @param turn [Hash]
-    # @return [String] "guide, 4 tool calls, 2.8 s"
+    # @return [Hash{String => String}] 'pin' and 'investigation', each when it applies
+    def guide_trail_links(turn)
+      return {} unless current_repository
+
+      answer = WoodsMap::Guide::Answer.new(turn['answer'].to_s, identifiers: current_repository.identifier_index,
+                                                                link: ->(*) { '#' })
+      WoodsMap::Guide::Handoff.links(turn, answer: answer, generation: current_repository.generation_number,
+                                           board: guide_page_values) do |query|
+        woods_map.trail_path(query)
+      end
+    end
+
+    # @param turn [Hash]
+    # @return [String] "guide, 4 tool calls, 2.8 s" or "guide, issue draft, 1 tool call, 2.1 s"
     def guide_who(turn)
       calls = Array(turn['tool_calls']).size
-      ['guide', ("#{calls} tool #{calls == 1 ? 'call' : 'calls'}" if calls.positive?),
+      draft = 'issue draft' if turn['kind'] == 'issue'
+      ['guide', draft, ("#{calls} tool #{calls == 1 ? 'call' : 'calls'}" if calls.positive?),
        ("#{turn['elapsed']} s" if turn['elapsed'])].compact.join(', ')
     end
   end
