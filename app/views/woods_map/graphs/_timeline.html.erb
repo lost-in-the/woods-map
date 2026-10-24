@@ -4,10 +4,15 @@
 <% t = timeline %>
 <section class="sec gtimeline" aria-labelledby="graph-timeline-title">
   <header><h2 class="t2" id="graph-timeline-title">Timeline <%= count_tag(t.table? ? "#{t.total} #{'commit'.pluralize(t.total)}, #{t.touched_units} of the units drawn" : 'no commit table') %><%= info_tip('Commits from this generation\'s commit table (Woods W-3) that touched the file or source paths of a unit drawn here, HEAD-reachable, newest first. Move the window to tint the units its commits touched.') %></h2></header>
+  <% if t.table? && t.author %>
+    <p class="cap" role="status">Only commits by <%= who(t.author) %>, as git recorded the name<%= ': none touched a unit drawn here' if t.commits.empty? %>. <%= link_to('all authors', current_page_url(author: nil)) %></p>
+  <% elsif t.table? && (authors = t.authors).size > 1 %>
+    <p class="cap">by author <%= safe_join(authors.first(8).map { |name| who(name, href: current_page_url(author: name)) }, ', ') %><%= ", and #{authors.size - 8} more in the list below" if authors.size > 8 %></p>
+  <% end %>
   <% if !t.table? %>
     <p class="cap"><%= { absent: 'This generation has no commit table: Woods writes one when it extracts inside a git checkout.', unsupported: 'This Woods has no commit table reader (W-3).', unreadable: 'Woods refused this generation\'s commit table.' }.fetch(t.state, 'No commit table.') %></p>
   <% elsif t.commits.empty? %>
-    <p class="cap">No commit in the table's window touched a unit drawn here.</p>
+    <% unless t.author %><p class="cap">No commit in the table's window touched a unit drawn here.</p><% end %>
   <% else %>
     <div class="scrub" data-graph-target="scrub" hidden>
       <label class="f">from <input type="range" min="0" max="<%= t.commits.size - 1 %>" value="0" step="1" data-graph-target="scrubFrom" data-action="input->graph#scrub" aria-label="Window start, oldest commit first"></label>
@@ -24,7 +29,7 @@
               { data: { commit: position },
                 cells: [date_abbr(c.date),
                         safe_join([tag.code(short_sha(c.sha)), tag.button('tint', class: 'tool', type: 'button', 'aria-label': "Tint the units #{short_sha(c.sha)} touched", data: { action: 'graph#pickCommit', commit: position, needs_js: true })], ' '),
-                        c.message.presence || empty_value, c.author.presence || empty_value,
+                        c.message.presence || empty_value, who(c.author, href: current_page_url(author: c.author)),
                         safe_join(c.units.map { |identifier, type| unit_link(identifier, type) }, ', ')] }
             } %>
     </details>

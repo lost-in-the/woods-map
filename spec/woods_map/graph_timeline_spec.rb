@@ -42,4 +42,14 @@ RSpec.describe WoodsMap::GraphTimeline do
       expect(t.payload).to eq([])
     end
   end
+
+  it 'narrows the commits and the canvas payload to one author (woods-map#92)' do
+    WoodsMap::Repository.open(FIXTURE_INDEX) do |repository|
+      t = described_class.new(repository, WoodsMap::Neighbourhood.new(repository, 'Micropost', type: 'model'),
+                              author: 'Leah Armstrong')
+      expect(t.commits.map(&:author).uniq).to eq(['Leah Armstrong'])
+      expect(t.payload.size).to eq(t.commits.size)
+      expect(t.authors).to include('Sam Okafor-Whitfield')
+    end
+  end
 end

@@ -18,9 +18,7 @@ module WoodsMap
     # @param step [LifecycleBuilder::Step]
     # @return [String] `Unit#method`, `Unit@event` or the template
     def trail_step_title(step)
-      return step.label if step.type == 'model_event' || step.method_name.nil?
-
-      "#{step.unit}##{step.method_name}"
+      step.title
     end
 
     # @param step [LifecycleBuilder::Step]
@@ -34,6 +32,18 @@ module WoodsMap
       return ERB::Util.html_escape(trail_step_title(step)) unless current_repository.graph_node(identifier, type: type)
 
       link_to(trail_step_title(step), woods_map.unit_path(type: type, identifier: identifier))
+    end
+
+    # @param step [LifecycleBuilder::Step]
+    # @return [ActiveSupport::SafeBuffer, nil] how a step the flow did not
+    #   reach by an operation was added: an inferred model event or a graph hop
+    def trail_step_note(step)
+      case step.via
+      when :inferred
+        tag.span(" save implies #{step.title}: the model and event the Passage ladder reads from #{step.caller}",
+                 class: 'dim')
+      when :graph then tag.span(' from a job_enqueue edge, no call site in the flow', class: 'dim')
+      end
     end
 
     # @param board [TrailBoard]

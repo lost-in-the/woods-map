@@ -42,7 +42,19 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
       end
       entries.map do |entry|
         ['flowchart', "trail #{entry}", WoodsMap::LifecycleBuilder.new(repository, entry).mermaid]
-      end + [['flowchart', 'trail pinned graph', pinned.graph_mermaid], ['er', 'trail pinned erd', pinned.erd_mermaid]]
+      end + [['flowchart', 'trail pinned graph', pinned.graph_mermaid],
+             ['er', 'trail pinned erd', pinned.erd_mermaid]] +
+        entry_lifecycle_diagrams(repository)
+    end
+  end
+
+  # The Lifecycle tab's entry flows (woods-map#91) on a job, a mailer and a controller action.
+  def entry_lifecycle_diagrams(repository)
+    [%w[job NotifySubscribersJob], %w[mailer MailingListMailer], %w[controller UsersController]].flat_map do |type, id|
+      lifecycle = WoodsMap::EntryLifecycle.new(repository, repository.unit(id, type: type), action: 'create')
+      { 'sequence' => 'sequence', 'flowchart' => 'flowchart', 'lanes' => 'flowchart' }.map do |view, drawn|
+        [drawn, "entry #{id} #{view}", lifecycle.diagram(view)]
+      end
     end
   end
 
