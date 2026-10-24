@@ -11,6 +11,7 @@
       blast              WoodsMap::BlastRadius or nil (tints the canvas)
       page               true on the full-screen page %>
 <% blast = local_assigns[:blast] %>
+<% clusters = Array(local_assigns[:clusters]) %>
 <% page = local_assigns.fetch(:page, false) %>
 <% filters = { types: params[:types].presence, via: params[:via].presence } %>
 <% graph_label = "Neighbourhood of #{identifier} at depth #{n.depth}, #{n.direction}: units and their edges, each edge labelled with its mechanism. Arrow keys move along the edges, Enter opens a unit's graph; the list below has the same edges." %>
@@ -20,7 +21,8 @@
      data-graph-url-value="<%= woods_map.neighbourhood_path(centre: identifier, type: type, depth: n.depth, direction: n.direction, **filters) %>"
      data-graph-unit-url-value="<%= unit_url %>"
      data-graph-generation-value="<%= @repository.generation_number %>"
-     data-graph-cache-value="<%= cache_key %>"<% if blast_units %>
+     data-graph-cache-value="<%= cache_key %>"<% if clusters.any? %>
+     data-graph-clusters-value="<%= clusters.to_json %>"<% if params[:group] == 'clusters' %> data-graph-mode-value="clusters"<% end %><% end %><% if blast_units %>
      data-graph-blast-value="<%= blast_units.to_json %>"<% end %>>
   <nav class="rail" aria-label="Graph filters">
     <form method="get" action="<%= link.call %>">
@@ -42,7 +44,7 @@
       <div style="padding:var(--s3) var(--s5)"><button class="btn" type="submit">apply filters</button></div>
       <div data-graph-target="layouts" hidden>
         <div class="grp">layout</div>
-        <div style="padding:var(--s1) var(--s5)"><span class="seg" role="group" aria-label="Layout"><% %w[butterfly radial].each do |mode| %><button type="button" aria-pressed="<%= mode == 'butterfly' %>" data-layout="<%= mode %>" data-graph-target="layout" data-action="graph#layout"><%= mode %></button><% end %></span></div>
+        <div style="padding:var(--s1) var(--s5)"><span class="seg" role="group" aria-label="Layout"><% (%w[butterfly radial] + (clusters.any? ? %w[clusters] : [])).each do |mode| %><button type="button" aria-pressed="<%= mode == 'butterfly' %>" data-layout="<%= mode %>" data-graph-target="layout" data-action="graph#layout"><%= mode %></button><% end %></span></div>
         <p class="cap" style="padding:0 var(--s5)">Positions you drag are kept per generation in this browser. <button class="tool" type="button" data-action="graph#forget">reset positions</button></p>
       </div>
       <%= local_assigns[:rail_extra] %>

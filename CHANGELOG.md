@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+- Landscape (`/woods/landscape`, B8-Landscape, B6-Overview, docs/design/notes/landscape.md).
+  - **Containers:** C4 level 2 from each unit's container attribution (Woods W-9), with technologies from the BehavioralProfile unit and external systems from configuration and external consumers. Relationships are counted from the published edges between containers. The container diagram is drawn by Pele.
+  - **Exports:** the same model as Mermaid, Structurizr DSL and LikeC4 plain text at `/woods/landscape.mmd`, `.dsl` and `.c4` (D-25).
+  - **Hotspots:** structure tiles, a churn × dependents ranking, the layer coupling matrix and structural risk.
+  - **Domains:** the published domain clusters (woods#799). The full-screen graph's new *clusters* layout boxes each cluster's units.
+  - `Landscape` joins the primary bar. People and the application's name are host settings: `config.landscape_actors` and `config.system_name`.
+- Graph canvas performance:
+  - Above 120 units or 150 edges, the first draw skips labels, arrows and edge routing until the reader zooms in.
+  - Cytoscape warms on a small off-screen graph while the neighbourhood request is in flight.
+  - On the 300-unit, 1,000-edge benchmark, the first draw drops from a median of 853 ms (min 693) to a median of 366 ms (min 318) at load average 4.4.
+
 - M5 Graph tab canvas (woods-map#7; FR-5, A-1, A-2, A-5): Cytoscape 3.34.3 is vendored as its unmodified ESM build (`vendor/javascript/cytoscape.esm.min.mjs`, MIT) and loaded on demand by a new `graph` controller. The controller draws the page's own neighbourhood query from `/woods/graph/neighbourhood`. Units are tinted by type from the tokens, sized by PageRank, and marked hub and cycle per identifier; truncated units are dashed. The butterfly layout puts dependents left and dependencies right; the radial layout is Cytoscape's built-in `concentric`. Neither needs a layout extension; fcose and dagre are deferred to woods-map#63. Other controls:
   - click, or Enter on the selection, opens a unit's graph;
   - arrow keys move along the edges, Home returns to this unit, and + / − / 0 zoom and fit;

@@ -1,0 +1,74 @@
+<% content_for :title, "#{@landscape.system_name} · Containers · Landscape · Woods Map" %>
+<% l = @landscape %>
+<%= render 'woods_map/landscape/frame', crumb: 'containers' %>
+<div class="body" data-controller="trail">
+  <div class="main landscape">
+    <% unless l.attributed? %>
+      <%= render 'woods_map/components/banner', severity: :warn, lead: 'No container attribution.', text: safe_join(['This generation was extracted by a Woods that does not publish ', tag.code('metadata.container'), ' (W-9, ', link_to('woods#759', 'https://github.com/lost-in-the/woods/issues/759'), '). Extract again to draw the containers; hotspots and domains still read.']) %>
+    <% end %>
+    <section class="sec">
+      <header>
+        <h2 class="t2">Containers <%= count_tag("#{l.processes.size} #{'process'.pluralize(l.processes.size)}, #{l.stores.size} #{'store'.pluralize(l.stores.size)}, #{l.externals.size} external #{'system'.pluralize(l.externals.size)}") %><%= info_tip('C4 level 2. Membership comes from each unit\'s metadata.container (W-9); technologies from the BehavioralProfile configuration unit. Logical, not physical: the index does not know how many processes run, or where.') %></h2>
+        <span class="goto">export: <%= safe_join(WoodsMap::LandscapeExport::FORMATS.map { |format, (ext, name)| link_to(name, woods_map.public_send(:"landscape_#{ext == 'mmd' ? 'mmd' : ext}_path"), type: 'text/plain', rel: 'alternate', data: { export: format }) }, ', ') %></span>
+      </header>
+      <% if l.attributed? %>
+        <div class="c4grid">
+          <div class="c4col" aria-label="People">
+            <div class="eyebrow">people, from host config</div>
+            <% if woods_map_config.landscape_actors.any? %>
+              <% woods_map_config.landscape_actors.each do |actor| %>
+                <div class="c4box person"><span class="st">«person»</span><b><%= actor[:name] || actor['name'] %></b><span class="tech"><%= actor[:description] || actor['description'] %></span><% if (uses = actor[:uses] || actor['uses']) %><ul><li><span class="k" aria-hidden="true">→</span><span><%= uses %></span></li></ul><% end %></div>
+              <% end %>
+            <% else %>
+              <p class="cap">None declared. People are the host's to name: <code>config.landscape_actors</code>.</p>
+            <% end %>
+          </div>
+          <div class="c4sys">
+            <div class="eyebrow"><%= [l.system_name, l.rails, 'software system'].compact.join(', ') %></div>
+            <div class="c4boxes"><% l.containers.each do |box| %><%= render 'woods_map/landscape/box', box: box, landscape: l %><% end %></div>
+            <p class="cap">
+              <% shared = l.shared %>
+              <% if shared.any? %>shared by every process: <%= safe_join(shared.map { |type, n| link_to("#{n} #{type.tr('_', ' ').pluralize(n)}", "#{woods_map.units_path}#type-#{type}") }, ', ') %><% end %><% if l.engines.any? %><%= shared.any? ? '; ' : '' %><%= l.engines.size %> <%= 'engine'.pluralize(l.engines.size) %> (<%= l.engines.first(6).join(', ') %><%= ', …' if l.engines.size > 6 %>)<% end %>
+            </p>
+          </div>
+          <div class="c4col" aria-label="External systems">
+            <div class="eyebrow">external systems</div>
+            <% if l.externals.any? %><% l.externals.each do |box| %><%= render 'woods_map/landscape/box', box: box, landscape: l %><% end %><% else %><p class="cap">None the index records.</p><% end %>
+          </div>
+        </div>
+        <nav class="c4ladder" aria-label="C4 levels">
+          <span><b>L1 · Context</b> <%= woods_map_config.landscape_actors.size %> people, 1 system, <%= l.externals.size %> external</span>
+          <span aria-current="page"><b>L2 · Containers</b> <%= l.processes.size %> processes, <%= l.stores.size %> stores, this page</span>
+          <a href="<%= woods_map.landscape_path(tab: 'domains') %>"><b>L3 · Components</b> <%= @clusters.size %> domain <%= 'cluster'.pluralize(@clusters.size) %></a>
+          <a href="<%= woods_map.units_path %>"><b>L4 · Code</b> <%= l.unit_count %> units</a>
+        </nav>
+      <% end %>
+    </section>
+    <% if l.attributed? %>
+      <section class="sec">
+        <%= render 'woods_map/components/diagram', title: 'Container diagram', facts: ["#{l.containers.size} containers", "#{l.relationships.size} relationships"],
+              tools: safe_join([tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: @export.mermaid, action: 'copy#copy', needs_js: true }),
+                                link_to('⤓ .mmd', woods_map.landscape_mmd_path, class: 'tool', type: 'text/plain', rel: 'alternate', data: { mermaid_url: woods_map.landscape_mmd_path })]),
+              mermaid: @export.mermaid, label: "C4 container diagram of #{l.system_name}: #{l.containers.size} containers and #{l.externals.size} external systems; the relationships table below has every arrow",
+              legend: [[tag.span('[ ]', class: 'ar'), 'container'], [tag.span('( )', class: 'ar'), 'data store'], [tag.span('[[ ]]', class: 'ar'), 'external system']],
+              provenance: ['metadata.container', 'BehavioralProfile', "gen #{@repository.generation_number}"] %>
+      </section>
+      <section class="sec">
+        <header><h2 class="t2">Relationships <%= count_tag(l.relationships.size) %><%= info_tip('Counts are the published edges between members of two containers, by mechanism. Rows marked BehavioralProfile come from configuration, not from edges.') %></h2></header>
+        <%= render 'woods_map/components/table', label: 'Relationships', min_width: '640px', columns: [{ label: 'from', width: '20%' }, { label: 'mechanism', width: '22%' }, { label: 'to', width: '20%' }, { label: 'edges' }],
+              rows: l.relationships.map { |r| { cells: [tag.b(l.name_of(r.from)), r.mechanism, l.name_of(r.to), r.edges || tag.span(r.source, class: 'dim')] } } %>
+      </section>
+    <% end %>
+    <section class="sec">
+      <% top = @hotspots.risks.reject { |risk| risk.kind == 'orphans' }.first(5) %>
+      <header><h2 class="t2">Where structure concentrates risk <%= count_tag(top.size) %><%= info_tip('Bridges, cycles and hubs without a mapped test, from graph_analysis.json (per identifier). The Hotspots tab has the whole list.') %></h2><a class="goto" href="<%= woods_map.landscape_path(tab: 'hotspots') %>">Hotspots →</a></header>
+      <% if top.any? %>
+        <%= render 'woods_map/components/table', label: 'Structural risk', min_width: '560px', columns: [{ label: 'unit', width: '34%' }, { label: 'why' }],
+              rows: top.map { |risk| { cells: [risk.type ? unit_link(risk.identifier, risk.type) : risk.identifier, "#{risk.kind}: #{risk.why}"] } } %>
+      <% else %>
+        <p class="cap">The analysis finds no bridge, cycle or uncovered hub.</p>
+      <% end %>
+    </section>
+    <%= render 'woods_map/shared/status', items: ["actors from config.landscape_actors, #{woods_map_config.landscape_actors.size} declared", 'containers from metadata.container, W-9', "gen #{@repository.generation_number}"], keys: [[%w[/], 'search']] %>
+  </div>
+</div>

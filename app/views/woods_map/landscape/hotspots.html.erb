@@ -1,0 +1,52 @@
+<% content_for :title, "#{@landscape.system_name} · Hotspots · Landscape · Woods Map" %>
+<% h = @hotspots %>
+<%= render 'woods_map/landscape/frame', crumb: 'hotspots' %>
+<div class="body" data-controller="trail">
+  <div class="main landscape">
+    <% if h.analysed? %>
+      <% longest = h.cycles.max_by { |cycle| cycle.uniq.size } %>
+      <%= render 'woods_map/components/facts', tiles: [
+            { eyebrow: safe_join(['hubs ', tag.b(h.hubs.size)]), rows: [['rule', 'most dependents'], ['source', 'graph_analysis']] },
+            { eyebrow: safe_join(['bridges ', tag.b(h.bridges.size)]), rows: [['meaning', 'single points of coupling']] },
+            { eyebrow: safe_join(['cycles ', tag.b(h.cycles.size)]), rows: [['longest', longest ? "#{longest.uniq.size} units" : empty_value], ['example', longest ? longest.uniq.first(3).join(' ↔ ') : empty_value]] },
+            { eyebrow: safe_join(['undeclared edges ', tag.b(h.undeclared_edges.size)]), rows: [['edge', h.undeclared_edges.first ? "#{h.undeclared_edges.first['from_package']} → #{h.undeclared_edges.first['to_package']}" : empty_value], ['finding', h.undeclared_edges.any? ? chip(:blocking, 'blocking') : empty_value]] },
+            { eyebrow: safe_join(['orphans ', tag.b(h.orphans.size)]), rows: [['no dependents', h.orphans.size.to_s], ['dead ends', "#{h.dead_ends.size}, no dependencies"]] },
+            { eyebrow: safe_join(['uncovered hubs ', tag.b(h.uncovered_hubs.size)]), rows: [['unit', h.uncovered_hubs.first ? unit_link(h.uncovered_hubs.first['identifier'], h.uncovered_hubs.first['type']) : empty_value], ['finding', 'no mapped test']] }
+          ] %>
+      <section class="sec">
+        <header><h2 class="t2">Hotspots <%= count_tag('churn × dependents') %><%= info_tip('Commits per unit come from Woods\' git enrichment of this generation; dependents from the graph. The most changed and most depended upon come first: review those first.') %></h2></header>
+        <% if h.churn? %>
+          <%= render 'woods_map/components/table', label: 'Hotspots', min_width: '560px', columns: [{ label: 'unit', width: '40%' }, { label: 'commits', width: '16%' }, { label: 'dependents', width: '16%' }, { label: 'change frequency' }],
+                rows: h.churn.map { |row| { cells: [unit_link(row[:identifier], row[:type]), row[:commits].to_s, row[:dependents].to_s, row[:change_frequency] || empty_value(applicable: false)] } } %>
+        <% else %>
+          <%= render 'woods_map/components/empty_state', title: 'No commit history in this generation', text: 'Woods records commits per unit when it extracts inside a git checkout. This generation carries none, so churn cannot be weighed against dependents; the structure below still reads.' %>
+        <% end %>
+      </section>
+      <section class="sec">
+        <% coupling = h.coupling %>
+        <header><h2 class="t2">Coupling between layers <%= count_tag('edges, from row to column') %><%= info_tip('Published typed edges between unit types, leaving out test coverage, route exercise, documentation and migration bookkeeping.') %></h2></header>
+        <% if coupling.any? %>
+          <% columns = WoodsMap::Hotspots::LAYERS.select { |to| coupling.values.any? { |row| row[to].positive? } } %>
+          <%= render 'woods_map/components/table', label: 'Coupling between layers', min_width: "#{180 + (columns.size * 110)}px",
+                columns: [{ label: 'from', width: '180px' }] + columns.map { |to| { label: to.tr('_', ' ').pluralize } },
+                rows: coupling.map { |from, row| { cells: [tag.b(from.tr('_', ' ').pluralize)] + columns.map { |to| row[to].positive? ? row[to].to_s : WoodsMap::Glyphs[:none] } } } %>
+        <% else %>
+          <p class="cap">No edges between these layers in this generation.</p>
+        <% end %>
+      </section>
+      <section class="sec">
+        <% risks = h.risks %>
+        <header><h2 class="t2">Structural risk <%= count_tag(risks.size) %><%= info_tip('From graph_analysis.json, scoped to identifiers as Woods publishes it. Nothing here proves a path ran.') %></h2></header>
+        <% if risks.any? %>
+          <%= render 'woods_map/components/table', label: 'Structural risk', min_width: '720px', columns: [{ label: 'kind', width: '16%' }, { label: 'unit', width: '30%' }, { label: 'why' }, { label: 'do', width: '16%' }],
+                rows: risks.map { |risk| { cells: [risk.kind, risk.type ? unit_link(risk.identifier, risk.type) : risk.identifier, risk.why, safe_join([(chip(risk.severity == :blocking ? :blocking : :note, risk.severity.to_s) if risk.severity == :blocking), risk.action].compact, ' ').presence || empty_value(applicable: false)] } } %>
+        <% else %>
+          <p class="cap">The analysis finds nothing to flag.</p>
+        <% end %>
+      </section>
+    <% else %>
+      <%= render 'woods_map/components/empty_state', title: 'No graph analysis in this generation', text: 'graph_analysis.json is absent, so there are no hubs, bridges or cycles to show. A full extraction writes it.' %>
+    <% end %>
+    <%= render 'woods_map/shared/status', items: ['graph_analysis + graph', "gen #{@repository.generation_number}", 'nothing here proves a path ran'], keys: [[%w[/], 'search']] %>
+  </div>
+</div>

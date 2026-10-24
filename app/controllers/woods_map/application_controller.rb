@@ -41,8 +41,9 @@ module WoodsMap
     # @param current [Symbol, nil] :units, :graph or :impact
     # @return [Array<Array(String, String, Boolean)>]
     def primary_nav(current = nil)
-      [['Units', woods_map.units_path, current == :units], ['Graph', woods_map.graph_path, current == :graph],
-       ['Impact', woods_map.impact_path, current == :impact]]
+      [['Units', woods_map.units_path, current == :units],
+       ['Landscape', woods_map.landscape_path, current == :landscape],
+       ['Graph', woods_map.graph_path, current == :graph], ['Impact', woods_map.impact_path, current == :impact]]
     end
 
     def woods_map

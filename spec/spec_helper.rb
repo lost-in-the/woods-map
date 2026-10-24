@@ -4,6 +4,7 @@ ENV['RAILS_ENV'] = 'test'
 require File.expand_path('dummy/config/environment', __dir__)
 require 'rspec/rails'
 require_relative 'support/html_response'
+require_relative 'support/landscape_index'
 
 FIXTURE_INDEX = File.expand_path('fixtures/index', __dir__)
 

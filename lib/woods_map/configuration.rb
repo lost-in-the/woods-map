@@ -30,6 +30,15 @@ module WoodsMap
     # @return [String] cookie name holding the exchanged token digest.
     attr_accessor :cookie_name
 
+    # @return [String, nil] the application's name on the Landscape page and its
+    #   exports. The index does not record one; "Application" when unset.
+    attr_accessor :system_name
+
+    # @return [Array<Hash>] the people around the system on the Landscape page
+    #   (C4 level 1): each `{ name:, description:, uses: }`, declared by the host
+    #   because no index can know them. Empty by default.
+    attr_accessor :landscape_actors
+
     def initialize
       @index_dir = default_index_dir
       @token = ENV.fetch('WOODS_MAP_TOKEN', nil)
@@ -37,6 +46,8 @@ module WoodsMap
       @require_token = false
       @guide_enabled = false
       @cookie_name = 'woods_map_session'
+      @system_name = nil
+      @landscape_actors = []
     end
 
     # @return [Boolean] whether a usable token is configured

@@ -95,3 +95,27 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .legend i.gblast{background:var(--panel);border-width:2px}
 .wm .legend i.gblast[data-distance="1"]{border-color:var(--hot)}
 .wm .legend i.gblast[data-distance="2"]{border-color:var(--mod)}
+
+/* The Landscape's C4 container level (B8-Landscape): people, the system with its containers, external
+   systems; then the L1 to L4 ladder. Tokens only; the selection bar marks the web process as on the board. */
+.wm .c4grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,3fr) minmax(0,1fr);gap:var(--s4);align-items:start}
+.wm .c4col,.wm .c4sys{display:flex;flex-direction:column;gap:var(--s3);min-width:0}
+.wm .c4sys{border:1px solid var(--rule2);border-radius:var(--r-ctl);padding:var(--s4);background:var(--panel)}
+.wm .c4boxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:var(--s3)}
+.wm .c4box{display:flex;flex-direction:column;gap:var(--s1);border:1px solid var(--rule2);border-radius:var(--r-ctl);padding:var(--s3) var(--s4);background:var(--bg);font-size:var(--fs-12);min-width:0}
+.wm .c4box.web{box-shadow:inset 3px 0 0 var(--select)}
+.wm .c4box .st{font-family:var(--ff-ui);font-size:var(--fs-11);color:var(--mut)}
+.wm .c4box b{font-family:var(--ff-ui);font-size:var(--fs-13);color:var(--bright);overflow-wrap:anywhere}
+.wm .c4box .tech{color:var(--mut);overflow-wrap:anywhere}
+.wm .c4box .cnts{overflow-wrap:anywhere}
+.wm .c4box ul{list-style:none;margin:var(--s1) 0 0;padding:0}
+.wm .c4box li{display:flex;gap:var(--s2)}
+.wm .c4box li .k{color:var(--dim)}
+.wm .c4ladder{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:var(--s5);border:1px solid var(--rule2);border-radius:var(--r-ctl);font-size:var(--fs-12)}
+.wm .c4ladder > *{display:flex;flex-direction:column;gap:var(--s1);padding:var(--s3) var(--s4);border-right:1px solid var(--rule);color:var(--mut);text-decoration:none;min-width:0}
+.wm .c4ladder > *:last-child{border-right:0}
+.wm .c4ladder b{font-family:var(--ff-ui);color:var(--text)}
+.wm .c4ladder [aria-current]{background:var(--select-tint);box-shadow:inset 0 -2px 0 var(--select)}
+.wm .c4ladder a:hover b{color:var(--link)}
+@container wm (max-width:959px){ .wm .c4grid{grid-template-columns:minmax(0,1fr)} .wm .c4ladder{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@container wm (max-width:639px){ .wm .c4ladder{grid-template-columns:minmax(0,1fr)} }
