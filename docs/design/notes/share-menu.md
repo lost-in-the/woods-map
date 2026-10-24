@@ -1,7 +1,10 @@
 # Share menu
 
-Scope: E-6, E-7; relates to #34. Markdown and JSON reports wait on
-[woods-map#57](https://github.com/lost-in-the/woods-map/issues/57).
+Scope: E-6, E-7; relates to #34. What the menu offers is settled by D-25
+([woods-map#57](https://github.com/lost-in-the/woods-map/issues/57)): the focus
+URL and the page's Mermaid, for agents pulling charts into pull-request review
+and people sharing architecture feedback. No Markdown or JSON report, not even
+Woods' output handed through; those stay with Woods (D-1).
 
 **Where.** `Share ▾` is a default button (`.btn`) placed just before the page's
 primary action:
@@ -27,11 +30,10 @@ viewport.
 | --- | --- | --- |
 | Focus URL with `⎘ copy URL` | `focus_url`: the page's absolute address and query, less any `token` (D-4). On opening it gains the `#L…` line the address targets | the URL text; the copy tool is hidden |
 | `⎘ <diagram title>` under *Mermaid*, one per diagram panel | the Mermaid text the panel already carries (`[data-diagram-target=source]`, D-21), copied unchanged | absent; each panel shows its Mermaid text instead |
-| A note on the impact pages | Markdown and JSON are Woods' renderers (D-1). Whether the map may hand their output through unchanged is woods-map#57 | the note |
 
 **What the menu does not do:**
 
-- It never renders, parses or derives a report, in line with the `CLAUDE.md` rule.
+- It never renders, parses, derives or hands through a Markdown or JSON report (D-25), and the boards' *Markdown for PR* button is dropped.
 - It does not add its own Mermaid export. Diagram-panel export belongs to the diagram panels.
 - The `y` key keeps copying the page's own first copy tool, skipping the Share menu's.
 

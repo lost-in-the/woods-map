@@ -89,7 +89,7 @@ Run this before a milestone issue is opened and again before it closes.
 | Keyboard help (NFR-3), with focus and shortcut browser coverage | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/keyboard-help.md) |
 | M1 to M8 | woods-map#2 to #10 as listed in the milestone table |
 | M1 follow-up: the undesigned reading pieces (units index, file view, Routes tab, type tiles, hover card, disambiguation, settings, keyboard help, share menu) | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34) |
-| Share menu (E-6, E-7): focus URL and the page's Mermaid; Markdown and JSON pending a decision | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/share-menu.md), [woods-map#57](https://github.com/lost-in-the/woods-map/issues/57) (needs-decision) |
+| Share menu (E-6, E-7): focus URL and the page's Mermaid, per D-25 | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/share-menu.md), [woods-map#57](https://github.com/lost-in-the/woods-map/issues/57) |
 | Type-specific facts tiles (B-4); other M1 follow-ups remain separate | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/published-type-facts.md) |
 | Design system epic (tokens, fonts, components, responsive tiers) | [woods-map#23](https://github.com/lost-in-the/woods-map/issues/23) |
 | D-22 Inline links need a cue besides colour (settled, amends D-11) | [woods-map#26](https://github.com/lost-in-the/woods-map/issues/26) |

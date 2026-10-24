@@ -19,14 +19,14 @@ RSpec.describe 'The Share menu', type: :request do
     expect(menu.xpath('following-sibling::*').first['class']).to include('primary')
   end
 
-  it 'offers no Markdown or JSON on a unit page, and names the open decision on the impact pages' do
+  it 'offers the focus URL and no Markdown or JSON report on unit and impact pages (D-25)' do
     get '/woods/units/model/User'
     expect(menu.text).not_to include('Markdown', 'JSON')
     get '/woods/impact', params: { focus: 'User' }
-    expect(menu.at_css('.sh-note').text).to include('woods-map#57')
-    expect(menu.at_css('.sh-url').text).to eq('http://www.example.com/woods/impact?focus=User')
+    expect([menu.at_css('.sh-url').text, menu.text.include?('Markdown')])
+      .to eq(['http://www.example.com/woods/impact?focus=User', false])
     get '/woods/impact', params: { mode: 'range' }
-    expect(menu.at_css('.sh-note').text).to include('woods-map#57')
+    expect(menu.text).not_to include('Markdown', 'JSON')
   end
 
   it 'leaves the Mermaid list to the page: an empty, hidden slot the script fills from the diagram panels' do

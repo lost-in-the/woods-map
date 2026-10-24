@@ -70,5 +70,4 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .share-panel .sh-row .tool{margin-left:auto}
 .wm .share-panel .sh-dia[hidden]{display:none}
 .wm .share-panel .sh-url{font-family:var(--ff-data);font-size:var(--fs-11);overflow-wrap:anywhere;user-select:all}
-.wm .share-panel .sh-note{margin:0;color:var(--mut)}
 @container wm (max-width:959px){ .wm .share-panel{right:auto;left:0} }
