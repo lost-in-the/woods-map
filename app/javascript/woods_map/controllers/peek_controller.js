@@ -2,7 +2,8 @@ import { Controller } from "@hotwired/stimulus"
 
 // The peek drawer (B8-Code): p on a focused reference link, or Alt+click,
 // fetches the target's first lines and opens them under the current row;
-// ✕ or Escape closes. A plain click still navigates.
+// ✕ or Escape closes and puts focus back on the reference that opened it.
+// A plain click still navigates.
 export default class extends Controller {
   connect() {
     this.onKey = (e) => this.key(e)
@@ -29,7 +30,8 @@ export default class extends Controller {
   }
 
   async openFor(link) {
-    this.close()
+    this.remove()
+    this.opener = link
     const row = link.closest(".row")
     if (!row) return
     try {
@@ -56,6 +58,12 @@ export default class extends Controller {
   }
 
   close() {
+    if (!this.peek) return
+    this.remove()
+    if (this.opener?.isConnected) this.opener.focus()
+  }
+
+  remove() {
     if (this.peek) { this.peek.remove(); this.peek = null }
   }
 }

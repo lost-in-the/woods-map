@@ -29,11 +29,21 @@ RSpec.describe 'Unit pages', type: :request do
     end
   end
 
-  it 'remembers the lens per browser and shows the effective class' do
+  it 'shows the lens a URL names, keeps it in the URL and remembers it for the bare URL (D-6)' do
     get '/woods/units/model/User?lens=effective'
-    expect(response).to redirect_to('/woods/units/model/User')
-    follow_redirect!
+    expect(response).to have_http_status(:ok)
     expect(response.body).to include('<b>Effective class</b>').and include('# schema: users')
+    get '/woods/units/model/User'
+    expect(response.body).to include('<b>Effective class</b>')
+    get '/woods/units/model/User?lens=written'
+    expect(response.body).not_to include('<b>Effective class</b>')
+  end
+
+  it 'ignores a lens it does not know and keeps the remembered one' do
+    get '/woods/units/model/User?lens=effective'
+    get '/woods/units/model/User?lens=sideways'
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include('<b>Effective class</b>')
   end
 
   it 'serves the schema, lifecycle and graph tabs' do
@@ -202,9 +212,12 @@ RSpec.describe 'Unit pages', type: :request do
     expect(response.body).to include('No model named Nope')
   end
 
-  it 'carries the file tree in the sheet with the current file marked' do
+  it 'names the file tree and the current file in the sheet without carrying the tree (M10)' do
     get '/woods/units/model/User'
-    expect(response.body).to include('class="f" href="/woods/files/app/models/micropost.rb"')
-    expect(response.body).to match(/aria-current="true"[^>]*data-tree-target="row"><span class="nm">user\.rb/)
+    tree = html_response_document.at_css('.sheet [data-sheet-target=tree]')
+    expect(tree.to_h).to include('data-src' => '/woods/tree?gen=1', 'data-current' => 'app/models/user.rb')
+    expect(html_response_document.css('nav.tree, a.f')).to be_empty
+    get tree['data-src']
+    expect(html_response_document.at_css('a.f[href="/woods/files/app/models/micropost.rb"]')).to be_present
   end
 end
