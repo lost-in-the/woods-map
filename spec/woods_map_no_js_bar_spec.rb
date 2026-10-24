@@ -13,9 +13,10 @@ RSpec.describe 'The bar without JavaScript', type: :request do
 
     get '/woods/units/model/User'
     bar = html_response_document.at_css('header.bar').to_html
+    nav = html_response_document.css('header.bar nav a').map { |a| a.text.strip }
     results = [1440, 960, 640, 390].index_with { |width| bar_result(bar, width) }
     results.each do |width, result|
-      expect(result).to include('nav' => %w[Units Graph ERD Impact], 'search' => true, 'overflow' => false),
+      expect(result).to include('nav' => nav, 'search' => true, 'overflow' => false),
                         "at #{width}: #{result}"
     end
   end
@@ -42,7 +43,7 @@ RSpec.describe 'The bar without JavaScript', type: :request do
       const shown = (el) => !!el && el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden'
       const bar = document.querySelector('header.bar')
       document.getElementById('result').textContent = JSON.stringify({
-        nav: [...bar.querySelectorAll('nav a')].filter(shown).map((a) => a.textContent.trim()).filter((t) => t !== 'History'),
+        nav: [...bar.querySelectorAll('nav a')].filter(shown).map((a) => a.textContent.trim()),
         search: shown(bar.querySelector('input.q')) && bar.querySelector('input.q').getBoundingClientRect().width > 60,
         overflow: document.body.scrollWidth > #{width}
       })
