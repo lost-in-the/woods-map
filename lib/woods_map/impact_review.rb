@@ -55,7 +55,7 @@ module WoodsMap
       @radius = radius
       @graph = repository.graph
       @analysis = repository.graph_analysis
-      @ivar_rule = UnassignedIvarRule.new(repository, radius)
+      @ivar_rule = UnassignedIvarRule.outcome(repository, radius)
     end
 
     # @return [Array<Finding>] the findings of the rules that ran
