@@ -18,7 +18,7 @@ module WoodsMap
         next render_timeline_mermaid if mermaid_request?
 
         @freshness = repository.freshness
-        @tree = WoodsMap::FileTree.for(repository)
+        @files_sheet = true
         @nav = primary_nav(:history)
         render :show
       end

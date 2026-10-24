@@ -9,7 +9,7 @@ module WoodsMap
         @status = repository.status
         @freshness = repository.freshness
         @retention = repository.retention
-        @tree = WoodsMap::FileTree.for(repository)
+        @files_sheet = true
       end
     end
   end

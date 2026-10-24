@@ -24,7 +24,7 @@ module WoodsMap
                                  .sort_by { |unit| [unit['type'].to_s, unit['identifier'].to_s] }
                                  .group_by { |unit| unit['type'].to_s }
         @unit_count = @unit_groups.values.sum(&:size)
-        @tree = WoodsMap::FileTree.for(repository)
+        @files_sheet = true
         @freshness = repository.freshness
         @nav = primary_nav(:units)
         render :index
@@ -32,8 +32,7 @@ module WoodsMap
     end
 
     def show
-      return redirect_to_remembered_lens if params[:lens].present?
-
+      remember_lens
       with_unit do
         @lifecycle = lifecycle_for(@unit)
         @callers = WoodsMap::Callers.for(@repository).by_method(@unit['identifier'], @unit['type'])
@@ -129,20 +128,28 @@ module WoodsMap
         @page = WoodsMap::UnitPage.new(repository, @unit)
         @definition = WoodsMap::CompositeSource.new(@unit).definition_line
         unless mermaid_request?
-          @tree = WoodsMap::FileTree.for(repository)
+          @files_sheet = true
           @freshness = repository.freshness
         end
         yield
       end
     end
 
+    # A `?lens=` the page names wins and is remembered for the bare URL (D-6),
+    # so a shared link shows the lens it names; anything else falls back to
+    # the remembered lens, then to as written.
     def lens
-      cookies[LENS_COOKIE].presence || 'written'
+      requested_lens || WoodsMap::CodeView::LENSES.find { |name| name == cookies[LENS_COOKIE] } || 'written'
     end
 
-    def redirect_to_remembered_lens
-      cookies[LENS_COOKIE] = { value: params[:lens], expires: 1.year.from_now, same_site: :lax }
-      redirect_to woods_map.unit_path(type: params[:type], identifier: routed_identifiers.first)
+    def requested_lens
+      WoodsMap::CodeView::LENSES.find { |name| name == params[:lens] }
+    end
+
+    def remember_lens
+      return unless requested_lens
+
+      cookies[LENS_COOKIE] = { value: requested_lens, expires: 1.year.from_now, same_site: :lax }
     end
 
     # A model's (or state machine's) Lifecycle tab: its callback chains.

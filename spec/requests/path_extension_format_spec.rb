@@ -54,10 +54,8 @@ RSpec.describe 'Pages for paths whose extension Rails knows as a format', type: 
     end
   end
 
-  it 'follows a lens switch back to the full page' do
+  it 'renders a lens switch as the full page' do
     get '/woods/units/config_file/config/cable.yml?lens=written', headers: browser
-    expect(response).to redirect_to('/woods/units/config_file/config/cable.yml')
-    get response.location, headers: browser
     expect_full_page
   end
 

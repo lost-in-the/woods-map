@@ -40,6 +40,18 @@ RSpec.describe WoodsMap::Hotspots do
     end
   end
 
+  it 'names each point by its rank, merges units at one position into one point and names the units in comments' do
+    hotspots do |h|
+      rows = [{ identifier: 'Shop::Widget', commits: 10, dependents: 3 },
+              { identifier: 'Gadget', commits: 10, dependents: 3 },
+              { identifier: 'Thing', commits: 2, dependents: 0 }]
+      allow(h).to receive(:churn).and_return(rows)
+      lines = h.quadrant_mermaid.lines.map(&:strip)
+      expect(lines).to include('%% 1 Shop.Widget', '%% 2 Gadget', '%% 3 Thing', '1/2: [0.98, 0.98]', '3: [0.20, 0.02]')
+      expect(lines.grep(/: \[/).size).to eq(2)
+    end
+  end
+
   it 'has no quadrant without commit counts' do
     hotspots do |h|
       allow(h).to receive(:churn).and_return([])

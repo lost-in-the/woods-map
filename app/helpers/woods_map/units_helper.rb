@@ -2,7 +2,7 @@
 
 module WoodsMap
   # Helpers for the unit pages: links to units, the facts tile values, the
-  # freshness words, the tab table.
+  # tab table. Freshness words are in {FreshnessHelper}.
   module UnitsHelper
     TAB_LABELS = { 'code' => 'Code', 'routes' => 'Routes', 'schema' => 'Schema', 'passage' => 'Passage',
                    'lifecycle' => 'Lifecycle', 'graph' => 'Graph', 'history' => 'History' }.freeze
@@ -124,33 +124,6 @@ module WoodsMap
       rest = links.size - shown.size
       shown << tag.span("+#{rest} more", class: 'dim') if rest.positive?
       safe_join(shown, ', ')
-    end
-
-    # The reasons behind the freshness words, for the bar's tooltip: what the
-    # quick check saw, and which of Woods' verifications it could not make.
-    #
-    # @param freshness [Hash, nil] the repository's freshness report
-    # @return [String, nil]
-    def freshness_detail(freshness)
-      return nil unless freshness.is_a?(Hash)
-
-      counts = freshness['counts'].to_h
-      seen = %w[added changed removed].filter_map { |k| "#{counts[k]} #{k}" if counts[k].to_i.positive? }
-      files = freshness.dig('metrics', 'visited_files')
-      seen << "#{files} files checked, no drift seen" if seen.empty? && files
-      reasons = Array(freshness['reasons']).map { |r| r.to_s.tr('_', ' ') }
-      [seen.join(', ').presence, reasons.join(', ').presence].compact.join('; ').presence
-    end
-
-    # @param state [String] a freshness state
-    # @return [Array(String, String)] the glyph class and the words for the bar
-    def freshness_words(state)
-      case state
-      when 'current' then ['fresh', 'index current']
-      when 'drifted' then ['hot', 'index drifted']
-      when 'stale' then ['mod', 'index stale']
-      else ['dim', 'freshness unknown']
-      end
     end
   end
 end

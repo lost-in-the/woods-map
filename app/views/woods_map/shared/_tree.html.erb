@@ -1,0 +1,9 @@
+<%# The file tree for the sheet (M10), served on its own by TreesController
+    and fetched when the sheet first opens. Top-level folders are open, the
+    rest folded with their contents hidden; the browser opens the current
+    file's folders. Locals: tree (WoodsMap::FileTree), since (WoodsMap::Since or nil). %>
+<% moved = ->(row) { since && row.kind == :file && Array(row.owner_keys).any? { |key| since.change(*key) } } %>
+<% mark = since ? safe_join([chip(:modified, "a unit in this file changed since gen #{since.from_generation}"), tag.span(" changed since gen #{since.from_generation}", class: 'sr-only')]) : nil %>
+<% rows = file_tree_rows(tree.rows) { |row| row.kind == :file ? safe_join([tag.span(" #{row.units} #{'unit'.pluralize(row.units)}, #{row.unresolved} unresolved", class: 'ct'), (mark if moved.call(row))].compact) : nil } %>
+<% changed_files = since ? tree.rows.count { |row| moved.call(row) } : nil %>
+<%= render 'woods_map/components/tree', total: safe_join(["#{tree.unit_count} units, #{tree.unresolved_count} unresolved", (changed_files ? ", #{changed_files} changed since gen #{since.from_generation}" : nil)].compact), rows: rows %>

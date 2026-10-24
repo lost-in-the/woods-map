@@ -2,8 +2,9 @@ import { Controller } from "@hotwired/stimulus"
 
 // Subdivided rows (D-17): a bare + / − opens the detail block under the row,
 // the checkbox selects it (tint on the toggle cell only), one expand-all
-// control per section. Keys inside the table: j / k move between rows, Enter
-// toggles, e expands all, E collapses all (Space checks natively).
+// control per section, which reads "collapse all" while every block is open
+// and then collapses them. Keys inside the table: j / k move between rows,
+// Enter toggles, e expands all, E collapses all (Space checks natively).
 //
 // Lives on the section that holds the header tools and the table. Without
 // JavaScript every detail block is open (html.no-js in map.css).
@@ -11,6 +12,7 @@ export default class extends Controller {
   connect() {
     this.onKey = this.onKey.bind(this)
     this.element.addEventListener("keydown", this.onKey)
+    this.syncAll()
   }
 
   disconnect() {
@@ -22,8 +24,27 @@ export default class extends Controller {
     this.set(button, button.getAttribute("aria-expanded") !== "true")
   }
 
-  expandAll() { this.toggles().forEach((button) => this.set(button, true)) }
+  // The section's expand-all control: expands every block, or collapses
+  // them when all are already open.
+  expandAll(event) {
+    const open = !(event?.currentTarget && this.allOpen())
+    this.toggles().forEach((button) => this.set(button, open))
+  }
+
   collapseAll() { this.toggles().forEach((button) => this.set(button, false)) }
+
+  allOpen() {
+    const toggles = this.toggles()
+    return toggles.length > 0 && toggles.every((button) => button.getAttribute("aria-expanded") === "true")
+  }
+
+  syncAll() {
+    const open = this.allOpen()
+    this.element.querySelectorAll('[data-action~="rows#expandAll"]').forEach((control) => {
+      control.textContent = open ? "collapse all" : "expand all"
+      control.setAttribute("aria-expanded", String(open))
+    })
+  }
 
   check(event) {
     const input = event.currentTarget
@@ -59,6 +80,7 @@ export default class extends Controller {
     row.classList.toggle("grp", open)
     const sub = this.subOf(row)
     if (sub) sub.classList.toggle("open", open)
+    this.syncAll()
   }
 
   subOf(row) {

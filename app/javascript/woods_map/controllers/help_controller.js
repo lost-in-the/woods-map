@@ -22,7 +22,9 @@ export default class extends Controller {
       if (event.key === "Tab") { event.preventDefault(); this.closeTarget.focus() }
       return
     }
-    if (event.key !== "?" || event.defaultPrevented || event.repeat || event.isComposing) return
+    // ? as typed, or Shift+Slash where the key event reports the slash.
+    const question = event.key === "?" || (event.key === "/" && event.shiftKey && event.code === "Slash")
+    if (!question || event.defaultPrevented || event.repeat || event.isComposing) return
     if (event.metaKey || event.ctrlKey || event.altKey) return
     if (event.target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return
     if (this.otherModal()) return

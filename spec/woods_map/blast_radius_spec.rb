@@ -38,9 +38,21 @@ RSpec.describe WoodsMap::BlastRadius do
 
   it 'annotates hubs and cycles, weighs by PageRank and draws the paths' do
     r = radius(focus: 'User', depth: 1)
-    expect(r.notes('User')).to eq(['hub, 19 dependents', 'in a cycle'])
+    expect(r.notes('User')).to eq(['hub, 19 dependents by identifier', 'in a cycle'])
     expect(r.weight('User')).to be > r.weight('CreateUsers')
     expect(r.dependent_count('User')).to eq(6)
     expect(r.mermaid).to start_with('flowchart LR').and include('User -- belongs_to --> Micropost', 'class User focus')
+  end
+
+  it 'counts typed dependents: one source under two types is two units, the same typed source twice is one' do
+    graph = { 'nodes' => { 'Widget' => { 'type' => 'model' }, 'reports' => { 'type' => 'database_view' } },
+              'reverse_via' => { 'Widget' => [
+                { 'source' => 'reports', 'source_type' => 'database_view', 'via' => 'code_reference' },
+                { 'source' => 'reports', 'source_type' => 'factory', 'via' => 'code_reference' },
+                { 'source' => 'reports', 'source_type' => 'factory', 'via' => 'belongs_to' },
+                { 'source' => 'Gadget', 'via' => 'code_reference' }
+              ] } }
+    repository = instance_double(WoodsMap::Repository, graph: graph, graph_analysis: {})
+    expect(described_class.new(repository, focus: 'Widget').dependent_count('Widget')).to eq(3)
   end
 end

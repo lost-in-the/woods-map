@@ -72,7 +72,7 @@ module WoodsMap
     def notes(identifier)
       notes = []
       hub = Array(@analysis['hubs']).find { |h| h['identifier'] == identifier }
-      notes << "hub, #{hub['dependent_count']} dependents" if hub
+      notes << "hub, #{hub['dependent_count']} dependents by identifier" if hub
       notes << 'in a cycle' if Array(@analysis['cycles']).any? { |cycle| cycle.include?(identifier) }
       rank = @graph.dig('pagerank', identifier)
       notes << "weight #{format('%.3f', rank)}" if rank

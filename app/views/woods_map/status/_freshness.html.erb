@@ -1,0 +1,20 @@
+<%# Freshness in full: Woods' quick source check, with how much of the
+    recorded baseline it read, its reasons in plain words and what to do
+    next. Locals: freshness (Hash or nil). %>
+<% report = freshness.to_h %>
+<% css, words = freshness_words(report['state'].to_s, report) %>
+<p><span class="<%= css %>">●</span> <%= report['state'].presence || 'unknown' %><%= ", #{words}" unless words.start_with?('index ', 'freshness ') %><%= safe_join([', checked ', date_abbr(report['checked_at'])]) if report['checked_at'] %>; Woods' quick check, reused for <%= WoodsMap::FreshnessCache::TTL %> seconds</p>
+<% counts = report['counts'].to_h %>
+<% drift = %w[added changed removed].filter_map { |k| "#{counts[k]} #{k}" if counts[k].to_i.positive? } %>
+<% seen = drift.any? ? drift.join(', ') : (report.any? ? freshness_coverage(report) : nil) %>
+<% if seen %><p><%= seen %></p><% end %>
+<% reasons = freshness_reasons(report) %>
+<% if reasons.any? %>
+  <p>Not <%= report['state'] == 'current' ? 'limited' : 'current' %> because:</p>
+  <ul class="fresh-list"><% reasons.each do |reason| %><li><%= reason %></li><% end %></ul>
+<% end %>
+<% steps = freshness_steps(report) %>
+<% if steps.any? %>
+  <p>Next:</p>
+  <ul class="fresh-list"><% steps.each do |step| %><li><%= step %></li><% end %></ul>
+<% end %>

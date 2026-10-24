@@ -1,18 +1,19 @@
-<%# The sheet behind ☰ below 960 (C3-Navigation): files first, this page's
-    sections below. It holds the file tree and borrows the page's nav.rail
-    while open. Locals: tree (FileTree or nil), current_path (String or nil). %>
+<%# The sheet behind ☰ (C3-Navigation): below 960 the primary nav first, then
+    files, then this page's sections. The file tree is not in the page (M10):
+    the sheet fetches it from tree_url the first time it opens and marks
+    current_path there. The sheet borrows the page's nav.rail while open.
+    The header stays put while the rest scrolls. Locals: tree_url (String or
+    nil), current_path (String or nil), nav (Array of [label, href, current?]). %>
 <div class="sheet-overlay" hidden data-sheet-target="overlay" data-action="click->sheet#outside">
   <div class="sheet" role="dialog" aria-modal="true" aria-label="Files and sections">
     <div class="sh"><button class="tool" type="button" aria-label="Close" data-action="sheet#close" data-sheet-target="close">✕</button><span class="eyebrow">files</span><span class="eyebrow aside">on this page</span></div>
-    <div data-sheet-target="body">
-      <% if local_assigns[:tree] %>
-        <% since = current_since if current_since&.available? %>
-        <% moved = ->(row) { since && row.kind == :file && Array(row.owner_keys).any? { |key| since.change(*key) } } %>
-        <% mark = since ? safe_join([chip(:modified, "a unit in this file changed since gen #{since.from_generation}"), tag.span(" changed since gen #{since.from_generation}", class: 'sr-only')]) : nil %>
-        <% rows = tree.rows.map { |row| { kind: row.kind, name: row.name, level: row.level, path: row.path, count: row.count, owner_keys: row.owner_keys, open: row.level < 2, current: row.path == local_assigns[:current_path], unindexed: false, href: (row.kind == :file ? woods_map.file_path(path: row.path) : nil), chips: (row.kind == :file ? safe_join([tag.span(" #{row.units} #{'unit'.pluralize(row.units)}, #{row.unresolved} unresolved", class: 'ct'), (mark if moved.call(row))].compact) : nil) } } %>
-        <% changed_files = since ? tree.rows.count { |row| moved.call(row) } : nil %>
-        <%= render 'woods_map/components/tree', total: safe_join(["#{tree.unit_count} units, #{tree.unresolved_count} unresolved", (changed_files ? ", #{changed_files} changed since gen #{since.from_generation}" : nil)].compact), rows: rows %>
-      <% end %>
+    <div class="sheet-scroll" data-sheet-target="scroll">
+      <nav class="sheet-nav" aria-label="Primary, in the sheet"><ul><% Array(local_assigns[:nav]).each do |label, href, current| %><li><a href="<%= href %>"<%= ' aria-current="page"'.html_safe if current %>><%= label %></a></li><% end %></ul></nav>
+      <div data-sheet-target="body">
+        <% if local_assigns[:tree_url] %>
+          <div class="sheet-tree" data-sheet-target="tree" data-src="<%= tree_url %>" data-current="<%= local_assigns[:current_path] %>"><p class="cap padx" role="status" data-sheet-target="treeStatus">The file tree loads when the sheet opens.</p></div>
+        <% end %>
+      </div>
     </div>
   </div>
 </div>

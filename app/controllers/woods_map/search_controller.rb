@@ -8,7 +8,7 @@ module WoodsMap
     def show
       with_repository do |repository|
         @repository = repository
-        @tree = WoodsMap::FileTree.for(repository)
+        @files_sheet = true
         @freshness = repository.freshness
         @results = WoodsMap::SearchResults.new(repository, params[:q], mode: params[:in].to_s,
                                                                        types: Array(params[:types]).presence)

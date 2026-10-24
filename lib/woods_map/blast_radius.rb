@@ -49,10 +49,16 @@ module WoodsMap
       @graph.dig('pagerank', identifier).to_f
     end
 
+    # Distinct typed units with an edge to this one in the generation's
+    # graph (`reverse_via` records carry the source's type). It is not the
+    # count graph_analysis gives a hub, which Woods takes per identifier when
+    # it analyses the graph; {#notes} labels that one as such.
+    #
     # @param identifier [String]
-    # @return [Integer] how many units depend on it
+    # @return [Integer] typed units that depend on it
     def dependent_count(identifier)
-      Array(@graph.dig('reverse_via', identifier)).pluck('source').uniq.size
+      Array(@graph.dig('reverse_via', identifier))
+        .map { |record| [record['source'], record['source_type'] || type_of(record['source'].to_s)] }.uniq.size
     end
 
     # @return [Array<Affected>] every unit within reach, breadth first, before the filters
@@ -86,10 +92,11 @@ module WoodsMap
     end
 
     # @param identifier [String]
-    # @return [Array<String>] notes from the analysis: hub, cycle, bridge
+    # @return [Array<String>] notes from the analysis: hub, cycle, bridge.
+    #   A hub's count is graph_analysis', per identifier, and says so.
     def notes(identifier)
       notes = []
-      notes << "hub, #{hubs[identifier]} dependents" if hubs.key?(identifier)
+      notes << "hub, #{hubs[identifier]} dependents by identifier" if hubs.key?(identifier)
       notes << 'in a cycle' if cycles.include?(identifier)
       notes << 'bridge' if bridges.include?(identifier)
       notes
