@@ -127,6 +127,9 @@ Run this before a milestone issue is opened and again before it closes.
 | M8 open choices: the 429 state, the loopback Host rule, no style attributes (needs-decision, open) | [woods-map#59](https://github.com/lost-in-the/woods-map/issues/59) |
 | M8 threat model and deployment guide beside Woods' `MCP_HTTP_TRANSPORT.md`, closed | [woods-map#10](https://github.com/lost-in-the/woods-map/issues/10), [THREAT_MODEL.md](../THREAT_MODEL.md), [DEPLOYMENT.md](../DEPLOYMENT.md) |
 | Share output that pastes cleanly into a GitHub pull-request comment: Mermaid GitHub can render, a copy-for-PR block, `config.public_url` (backlog; would amend D-25) | [woods-map#76](https://github.com/lost-in-the/woods-map/issues/76) |
+| M1 exit criterion: both design-study scenarios walked by clicking only, JavaScript on and off, on testbed rails-8.0 and rails-6.0 (woods-testbed `scripts/support/woods_map_walks.json`); scroll regions focusable without JavaScript | [woods-testbed#38](https://github.com/lost-in-the/woods-testbed/issues/38) |
+| Lifecycle tab on controllers, jobs and mailers: entry flows instead of model event chains (FR-6, needs-decision) | [woods-map#91](https://github.com/lost-in-the/woods-map/issues/91) |
+| History: filter the timeline by a commit's author (scenario 2 step 4) | [woods-map#92](https://github.com/lost-in-the/woods-map/issues/92) |
 | D-10 Source of truth for visual tokens | [woods-map#12](https://github.com/lost-in-the/woods-map/issues/12) |
 | D-11 Colour meaning | [woods-map#13](https://github.com/lost-in-the/woods-map/issues/13) |
 | D-12 Typefaces | [woods-map#14](https://github.com/lost-in-the/woods-map/issues/14) |

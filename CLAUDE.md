@@ -82,6 +82,7 @@ docs/design/                     # design study, decisions, boards, foundations,
 
 ## Gotchas
 
+- A horizontally scrolling wrapper (`.tblwrap`, `pre.cmd`, `.cvwrap`, `.tl`) is rendered with `role="region"`, an `aria-label` and `tabindex="0"` so it is reachable without JavaScript; the `cliff` controller removes the tab stop when nothing overflows. A new scroll wrapper must do the same.
 - `Woods::MCP::IndexReader#search` answers with symbol keys and rows of identifier, type and match_field only; `Repository#search` stringifies the keys and adds `file_path` from the graph nodes. Read search results through the repository.
 - Freshness is `Woods::SourceInputs::Status` over the index root (`PublishedIndex#index_dir`), never the payload dir; a quick check that finds no changes can still say `unknown` when Woods could not verify the boot boundary, and the bar reports Woods' reasons rather than upgrading the verdict.
 - Unit identifiers and file keys keep their extension in the URL. Their routes declare `format: false`, yet Rails reads a format from the path extension when a request has no Accept header (curl, crawlers) or a browser's catch-all one (`.yml` → YAML, a 500; `.js` → a page without the layout). `WoodsMap::PathExtension` makes those pages HTML; a new route that takes a path-like value must stay `format: false` and HTML.
