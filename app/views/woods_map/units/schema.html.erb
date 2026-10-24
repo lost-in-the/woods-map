@@ -21,9 +21,12 @@
             rows: assocs.map { |a| { cells: [a.macro, unit_link(a.target), a.options.presence || empty_value(applicable: false), a.foreign_key || tag.span('derived', class: 'dim'), a.enforced, a.finding ? safe_join([chip(:note), ' ', a.finding]) : empty_value(applicable: false)] } } %>
     </section>
     <section class="sec" aria-labelledby="colsh">
+      <% since_from = current_since&.available? ? current_since.from_generation : nil %>
+      <% col_marks = since_from && (current_since.column_marks(@page.identifier, @page.type) || (@schema.table_name && current_since.column_marks("table:#{@schema.table_name}", 'database_table'))) %>
       <header><h2 class="t2" id="colsh">Columns <%= count_tag(@schema.columns.size) %></h2></header>
       <%= render 'woods_map/components/table', label: 'Columns', min_width: '760px', columns: [{ label: 'column', width: '180px', cell_class: 'nw id' }, { label: 'type', width: '110px' }, { label: 'null', width: '60px' }, { label: 'default', width: '110px' }, { label: 'index' }, { label: 'written by' }],
-            rows: @schema.columns.map { |c| { cells: [c.name, c.type, c.null, c.default.nil? ? empty_value(applicable: false) : c.default.to_s, c.index || empty_value(applicable: false), Array(c.written_by).any? ? c.written_by.join(', ') : empty_value(applicable: false)] } } %>
+            caption: (col_marks&.removed&.any? ? "removed since gen #{since_from}: #{col_marks.removed.sort.join(', ')}" : nil),
+            rows: @schema.columns.map { |c| kind = col_marks && col_marks[c.name]; { classes: (kind ? 'chg' : nil), cells: [(kind ? safe_join([chip(:modified, "#{kind} since gen #{since_from}"), tag.span(" #{kind} since gen #{since_from}: ", class: 'sr-only'), ' ', c.name]) : c.name), c.type, c.null, c.default.nil? ? empty_value(applicable: false) : c.default.to_s, c.index || empty_value(applicable: false), Array(c.written_by).any? ? c.written_by.join(', ') : empty_value(applicable: false)] } } %>
     </section>
     <section class="sec" aria-labelledby="dbh">
       <header><h2 class="t2" id="dbh">Database facts <%= count_tag('what the schema enforces') %></h2></header>

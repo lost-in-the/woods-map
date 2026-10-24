@@ -96,6 +96,47 @@ RSpec.describe '?since= highlighting from Woods\' range report', type: :request 
     expect(tree.at_css('a.f[data-path="app/models/micropost.rb"] .M')).to be_nil
   end
 
+  describe 'filters and columns (woods#820, woods#821)' do
+    def report_with(*records)
+      stub_range_report(range_report_data.merge('changed' => range_report_changes + records))
+    end
+
+    it 'marks the filter-matrix row whose declaration holds a changed line' do
+      lines = { 'hunks' => [{ 'before' => [34, 1], 'after' => [34, 1] }], 'added_lines' => 1, 'removed_lines' => 1,
+                'coverage' => 'complete' }
+      report_with({ 'identifier' => 'UsersController', 'type' => 'controller', 'status' => 'modified',
+                    'facets' => ['source'], 'metadata_keys' => [], 'source_changes' => lines })
+      get '/woods/units/controller/UsersController/passage', params: { action_name: 'edit', since: 'gen:1' }
+      rows = doc.css('table[aria-label="Filter matrix"] tbody tr.chg')
+      expect(rows.map { |tr| tr.at_css('td a, td').text }).to all(include('correct_user'))
+      expect(rows.size).to eq(1)
+      expect(rows.first.at_css('.sr-only').text).to include('its declaration changed since gen 1')
+    end
+
+    def column_records
+      columns = { 'added' => ['state'], 'removed' => ['legacy'], 'modified' => ['content'] }
+      report_with({ 'identifier' => 'table:microposts', 'type' => 'database_table', 'status' => 'modified',
+                    'facets' => ['metadata'], 'metadata_keys' => ['columns'], 'column_changes' => columns },
+                  { 'identifier' => 'Micropost', 'type' => 'model', 'status' => 'modified', 'facets' => ['metadata'],
+                    'metadata_keys' => ['columns'], 'column_changes' => columns.merge('added' => []) })
+    end
+
+    it 'marks moved columns on the ERD list and in its diagram' do
+      column_records
+      get '/woods/erd', params: { since: 'gen:1' }
+      expect(doc.at_css('table[aria-label="Tables in this chunk"]').text).to include('+state ~content −legacy')
+      expect(response.body).to include('content &quot;modified since gen 1&quot;')
+    end
+
+    it 'marks moved columns on the Schema tab and lists the removed ones' do
+      column_records
+      get '/woods/units/model/Micropost/schema', params: { since: 'gen:1' }
+      rows = doc.css('table[aria-label="Columns"] tbody tr.chg')
+      expect(rows.map { |tr| tr.css('td').first.text }).to eq(['M modified since gen 1:  content'])
+      expect(doc.at_css('section[aria-labelledby="colsh"] .cap').text).to include('removed since gen 1: legacy')
+    end
+  end
+
   it 'says on the ERD how many tables moved' do
     get '/woods/erd', params: { since: 'gen:1' }
     expect(doc.at_css('.banner').text).to include('0 tables changed since gen 1.')

@@ -40,6 +40,21 @@ module WoodsMap
       end
     end
 
+    # A unit's moved columns: name => :added or :modified, and the removed names.
+    ColumnMarks = Struct.new(:by_name, :removed, keyword_init: true) do
+      # @param name [String]
+      # @return [Symbol, nil]
+      def [](name)
+        by_name[name.to_s]
+      end
+
+      # @return [String] "+published_at ~state −legacy"
+      def summary
+        added, modified = by_name.keys.sort.partition { |name| by_name[name] == :added }
+        (added.map { |n| "+#{n}" } + modified.map { |n| "~#{n}" } + removed.sort.map { |n| "−#{n}" }).join(' ')
+      end
+    end
+
     LineMarks = Struct.new(:changed, :removed_after, :added, :removed, :coverage, keyword_init: true) do
       # @param number [Integer, nil] a composite line
       # @return [Boolean]
@@ -167,6 +182,21 @@ module WoodsMap
       methods = Array(unit.dig('metadata', 'methods')).select { |entry| method_entry?(entry) }
       Changed.new(methods: methods.select { |entry| moved?(marks, entry['line'], entry['end_line']) },
                   all_methods: methods, marks: marks)
+    end
+
+    # The columns the report records moving for a unit (`column_changes`,
+    # woods#821), as column name => :added or :modified, plus the removed names.
+    #
+    # @param identifier [String]
+    # @param type [String]
+    # @return [ColumnMarks, nil] nil when the record names no columns
+    def column_marks(identifier, type)
+      changes = change(identifier, type)&.dig('column_changes')
+      return nil unless changes.is_a?(Hash)
+
+      marks = Array(changes['added']).to_h { |name| [name.to_s, :added] }
+      Array(changes['modified']).each { |name| marks[name.to_s] ||= :modified }
+      ColumnMarks.new(by_name: marks, removed: Array(changes['removed']).map(&:to_s))
     end
 
     # @param identifier [String]

@@ -7,6 +7,8 @@
 <% before = applying.select { |f| f.kind == 'before' }; after = applying.select { |f| f.kind == 'after' }; around = applying.select { |f| f.kind == 'around' } %>
 <% skipped = p.filters - applying %>
 <% resolved = p.resolved? %>
+<% moved_members = current_since&.changed_members(@unit) %>
+<% filter_change = ->(f) { moved_members&.callback(f.since_entry, f.owner || @page.identifier) } %>
 <% chain_chip = resolved ? 'resolved chain' : 'declared' %>
 <% skipped_label = resolved ? 'skipped' : 'not declared' %>
 <% condition_text = ->(f) { f.condition ? safe_join([' ', f.condition, ' ', layer_chip('conditional, not evaluated')]) : '' } %>
@@ -184,7 +186,8 @@
             <tbody>
               <% p.filters.each do |f| %>
                 <% cell_title = resolved ? [f.condition, (f.scope == 'every action' ? nil : f.scope)].compact.join('; ').presence : nil %>
-                <tr><td class="id"><%= f.kind %> <%= code_line_link(f.file, f.line, text: f.name) %><br><span class="mut regular"><% if resolved %><%= f.owner == @page.identifier ? f.owner : (filter_owner(f.owner).presence || 'owner not published') %><%= f.conditional? ? ", conditional: #{f.condition || 'if/unless'}" : '' %><% else %><%= f.file ? f.file.sub('app/controllers/', '') : f.scope %><%= f.file && f.scope != 'every action' ? ", #{f.scope}" : '' %><% end %></span></td><% p.actions.each do |a| %><% on = f.applies?(a) %><td class="c <%= on ? 'on' : 'off' %><%= ' cur' if a == p.action %>"<% if on && cell_title %> title="<%= cell_title %>"<% end %>><%= on ? '✓' : '·' %><% if on && f.conditional? %><span class="sr-only">, when <%= f.condition || 'its condition holds' %></span><% end %></td><% end %></tr>
+                <% change = filter_change.call(f) %>
+                <tr<%= ' class="chg"'.html_safe if change %>><td class="id"><% if change %><%= chip(:modified, change == :method ? 'its method changed' : 'its declaration changed') %><span class="sr-only"> its <%= change %> changed since gen <%= current_since.from_generation %>: </span> <% end %><%= f.kind %> <%= code_line_link(f.file, f.line, text: f.name) %><br><span class="mut regular"><% if resolved %><%= f.owner == @page.identifier ? f.owner : (filter_owner(f.owner).presence || 'owner not published') %><%= f.conditional? ? ", conditional: #{f.condition || 'if/unless'}" : '' %><% else %><%= f.file ? f.file.sub('app/controllers/', '') : f.scope %><%= f.file && f.scope != 'every action' ? ", #{f.scope}" : '' %><% end %></span></td><% p.actions.each do |a| %><% on = f.applies?(a) %><td class="c <%= on ? 'on' : 'off' %><%= ' cur' if a == p.action %>"<% if on && cell_title %> title="<%= cell_title %>"<% end %>><%= on ? '✓' : '·' %><% if on && f.conditional? %><span class="sr-only">, when <%= f.condition || 'its condition holds' %></span><% end %></td><% end %></tr>
               <% end %>
             </tbody>
           </table>

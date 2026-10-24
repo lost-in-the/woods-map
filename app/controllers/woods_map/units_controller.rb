@@ -12,6 +12,7 @@ module WoodsMap
     include WoodsMap::RoutedIdentifier
     include WoodsMap::UnitHistory
     include WoodsMap::GraphOverlays
+    include WoodsMap::UnitLifecycle
 
     LENS_COOKIE = 'woods_map_lens'
 
@@ -169,26 +170,12 @@ module WoodsMap
       render :entry_lifecycle
     end
 
-    def lifecycle_for(unit, dynamic: nil)
-      WoodsMap::Lifecycle.new(unit, concern_methods: concern_methods(unit), dynamic: dynamic,
-                                    changed: current_since&.changed_members(unit))
-    end
-
     # The ladder's event: ?event= when valid, else the one the action implies, else the first chain.
     def ladder_event(ladder)
       return nil unless ladder
 
       requested = params[:event] if WoodsMap::Lifecycle::EVENTS.include?(params[:event])
       requested || @passage.ladder_event || ladder.chains.keys.first || 'create'
-    end
-
-    # concern name => the instance methods that concern defines, for the
-    # concerns the unit inlines.
-    def concern_methods(unit)
-      Array(unit.dig('metadata', 'inlined_concerns')).to_h do |name|
-        concern = @repository.unit(name, type: 'concern')
-        [name, Array(concern&.dig('metadata', 'instance_methods')).map(&:to_s)]
-      end
     end
   end
 end
