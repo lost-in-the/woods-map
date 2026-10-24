@@ -20,9 +20,22 @@ module WoodsMap
     # Stable, unambiguous typed identity; the full digest avoids truncating collisions.
     # @param identity [Array(String, String)] identifier and type
     # @return [String]
-    def node_id(identity)
+    def self.node_id(identity)
       "n_#{Digest::SHA256.hexdigest(identity.to_json)}"
     end
+
+    # The edge's element id: typed endpoints plus mechanism, as the JSON carries it.
+    # The Graph tab's list rows carry it too, so a row and its drawn edge pair up.
+    # @param edge [Neighbourhood::Edge]
+    # @return [String]
+    def self.edge_id(edge)
+      "e_#{Digest::SHA256.hexdigest([[edge.from, edge.from_type], edge.via, [edge.to, edge.to_type]].to_json)}"
+    end
+
+    # @!method node_id(identity)
+    #   @param identity [Array(String, String)] identifier and type
+    #   @return [String] see {.node_id}
+    delegate :node_id, to: :class
 
     # @param identity [Array(String, String)] identifier and type
     # @return [String, nil] an explicitly published package
@@ -49,9 +62,8 @@ module WoodsMap
     def edge(edge)
       from = [edge.from, edge.from_type]
       to = [edge.to, edge.to_type]
-      id = Digest::SHA256.hexdigest([from, edge.via, to].to_json)
       raw = raw_edge(edge)
-      { 'data' => { 'id' => "e_#{id}", 'source' => node_id(from), 'target' => node_id(to),
+      { 'data' => { 'id' => self.class.edge_id(edge), 'source' => node_id(from), 'target' => node_id(to),
                     'via' => edge.via, 'depth' => edge.depth,
                     'through' => raw['through'], 'cross_database' => raw['cross_database'] } }
     end

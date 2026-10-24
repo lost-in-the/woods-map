@@ -2,7 +2,11 @@
 <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
 <% n = @neighbourhood %>
 <%= render 'woods_map/units/frame', page: @page, tab: 'graph', definition: @definition %>
-<div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
+<% graph_label = "Neighbourhood of #{@page.identifier} at depth #{n.depth}, #{n.direction}: units and their edges, each edge labelled with its mechanism. Arrow keys move along the edges, Enter opens a unit's graph; the list below has the same edges." %>
+<div class="body" data-controller="trail graph" data-trail-title-value="<%= @page.identifier %>"
+     data-graph-url-value="<%= woods_map.neighbourhood_path(centre: @page.identifier, type: @page.type, depth: n.depth, direction: n.direction, types: params[:types].presence, via: params[:via].presence) %>"
+     data-graph-unit-url-value="<%= woods_map.unit_graph_path(type: '__type__', identifier: '__identifier__', depth: n.depth, direction: n.direction) %>"
+     data-graph-generation-value="<%= @repository.generation_number %>">
   <nav class="rail" aria-label="Graph filters">
     <form method="get" action="<%= woods_map.unit_graph_path(type: @page.type, identifier: @page.identifier) %>">
       <h2 class="t3 on">Neighbourhood</h2>
@@ -18,21 +22,44 @@
       <div class="grp">via <span class="cnt"><%= n.via_counts.values.sum(&:size) %></span></div>
       <% n.via_counts.each do |family, vias| %><div class="grp" style="border:0;padding-top:var(--s2)"><%= family %></div><% vias.each do |via, count| %><label class="f"><input type="checkbox" name="via[]" value="<%= via %>"<%= ' checked'.html_safe if params[:via].nil? || Array(params[:via]).include?(via) %>> <%= via %> <span class="cnt"><%= count %></span></label><% end %><% end %>
       <div style="padding:var(--s3) var(--s5)"><button class="btn" type="submit">apply filters</button></div>
+      <div data-graph-target="layouts" hidden>
+        <div class="grp">layout</div>
+        <div style="padding:var(--s1) var(--s5)"><span class="seg" role="group" aria-label="Layout"><% %w[butterfly radial].each do |mode| %><button type="button" aria-pressed="<%= mode == 'butterfly' %>" data-layout="<%= mode %>" data-graph-target="layout" data-action="graph#layout"><%= mode %></button><% end %></span></div>
+      </div>
     </form>
   </nav>
   <div class="main">
     <section class="sec">
+      <div class="dia graph" data-graph-target="panel" hidden>
+        <div class="dh"><b>Neighbourhood</b><span class="gfacts" data-graph-target="facts"></span><span class="tools">
+          <button class="tool" type="button" aria-label="Zoom in" data-action="graph#zoomIn">+</button>
+          <button class="tool" type="button" aria-label="Zoom out" data-action="graph#zoomOut">−</button>
+          <button class="tool" type="button" data-action="graph#fit">fit</button>
+          <%= tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: n.mermaid, action: 'copy#copy' }) %>
+          <button class="tool" type="button" aria-pressed="false" aria-controls="graph-flowchart" data-graph-target="flowchart" data-action="graph#flowchart">flowchart</button>
+        </span></div>
+        <div class="gcanvas" tabindex="0" role="application" aria-roledescription="graph" aria-label="<%= graph_label %>" aria-describedby="graph-status" data-graph-target="canvas"></div>
+        <p class="gstatus" id="graph-status" role="status" data-graph-target="status">Tab to the canvas: arrow keys move along the edges, Enter opens a unit's graph, + and − zoom, 0 fits.</p>
+        <%= render 'woods_map/components/legend',
+              entries: n.type_counts.keys.map { |type| [tag.i(class: 'sw gsw', data: { gtype: type }), type.to_s.tr('_', ' ')] } +
+                       [[tag.span('──', class: 'ar'), 'association'], [tag.span('┄┄', class: 'ar'), 'other mechanisms'],
+                        [tag.i(class: 'sw', style: 'border-color:var(--select)'), 'this unit'], ['', 'hub, cycle: graph_analysis, per identifier']],
+              provenance: ['typed edges', 'weight = pagerank', "gen #{@repository.generation_number}"] %>
+      </div>
+      <p class="cap refusal" role="status" data-graph-target="message" hidden></p>
+      <div id="graph-flowchart" data-graph-target="fallback">
       <%= render 'woods_map/components/diagram', title: 'Neighbourhood', facts: ["#{@page.identifier}, depth #{n.depth}, #{n.direction}", "#{n.node_count} #{'unit'.pluralize(n.node_count)}", "#{n.edges.size} #{'edge'.pluralize(n.edges.size)}"],
             tools: tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: n.mermaid, action: 'copy#copy', needs_js: true }),
             mermaid: n.mermaid, label: "Neighbourhood of #{@page.identifier} at depth #{n.depth}: #{n.edges.size} edges, each labelled with its mechanism; the list below has the same edges",
             refusal: (n.over_budget? ? "#{n.node_count} units is over the flowchart budget of #{WoodsMap::Neighbourhood::NODE_BUDGET}; narrow the types or mechanisms to draw it. The list below has every edge." : nil),
             legend: [[tag.i(class: 'sw', style: 'border-color:var(--select)'), 'this unit'], [tag.span('→', class: 'ar'), 'edge, labelled with its mechanism']], provenance: ['typed edges', "gen #{@repository.generation_number}"] %>
+      </div>
     </section>
-    <section class="sec" data-controller="rows">
-      <header><h2 class="t2">List equivalent <%= count_tag("#{n.edges.size} of #{n.all_edges.size} edges") %><%= info_tip('The same edges the diagram draws, and the canvas will (M5); dependents point at this unit, dependencies away from it. Notes come from graph_analysis.json.') %></h2></header>
+    <section class="sec" data-controller="rows" data-graph-target="list">
+      <header><h2 class="t2">List equivalent <%= count_tag("#{n.edges.size} of #{n.all_edges.size} edges") %><%= info_tip('The same edges the canvas and the flowchart draw; dependents point at this unit, dependencies away from it. Notes come from graph_analysis.json, per identifier. Arrow keys move between rows; a row in focus lights its edge on the canvas.') %></h2></header>
       <%= render 'woods_map/components/table', label: 'Edges', min_width: '720px', columns: [{ label: 'from', width: '30%' }, { label: 'via', width: '160px', cell_class: 'nw' }, { label: 'to', width: '30%', cell_class: 'id' }, { label: 'notes' }],
-            rows: n.edges.map { |e| { cells: [n.focus?(e.from, e.from_type) ? e.from : unit_link(e.from, e.from_type), e.via, n.focus?(e.to, e.to_type) ? e.to : unit_link(e.to, e.to_type), (n.notes(n.focus?(e.from, e.from_type) ? e.to : e.from) + (e.depth > 1 ? ['2 hops'] : [])).join(', ').presence || empty_value(applicable: false)] } } %>
+            rows: n.edges.map { |e| { data: { edge: WoodsMap::GraphElements.edge_id(e) }, cells: [n.focus?(e.from, e.from_type) ? e.from : unit_link(e.from, e.from_type), e.via, n.focus?(e.to, e.to_type) ? e.to : unit_link(e.to, e.to_type), (n.notes(n.focus?(e.from, e.from_type) ? e.to : e.from) + (e.depth > 1 ? ['2 hops'] : [])).join(', ').presence || empty_value(applicable: false)] } } %>
     </section>
-    <%= render 'woods_map/shared/status', items: ['typed edges', 'graph_analysis', "gen #{@repository.generation_number}"], keys: [[%w[1 2], 'depth'], [%w[/], 'search']] %>
+    <%= render 'woods_map/shared/status', items: ['typed edges', 'graph_analysis', "gen #{@repository.generation_number}"], keys: [[%w[← ↑ → ↓], 'move'], [%w[↵], 'open'], [%w[1 2], 'depth'], [%w[/], 'search']] %>
   </div>
 </div>

@@ -61,3 +61,20 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .keyboard-help section{margin-top:var(--s5)}
 .wm .keyboard-help dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--s2) var(--s4)}
 .wm .keyboard-help dd{margin:0;overflow-wrap:anywhere}
+
+/* The Graph tab's Cytoscape canvas (M5): one tab stop with the selection's focus ring, a fixed
+   height in spacing steps, and the status line naming the selected unit. Each unit type's tint is
+   --g on [data-gtype]: the graph controller reads it through a probe and mixes it into --panel,
+   as the legend swatches do, so canvas and legend share one source. Types without a rule stay neutral. */
+.wm .dia.graph .dh .gfacts{display:inline-flex;gap:var(--s5);flex-wrap:wrap}
+@container wm (max-width:639px){ .wm .dia.graph .dh{flex-wrap:wrap;white-space:normal;row-gap:var(--s2)} .wm .dia.graph .dh .tools{margin-left:0;flex-wrap:wrap} }
+.wm .gcanvas{position:relative;height:calc(var(--s7) * 10);background:var(--bg);border-top:1px solid var(--rule)}
+.wm .gcanvas:focus-visible{outline:2px solid var(--select);outline-offset:-2px}
+.wm .gstatus{min-height:1.55em;padding:var(--s2) var(--s4);font-family:var(--ff-ui);font-size:var(--fs-12);color:var(--mut);border-top:1px solid var(--rule)}
+@container wm (max-width:639px){ .wm .gcanvas{height:calc(var(--s7) * 7)} }
+.wm [data-gtype]{--g:var(--op)}
+.wm [data-gtype=model],.wm [data-gtype=database_table],.wm [data-gtype=database_view],.wm [data-gtype=migration]{--g:var(--fn)}
+.wm [data-gtype=controller],.wm [data-gtype=route],.wm [data-gtype=middleware]{--g:var(--k)}
+.wm [data-gtype=view_template],.wm [data-gtype=component],.wm [data-gtype=view_component],.wm [data-gtype=phlex]{--g:var(--str)}
+.wm [data-gtype=job],.wm [data-gtype=mailer],.wm [data-gtype=scheduled_job]{--g:var(--var)}
+.wm .legend i.gsw{background:color-mix(in srgb,var(--g) 18%,var(--panel))}

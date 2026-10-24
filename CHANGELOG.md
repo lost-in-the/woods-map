@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+- M5 Graph tab canvas (woods-map#7; FR-5, A-1, A-2, A-5): Cytoscape 3.34.3 is vendored as its unmodified ESM build (`vendor/javascript/cytoscape.esm.min.mjs`, MIT) and loaded on demand by a new `graph` controller. The controller draws the page's own neighbourhood query from `/woods/graph/neighbourhood`. Units are tinted by type from the tokens, sized by PageRank, and marked hub and cycle per identifier; truncated units are dashed. The butterfly layout puts dependents left and dependencies right; the radial layout is Cytoscape's built-in `concentric`. Neither needs a layout extension; fcose and dagre are deferred to woods-map#63. Other controls:
+  - click, or Enter on the selection, opens a unit's graph;
+  - arrow keys move along the edges, Home returns to this unit, and + / − / 0 zoom and fit;
+  - list rows light their edge, and ↑ / ↓ move between them;
+  - the toolbar has zoom, fit, copy Mermaid and a *flowchart* toggle.
+
+  The Pele flowchart and the list stay the page without JavaScript and when the fetch fails.
+
 - Add contextual keyboard help (`?` and a primary-bar button), focus containment and return, typing/modal guards and Chromium keyboard regressions (NFR-3, #34). Remove the unimplemented source-line j/k hint.
 
 - M3, first slice (woods-map#5, D-21): diagram panels draw their Mermaid text with Pele 1.6.0, vendored as `vendor/javascript/pele.js` and loaded on the first panel that needs it. The text stays in the page as the fallback without JavaScript or when Pele refuses it, and *Mermaid text* swaps back to it. Diagrams keep their natural width and scroll sideways (C4), themed by the `--pele-*` tokens of B9-Pele in `tokens.css`, which replace the Mermaid overrides. The Schema ER and the Lifecycle sequence are drawn; the Graph tab gains the neighbourhood flowchart above the list equivalent, with a 150-node budget (R-4); the ER diagram has a 40-table budget and the lifecycle sequence a 150 participant-and-message budget, and each keeps the text and names its budget when exceeded. When Pele refuses a text at render time (over its 50,000-character limit, an unknown syntax), the panel says so in a status line above the text. The lifecycle sequence moves into `Lifecycle#mermaid`, with aliased participants so namespaced names stay valid. ER entities are quoted as written, so a namespaced table (`active_storage/attachments`) is valid Mermaid and a schema-qualified `audit.logs` stays apart from `audit_logs`. A headless render spec draws every generated text from the fixture with the vendored build in Node (`WOODS_MAP_RENDER_SPEC=1` in CI).
