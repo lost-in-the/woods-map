@@ -33,6 +33,10 @@ WoodsMap::Engine.routes.draw do
   get 'erd.mmd', to: 'erd#show', as: :erd_mmd, defaults: { mmd: '1' }, format: false
   get 'erd(/:chunk)', to: 'erd#show', as: :erd, constraints: { chunk: /[1-9][0-9]{0,5}/ }, format: false
 
+  # The cross-unit timeline (M4): typed identifiers in the query, never a path.
+  get 'history.mmd', to: 'history#show', as: :history_mmd, defaults: { mmd: '1' }, format: false
+  get 'history', to: 'history#show', as: :history
+
   get 'units', to: 'units#index', as: :units
   # File paths are exact admitted file_map keys, never host filesystem paths.
   get 'files', to: 'files#show', format: false
@@ -42,7 +46,7 @@ WoodsMap::Engine.routes.draw do
   # from the pinned generation; never a file path.
   scope 'units/:type', constraints: { type: /[a-z0-9_]+/ }, format: false do
     # The tabs' Mermaid text (D-25), ahead of the glob routes that would take `.mmd` as part of an identifier.
-    %w[schema passage lifecycle graph].each do |tab|
+    %w[schema passage lifecycle graph history].each do |tab|
       get "*identifier/#{tab}.mmd", to: "units##{tab}", as: :"unit_#{tab}_mmd", defaults: { mmd: '1' }
     end
     get '*identifier/schema', to: 'units#schema', as: :unit_schema
