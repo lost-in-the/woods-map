@@ -2,7 +2,7 @@
 
 require_relative '../support/synthetic_index'
 
-# The files sheet's tree (M10): no page carries it; the sheet fetches one
+# The files sheet's tree: no page carries it; the sheet fetches one
 # fragment per generation, cached by the browser, without framework or gem
 # source; folded folders hide what is under them.
 RSpec.describe 'The files sheet', type: :request do

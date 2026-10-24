@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module WoodsMap
-  # The file tree as its own response (M10): the sheet fetches it the first
+  # The file tree as its own response: the sheet fetches it the first
   # time it opens, so a page carries none of it. The fragment depends only on
   # the pinned generation and the `?since=` selector, so it is rendered once
   # per pair and kept in a small process cache; the browser revalidates it by

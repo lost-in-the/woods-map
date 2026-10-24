@@ -400,7 +400,7 @@ html.no-js .wm .amb-pop[hidden]{display:block}
 .wm .bar-fresh a.why{color:inherit;text-decoration:none}
 .wm .bar-fresh a.why:hover .w{text-decoration:underline}
 .wm .fresh-list{margin:var(--s1) 0 var(--s2);padding-left:var(--s5);list-style:disc}
-/* Navigation at every width (M10, B4 to B9). ☰ opens the files sheet at every width,
+/* Navigation at every width. ☰ opens the files sheet at every width,
    with a 32px hit area. The sheet's header stays put while the nav, files and sections
    scroll beneath it, and the tree's filter stays at the top of that scroll. Below 960 the
    sheet carries the primary nav the bar hides. Below 640 the bar keeps a usable search
@@ -422,11 +422,11 @@ html.no-js .wm .amb-pop[hidden]{display:block}
   .wm .bar .bar-search .q{display:block}
   .wm .status{flex-wrap:wrap;height:auto;min-height:32px;row-gap:var(--s1);column-gap:var(--s4);padding-block:var(--s2);white-space:normal}
 }
-/* The peek (B16) starts after the gutters, so it is at most the code region's width less
+/* The peek starts after the gutters, so it is at most the code region's width less
    the gutters and its right margin, and it sticks just after the gutters, not under them. */
 .wm .cvwrap .cv .peek{left:52px;max-width:calc(100cqw - 52px - var(--s4))}
 @container wm (max-width:639px){ .wm .cvwrap .cv .peek{left:68px;max-width:calc(100cqw - 68px - var(--s4))} }
-/* The cross-unit timeline below 640 (N7): the lane names take at most two fifths of the
+/* The cross-unit timeline below 640: the lane names take at most two fifths of the
    width and end in an ellipsis, so the plot keeps the rest and every dot is on screen. */
 @container wm (max-width:639px){
   .wm .tl{grid-template-columns:minmax(0,40%) minmax(0,1fr);overflow-x:visible}

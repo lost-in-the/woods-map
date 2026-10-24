@@ -72,7 +72,7 @@ WoodsMap::Engine.routes.draw do
   get 'units', to: 'units#index', as: :units
   # File paths are exact admitted file_map keys, never host filesystem paths.
   get 'files', to: 'files#show', format: false
-  # The file tree the sheet fetches when it first opens (M10): one fragment per generation.
+  # The file tree the sheet fetches when it first opens: one fragment per generation.
   get 'tree', to: 'trees#show', as: :tree, format: false
   get 'files/*path', to: 'files#show', as: :file, format: false
 
