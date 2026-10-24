@@ -7,7 +7,7 @@ module WoodsMap
   # container diagram is also served as Mermaid, Structurizr DSL and LikeC4
   # text, for agents and architecture tools (D-25).
   class LandscapeController < ApplicationController
-    TABS = %w[context containers components hotspots domains].freeze
+    TABS = %w[context containers components hotspots domains status].freeze
 
     prepend_before_action :text_response, only: %i[export diagram]
 
@@ -54,19 +54,33 @@ module WoodsMap
 
     def diagram_text(repository, name)
       case name
-      when 'components'
-        components = WoodsMap::Components.new(repository, group: params[:group])
-        components.limit ? [nil, limit_message(components.limit)] : [components.mermaid]
+      when 'components' then components_text(repository)
       when 'context'
         [WoodsMap::LandscapeContext.new(landscape_for(repository), actors: woods_map_config.landscape_actors).mermaid]
+      when 'mindmap' then mindmap_text(repository)
+      else hotspots_text(WoodsMap::Hotspots.new(repository, size: params[:size]), name)
+      end
+    end
+
+    def components_text(repository)
+      components = WoodsMap::Components.new(repository, group: params[:group])
+      components.limit ? [nil, limit_message(components.limit)] : [components.mermaid]
+    end
+
+    def mindmap_text(repository)
+      clusters = repository.graph_analysis['domain_clusters']
+      return [nil, 'This generation publishes no domain clusters (woods#799).'] if clusters.blank?
+
+      [WoodsMap::DomainMindmap.new(clusters, system_name: landscape_for(repository).system_name).mermaid]
+    end
+
+    def hotspots_text(hotspots, name)
+      case name
       when 'treemap'
-        [WoodsMap::Hotspots.new(repository).treemap_mermaid,
+        [hotspots.treemap_mermaid,
          'This generation publishes no source sizes (woods#810); extract again with a Woods that does.']
-      when 'quadrant'
-        [WoodsMap::Hotspots.new(repository).quadrant_mermaid,
-         'This generation carries no commit counts to weigh churn.']
-      else
-        [WoodsMap::Hotspots.new(repository).sankey_mermaid, 'No edge runs forward between the layers.']
+      when 'quadrant' then [hotspots.quadrant_mermaid, 'This generation carries no commit counts to weigh churn.']
+      else [hotspots.sankey_mermaid, 'No edge runs forward between the layers.']
       end
     end
 
@@ -91,9 +105,11 @@ module WoodsMap
       @export = WoodsMap::LandscapeExport.new(@landscape, generation: repository.generation_number,
                                                           actors: woods_map_config.landscape_actors)
       @context = WoodsMap::LandscapeContext.new(@landscape, actors: woods_map_config.landscape_actors)
-      @hotspots = WoodsMap::Hotspots.new(repository)
+      @hotspots = WoodsMap::Hotspots.new(repository, size: params[:size])
       @clusters = Array(repository.graph_analysis['domain_clusters'])
       @components = WoodsMap::Components.new(repository, group: params[:group])
+      @status = WoodsMap::LandscapeStatus.new(repository, landscape: @landscape, hotspots: @hotspots,
+                                                          components: @components)
     end
 
     def landscape_for(repository)

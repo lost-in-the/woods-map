@@ -48,8 +48,8 @@ module WoodsMap
 
     def schema
       with_unit do
-        @schema = WoodsMap::SchemaView.new(@unit, table: @page.table, graph_analysis: @repository.graph_analysis)
-        next render_tab_mermaid(@schema.mermaid, 'schema', refusal: @schema.refusal) if mermaid_request?
+        @schema = WoodsMap::SchemaView.for(@repository, @unit, table: @page.table)
+        next render_schema_mermaid if mermaid_request?
 
         render :schema
       end

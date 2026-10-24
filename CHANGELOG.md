@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+- M3 close-out (woods-map#5).
+  - **Exit check:** `spec/support/m3_exit_check.rb` compares every entry Lifecycle (sequence, flowchart, lanes), model event chain and Schema ER with Woods' flow documents and model metadata. It runs on the fixture in CI, and on any index with `WOODS_MAP_EXIT_INDEX`. The testbed run is in docs/design/notes/m3-exit-check.md.
+  - The ER now draws an association to the table its target model reads (`active_storage_attachments`, not `active_storage/attachments`).
+  - **External services** (woods#814): Context and Containers draw each service the Gemfile declares a catalogued client gem for, or that the code calls through a client constant. Web and job processes get a relationship to the services their units call.
+  - **Schema class diagram:** columns, scopes and own methods, the parent class, included concerns and one hop of associations, beside the ER. Its text is at `schema.mmd?view=class`.
+  - **Domains mindmap** of the published clusters, at `/woods/landscape/mindmap.mmd`.
+  - Hotspots' treemap can also be sized by unit count or PageRank (`?size=`).
+  - **Landscape Status** tab: what the generation publishes for the Landscape and what each fact draws.
+
 - The Code tab's count says what it counts: `25 loc`, Woods' lines of code (neither blank nor a comment), where it said `25 lines` beside a code header of `37 lines` for the same file. The header now names both, `37 lines · 25 loc`, the loc explained on hover and focus.
 - Landscape Context and treemap (woods-map#5, docs/design/notes/landscape.md).
   - **Context (C4 level 1)** is its own tab at `/woods/landscape/context`. It shows the host's people (`config.landscape_actors`), the system, and the external systems the index records: mail delivery and object storage from the BehavioralProfile unit, and declared external consumers. The Pele diagram has its Mermaid at `/woods/landscape/context.mmd`. The Structurizr DSL and LikeC4 exports now carry the people and a system context view. The page names its limits: services the code calls are not published (woods#814).

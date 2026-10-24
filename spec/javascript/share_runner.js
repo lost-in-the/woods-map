@@ -40,14 +40,15 @@ async function runShareRegression() {
     const url = details.querySelector('.sh-url').textContent
     check(url.endsWith('/schema#L3') && details.querySelector('[data-share-target="copyUrl"]').dataset.copyTextValue === url, 'the focus URL carries the targeted line')
     const copies = [...details.querySelectorAll('[data-share-target="diagrams"] button')]
-    check(copies.length === 1 && copies[0].dataset.copyTextValue === source && copies[0].dataset.controller === 'copy', 'one Mermaid copy per diagram, with the panel\'s own text')
+    // The Schema tab carries the ER diagram and the class diagram (woods-map#5).
+    check(copies.length === 2 && copies[0].dataset.copyTextValue === source && copies[0].dataset.controller === 'copy' && /^classDiagram/.test(copies[1].dataset.copyTextValue), 'one Mermaid copy per diagram, with the panel\'s own text')
     check(/User schema/.test(copies[0]?.getAttribute('aria-label') || ''), 'the Mermaid copy names its diagram')
     const mmd = details.querySelector('[data-share-target="diagrams"] a')
     check(mmd && /\/woods\/units\/model\/User\/schema\.mmd$/.test(mmd.getAttribute('href')) && /^https?:/.test(mmd.getAttribute('href')), 'each diagram links its absolute .mmd URL')
     const box = details.querySelector('.share-panel').getBoundingClientRect()
     check(box.left >= 0 && box.right <= width, `the panel fits the viewport (${Math.round(box.left)}..${Math.round(box.right)})`)
     summary.click(); summary.click(); await wait(40)
-    check(details.querySelectorAll('[data-share-target="diagrams"] button').length === 1 && details.querySelectorAll('[data-share-target="diagrams"] a').length === 1, 'reopening does not duplicate the Mermaid copies')
+    check(details.querySelectorAll('[data-share-target="diagrams"] button').length === 2 && details.querySelectorAll('[data-share-target="diagrams"] a').length === 2, 'reopening does not duplicate the Mermaid copies')
 
     copies[0].focus()
     details.querySelector('.share-panel').dispatchEvent(new win.KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))

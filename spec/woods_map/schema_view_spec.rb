@@ -15,8 +15,15 @@ RSpec.describe WoodsMap::SchemaView do
       erDiagram
         "microposts"
         "microposts" }o--|| "users" : "user"
-        "microposts" ||--o{ "active_storage/attachments" : "image_attachment"
+        "microposts" ||--o{ "active_storage_attachments" : "image_attachment"
     MERMAID
+  end
+
+  it 'draws the far table a target model publishes, not one guessed from its name (M3 exit check)' do
+    tables = { 'User' => 'accounts', 'ActiveStorage::Attachment' => 'active_storage_attachments' }
+    text = described_class.new(unit, tables: tables).mermaid
+    expect(text).to include('"microposts" }o--|| "accounts" : "user"')
+    expect(text).to include('"microposts" ||--o{ "active_storage_attachments" : "image_attachment"')
   end
 
   it 'keeps a schema-qualified table apart from a table whose name differs only in punctuation' do

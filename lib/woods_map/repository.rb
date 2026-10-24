@@ -133,6 +133,13 @@ module WoodsMap
     # @return [Pathname] the index root this repository was opened at
     delegate :index_dir, to: :@index
 
+    # @return [Hash{String => String}] model identifier => the table its graph node names
+    def model_tables
+      @model_tables ||= Hash(graph['nodes']).each_with_object({}) do |(identifier, node), tables|
+        tables[identifier] = node['table'] if node['type'] == 'model' && node['table']
+      end
+    end
+
     # @return [Hash] the raw dependency graph (nodes, edges, reverse, reverse_via, pagerank, file_map)
     def graph
       @graph ||= @reader.raw_graph_data
