@@ -133,7 +133,7 @@ RSpec.describe 'History', type: :request do
 
     it 'lists only the commits one generation first carried' do
       get '/woods/units/job/ApplicationJob/history', params: { by: 'generation', gen: '2' }
-      expect(doc.at_css('h2#commits').text).to include('1 first carried by gen 2')
+      expect(doc.at_css('h2#commits-title').text).to include('1 first carried by gen 2')
       expect(doc.css('table[aria-label="Commits"] tbody tr:not(.sub)').size).to eq(1)
       expect(doc.at_css('#commits .tools a').text).to eq('all generations')
     end
