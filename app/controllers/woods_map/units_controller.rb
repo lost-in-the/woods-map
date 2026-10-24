@@ -130,7 +130,8 @@ module WoodsMap
       with_repository do |repository|
         @repository = repository
         @tab = action_name
-        @unit = routed_identifiers.lazy.map { |id| repository.unit(id, type: params[:type].to_s) }.find(&:itself)
+        type = params[:type].to_s
+        @unit = routed_identifiers.lazy.map { |id| repository.unit(id, type: type) }.find(&:itself)
         next render_missing_unit unless @unit
 
         @page = WoodsMap::UnitPage.new(repository, @unit)
