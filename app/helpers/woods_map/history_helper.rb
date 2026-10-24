@@ -9,7 +9,7 @@ module WoodsMap
     FILE_STATUS = { 'added' => 'new', 'deleted' => 'deleted', 'type_changed' => 'type changed' }.freeze
 
     # The query parameters the History tab's own links keep.
-    HISTORY_TAB_PARAMS = %w[range week all from to by gen since author].freeze
+    HISTORY_TAB_PARAMS = %w[range week all from to by gen since author span].freeze
 
     # The History tab's URL with the current range, week, all, author and
     # diff parameters, overridden by +changes+ (nil removes one).

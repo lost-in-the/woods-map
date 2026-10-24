@@ -2,7 +2,7 @@
 <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
 <% chains = @lifecycle.chains %>
 <% steps = @lifecycle.steps(@event) %>
-<% here = ->(event: @event, view: @view) { woods_map.unit_lifecycle_path(type: @page.type, identifier: @page.identifier, event: event, view: (view == WoodsMap::Lifecycle::VIEWS.first ? nil : view)) } %>
+<% here = ->(event: @event, view: @view) { woods_map.unit_lifecycle_path(type: @page.type, identifier: @page.identifier, event: event, view: (view == WoodsMap::Lifecycle::VIEWS.first ? nil : view), since: params[:since].presence) } %>
 <% controls = safe_join([
      tag.span('entry', class: 'lbl'), tag.span(safe_join(WoodsMap::Lifecycle::EVENTS.map { |e| link_to(e, here.call(event: e), 'aria-current': (e == @event ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'entry'),
      tag.span('view', class: 'lbl'), tag.span(safe_join(@lifecycle.views.map { |v| link_to(v == 'dynamic' ? 'C4 dynamic' : v, here.call(view: v), 'aria-current': (v == @view ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'view')
@@ -28,7 +28,7 @@
                       legend: [['', 'one lane per place a step runs'], [tag.span('⇢', class: 'ar'), 'async hop to a job or mailer, another process'], ['', 'numbers match the steps below']] }
        }.fetch(@view) %>
     <section class="sec">
-      <%= render 'woods_map/components/diagram', title: panel[:title], facts: ["#{@page.identifier} #{@event}", "#{steps.size} steps"], name: "#{@page.identifier} lifecycle #{@event} #{@view}", mermaid_url: woods_map.unit_lifecycle_mmd_path(type: @page.type, identifier: @page.identifier, event: @event, view: (@view == WoodsMap::Lifecycle::VIEWS.first ? nil : @view)), mermaid: mermaid, key: 'y', label: panel[:label], refusal: (@lifecycle.refusal(@event, view: @view) && "#{@lifecycle.refusal(@event, view: @view)}; the steps below list every one."), legend: panel[:legend], provenance: ['resolved chain', "gen #{@repository.generation_number}"] %>
+      <%= render 'woods_map/components/diagram', title: panel[:title], facts: ["#{@page.identifier} #{@event}", "#{steps.size} steps"], name: "#{@page.identifier} lifecycle #{@event} #{@view}", mermaid_url: woods_map.unit_lifecycle_mmd_path(type: @page.type, identifier: @page.identifier, event: @event, view: (@view == WoodsMap::Lifecycle::VIEWS.first ? nil : @view)), mermaid: mermaid, key: 'y', label: panel[:label], refusal: (@lifecycle.refusal(@event, view: @view) && "#{@lifecycle.refusal(@event, view: @view)}; the steps below list every one."), legend: panel[:legend] + (steps.any?(&:changed) ? [[chip(:modified), (@view == 'sequence' ? 'moved since the selected generation: marked in the steps below (a sequence has no node classes)' : 'outlined: its method or declaration moved since the selected generation')]] : []), provenance: ['resolved chain', "gen #{@repository.generation_number}"] %>
     </section>
     <section class="sec" aria-labelledby="ladder">
       <header><h2 class="t2" id="ladder">Steps for <%= @event %> <%= count_tag("#{steps.size} steps, in the order Rails runs them") %><%= info_tip('Order is the resolved runtime chain, not file order. Side effects come from a regex analysis of the callback body; a proc callback is skipped.') %></h2></header>

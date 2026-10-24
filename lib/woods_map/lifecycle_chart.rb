@@ -35,7 +35,7 @@ module WoodsMap
       lines << "  done([#{label('done')}])"
       link(lines, exits, 'done')
       @targets.each_with_index { |target, i| lines << "  a#{i}[/#{label(target)}/]" }
-      (lines + async_edges).join("\n")
+      (lines + async_edges + changed_classes).join("\n")
     end
 
     # Mermaid swimlane text (`swimlane-beta`, verified on the vendored Pele):
@@ -44,13 +44,10 @@ module WoodsMap
     #
     # @return [String]
     def lanes
-      lines = ['swimlane-beta TB']
-      @steps.group_by(&:phase).sort_by { |phase, _| LANES.keys.index(phase) }.each do |phase, members|
-        lines.concat(lane(phase, members.map { |s| ["s#{s.n}", step_text(s)] }))
-      end
+      lines = ['swimlane-beta TB', *step_lanes]
       lines.concat(lane('async', @targets.each_with_index.map { |target, i| ["a#{i}", target] })) if @targets.any?
       @steps.each_cons(2) { |a, b| lines << "  s#{a.n} --> s#{b.n}" }
-      (lines + async_edges).join("\n")
+      (lines + async_edges + changed_classes).join("\n")
     end
 
     # @return [Integer] nodes in the flowchart: start, done, the commit,
@@ -101,6 +98,19 @@ module WoodsMap
     def link(lines, exits, node)
       exits.each { |from, text| lines << (text ? "  #{from} -.->|#{text}| #{node}" : "  #{from} --> #{node}") }
       [[node, nil]]
+    end
+
+    # `?since=` (E-8): the steps whose method or declaration moved, drawn
+    # with map.css' `chg` rule. Without a change the text is unchanged.
+    def step_lanes
+      @steps.group_by(&:phase).sort_by { |phase, _| LANES.keys.index(phase) }.flat_map do |phase, members|
+        lane(phase, members.map { |s| ["s#{s.n}", step_text(s)] })
+      end
+    end
+
+    def changed_classes
+      ids = @steps.select(&:changed).map { |s| "s#{s.n}" }
+      ids.any? ? ["  class #{ids.join(',')} chg"] : []
     end
 
     def async_edges

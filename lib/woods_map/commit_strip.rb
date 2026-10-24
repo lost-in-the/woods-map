@@ -72,6 +72,12 @@ module WoodsMap
       buckets.select(&:recent).sum(&:count)
     end
 
+    # @param value [String, Time] a commit date
+    # @return [Integer, nil] the bar holding it; nil outside the window
+    def index_of(value)
+      bucket_index(day(value))
+    end
+
     # @return [Array<Bucket>] oldest first
     def buckets
       @buckets ||= Array.new(bucket_count) do |index|

@@ -28,10 +28,10 @@ Each banner has *open the report* (the range page focused on this unit) and *cle
 - **Graph:** the explorer's report emphasis, as on the impact Graph tab: changed filled, reached ringed by distance.
 - **Passage:** each template the report records as changed gets an `M` chip, and its link keeps `since`.
 - **ERD:** a banner counts the changed tables, and each changed table in the chunk list gets the `--mod` rule and an `M` chip.
-- **Lifecycle:** the banner only. Which step moved needs per-callback evidence the report does not carry.
+- **Lifecycle:** a step is marked M (row rule, chip, screen-reader words naming which) when the changed lines touch its method's published extent (`metadata.methods`, W-2, `line`..`end_line`) or its declaration (`declaration` on the callback entry, [woods#817](https://github.com/lost-in-the/woods/issues/817)), both in the annotated source the line ranges address (`Since#changed_members`). The flowchart and lanes outline those nodes (`class sN chg`, map.css); the sequence has no node classes, so its legend points to the steps table. The Passage ladder marks steps the same way. A method named by two owners is matched to the step's owner first.
 
 **Limits.**
 
 - **The schema header fold and an added unit's lines** are not line-marked: the header is folded, and an added unit has no `before` (the banner says *Added*).
-- **Steps, columns and diagram nodes** are not marked inside the Mermaid diagrams. Pele draws the current text, and per-entry change evidence is not in the report.
+- **Sequence steps, ERD columns and graph nodes inside diagrams** are not marked per entry: a sequence has no node classes, and the report carries no per-column evidence. A step whose method or declaration Woods does not publish (a proc, a framework callback, a metaprogrammed or ambiguous declaration) is not marked; the banner still names the moved keys.
 - **Cost:** a comparison per page view. It is opt-in by the parameter, and Woods bounds it with the report's own budgets.

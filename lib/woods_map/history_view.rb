@@ -36,9 +36,10 @@ module WoodsMap
     # @param filters [Hash] `range:` one of {RANGES} (365d by default); `week:`
     #   an ISO date, only the bar starting that day; `by:` commit (bars per
     #   week or day) or generation (bars per retained generation); `gen:` only
-    #   the commits a generation first carried; `all:` every commit in the
-    #   window rather than the latest {SHOWN}; `author:` only the commits whose
-    #   author, as git recorded it, is exactly this name (woods-map#92)
+    #   the commits a generation first carried; `span:` only the days a drag
+    #   picked ({DateSpan}); `all:` every commit in the window rather than
+    #   the latest {SHOWN}; `author:` only the commits whose author, as git
+    #   recorded it, is exactly this name (woods-map#92)
     def initialize(repository, unit, now: Time.now.utc, **filters)
       @repository = repository
       @unit = unit
@@ -46,13 +47,13 @@ module WoodsMap
       @git = unit.dig('metadata', 'git') || {}
       @table = repository.git_commits
       @days = RANGES.fetch(filters[:range].to_s) { RANGES.fetch('365d') }
-      @week = parse_date(filters[:week])
       @all = filters[:all] ? true : false
-      @by = BY.include?(filters[:by].to_s) ? filters[:by].to_s : BY.first
-      @gen = parse_generation(filters[:gen])
+      read_filters(filters)
       @author = filters[:author].to_s.presence
     end
 
+    # @return [Range<Date>, nil] the days a drag picked on the strip
+    attr_reader :span
     # @return [String, nil] the author the commits are narrowed to
     attr_reader :author
 
@@ -116,7 +117,7 @@ module WoodsMap
     # @return [Array<Commit>]
     def commits
       list = table? ? narrow(window_commits) : window_commits
-      @all || @week || @gen ? list.first(ALL_LIMIT) : list.first(SHOWN)
+      @all || @week || @gen || @span ? list.first(ALL_LIMIT) : list.first(SHOWN)
     end
 
     # @return [Integer] commits in the window, or the unit's commit count without a table
@@ -200,17 +201,6 @@ module WoodsMap
       shown = CommitRows.fallback(@git).size
       reason = TABLE_STATES.fetch(state, TABLE_STATES[:absent])
       "#{shown} of #{@git['commit_count'].to_i} commits per unit: #{reason}"
-    end
-
-    def narrow(list)
-      list = list.select { |c| in_week?(c) } if @week
-      list = list.select { |c| c.generation&.number == @gen } if @gen
-      list
-    end
-
-    def in_week?(commit)
-      date = time(commit.date)&.to_date
-      date && date >= @week && date < @week + (commit_strip&.step || 7)
     end
 
     def time(value)

@@ -2,22 +2,30 @@
     the last four weeks hot, a dashed mark per retained generation. Drawn as
     an SVG in viewBox units; colours come from map.css. Locals: strip
     (CommitStrip), bar_url (callable Date => URL, or nil for plain bars),
-    selected (Date or nil), label (String, the chart's accessible name). %>
+    selected (Date, Range of Dates, or nil), label (String, the chart's
+    accessible name), brush_url (String or nil: the page's URL with
+    __SPAN__ where a dragged span goes; draws the brush, CommitStrip only). %>
 <% bar_url = local_assigns[:bar_url] %>
-<div class="strip">
+<% selected = local_assigns[:selected] %>
+<% brush_url = local_assigns[:brush_url] %>
+<%= tag.div(class: 'strip', data: (brush_url ? { controller: 'brush', brush_url: brush_url, brush_unit: (strip.step == 1 ? 'day' : 'week'), brush_buckets: strip.buckets.map { |b| [b.first.iso8601, b.last.iso8601] }.to_json } : {})) do %>
   <svg class="strip-svg" viewBox="0 -4 <%= strip.width %> <%= WoodsMap::CommitStrip::HEIGHT + 6 %>" preserveAspectRatio="none" role="group" aria-label="<%= label %>">
     <title><%= label %></title>
     <% strip.marks.each do |mark| %><line class="gm" x1="<%= mark.x %>" x2="<%= mark.x %>" y1="-4" y2="<%= WoodsMap::CommitStrip::HEIGHT %>"><title>generation <%= mark.number %> extracted</title></line><% end %>
-    <% strip.buckets.each do |bucket| %>
-      <% classes = ['bar', (bucket.recent ? 'recent' : nil), (bucket.count.zero? ? 'zero' : nil), (local_assigns[:selected] == bucket.first ? 'sel' : nil)].compact.join(' ') %>
+    <% if brush_url %><rect class="brush-band" x="0" y="-4" width="0" height="<%= WoodsMap::CommitStrip::HEIGHT + 6 %>" visibility="hidden" data-brush-band></rect><% end %>
+    <% strip.buckets.each_with_index do |bucket, index| %>
+      <% sel = selected.is_a?(Range) ? selected.cover?(bucket.first) : selected == bucket.first %>
+      <% classes = ['bar', (bucket.recent ? 'recent' : nil), (bucket.count.zero? ? 'zero' : nil), (sel ? 'sel' : nil)].compact.join(' ') %>
+      <% data = brush_url ? { 'data-index' => index } : {} %>
       <% height = bucket.count.zero? ? 1 : bucket.height %>
       <% rect = tag.rect(class: classes, x: bucket.x, y: WoodsMap::CommitStrip::HEIGHT - height, width: strip.class::BAR, height: height) %>
       <% if bar_url && bucket.count.positive? %>
-        <a href="<%= bar_url.call(bucket.first) %>" aria-label="<%= bucket.label(strip.step) %>"><title><%= bucket.label(strip.step) %></title><%= rect %></a>
+        <%= tag.a(href: bar_url.call(bucket.first), 'aria-label': bucket.label(strip.step), **data) do %><title><%= bucket.label(strip.step) %></title><%= rect %><% end %>
       <% else %>
-        <g><title><%= bucket.label(strip.step) %></title><%= rect %></g>
+        <%= tag.g(**data) do %><title><%= bucket.label(strip.step) %></title><%= rect %><% end %>
       <% end %>
     <% end %>
   </svg>
+  <% if brush_url %><p class="sr-only" aria-live="polite" data-brush-status></p><% end %>
   <svg class="strip-axis" width="100%" height="14" aria-hidden="true" focusable="false"><% last = [strip.bucket_count - 1, 1].max %><% strip.ticks.each do |index, text| %><text x="<%= (100.0 * index / last).round(2) %>%" y="11" text-anchor="<%= index.zero? ? 'start' : (index == last ? 'end' : 'middle') %>"><%= text %></text><% end %></svg>
-</div>
+<% end %>
