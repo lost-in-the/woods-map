@@ -315,3 +315,17 @@ html.js .wm .guide .guide-nojs{display:none}
 .wm .difft{overflow-x:auto}
 /* --dim line numbers fall under AA on the diff tints (3.8:1 dark); --mut clears it in both themes */
 .wm .difft .dl.add span:nth-child(-n+2),.wm .difft .dl.del span:nth-child(-n+2){color:var(--mut)}
+
+/* Code references by confidence (W-1): a static link is dashed, an ambiguous
+   reference is a button with a dotted rule that opens its candidates. */
+.wm .cv .src a.const.static{border-bottom:1px dashed var(--dim)}
+.wm .cv .src button.amb{font:inherit;color:var(--const);background:none;border:0;border-bottom:1px dotted var(--hot);padding:0;margin:0;cursor:pointer;line-height:inherit}
+.wm .cv .src button.amb:hover,.wm .cv .src button.amb[aria-expanded=true]{color:var(--select);border-bottom-color:var(--select)}
+/* The disambiguation popover (FR-4, B-1); without JavaScript the lists follow the code. */
+.wm .amb-pop{z-index:4;font-family:var(--ff-ui);font-size:var(--fs-12);color:var(--text);background:var(--panel);border:1px solid var(--rule2);border-radius:var(--r-ctl);padding:var(--s3) var(--s4);max-width:min(460px,calc(100vw - 32px));box-shadow:0 2px 8px rgba(0,0,0,.35);margin:var(--s3) var(--s5)}
+html.js .wm .amb-pop{position:fixed;margin:0}
+html.no-js .wm .amb-pop[hidden]{display:block}
+.wm .amb-pop .cap{margin:0 0 var(--s2)}
+.wm .amb-pop ul{list-style:none;margin:0;padding:0;display:grid;gap:var(--s2)}
+.wm .amb-pop li{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:baseline}
+.wm .amb-pop li .dim{font-family:var(--ff-data);overflow-wrap:anywhere}

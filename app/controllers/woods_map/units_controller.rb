@@ -7,6 +7,7 @@ module WoodsMap
   # lock covers the whole response; the identifier and the type come from the
   # URL, never a path.
   class UnitsController < ApplicationController
+    include WoodsMap::MethodLinks
     include WoodsMap::UnitMermaid
     include WoodsMap::UnitHistory
 
@@ -31,10 +32,12 @@ module WoodsMap
 
       with_unit do
         @lifecycle = lifecycle_for(@unit)
-        @code = code_view(@unit, lens, @lifecycle)
+        @callers = WoodsMap::Callers.for(@repository).by_method(@unit['identifier'], @unit['type'])
+        @code = code_view(@unit, lens, @lifecycle, callers: @callers)
         @heat = @repository.git_commits && WoodsMap::PathHeat.new(@repository.git_commits)
         @concern_paths = WoodsMap::UnitPaths.concern_files(@repository, @unit)
-        @outline = WoodsMap::Outline.new(@unit, lifecycle: @lifecycle, concern_methods: concern_methods(@unit))
+        @outline = WoodsMap::Outline.new(@unit, lifecycle: @lifecycle, concern_methods: concern_methods(@unit),
+                                                method_href: method_href(@unit), callers: @callers)
         @cards = WoodsMap::HoverCard.for(@repository, @code.linked_targets)
         render :show
       end
@@ -60,11 +63,11 @@ module WoodsMap
         end
 
         @passage = WoodsMap::Passage.new(@repository, @unit, action: params[:action_name])
-        next render_tab_mermaid(@passage.mermaid, "#{@passage.action} passage") if mermaid_request?
-
         @ladder_model = @passage.ladder_model
         @ladder = @ladder_model && lifecycle_for(@ladder_model)
         @ladder_event = ladder_event(@ladder)
+        next render_passage_mermaid if mermaid_request?
+
         render :passage
       end
     end
@@ -84,10 +87,10 @@ module WoodsMap
 
     def lifecycle
       with_unit do
-        @lifecycle = lifecycle_for(@unit)
+        @lifecycle = lifecycle_for(@unit, dynamic: WoodsMap::DynamicView.new(@repository))
         @event = params[:event] if WoodsMap::Lifecycle::EVENTS.include?(params[:event])
         @event ||= @lifecycle.chains.keys.first || 'create'
-        @view = WoodsMap::Lifecycle::VIEWS.include?(params[:view]) ? params[:view] : WoodsMap::Lifecycle::VIEWS.first
+        @view = @lifecycle.views.find { |view| view == params[:view] } || WoodsMap::Lifecycle::VIEWS.first
         @state_machines = []
         @state_machines = WoodsMap::StateMachineView.for_model(@repository, @page.identifier) if @page.type == 'model'
         next render_lifecycle_mermaid if mermaid_request?
@@ -156,16 +159,8 @@ module WoodsMap
       redirect_to woods_map.unit_path(type: params[:type], identifier: params[:identifier])
     end
 
-    def code_view(unit, lens, lifecycle)
-      WoodsMap::CodeView.new(unit, lens: lens, references: WoodsMap::References.new(@repository, unit),
-                                   marginalia: WoodsMap::Marginalia.new(unit, lifecycle: lifecycle, table: @page.table),
-                                   unit_path: lambda { |identifier, type|
-                                     woods_map.unit_path(type: type, identifier: identifier)
-                                   })
-    end
-
-    def lifecycle_for(unit)
-      WoodsMap::Lifecycle.new(unit, concern_methods: concern_methods(unit))
+    def lifecycle_for(unit, dynamic: nil)
+      WoodsMap::Lifecycle.new(unit, concern_methods: concern_methods(unit), dynamic: dynamic)
     end
 
     # The ladder's event: ?event= when valid, else the one the action implies, else the first chain.

@@ -10,7 +10,7 @@
 <div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
   <% groups = [] %>
   <% if h.table? && h.generations.any? %>
-    <% groups << { label: "generations touching #{@page.identifier}", count: h.generations.size, items: h.generations.map { |g| { key: g.number, text: short_sha(g.head), own: safe_join([(g.extracted_at ? date_abbr(g.extracted_at) : nil), (g.baseline ? 'and earlier' : nil)].compact, ', '), current: g.number == @repository.generation_number } } } %>
+    <% groups << { label: "generations touching #{@page.identifier}", count: h.generations.size, items: h.generations.map { |g| { key: g.number, text: short_sha(g.head), own: safe_join([(g.extracted_at ? date_abbr(g.extracted_at) : nil), (g.baseline ? 'and earlier' : nil), (@repository.retention.pinned?(g.number) ? 'pinned' : nil)].compact, ', '), current: g.number == @repository.generation_number } } } %>
   <% end %>
   <% groups << { label: 'people', count: h.people.size, items: h.people.map { |p| { key: p.commits, text: who(p.name), own: (p.last ? safe_join(['last ', date_abbr(p.last)]) : nil) } } } %>
   <% if h.co_changes.any? %>
@@ -90,9 +90,9 @@
         <form class="impact-range-form" method="get" action="<%= woods_map.unit_history_path(type: @page.type, identifier: @page.identifier, anchor: 'diff') %>">
           <% if h.range %><input type="hidden" name="range" value="<%= h.range %>"><% end %>
           <label class="lbl" for="diff-from">from</label>
-          <select id="diff-from" name="from" class="filter auto"><% gens.each do |n| %><option value="<%= n %>"<%= ' selected'.html_safe if n == (@diff&.from || gens[-2]) %>>gen <%= n %></option><% end %></select>
+          <select id="diff-from" name="from" class="filter auto"><% gens.each do |n| %><option value="<%= n %>"<%= ' selected'.html_safe if n == (@diff&.from || gens[-2]) %>>gen <%= n %><%= ', pinned' if @repository.retention.pinned?(n) %></option><% end %></select>
           <label class="lbl" for="diff-to">to</label>
-          <select id="diff-to" name="to" class="filter auto"><% gens.each do |n| %><option value="<%= n %>"<%= ' selected'.html_safe if n == (@diff&.to || gens[-1]) %>>gen <%= n %></option><% end %></select>
+          <select id="diff-to" name="to" class="filter auto"><% gens.each do |n| %><option value="<%= n %>"<%= ' selected'.html_safe if n == (@diff&.to || gens[-1]) %>>gen <%= n %><%= ', pinned' if @repository.retention.pinned?(n) %></option><% end %></select>
           <button class="btn" type="submit">Diff</button>
         </form>
       </section>

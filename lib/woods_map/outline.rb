@@ -6,16 +6,20 @@ module WoodsMap
   # actions and filters. Everything comes from the unit's metadata.
   class Outline
     Group = Struct.new(:label, :count, :items, keyword_init: true)
-    Item = Struct.new(:key, :text, :own, :line, keyword_init: true)
+    Item = Struct.new(:key, :text, :own, :line, :href, keyword_init: true)
 
     # @param unit [Hash]
     # @param lifecycle [WoodsMap::Lifecycle, nil]
     # @param concern_methods [Hash{String => Array<String>}]
-    def initialize(unit, lifecycle: nil, concern_methods: {})
+    # @param method_href [#call, nil] method table entry => URL of its line, or nil
+    # @param callers [Hash{String, nil => Array}] calls into the unit by method name
+    def initialize(unit, lifecycle: nil, concern_methods: {}, method_href: nil, callers: {})
       @unit = unit
       @metadata = unit['metadata'] || {}
       @lifecycle = lifecycle
       @concern_methods = concern_methods
+      @method_href = method_href
+      @callers = callers
     end
 
     # @return [Array<Group>]
@@ -58,7 +62,14 @@ module WoodsMap
       Group.new(label: 'associations', count: assocs.size, items: items)
     end
 
+    # Grouped by owner from the method table (W-2) when the index has one, in
+    # source order with each method's line; else the name lists.
     def method_groups
+      table = @metadata['methods']
+      table.is_a?(Array) ? table_groups(table) : name_groups
+    end
+
+    def name_groups
       own = Array(@metadata['instance_methods'] || @metadata['public_methods']).map(&:to_s)
       concern_defined = @concern_methods.values.flatten
       groups = []
@@ -74,6 +85,25 @@ module WoodsMap
         })
       end
       groups
+    end
+
+    def table_groups(table)
+      entries = table.select { |entry| entry.is_a?(Hash) && entry['name'].is_a?(String) }
+      owners = entries.pluck('owner').uniq
+      owners = [@unit['identifier']] + (owners - [@unit['identifier']]) if owners.include?(@unit['identifier'])
+      owners.map do |owner|
+        items = entries.select { |entry| entry['owner'] == owner }.map { |entry| table_item(entry) }
+        Group.new(label: "methods, #{owner}", count: items.size, items: items)
+      end
+    end
+
+    def table_item(entry)
+      name = entry['kind'] == 'singleton' ? "self.#{entry['name']}" : entry['name']
+      calls = Array(@callers[entry['name']]).size if entry['owner'] == @unit['identifier']
+      own = [(entry['visibility'] if entry['visibility'] && entry['visibility'] != 'public'),
+             (entry['kind'] if entry['kind'] == 'module_function'),
+             ("#{calls} #{calls == 1 ? 'caller' : 'callers'}" if calls&.positive?)].compact.join(', ').presence
+      Item.new(key: '·', text: name, own: own, href: @method_href&.call(entry))
     end
 
     def scopes_group

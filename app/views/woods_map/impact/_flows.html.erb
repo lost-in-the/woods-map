@@ -1,5 +1,24 @@
-<%# The Flows tab (B6-Impact-Flows) needs flows per unit, inverted from flow documents (W-13). %>
-<section class="sec" aria-labelledby="fl">
-  <header><h2 class="t2" id="fl">Flows <%= count_tag('0, not inverted') %><%= info_tip('Affected flows are the entry points whose flow documents pass through a changed unit (E-4). The index has no inverted flow index yet (W-13) and no flow documents unless precompute_flows is on (W-14).') %></h2></header>
-  <%= render 'woods_map/components/empty_state', title: 'No flow runs through the focus, as far as this generation says', text: safe_join(['Entry points per unit come from the inverted flow index (W-13, ', link_to('woods#763', 'https://github.com/lost-in-the/woods/issues/763'), ') over precomputed flow documents (W-14, ', link_to('woods#764', 'https://github.com/lost-in-the/woods/issues/764'), '). Until they are published the routes among the affected units are the nearest fact: ', (r.affected.select { |a| a.type == 'route' }.any? ? safe_join(r.affected.select { |a| a.type == 'route' }.map { |a| unit_link(a.identifier, 'route') }, ', ') : 'none within this depth'), '.']) %>
+<%# The Flows tab (B6-Impact-Flows) in pre-change mode: entry points whose
+    precomputed flow documents expanded a focus unit, from Woods' inverted
+    flow membership (W-13) in the pinned generation. Locals: r, v, impact_url. %>
+<%= render 'woods_map/impact/flow_gaps', r: r %>
+<% f = @flows %>
+<% routes = r.affected.select { |a| a.type == 'route' } %>
+<% nearest = safe_join(['The routes among the affected units are the nearest fact: ', (routes.any? ? safe_join(routes.map { |a| unit_link(a.identifier, 'route') }, ', ') : 'none within this depth'), '.']) %>
+<section class="sec" aria-labelledby="fl" data-controller="rows">
+  <header><h2 class="t2" id="fl">Flows <%= count_tag(f&.state == :available ? "#{f.total} through the focus" : 'not published') %><%= info_tip("Entry points whose precomputed flow documents expanded a focus unit, from Woods' inverted flow membership (W-13, flows/by_unit.json) in gen #{@repository.generation_number}. Membership is bounded: a step expanded within the document's depth, not proof that a path runs. Steps are the published document's; changed steps are marked M, reached ones carry their distance.") %></h2><% if f&.state == :available && f.total.positive? %><button class="tool goto" type="button" data-action="rows#expandAll" data-needs-js>expand all</button><% end %></header>
+  <% case f&.state %>
+  <% when :available %>
+    <% if f.total.zero? %>
+      <%= render 'woods_map/components/empty_state', title: 'No precomputed flow expands the focus', text: safe_join(["Woods' flow membership lists no entry point through #{r.focus.join(', ')} in gen #{@repository.generation_number}. Membership is bounded by each document's depth, so this is not proof that no request reaches it. ", nearest]) %>
+    <% else %>
+      <%= render 'woods_map/impact/flow_table', flows: f, focus: [] %>
+    <% end %>
+  <% when :unreadable %>
+    <%= render 'woods_map/components/empty_state', title: 'Flow evidence unreadable', text: safe_join(["Woods refused a flow artifact of gen #{@repository.generation_number} as unreadable or malformed; its evidence is unavailable, not empty. ", nearest]) %>
+  <% when :unsupported %>
+    <%= render 'woods_map/components/empty_state', title: 'This Woods cannot read flow membership', text: safe_join(['Entry points per unit need the published-index flow readers (', link_to('woods#805', 'https://github.com/lost-in-the/woods/pull/805'), '). ', nearest]) %>
+  <% else %>
+    <%= render 'woods_map/components/empty_state', title: 'No flow membership in this generation', text: safe_join(["Gen #{@repository.generation_number} publishes no inverted flow index: flows are precomputed only when the host sets precompute_flows. This is not a conclusive zero. ", nearest]) %>
+  <% end %>
 </section>

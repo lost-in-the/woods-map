@@ -6,6 +6,8 @@ require 'woods/published_index'
 require 'woods/mcp/index_reader'
 require 'woods/source_inputs/status'
 require_relative 'repository_history'
+require_relative 'repository_flows'
+require_relative 'retention'
 
 module WoodsMap
   # One pinned generation per request.
@@ -17,6 +19,7 @@ module WoodsMap
   # reader of that one generation; nothing is resolved from a path.
   class Repository
     include RepositoryHistory
+    include RepositoryFlows
 
     # Raised when no published generation can be opened at the configured root.
     class Unavailable < StandardError; end
@@ -138,6 +141,15 @@ module WoodsMap
       @graph_analysis ||= @reader.graph_analysis || {}
     rescue StandardError
       @graph_analysis = {}
+    end
+
+    # The request flows a best-effort extraction could not assemble (W-14,
+    # woods#764): +entry_point+, +controller+, +action+, +reason+, +error+.
+    # Empty when none failed, or with a Woods that does not publish them.
+    #
+    # @return [Array<Hash>]
+    def flow_failures
+      @flow_failures ||= @reader.respond_to?(:flow_failures) ? Array(@reader.flow_failures).grep(Hash) : []
     end
 
     # Drift of the working tree against this generation, within a quarter

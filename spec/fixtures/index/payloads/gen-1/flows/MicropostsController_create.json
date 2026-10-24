@@ -1,0 +1,37 @@
+{
+  "entry_point": "MicropostsController#create",
+  "generated_at": "2026-10-18T00:00:00Z",
+  "max_depth": 3,
+  "route": {
+    "path": "/microposts",
+    "verb": "POST"
+  },
+  "steps": [
+    {
+      "file_path": "app/controllers/microposts_controller.rb",
+      "operations": [
+        {
+          "file": "app/controllers/microposts_controller.rb",
+          "line": 5,
+          "method": "build",
+          "target": "Micropost",
+          "type": "call"
+        }
+      ],
+      "type": "controller",
+      "unit": "MicropostsController#create"
+    },
+    {
+      "file_path": "app/models/micropost.rb",
+      "operations": [],
+      "type": "model",
+      "unit": "Micropost"
+    },
+    {
+      "file_path": "app/models/user.rb",
+      "operations": [],
+      "type": "model",
+      "unit": "User"
+    }
+  ]
+}
