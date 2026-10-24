@@ -7,7 +7,7 @@ relationship graphs, schema and history, and get change-impact reports with
 sharable focus URLs. It reads the published index only: no live database, no
 runtime reflection, no git subprocess at request time.
 
-Status: M1 Reading, M2 Passage, M3 Diagrams, M4 History, M4b Impact (the map side; Woods owns `woods:impact` output), M6 Trail and M8 Staging are closed, and their pages landed. M5 Graph has landed (neighbourhood endpoint, Graph tab, full-screen page with clusters, flow overlay and commit timeline) and stays open on its layout decision (woods-map#63) and a timing run on testbed hardware. M7 Guide has landed, off by default, and stays open on a real-provider run. The design study, decision log, boards
+Status: M1 Reading, M2 Passage, M3 Diagrams, M4 History, M4b Impact (the map side; Woods owns `woods:impact` output), M5 Graph, M6 Trail and M8 Staging are closed, and their pages landed (M5: neighbourhood endpoint, Graph tab and full-screen page in the butterfly layout of D-30, flow overlay and commit timeline). M7 Guide has landed, off by default, and stays open on a real-provider run. The design study, decision log, boards
 and milestone plan live in `docs/design/` and are the source of truth for
 scope; `docs/design/foundations/tokens.css` is the stylesheet the engine ships
 verbatim (a spec keeps the two copies identical).
