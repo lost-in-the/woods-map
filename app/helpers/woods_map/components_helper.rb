@@ -4,6 +4,37 @@ module WoodsMap
   # Helpers for the component partials: glyphs, chips, counts, people and the
   # ⓘ explanation.
   module ComponentsHelper
+    # Table minimum widths, in px, that map.css has a class for: every 20 px
+    # from 480 to 1200. The policy (M8) refuses style attributes, so a
+    # table's minimum is a class, not a custom property set inline.
+    TABLE_MIN_WIDTHS = (480..1200).step(20).to_a.freeze
+
+    # @param value [String, nil] a minimum width such as `"900px"`
+    # @return [String, nil] the class that sets it
+    # @raise [ArgumentError] for a width map.css has no class for
+    def table_min_width_class(value)
+      return nil if value.nil?
+
+      px = value.to_s[/\A(\d+)px\z/, 1].to_i
+      raise ArgumentError, "no table minimum class for #{value.inspect}" unless TABLE_MIN_WIDTHS.include?(px)
+
+      "min-#{px}"
+    end
+
+    # A column width as the `width` attribute's presentational hint, which the
+    # policy does not govern: `"150px"` becomes `150`, a percentage stays.
+    #
+    # @param value [String] `"<n>px"` or `"<n>%"`
+    # @return [String]
+    # @raise [ArgumentError] for any other unit
+    def table_column_width(value)
+      case value.to_s
+      when /\A(\d+)px\z/ then Regexp.last_match(1)
+      when /\A\d+%\z/ then value.to_s
+      else raise ArgumentError, "column widths are px or %, not #{value.inspect}"
+      end
+    end
+
     # A glyph from the vocabulary (D-20), hidden from screen readers unless it
     # is the whole label.
     #

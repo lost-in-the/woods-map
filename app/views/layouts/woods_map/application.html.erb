@@ -10,13 +10,17 @@
   <script type="importmap" nonce="<%= content_security_policy_nonce %>"><%= raw WoodsMap::Importmap.to_json(url_for: ->(digest, path) { woods_map.engine_asset_path(digest: digest, path: path) }) %></script>
   <script type="module" nonce="<%= content_security_policy_nonce %>">import "woods_map";</script>
 </head>
-<body class="wm page" data-theme="dark" data-controller="tooltip sheet keys help">
+<body class="wm page" data-theme="dark" data-controller="tooltip sheet keys help settings<%= ' guide' if guide_status == :ready %>">
   <%= render 'woods_map/shared/bar', generation: @generation, nav: @nav, freshness: @freshness, query: params[:q] %>
   <% if flash[:alert] %><%= render 'woods_map/components/banner', severity: :risk, lead: 'Refused.', text: flash[:alert] %><% end %>
   <%= yield :banner %>
-  <main class="page-main">
-    <%= yield %>
-  </main>
+  <% if guide_visible? && guide_status != :ready %><%= render 'woods_map/components/banner', severity: :mod, lead: 'Guide unavailable.', text: WoodsMap::Guide.notice(woods_map_config) %><% end %>
+  <div class="page-row">
+    <main class="page-main">
+      <%= yield %>
+    </main>
+    <% if guide_status == :ready && current_repository %><%= render 'woods_map/guide/panel' %><% end %>
+  </div>
   <%= render 'woods_map/shared/sheet', tree: @tree, current_path: @file_path || @page&.path %>
   <%= render 'woods_map/shared/keyboard_help' %>
 </body>

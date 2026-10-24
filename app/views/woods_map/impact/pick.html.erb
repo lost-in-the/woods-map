@@ -2,13 +2,13 @@
 <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
 <%= render 'woods_map/impact/frame', title: 'Impact', subtitle: "pre-change mode, gen #{@repository.generation_number}", crumb: 'blast radius' %>
 <div class="body" data-controller="trail">
-  <div class="main" style="margin-left:var(--s5)">
+  <div class="main inset">
     <%= render 'woods_map/components/empty_state', title: @radius.unknown.any? ? "No unit named #{@radius.unknown.join(', ')} in gen #{@repository.generation_number}" : 'Pick a focus', text: safe_join(['The blast radius of a planned change (E-9): name one or more units and the page lists what depends on them within a depth, the risks the graph can prove, the tests to run first and what the index could not resolve. A range (', link_to('compare retained generations', woods_map.impact_path(mode: 'range')), ') reads retained evidence from Woods (W-12).']) %>
-    <form method="get" action="<%= woods_map.impact_path %>" style="margin-top:var(--s4);display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap">
+    <form method="get" action="<%= woods_map.impact_path %>" class="impact-range-form gap-top">
       <label class="lbl" for="focus">focus</label>
-      <input class="filter" id="focus" type="text" name="focus" value="<%= @radius.unknown.join(',') %>" placeholder="User, PostsController, users/show.html.erb" aria-label="Focus units, comma separated" style="width:min(100%,420px)">
+      <input class="filter focus-input" id="focus" type="text" name="focus" value="<%= @radius.unknown.join(',') %>" placeholder="User, PostsController, users/show.html.erb" aria-label="Focus units, comma separated">
       <label class="lbl" for="depth">depth</label>
-      <select id="depth" name="depth" class="filter" style="width:auto"><% (1..WoodsMap::BlastRadius::MAX_DEPTH).each do |d| %><option value="<%= d %>"<%= ' selected'.html_safe if d == 2 %>><%= d %></option><% end %></select>
+      <select id="depth" name="depth" class="filter auto"><% (1..WoodsMap::BlastRadius::MAX_DEPTH).each do |d| %><option value="<%= d %>"<%= ' selected'.html_safe if d == 2 %>><%= d %></option><% end %></select>
       <button class="btn primary" type="submit">blast radius</button>
     </form>
   </div>

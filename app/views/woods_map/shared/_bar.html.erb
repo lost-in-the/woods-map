@@ -2,7 +2,7 @@
     freshness as ● + words, generation, SHA. Locals: generation (Hash or nil),
     freshness (Hash or nil), nav (Array of [label, href, current?]),
     search_path (String or nil), query (String or nil), label (landmark name). %>
-<% nav = local_assigns[:nav] || [['Units', woods_map.units_path, false], ['Impact', woods_map.impact_path, false]] %>
+<% nav = local_assigns[:nav] || primary_nav %>
 <% fresh_class, fresh_words = freshness_words(local_assigns[:freshness].to_h['state'].to_s) %>
 <% fresh_detail = freshness_detail(local_assigns[:freshness]) %>
 <header class="bar">
@@ -21,5 +21,9 @@
       <span><span class="dim">○</span><span class="w"> no index</span></span>
     <% end %>
   </span>
+  <% if local_assigns.fetch(:label, 'Primary') == 'Primary' && guide_visible? %>
+    <% if guide_status == :ready %><button class="btn guide-toggle" type="button" aria-controls="wm-guide" aria-expanded="false" aria-keyshortcuts="g" data-guide-target="toggle" data-action="guide#toggle" data-needs-js>Guide ▸</button>
+    <% else %><button class="btn guide-toggle" type="button" disabled aria-describedby="wm-guide-why" title="<%= WoodsMap::Guide.notice(woods_map_config) %>">Guide ▸</button><span class="sr-only" id="wm-guide-why"><%= WoodsMap::Guide.notice(woods_map_config) %></span><% end %>
+  <% end %>
   <% if local_assigns.fetch(:label, 'Primary') == 'Primary' %><button class="tool" type="button" aria-label="Keyboard shortcuts" aria-controls="wm-keyboard-help" aria-haspopup="dialog" aria-keyshortcuts="?" data-action="help#open" data-needs-js>?</button><% end %>
 </header>

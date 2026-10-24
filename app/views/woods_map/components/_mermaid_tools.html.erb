@@ -1,0 +1,12 @@
+<%# The export tools of a diagram (mermaid-diagram-types.md, constraint 3;
+    D-25): ⎘ copies the Mermaid text already in the page, and ⤓ .mmd links
+    to the same text served as text/plain from a stable URL, for people and
+    for agents that should not scrape HTML. A type newer than GitHub's Mermaid
+    says so. Locals: text (String, the Mermaid text), name (String, what the
+    diagram shows, for the file name), url (String or nil, the .mmd route),
+    key (String or nil: "y" when this is the copy the page's status bar names).
+    data-mermaid-name and data-mermaid-href let the Share menu list the page's
+    diagrams with their absolute .mmd URLs (D-25). %>
+<%= tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: text, action: 'copy#copy', needs_js: true, key: local_assigns[:key], mermaid_name: name, mermaid_href: (local_assigns[:url] && "#{request.base_url}#{local_assigns[:url]}") }.compact) %>
+<% if local_assigns[:url] %><%= link_to('⤓ .mmd', url, class: 'tool', rel: 'alternate', type: 'text/plain', download: WoodsMap::MermaidExport.filename(name), data: { mermaid_url: true }) %><% end %>
+<% if WoodsMap::MermaidExport.newer_than_github?(text) %><span class="lyr">may not render on GitHub</span><% end %>

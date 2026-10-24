@@ -92,12 +92,12 @@ The connection inventory in [`connection-types.md`](connection-types.md) is the 
 
 ## Open verifications for the design agent
 
-- [ ] Swimlanes (2): lane syntax, async edge styling, label wrapping, behaviour on 3+ lanes with back-edges.
+- [x] Swimlanes (2): lane syntax, async edge styling, label wrapping, behaviour on 3+ lanes with back-edges. Verified on the vendored Pele 1.6.0 (D-21), which draws the Lifecycle lanes view; see [notes/lifecycle-views.md](notes/lifecycle-views.md).
 - [ ] Block (20): whether a fixed grid beats the ELK flowchart for L2 on the testbed landscape.
 - [ ] Radar (24): the 0 to 100 normalisation formula per measure, shown in the card; axis label clipping on long names.
 - [ ] Event modeling (25): fit on a testbed variant with `event` units; skip if the result is a decorated sequence diagram.
 - [ ] Use case (12): only if the host supplies actors; decide with the Landscape L1 design.
 - [ ] Agentflow (32): render one real guide transcript; revisit when it enters the public docs nav and its syntax is declared stable.
-- [ ] GitHub's Mermaid version at the time of M3, to mark which exports render in pull requests.
+- [ ] GitHub's Mermaid version at the time of M3, to mark which exports render in pull requests. Not yet measured. Until it is, `WoodsMap::MermaidExport::NEWER_THAN_GITHUB` marks the types from Mermaid 11.13 on, and of the generated types only `swimlane-beta` is among them.
 
 Record each outcome in `decisions.md` with the testbed variant and the Mermaid version used.

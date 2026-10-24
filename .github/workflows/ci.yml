@@ -28,6 +28,11 @@ jobs:
       - run: bundle exec rake spec
         env:
           WOODS_MAP_RENDER_SPEC: '1'
+      # The M8 gate on a real socket: the dummy host under Puma, driven over
+      # loopback and a non-loopback address of the runner.
+      - run: bundle exec rspec spec/woods_map/engine_http_server_spec.rb
+        env:
+          WOODS_MAP_RUN_HTTP_SERVER: '1'
   lint:
     name: RuboCop
     runs-on: ubuntu-latest

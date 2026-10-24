@@ -95,10 +95,18 @@ non-colour cue or lifts an existing role within its own hue.
 | D-23 | Token contrast at 11–12px (amends D-11) | Four corrected values: dark `--dim` `#86919E` (from `#6E7987`); dark `--risk` `#EE665F` (from `#E64D47`); light `--dim` `#646E7B` (from `#6E7987`); light `--hot` `#A74D1A` (from `#B9561D`). The `M` and blocking chips take their text from `var(--bg)` instead of a hard-coded colour. | Every role reaches 4.5:1 on `--bg`, `--panel` and `--ground2` in both themes. The lowest is light `--dim` on `--ground2` at 4.53:1. Each value stays in its pigeon hue, so D-11's severity order and its colour-vision separation of sun, orange and beak are unchanged. Both `tokens.css` copies carry the values. Board renders made before this use the old values; regenerate them from the engine's copy. The `--hover` tint is a separate gap, tracked in [woods-map#49](https://github.com/lost-in-the/woods-map/issues/49). [woods-map#27](https://github.com/lost-in-the/woods-map/issues/27) |
 | D-24 | Code view scrolling (amends B8-Code) | The code view scrolls as one region (`.cvwrap`, focusable only while it overflows). The source column grows to its longest line, and the heat strip, line numbers and marginalia stay in place with `position:sticky`. Long lines are never soft-wrapped by default at any width. | D-17's "scroll past a visible cliff" now covers code as well as tables. B8-Code's per-line `overflow-x:auto` is retired, because a keyboard could not reach it (WCAG 2.1.1, axe `scrollable-region-focusable`). Wrapping was rejected as the default: continuation lines lose their indentation, which misreads in Ruby. A `wrap` setting may exist only as an opt-in per browser (B-15), off by default. [woods-map#29](https://github.com/lost-in-the/woods-map/issues/29) |
 
+## Sharing (24 October 2026)
+
+Settled by the maintainer on [woods-map#57](https://github.com/lost-in-the/woods-map/issues/57).
+
+| # | Question | Decision | Consequence |
+|---|---|---|---|
+| D-25 | What the Share menu offers | The Share menu offers the focus URL and the Mermaid text of the page's diagrams. It offers no Markdown or JSON report, even text handed through unchanged from Woods. Its audience is agents pulling charts into automated code review on pull requests, and people sharing architecture feedback. | Impact reports in Markdown and JSON stay with Woods (D-1): `woods:impact`, its CI comment and the `change_impact` MCP tool. The boards' *Markdown for PR* button is dropped. The `CLAUDE.md` rule "never render Markdown or JSON reports here" stands as written. Because agents are a primary audience, two things must hold: a focus URL is stable and carries no token, and every diagram's Mermaid text can be fetched without scraping HTML. |
+
 ## Open
 
 - Editor deep links: scheme and checkout path are per-browser settings; never guessed from the index.
-- Server-sent events behind proxies: document Puma and nginx settings; fall back to polling Turbo Frames when the stream cannot open.
+- Server-sent events behind proxies: document Puma and nginx settings; fall back to polling Turbo Frames when the stream cannot open. The known settings are in [DEPLOYMENT.md](../DEPLOYMENT.md#8-streaming-the-m7-guide-behind-proxies); M7 verifies them.
 - Reference span size (F-3) must be measured on `woods-testbed` `rails-8.0-large` before M0 closes.
 - Boundary-row labels in flow tables (`⇒ async hop, new process: …`) are placeholders; the real label comes from the job or mailer unit named by the flow.
 - The ☰ sheet and tree strip have token and layout rules but no interaction prototype yet; verify with keyboard and screen reader on the testbed before M1 closes.

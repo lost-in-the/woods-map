@@ -3,6 +3,7 @@
 module WoodsMap
   # JSON-only projection behind the same host and token gate as the HTML graph.
   class NeighbourhoodsController < ApplicationController
+    woods_map_rate_limit :graph
     prepend_before_action :json_response
     rescue_from NeighbourhoodQuery::Invalid, with: :invalid_query
 
