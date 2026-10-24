@@ -33,6 +33,7 @@ RSpec.describe 'History', type: :request do
     end
 
     it "shows each file's line counts and links the latest commit's hunks into the Code view" do
+      skip 'needs a Woods whose commit table reader has line_stats? (woods#804)' unless WoodsLineStats.supported?
       get '/woods/units/job/ApplicationJob/history'
       sub = doc.css('table[aria-label="Commits"] tbody tr.sub').first
       expect(sub.text).to include('app/jobs/application_job.rb +2 −1', 'L3–4')

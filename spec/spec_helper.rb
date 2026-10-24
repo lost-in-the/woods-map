@@ -6,6 +6,7 @@ require 'rspec/rails'
 require_relative 'support/html_response'
 require_relative 'support/landscape_index'
 require_relative 'support/fake_guide_chat'
+require_relative 'support/woods_line_stats'
 
 RSpec::Matchers.define_negated_matcher :not_include, :include
 

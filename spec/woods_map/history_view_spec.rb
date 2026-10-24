@@ -55,7 +55,7 @@ RSpec.describe WoodsMap::HistoryView do
     view('Micropost', 'model') do |history|
       expect(history.people.map { |p| [p.name, p.commits] }).to eq([['Leah Armstrong', 2], ['Sam Okafor-Whitfield', 1]])
       expect(history.limits).to include('heat is per file, not per line')
-      expect(history.limits.join).not_to include('woods#804')
+      expect(history.limits.join.include?('woods#804')).to eq(!WoodsLineStats.supported?)
     end
   end
 
