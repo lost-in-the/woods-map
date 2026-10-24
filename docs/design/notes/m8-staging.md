@@ -36,6 +36,10 @@ The limit runs after the gate, so a refused client is never counted. It also run
   - A request with none of the three is a non-browser client. The token check still gates it.
 - **Token-less loopback mode:** the request must also name a loopback `Host` (`Woods::MCP::OriginPolicy`), or a host listed in `config.allowed_origins`. Otherwise it gets a 403 panel that names DNS rebinding. Token holders are unaffected, because a rebound page has neither the token nor the cookie.
 
+## Copy
+
+The non-loopback 403 panel's last sentence on B8-States read "Or let the host gate it with `config.authorize`". The hook runs before the token check and can refuse, but it does not admit a non-loopback request without the token (D-4, the exit criterion of M8). The panel now says the hook puts the host's sign-in in front of the token and does not replace it.
+
 ## Validation
 
 - Request specs cover the policy on every response family, the host interaction, the absence of style attributes, the budgets and the origin matrix.

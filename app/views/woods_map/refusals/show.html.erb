@@ -10,7 +10,7 @@
   <% when :rebinding %>
     The request arrived over loopback but named a host that is not loopback, which is how a DNS-rebinding page would reach the map through this browser. Open the map at <code>localhost</code> or <code>127.0.0.1</code>, list the name in <code>config.allowed_origins</code>, or configure <code>WOODS_MAP_TOKEN</code>.
   <% else %>
-    This host is not loopback and no <code>WOODS_MAP_TOKEN</code> is configured, so the map does not boot its routes. Set the token and open <code>/woods?token=…</code> once; it becomes a cookie. Or let the host gate it with <code>config.authorize</code>.
+    This host is not loopback and no <code>WOODS_MAP_TOKEN</code> is configured, so the map does not boot its routes. Set the token and open <code>/woods?token=…</code> once; it becomes a cookie. <code>config.authorize</code> can put the host's own sign-in in front of the token; it does not replace it.
     <pre class="cmd" tabindex="0" role="region" aria-label="Token and hook configuration">WOODS_MAP_TOKEN=$(openssl rand -hex 24)   # staging only
 # config/initializers/woods_map.rb
 WoodsMap.configure do |c|
