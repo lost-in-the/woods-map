@@ -21,10 +21,10 @@ RSpec.describe 'Diagram texts render with the vendored Pele' do # rubocop:disabl
   end
 
   def diagrams
-    unit_diagrams + landscape_diagrams + [FIXTURE_INDEX,
-                                          WoodsMap::LargeSchemaIndex.path].each_with_index.flat_map do |dir, i|
+    erd = [FIXTURE_INDEX, WoodsMap::LargeSchemaIndex.path].each_with_index.flat_map do |dir, i|
       WoodsMap::Repository.open(dir) { |repository| erd_diagrams(repository, i.zero? ? 'fixture' : '300') }
     end
+    unit_diagrams + landscape_diagrams + erd
   end
 
   def unit_diagrams
