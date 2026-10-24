@@ -135,6 +135,16 @@ module WoodsMap
       template_resolver.missing_facts
     end
 
+    # @return [Array<PassageTemplates::Unresolved>] dynamic render targets and unresolved partials
+    def unresolved_renders
+      template_resolver.unresolved
+    end
+
+    # @return [Boolean] whether every template the action can render is known and has facts
+    def coverage_complete?
+      missing_template_facts.empty? && unresolved_renders.empty?
+    end
+
     # @return [Array<Flag>, nil] lexical template ivar mentions without a recorded assignment;
     #   nil when the index has no facts to decide with
     def flags
