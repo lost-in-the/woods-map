@@ -37,6 +37,8 @@ module WoodsMap
     def schema
       with_unit do
         @schema = WoodsMap::SchemaView.new(@unit, table: @page.table, graph_analysis: @repository.graph_analysis)
+        next render_tab_mermaid(@schema.mermaid, 'schema', refusal: @schema.refusal) if mermaid_request?
+
         render :schema
       end
     end
@@ -46,10 +48,14 @@ module WoodsMap
     def passage
       with_unit do
         unless @page.tabs.include?('passage')
+          next render_text(:not_found, "A #{@page.type.tr('_', ' ')} has no passage.") if mermaid_request?
+
           next redirect_to(woods_map.unit_path(type: @page.type, identifier: @page.identifier))
         end
 
         @passage = WoodsMap::Passage.new(@repository, @unit, action: params[:action_name])
+        next render_tab_mermaid(@passage.mermaid, "#{@passage.action} passage") if mermaid_request?
+
         @ladder_model = @passage.ladder_model
         @ladder = @ladder_model && lifecycle_for(@ladder_model)
         @ladder_event = ladder_event(@ladder)
@@ -75,6 +81,11 @@ module WoodsMap
         @lifecycle = lifecycle_for(@unit)
         @event = params[:event] if WoodsMap::Lifecycle::EVENTS.include?(params[:event])
         @event ||= @lifecycle.chains.keys.first || 'create'
+        if mermaid_request?
+          next render_tab_mermaid(@lifecycle.mermaid(@event), "lifecycle #{@event}",
+                                  refusal: @lifecycle.refusal(@event))
+        end
+
         render :lifecycle
       end
     end
@@ -87,6 +98,11 @@ module WoodsMap
           direction: params[:direction].to_s, depth: params.fetch(:depth, 1),
           filters: { types: params[:types], via: params[:via] }
         )
+        if mermaid_request?
+          next render_tab_mermaid(@neighbourhood.mermaid, "neighbourhood depth #{@neighbourhood.depth}",
+                                  refusal: @neighbourhood.refusal)
+        end
+
         render :graph
       end
     end
@@ -119,8 +135,10 @@ module WoodsMap
 
         @page = WoodsMap::UnitPage.new(repository, @unit)
         @definition = WoodsMap::CompositeSource.new(@unit).definition_line
-        @tree = WoodsMap::FileTree.for(repository)
-        @freshness = repository.freshness
+        unless mermaid_request?
+          @tree = WoodsMap::FileTree.for(repository)
+          @freshness = repository.freshness
+        end
         yield
       end
     end
@@ -128,11 +146,20 @@ module WoodsMap
     def render_missing_unit
       @identifier = params[:identifier].to_s
       @type = params[:type].to_s
+      return render_text(:not_found, "No #{@type.tr('_', ' ')} named #{@identifier}.") if mermaid_request?
+
       render 'woods_map/units/missing', status: :not_found
     end
 
     def lens
       cookies[LENS_COOKIE].presence || 'written'
+    end
+
+    # A tab's Mermaid text; a refused one names the page that lists everything.
+    def render_tab_mermaid(text, what, refusal: nil)
+      page = request.base_url + request.path.delete_suffix('.mmd')
+      page += "?#{request.query_string}" if request.query_string.present?
+      render_mermaid(text, name: "#{@page.identifier} #{what}", refusal: refusal, page: page)
     end
 
     def redirect_to_remembered_lens

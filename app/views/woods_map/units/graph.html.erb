@@ -24,8 +24,9 @@
     <section class="sec">
       <%= render 'woods_map/components/diagram', title: 'Neighbourhood', facts: ["#{@page.identifier}, depth #{n.depth}, #{n.direction}", "#{n.node_count} #{'unit'.pluralize(n.node_count)}", "#{n.edges.size} #{'edge'.pluralize(n.edges.size)}"],
             name: "#{@page.identifier} neighbourhood depth #{n.depth}",
+            mermaid_url: woods_map.unit_graph_mmd_path(type: @page.type, identifier: @page.identifier, direction: n.direction, depth: n.depth, types: params[:types].presence, via: params[:via].presence),
             mermaid: n.mermaid, label: "Neighbourhood of #{@page.identifier} at depth #{n.depth}: #{n.edges.size} edges, each labelled with its mechanism; the list below has the same edges",
-            refusal: (n.over_budget? ? "#{n.node_count} units is over the flowchart budget of #{WoodsMap::Neighbourhood::NODE_BUDGET}; narrow the types or mechanisms to draw it. The list below has every edge." : nil),
+            refusal: (n.refusal && "#{n.refusal}. The list below has every edge."),
             legend: [[tag.i(class: 'sw', style: 'border-color:var(--select)'), 'this unit'], [tag.span('→', class: 'ar'), 'edge, labelled with its mechanism']], provenance: ['typed edges', "gen #{@repository.generation_number}"] %>
     </section>
     <section class="sec" data-controller="rows">

@@ -126,6 +126,14 @@ module WoodsMap
       sequence_size(event) > SEQUENCE_BUDGET
     end
 
+    # @param event [String] create, update or destroy
+    # @return [String, nil] why the sequence is not drawn, nil within the budget
+    def refusal(event)
+      return nil unless over_budget?(event)
+
+      "#{sequence_size(event)} participants and messages is over the sequence budget of #{SEQUENCE_BUDGET}"
+    end
+
     private
 
     def fires?(callback, type, event)

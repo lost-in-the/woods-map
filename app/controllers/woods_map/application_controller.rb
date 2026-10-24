@@ -16,6 +16,7 @@ module WoodsMap
   # from the index reaches a client that is not allowed in.
   class ApplicationController < ActionController::Base
     include WoodsMap::Authentication
+    include WoodsMap::MermaidText
 
     protect_from_forgery with: :exception
     layout 'woods_map/application'
@@ -86,6 +87,8 @@ module WoodsMap
     # browser is sent to the same URL without it, so the secret does not stay
     # in the address bar or the history. Ignored while no token is configured.
     def exchange_query_token!
+      return if mermaid_request? # text for agents: the header or the cookie, never a token in the URL
+
       presented = query_token
       return if presented.nil?
 
@@ -109,11 +112,12 @@ module WoodsMap
     end
 
     def respond_to_unauthenticated
-      if request.format.html?
+      if request.format.html? && !mermaid_request?
         redirect_to woods_map.new_session_path
       else
         response.headers['WWW-Authenticate'] = 'Bearer realm="Woods Map"'
-        head :unauthorized
+        next_step = 'Send the token as an Authorization: Bearer header.'
+        mermaid_request? ? render_text(:unauthorized, next_step) : head(:unauthorized)
       end
     end
 
@@ -121,11 +125,15 @@ module WoodsMap
     #
     # @param reason [Symbol] :token, :host or :origin
     def refuse(reason)
+      return render_text(:forbidden, "Woods Map refused the request (#{reason}).") if mermaid_request?
+
       @reason = reason
       render 'woods_map/refusals/show', layout: 'woods_map/bare', status: :forbidden
     end
 
     def render_unavailable(error)
+      return render_text(:service_unavailable, 'No published Woods index.') if mermaid_request?
+
       @error = error
       render 'woods_map/status/unavailable', status: :service_unavailable
     end
