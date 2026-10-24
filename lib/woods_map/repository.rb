@@ -163,7 +163,7 @@ module WoodsMap
     # (`Woods::Diagrams`) that read the same generation the page does.
     #
     # @return [Woods::MCP::IndexReader]
-    def index_reader = @reader
+    def index_reader = reader
 
     # @return [Hash] the raw dependency graph (nodes, edges, reverse, reverse_via, pagerank, file_map)
     def graph
