@@ -15,8 +15,12 @@ module WoodsMap
     # @param unit [Hash] a model or database_table unit
     # @param table [Hash, nil] the database_table unit behind a model
     # @param graph_analysis [Hash]
-    def initialize(unit, table: nil, graph_analysis: {})
+    # @param tables [Hash{String => String}] model identifier => its table, from
+    #   the graph nodes' `table`, so an association's far side is the table the
+    #   model reads rather than a guess from its name
+    def initialize(unit, table: nil, graph_analysis: {}, tables: {})
       @unit = unit
+      @tables = tables
       @metadata = unit['metadata'] || {}
       @table = table
       @table_metadata = (table || (unit['type'] == 'database_table' ? unit : nil))&.dig('metadata') || {}
@@ -76,7 +80,7 @@ module WoodsMap
       lines << "  #{entity(table_name)}" if table_name.present?
       er_associations.each do |a|
         cardinality = a['type'].to_s.start_with?('belongs_to') ? '}o--||' : '||--o{'
-        lines << "  #{entity(table_name)} #{cardinality} #{entity(a['target'].to_s.tableize)} : \"#{a['name']}\""
+        lines << "  #{entity(table_name)} #{cardinality} #{entity(target_table(a))} : \"#{a['name']}\""
       end
       lines.join("\n")
     end
@@ -84,7 +88,7 @@ module WoodsMap
     # @return [Integer] distinct tables the ER diagram draws, this one included
     def table_count
       # compact_blank arrived in Rails 6.1; the engine's floor is 6.0.
-      ([table_name] + er_associations.map { |a| a['target'].to_s.tableize }).reject(&:blank?).uniq.size # rubocop:disable Rails/CompactBlank
+      ([table_name] + er_associations.map { |a| target_table(a) }).reject(&:blank?).uniq.size # rubocop:disable Rails/CompactBlank
     end
 
     # @return [Boolean] whether the ER diagram would exceed {TABLE_BUDGET}
@@ -98,6 +102,14 @@ module WoodsMap
     end
 
     private
+
+    # The far table of an association: the target model's published table,
+    # else Rails' default for the name (`ActiveStorage::Attachment` reads
+    # `active_storage_attachments`, not `active_storage/attachments`).
+    def target_table(assoc)
+      target = assoc['target'].to_s
+      @tables[target].presence || target.tableize.tr('/', '_')
+    end
 
     def er_associations
       Array(@metadata['associations']).reject { |a| a['through'] }
@@ -118,7 +130,7 @@ module WoodsMap
     end
 
     def key_text(assoc, key)
-      assoc['type'].to_s == 'belongs_to' ? "#{table_name}.#{key}" : "#{assoc['target'].to_s.tableize}.#{key}"
+      assoc['type'].to_s == 'belongs_to' ? "#{table_name}.#{key}" : "#{target_table(assoc)}.#{key}"
     end
 
     def enforcement(assoc, key)

@@ -1,0 +1,134 @@
+# frozen_string_literal: true
+
+require 'woods/flow_assembler'
+
+module WoodsMap
+  # The M3 exit criterion (woods-map#5, docs/design/notes/m3-exit-check.md):
+  # the Lifecycle and Schema texts the map draws match Woods' flow documents
+  # (`FlowAssembler`, as `woods:flow` builds them) and the model metadata of
+  # one generation. Each check returns rows with their problems; an empty
+  # problem list is a match.
+  module M3ExitCheck
+    module_function
+
+    # @param index_dir [String] a published Woods index
+    # @return [Hash{Symbol => Array<Hash>}] :entries, :models, :schema
+    def run(index_dir)
+      Repository.open(index_dir) do |repository|
+        assembler = Woods::FlowAssembler.new(graph: Woods::DependencyGraph.from_h(repository.graph),
+                                             extracted_dir: Woods::PublishedIndex.new(index_dir).payload_dir.to_s)
+        { entries: entries(repository, assembler), models: models(repository, assembler),
+          schema: schema(repository) }
+      end
+    end
+
+    # Every controller action, job and mailer action: Woods' steps appear on
+    # the map in Woods' order, and the sequence, flowchart and lanes texts
+    # each draw every step.
+    def entries(repository, assembler)
+      %w[controller job mailer].flat_map do |type|
+        repository.units(type: type).flat_map do |entry|
+          unit = repository.unit(entry['identifier'], type: type)
+          EntryLifecycle.new(repository, unit).actions.filter_map do |action|
+            entry_row(repository, assembler, EntryLifecycle.new(repository, unit, action: action))
+          end
+        end
+      end
+    end
+
+    def entry_row(repository, assembler, lifecycle)
+      steps = lifecycle.steps
+      return nil if steps.empty?
+
+      depth = depth_of(repository, lifecycle)
+      woods = Array(assembler.assemble(lifecycle.entry, max_depth: depth).to_h[:steps])
+              .reject { |s| s[:type].to_s == 'cycle' }.map { |s| s[:unit].to_s }.uniq
+      labels = steps.map(&:label)
+      problems = []
+      problems << "Woods steps missing: #{woods - labels}" unless (woods - labels).empty?
+      problems << "order: Woods #{woods}, map #{labels}" unless labels & woods == woods & labels
+      problems.concat(text_problems(lifecycle, steps))
+      { entry: lifecycle.entry, source: lifecycle.source, depth: depth, woods: woods.size, map: steps.size,
+        added: steps.reject { |s| woods.include?(s.label) }.map { |s| "#{s.label} (#{s.via})" }, problems: problems }
+    end
+
+    def depth_of(repository, lifecycle)
+      return LifecycleBuilder::FLOW_DEPTH unless lifecycle.source == 'precomputed'
+
+      repository.flow_document(lifecycle.entry)&.dig('max_depth') || LifecycleBuilder::FLOW_DEPTH
+    end
+
+    def text_problems(lifecycle, steps)
+      sequence = lifecycle.diagram('sequence')
+      counts = { 'sequence messages' => sequence.lines.count { |l| l.match?(/^\s+\S+-(>>|\))\S+: /) },
+                 'flowchart nodes' => lifecycle.diagram('flowchart').lines.count { |l| l.match?(/^\s+s\d+\[/) },
+                 'lanes nodes' => lifecycle.diagram('lanes').lines.count { |l| l.match?(/^\s+s\d+\[/) } }
+      problems = counts.filter_map { |what, n| "#{what} #{n} for #{steps.size} steps" unless n == steps.size }
+      missing = steps.reject { |s| sequence.include?(s.title.tr(';#', ',·')) }.map(&:title)
+      problems << "not in the sequence: #{missing}" if missing.any?
+      problems
+    end
+
+    # Every application model and event: the map's callback chain is Woods'
+    # model event flow's application callbacks, in Woods' order, and the
+    # sequence names each.
+    def models(repository, assembler)
+      repository.units(type: 'model').flat_map do |entry|
+        unit = repository.unit(entry['identifier'], type: 'model')
+        next [] unless unit['file_path'].to_s.start_with?('app/')
+
+        lifecycle = Lifecycle.new(unit, concern_methods: concern_methods(repository, unit))
+        Lifecycle::EVENTS.filter_map { |event| model_row(assembler, unit, lifecycle, event) }
+      end
+    end
+
+    def model_row(assembler, unit, lifecycle, event)
+      map = lifecycle.steps(event).map(&:filter)
+      operations = Array(assembler.assemble("#{unit['identifier']}@#{event}", max_depth: 1).to_h[:steps])
+                   .flat_map { |s| Array(s[:operations]) }.select { |op| op[:type].to_s == 'callback' }
+      woods = operations.reject { |op| op[:unexpanded] }.map { |op| op[:method].to_s }
+      return nil if map.empty? && woods.empty?
+
+      problems = []
+      problems << "callbacks: map #{map}, Woods #{woods}" unless map == woods
+      sequence = lifecycle.mermaid(event)
+      problems << 'a callback is missing from the sequence' unless map.all? { |name| sequence.include?(name) }
+      { entry: "#{unit['identifier']}@#{event}", callbacks: map, woods_unexpanded: operations.size - woods.size,
+        map_framework: lifecycle.framework.size, problems: problems }
+    end
+
+    def concern_methods(repository, unit)
+      Array(unit.dig('metadata', 'inlined_concerns')).to_h do |name|
+        [name, Array(repository.unit(name, type: 'concern')&.dig('metadata', 'instance_methods')).map(&:to_s)]
+      end
+    end
+
+    # Every application model: the Schema tab's columns are the model's, and
+    # its ER text draws each direct association to the table its target reads.
+    def schema(repository)
+      tables = Hash(repository.graph['nodes']).select { |_, n| n['type'] == 'model' && n['table'] }
+                                              .transform_values { |n| n['table'] }
+      repository.units(type: 'model').filter_map do |entry|
+        unit = repository.unit(entry['identifier'], type: 'model')
+        next unless unit['file_path'].to_s.start_with?('app/')
+
+        schema_row(unit, SchemaView.new(unit, tables: tables), tables)
+      end
+    end
+
+    def schema_row(unit, view, tables)
+      columns = Array(unit.dig('metadata', 'columns')).pluck('name')
+      problems = []
+      problems << "columns: #{view.columns.map(&:name)}" unless view.columns.map(&:name) == columns
+      text = view.mermaid
+      Array(unit.dig('metadata', 'associations')).reject { |a| a['through'] }.each do |a|
+        table = tables[a['target']]
+        next if table.nil? || text.include?(%("#{table}"))
+
+        problems << "#{a['name']} does not draw #{table}"
+      end
+      { entry: unit['identifier'], table: view.table_name, columns: columns.size,
+        associations: view.associations.size, problems: problems }
+    end
+  end
+end
