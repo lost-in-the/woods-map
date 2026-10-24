@@ -60,10 +60,6 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .keyboard-help section{margin-top:var(--s5)}
 .wm .keyboard-help dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--s2) var(--s4)}
 .wm .keyboard-help dd{margin:0;overflow-wrap:anywhere}
-/* The current rail item sits on --select-tint, where --dim misses AA in the light theme (4.23:1). */
-.wm .rail li[aria-current=true] .own{color:var(--mut)}
-/* The ERD rail numbers its chunks; the number sits on the same tint. */
-.wm .rail li[aria-current=true] .k{color:var(--mut)}
 /* The hover card on a reference (B-3), inside the one tooltip (D-16). */
 .wm .tip .hcard{min-width:220px}
 .wm .hcard .hch{display:flex;gap:var(--s2);align-items:baseline;margin-bottom:var(--s1)}
