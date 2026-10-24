@@ -7,7 +7,7 @@ module WoodsMap
   # `FlowAssembler`, the assembler `trace_flow` uses, over the graph and the
   # payload that `Woods::MCP::IndexReader` resolves. Published generations
   # never change, so a flow is cached per index identity, generation, entry
-  # and depth. Mixed into {Repository}, which supplies `@reader` and
+  # and depth. Mixed into {Repository}, which supplies `reader` and
   # `generation_key`.
   module RepositoryAssembledFlows
     CACHE_SIZE = 32
@@ -51,7 +51,7 @@ module WoodsMap
     #   assembled), frozen
     def flow(entry, max_depth:)
       precomputed_flow(entry) || RepositoryAssembledFlows.fetch([generation_key, entry, max_depth]) do
-        assembler = Woods::FlowAssembler.new(graph: @reader.dependency_graph, extracted_dir: @reader.payload_dir.to_s)
+        assembler = Woods::FlowAssembler.new(graph: reader.dependency_graph, extracted_dir: reader.payload_dir.to_s)
         assembler.assemble(entry, max_depth: max_depth).to_h.merge(source: 'assembled').freeze
       end
     end

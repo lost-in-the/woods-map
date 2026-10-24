@@ -14,8 +14,7 @@ RSpec.describe WoodsMap::NeighbourhoodResponse do
   end
   let(:repository) do
     allow(Woods::MCP::IndexReader).to receive(:new).and_return(instance_double(Woods::MCP::IndexReader))
-    repo = WoodsMap::Repository.new(instance_double(Woods::PublishedIndex,
-                                                    payload_dir: Pathname.new('/synthetic/index')))
+    repo = WoodsMap::Repository.new(synthetic_published_index)
     allow(repo).to receive_messages(graph: graph, graph_analysis: {}, generation_facts: { 'generation' => 'pinned' })
     repo
   end

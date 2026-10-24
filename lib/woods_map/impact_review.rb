@@ -44,6 +44,9 @@ module WoodsMap
        'runtime values, query plans, latency, authorization, rendered output, external services']
     ].freeze
 
+    # Unresolved renders around a radius are read from every involved unit;
+    # at a hub that is most of the generation, so they are kept per
+    # generation and involved set.
     # Unit types a test can be expected to cover.
     TESTABLE = %w[model controller mailer job service poro concern view_template component view_component
                   serializer].freeze
@@ -55,7 +58,7 @@ module WoodsMap
       @radius = radius
       @graph = repository.graph
       @analysis = repository.graph_analysis
-      @ivar_rule = UnassignedIvarRule.new(repository, radius)
+      @ivar_rule = UnassignedIvarRule.outcome(repository, radius)
     end
 
     # @return [Array<Finding>] the findings of the rules that ran

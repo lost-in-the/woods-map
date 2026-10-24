@@ -8,6 +8,7 @@
 <%= render 'woods_map/graphs/explorer', identifier: @centre['identifier'], type: @centre['type'], n: n, page: true, blast: @blast,
       flows: @flows, flow: @flow, timeline: @timeline,
       link: here,
+      mermaid_url: woods_map.unit_graph_mmd_path(type: @centre['type'], identifier: @centre['identifier'], direction: n.direction, depth: n.depth, types: params[:types].presence, via: params[:via].presence),
       unit_url: woods_map.graph_path(centre: '__identifier__', type: '__type__', depth: n.depth, direction: n.direction, blast: (@blast ? '1' : nil)),
       rail_extra: safe_join([tag.div('domains', class: 'grp'),
                              tag.p(safe_join(['The published domain clusters are on Landscape: ', link_to('Domains', woods_map.landscape_path(tab: 'domains')), ' and ', link_to('Components by cluster', woods_map.landscape_path(tab: 'components', group: 'cluster')), '.']), class: 'cap padx')]) %>

@@ -156,15 +156,18 @@ Review agents usually talk to the Woods Index MCP server, not the map. Woods
 offers Mermaid only through `change_impact` (`format: mermaid`), which is wired
 when a snapshot store is. Its impact text also parses with 11.16.1.
 
-[woods#826](https://github.com/lost-in-the/woods/issues/826) proposes three
-pieces in Woods:
+[woods#826](https://github.com/lost-in-the/woods/issues/826) added three
+pieces to Woods:
 
 - `Woods::Diagrams`, with neighbourhood, schema, lifecycle and impact;
-- a `diagram` MCP tool;
-- a `woods:diagram` task.
+- the always-on `diagram` MCP tool;
+- the `woods:diagram` task.
 
-The map's view objects would then delegate to `Woods::Diagrams` for those
-kinds. Woods never depends on the map.
+Each kind has its own depth, and every kind parses with GitHub's 11.16.1.
+The map's Graph neighbourhood, Schema ER and Lifecycle sequence draw from
+these builders when the loaded Woods has them (`WoodsMap::WoodsDiagrams`), so
+a page, its `.mmd` and `.md` and a review agent's tool call give the same
+bytes.
 
 ## Validation
 

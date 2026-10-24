@@ -49,15 +49,16 @@ export default class extends Controller {
     }
     // One row per distinct text: the Graph tab's canvas and its flowchart fallback export the same diagram.
     const seen = new Set()
-    const tools = [...document.querySelectorAll("[data-mermaid-name][data-copy-text-value]:not([data-pr-comment])")].filter((tool) => {
-      const text = `${tool.dataset.copyTextValue}\u0000${tool.dataset.mermaidHref || ""}`
+    // A text over the inline budget is not in the page: its tool copies from its .mmd route.
+    const tools = [...document.querySelectorAll("[data-mermaid-name][data-copy-text-value]:not([data-pr-comment]), [data-mermaid-name][data-copy-url-value]")].filter((tool) => {
+      const text = `${tool.dataset.copyTextValue || tool.dataset.copyUrlValue}\u0000${tool.dataset.mermaidHref || ""}`
       if (!outside(tool) || seen.has(text)) return false
       seen.add(text)
       return true
     })
     for (const tool of tools) {
       const title = tool.dataset.mermaidName
-      list.appendChild(this.copyButton(`⎘ ${title}`, `Copy the Mermaid text of ${title}`, tool.dataset.copyTextValue))
+      list.appendChild(this.copyButton(`⎘ ${title}`, `Copy the Mermaid text of ${title}`, tool.dataset.copyTextValue, tool.dataset.copyUrlValue))
       if (tool.dataset.mermaidHref) {
         const link = document.createElement("a")
         link.className = "tool"
@@ -80,14 +81,15 @@ export default class extends Controller {
     list.hidden = tools.length === 0
   }
 
-  copyButton(text, label, value) {
+  copyButton(text, label, value, url) {
     const button = document.createElement("button")
     button.type = "button"
     button.className = "tool"
     button.textContent = text
     button.setAttribute("aria-label", label)
     button.dataset.controller = "copy"
-    button.dataset.copyTextValue = value
+    if (url) button.dataset.copyUrlValue = url
+    else button.dataset.copyTextValue = value
     button.dataset.action = "copy#copy"
     return button
   }

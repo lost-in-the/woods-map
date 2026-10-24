@@ -94,8 +94,10 @@ module WoodsMap
     #   container attribution, the view is not offered
     # @param changed [Since::Changed, nil] with `?since=`, what moved in the
     #   unit's source: a step is marked when its method or declaration did
-    def initialize(unit, concern_methods: {}, dynamic: nil, changed: nil)
+    # @param repository [Repository, nil] when given, the sequence comes from Woods' builder (woods#826)
+    def initialize(unit, concern_methods: {}, dynamic: nil, changed: nil, repository: nil)
       @unit = unit
+      @repository = repository
       @changed = changed
       @dynamic = dynamic
       defined = unit['source_code'].to_s.scan(DEFINITION).flatten.to_set | concern_methods.values.flatten.to_set
@@ -131,9 +133,19 @@ module WoodsMap
     # the steps table (`autonumber`). Participants are aliased so namespaced
     # names (`Admin::User`) stay valid Mermaid.
     #
+    # Woods' own builder draws it when the loaded Woods has one (woods#826).
+    #
     # @param event [String] create, update or destroy
     # @return [String]
     def mermaid(event)
+      WoodsDiagrams.lifecycle(@repository, @owner, event) || local_mermaid(event)
+    end
+
+    # The map's own sequence text, for a Woods without the diagram builders.
+    #
+    # @param event [String] create, update or destroy
+    # @return [String]
+    def local_mermaid(event)
       list = steps(event)
       targets = list.filter_map(&:async_target).uniq
       lines = ['sequenceDiagram', '  autonumber', '  participant App', "  participant M as #{@owner}"]
