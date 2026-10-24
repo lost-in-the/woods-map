@@ -22,6 +22,8 @@ module WoodsMap
     # Flowchart node budget (R-4): above it the panel names the budget and
     # keeps the text, rather than drawing a diagram nobody can read.
     NODE_BUDGET = 150
+    # Rows one page of the list equivalent shows; the pager reaches the rest.
+    LIST_PER_PAGE = 300
 
     # @param repository [WoodsMap::Repository]
     # @param identifier [String]
@@ -94,7 +96,7 @@ module WoodsMap
 
     # @return [Integer] distinct typed units the filtered edges touch, the focus included
     def node_count
-      edges.flat_map { |e| [[e.from, e.from_type], [e.to, e.to_type]] }.push(@focus).uniq.size
+      @node_count ||= mermaid_nodes.size
     end
 
     # @return [Boolean] whether the flowchart would exceed {NODE_BUDGET}
@@ -114,8 +116,9 @@ module WoodsMap
     #
     # @return [String]
     def mermaid
-      WoodsDiagrams.text(@repository, kind: 'neighbourhood', identifier: @focus.first, type: @focus.last,
-                                      depth: @depth, direction: @direction, types: @types, via: @via) || local_mermaid
+      @mermaid ||= WoodsDiagrams.text(@repository, kind: 'neighbourhood', identifier: @focus.first, type: @focus.last,
+                                                   depth: @depth, direction: @direction, types: @types, via: @via) ||
+                   local_mermaid
     end
 
     # The map's own flowchart text: each unit declared once with its label,
@@ -135,12 +138,14 @@ module WoodsMap
     private
 
     def node_id(identifier, type)
-      "n_#{Digest::SHA256.hexdigest([type, identifier].to_json)[0, 16]}"
+      (@node_ids ||= {})[[identifier, type]] ||= "n_#{Digest::SHA256.hexdigest([type, identifier].to_json)[0, 16]}"
     end
 
     # The centre, then every other unit an edge names, each once.
     def mermaid_nodes
-      ([@focus] + edges.flat_map { |edge| [[edge.from, edge.from_type], [edge.to, edge.to_type]] }).uniq
+      @mermaid_nodes ||= ([@focus] + edges.flat_map do |edge|
+        [[edge.from, edge.from_type], [edge.to, edge.to_type]]
+      end).uniq
     end
 
     def mermaid_node(identifier, type)

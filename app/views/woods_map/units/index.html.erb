@@ -1,22 +1,28 @@
-<% content_for :title, 'Units · Woods Map' %>
+<% content_for :title, @units_index.type ? "#{@units_index.type.tr('_', ' ')} units · Woods Map" : 'Units · Woods Map' %>
 <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
-<%= render 'woods_map/shared/crumbs', crumbs: [['units', nil]] %>
-<%= render 'woods_map/shared/ident', title: 'Units', subtitle: "#{@unit_count} units, #{@unit_groups.size} types, gen #{@repository.generation_number}" %>
+<%= render 'woods_map/shared/crumbs', crumbs: @units_index.type ? [['units', woods_map.units_path], [@units_index.type.tr('_', ' '), nil]] : [['units', nil]] %>
+<% subtitle = @units_index.type ? "#{pluralize(@units_index.type_counts[@units_index.type], 'unit')}#{", page #{@units_index.list.number} of #{@units_index.list.pages}" if @units_index.list.paged?}, gen #{@repository.generation_number}" : "#{@units_index.unit_count} units, #{@units_index.type_counts.size} types, gen #{@repository.generation_number}" %>
+<%= render 'woods_map/shared/ident', title: @units_index.type ? "#{@units_index.type.tr('_', ' ').capitalize} units" : 'Units', subtitle: subtitle %>
 <div class="body gap-top">
   <nav class="rail" aria-label="Unit types">
     <h2 class="t3 on">Types</h2>
-    <% @unit_groups.each do |type, units| %>
-      <%= link_to woods_map.units_path(anchor: "type-#{type}"), class: 'f' do %><%= type.tr('_', ' ') %><span class="cnt"><%= units.size %></span><% end %>
+    <% @units_index.type_counts.each do |type, count| %>
+      <%= link_to(@units_index.type ? woods_map.units_path(type: type) : woods_map.units_path(anchor: "type-#{type}"), class: 'f', 'aria-current': (@units_index.type == type ? 'page' : nil)) do %><%= type.tr('_', ' ') %><span class="cnt"><%= count %></span><% end %>
     <% end %>
   </nav>
   <div class="main">
-    <% if @unit_groups.empty? %>
+    <% if @units_index.groups.empty? %>
       <%= render 'woods_map/components/empty_state', title: 'No indexed units', text: 'This published generation contains no units.' %>
     <% end %>
-    <% @unit_groups.each do |type, units| %>
+    <% @units_index.groups.each do |type, units| %>
+      <% total = @units_index.type_counts[type] %>
       <section class="sec" aria-labelledby="type-<%= type %>">
-        <header><h2 class="t2" id="type-<%= type %>"><%= type.tr('_', ' ') %> <%= count_tag(units.size) %></h2></header>
-        <%= render 'woods_map/components/table', label: "#{type.tr('_', ' ')} units", min_width: '640px', columns: [{ label: 'unit', width: '300px', cell_class: 'id' }, { label: 'indexed file' }], rows: units.map { |unit| { cells: [unit_link(unit['identifier'], type, listed: true), unit['file_path'].presence || tag.span('No indexed file', class: 'dim')] } } %>
+        <header><h2 class="t2" id="type-<%= type %>"><%= type.tr('_', ' ') %> <%= count_tag(total) %></h2></header>
+        <% caption = if !@units_index.type && units.size < total
+                       safe_join(["The first #{units.size} of #{total}, by name. ", link_to("All #{total} #{type.tr('_', ' ')} units", woods_map.units_path(type: type))])
+                     end %>
+        <%= render 'woods_map/components/table', label: "#{type.tr('_', ' ')} units", min_width: '640px', columns: [{ label: 'unit', width: '300px', cell_class: 'id' }, { label: 'indexed file' }], rows: units.map { |unit| { cells: [unit_link(unit['identifier'], type, listed: true), unit['file_path'].presence || tag.span('No indexed file', class: 'dim')] } }, caption: caption %>
+        <% if @units_index.list %><%= render 'woods_map/components/pager', list: @units_index.list, noun: "#{type.tr('_', ' ')} units" %><% end %>
       </section>
     <% end %>
   </div>

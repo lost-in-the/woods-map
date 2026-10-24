@@ -9,6 +9,25 @@ module WoodsMap
     NAME = 'template reads unassigned ivar'
     OWNER_TYPES = %w[controller mailer].freeze
 
+    # What the impact page reads from a rule run: its findings, unknowns and result.
+    Outcome = Struct.new(:findings, :unknowns, :result, keyword_init: true)
+
+    # The rule reads every passage of the controllers and mailers a change
+    # reaches: one unit and its templates each. Outcomes are kept per
+    # generation and reach, so a hub's impact page reads them once.
+    MEMO = GenerationMemo.new(16)
+
+    # @param repository [WoodsMap::Repository]
+    # @param radius [WoodsMap::BlastRadius]
+    # @return [Outcome] the rule's outcome for that radius, computed once per generation
+    def self.outcome(repository, radius)
+      key = [repository.generation_key, radius.focus, radius.direct.map { |a| [a.identifier, a.type] }]
+      MEMO.fetch(key) do
+        rule = new(repository, radius)
+        Outcome.new(findings: rule.findings.freeze, unknowns: rule.unknowns.freeze, result: rule.result)
+      end
+    end
+
     # @param repository [WoodsMap::Repository]
     # @param radius [WoodsMap::BlastRadius]
     def initialize(repository, radius)

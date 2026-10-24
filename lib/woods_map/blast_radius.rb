@@ -13,6 +13,8 @@ module WoodsMap
     Affected = Struct.new(:identifier, :type, :distance, :via, :from, :path, keyword_init: true)
 
     MAX_DEPTH = 3
+    # Affected rows one page of the impact list shows; the pager reaches the rest.
+    LIST_PER_PAGE = 300
     # The "show" control: which unit types a view hides.
     HIDDEN = { 'no_tests' => %w[test_mapping test_support],
                'no_views' => %w[view_template view_component component] }.freeze

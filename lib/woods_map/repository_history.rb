@@ -6,7 +6,8 @@ module WoodsMap
   # `Woods::PublishedIndex` and locked like the request's own. Mixed into
   # Repository, which supplies `@index` and `generation_number`.
   module RepositoryHistory
-    # The pinned generation's commit table (Woods W-3), read once.
+    # The pinned generation's commit table (Woods W-3), read once per
+    # generation and shared by the requests that pin it.
     #
     # @return [Woods::PublishedIndex::CommitTable, nil] nil when the generation
     #   publishes none, the table is unreadable, or this Woods has no reader;
@@ -23,7 +24,7 @@ module WoodsMap
     #   or :unsupported (this Woods has no commit table reader)
     def commit_table_state
       @commit_table_state ||= begin
-        @git_commits = @index.git_commits if @index.respond_to?(:git_commits)
+        @git_commits = snapshot.fetch(:git_commits) { [@index.git_commits] }.first if @index.respond_to?(:git_commits)
         if !@index.respond_to?(:git_commits) then :unsupported
         elsif @git_commits then :available
         else :absent
