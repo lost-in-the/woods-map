@@ -13,7 +13,7 @@ RSpec.describe WoodsMap::ImpactRange do
   before { allow(described_class).to receive(:backend).and_return(backend) }
 
   it 'delegates the range to Woods and retains coverage without completing empty sections' do
-    allow(backend).to receive(:compare).with(FIXTURE_INDEX, from: 'gen:1', to: 'now')
+    allow(backend).to receive(:compare).with(FIXTURE_INDEX, hash_including(from: 'gen:1', to: 'now'))
                                        .and_return(double(to_h: data))
     result = described_class.new(FIXTURE_INDEX, from: 'gen:1')
     expect(result.state).to eq(:available)
@@ -88,6 +88,24 @@ RSpec.describe WoodsMap::ImpactRange do
     it 'says how to pin a review base when nothing is pinned' do
       allow(WoodsMap::Retention).to receive(:read).and_return(WoodsMap::Retention.new(:available, []))
       expect(described_class.new(FIXTURE_INDEX, from: 'gen:9').message).to include('woods:pin[N]')
+    end
+  end
+
+  describe "Woods' report cache" do
+    before { allow(backend).to receive(:compare).and_return(double(to_h: data)) }
+
+    it 'passes one cache to every comparison in the process' do
+      stub_const('Woods::Impact::ReportCache', Class.new { def initialize(size:) = (@size = size) })
+      2.times { described_class.new(FIXTURE_INDEX, from: 'gen:1') }
+      cache = described_class.report_cache
+      expect(cache).to be_a(Woods::Impact::ReportCache)
+      expect(backend).to have_received(:compare).with(FIXTURE_INDEX, from: 'gen:1', to: 'now', cache: cache).twice
+    end
+
+    it 'compares without one on a Woods that has none' do
+      hide_const('Woods::Impact::ReportCache')
+      described_class.new(FIXTURE_INDEX, from: 'gen:1')
+      expect(backend).to have_received(:compare).with(FIXTURE_INDEX, from: 'gen:1', to: 'now')
     end
   end
 

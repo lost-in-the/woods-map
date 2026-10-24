@@ -4,6 +4,13 @@ module WoodsMap
   # Reads Woods' authoritative retained-generation report without deriving impact.
   # Historical identities deliberately have no links into the current generation.
   class ImpactRange
+    # Ranges whose comparison Woods keeps per process (`Woods::Impact::ReportCache`).
+    # A range over a large application takes seconds to compare, and every
+    # lens, page, unit diff and `?since=` view of that range asks for it.
+    CACHE_SIZE = 4
+
+    @mutex = Mutex.new
+
     MESSAGES = {
       unavailable: 'Range reports are unavailable in this Woods version. Install a version providing Woods::Impact::Report.',
       invalid: 'The range could not be resolved. Use gen:N, now, or a retained commit SHA (7–40 characters).',
@@ -19,6 +26,26 @@ module WoodsMap
     # @return [ImpactRange]
     def self.saved(index_dir, id)
       allocate.tap { |range| range.send(:load_saved, index_dir, id.to_s) }
+    end
+
+    class << self
+      # Woods' comparison cache, shared by every range this process reads.
+      # It keys on the payloads a range resolves to, so `gen:N`, a commit SHA
+      # and `now` naming one pair share a comparison, and a new publish or a
+      # prune is a new key. nil on a Woods without one: each view compares.
+      #
+      # @return [Woods::Impact::ReportCache, nil]
+      def report_cache
+        return nil unless defined?(Woods::Impact::ReportCache)
+
+        @mutex.synchronize { @report_cache ||= Woods::Impact::ReportCache.new(size: CACHE_SIZE) }
+      end
+
+      # Drop the cache (specs).
+      # @return [void]
+      def reset!
+        @mutex.synchronize { @report_cache = nil }
+      end
     end
 
     # @return [Class, nil] Woods' saved-report store, loaded only when a saved report is requested
@@ -58,7 +85,9 @@ module WoodsMap
       @state = :unavailable
       return unless backend
 
-      @data = backend.compare(index_dir, from: from, to: to).to_h
+      cache = self.class.report_cache
+      options = cache ? { cache: cache } : {}
+      @data = backend.compare(index_dir, from: from, to: to, **options).to_h
       @state = valid_envelope? ? :available : :error
     rescue ArgumentError => e
       @state = :invalid
