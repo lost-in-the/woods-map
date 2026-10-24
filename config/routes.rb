@@ -17,9 +17,9 @@ WoodsMap::Engine.routes.draw do
   get 'landscape.dsl', to: 'landscape#export', as: :landscape_dsl, defaults: { export: 'structurizr' }, format: false
   get 'landscape.c4', to: 'landscape#export', as: :landscape_c4, defaults: { export: 'likec4' }, format: false
   get 'landscape/:diagram.mmd', to: 'landscape#diagram', as: :landscape_diagram_mmd,
-                                constraints: { diagram: /components|quadrant|sankey/ }, format: false
+                                constraints: { diagram: /context|components|quadrant|sankey|treemap/ }, format: false
   get 'landscape(/:tab)', to: 'landscape#show', as: :landscape,
-                          constraints: { tab: /containers|components|hotspots|domains/ }, format: false
+                          constraints: { tab: /context|containers|components|hotspots|domains/ }, format: false
 
   # The full-screen graph (M5): a centre by identifier and type, never a path.
   get 'graph', to: 'graphs#show', as: :graph

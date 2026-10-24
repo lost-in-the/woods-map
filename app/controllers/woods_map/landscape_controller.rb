@@ -7,7 +7,7 @@ module WoodsMap
   # container diagram is also served as Mermaid, Structurizr DSL and LikeC4
   # text, for agents and architecture tools (D-25).
   class LandscapeController < ApplicationController
-    TABS = %w[containers components hotspots domains].freeze
+    TABS = %w[context containers components hotspots domains].freeze
 
     prepend_before_action :text_response, only: %i[export diagram]
 
@@ -28,7 +28,8 @@ module WoodsMap
         response.headers['X-Woods-Generation'] = repository.generation_number.to_s
         next render_text(:unprocessable_entity, needs_attribution) unless landscape.attributed?
 
-        exporter = WoodsMap::LandscapeExport.new(landscape, generation: repository.generation_number)
+        exporter = WoodsMap::LandscapeExport.new(landscape, generation: repository.generation_number,
+                                                            actors: woods_map_config.landscape_actors)
         response.headers['Content-Disposition'] = %(inline; filename="#{exporter.filename(format)}")
         render plain: "#{exporter.text_for(format)}\n", content_type: 'text/plain'
       end
@@ -56,6 +57,11 @@ module WoodsMap
       when 'components'
         components = WoodsMap::Components.new(repository, group: params[:group])
         components.limit ? [nil, limit_message(components.limit)] : [components.mermaid]
+      when 'context'
+        [WoodsMap::LandscapeContext.new(landscape_for(repository), actors: woods_map_config.landscape_actors).mermaid]
+      when 'treemap'
+        [WoodsMap::Hotspots.new(repository).treemap_mermaid,
+         'This generation publishes no source sizes (woods#810); extract again with a Woods that does.']
       when 'quadrant'
         [WoodsMap::Hotspots.new(repository).quadrant_mermaid,
          'This generation carries no commit counts to weigh churn.']
@@ -82,7 +88,9 @@ module WoodsMap
       @tree = WoodsMap::FileTree.for(repository)
       @nav = primary_nav(:landscape)
       @landscape = landscape_for(repository)
-      @export = WoodsMap::LandscapeExport.new(@landscape, generation: repository.generation_number)
+      @export = WoodsMap::LandscapeExport.new(@landscape, generation: repository.generation_number,
+                                                          actors: woods_map_config.landscape_actors)
+      @context = WoodsMap::LandscapeContext.new(@landscape, actors: woods_map_config.landscape_actors)
       @hotspots = WoodsMap::Hotspots.new(repository)
       @clusters = Array(repository.graph_analysis['domain_clusters'])
       @components = WoodsMap::Components.new(repository, group: params[:group])

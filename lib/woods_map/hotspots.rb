@@ -47,9 +47,7 @@ module WoodsMap
     end
 
     # @return [Array<String>]
-    def orphans
-      Array(@analysis['orphans'])
-    end
+    def orphans = Array(@analysis['orphans'])
 
     # @return [Array<String>]
     def dead_ends
@@ -125,6 +123,8 @@ module WoodsMap
       points = rows.map { |row| quadrant_point(row, most, widest) }
       (QUADRANT_HEAD + points).join("\n")
     end
+
+    delegate :code_sizes, :sized_by_package?, :treemap_mermaid, to: :sizes
 
     # The layer coupling in the layering direction only (B6-Overview's
     # forward flow) as a Mermaid sankey: edges from a layer to a later one in
@@ -210,6 +210,8 @@ module WoodsMap
     def point_name(identifier)
       identifier.to_s.gsub('::', '.').gsub(%r{[^A-Za-z0-9 _./#-]}, ' ').squeeze(' ').strip.presence || 'unit'
     end
+
+    def sizes = @sizes ||= CodeSizes.new(@graph, @analysis)
 
     def target_type(edge)
       (edge['type'] || @graph.dig('nodes', edge['target'], 'type')).to_s
