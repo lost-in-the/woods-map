@@ -30,7 +30,7 @@ opens the file tree.
 | callers panel | Callers of the current method | B-13 | [B8-Code](boards/B8-Code.html) (margin "called from") | partial |
 | unit diff across generations | Unified source diff with metadata changes | B-14, FR-7 | [B8-Impact-Changed](boards/B8-Impact-Changed.html) (diff component) | partial, no unit-page entry |
 | Schema tab | ER one hop, associations, columns, database facts | FR-6 | [B6-Schema](boards/B6-Schema.html) | final |
-| Lifecycle tab | Sequence / flowchart / lanes, numbered steps, state machine | FR-6, B-19, B-23 | [B6-Lifecycle](boards/B6-Lifecycle.html) | final; C4-dynamic rendering (B-23) missing from the view control |
+| Lifecycle tab | Sequence / flowchart / lanes, numbered steps, state machine | FR-6, B-19, B-23 | [B6-Lifecycle](boards/B6-Lifecycle.html), [lifecycle views note](notes/lifecycle-views.md) | final; the flowchart and lanes renderings follow the note; C4-dynamic (B-23) needs W-9 and is not offered; per-transition callbacks wait on [woods#796](https://github.com/lost-in-the/woods/issues/796) |
 | Graph tab | Neighbourhood, filters, depth, hubs | FR-5, A-1, A-2 | [B6-Graph](boards/B6-Graph.html) | final |
 | History tab | Commit strip, commits with description rows, co-change, people | FR-7, B-6, C-5 | [B6-History](boards/B6-History.html) | final; generation picker not drawn |
 | Controller: Routes tab | Routes, helpers, action sources | FR-3 | [Routes tab note](notes/routes-tab.md) | routes as declared joined to route units, named-route helpers, action sources, unresolvable-route findings; helper references are controller-level until [woods#795](https://github.com/lost-in-the/woods/issues/795) |
@@ -71,7 +71,7 @@ them. Each is a comment on that issue, so the issue owns it.
 - **M1 · Reading (woods-map#34, carried over from #2)**: units index and indexed ownership now have a [bounded design note](notes/m1-indexed-navigation.md) under [#34](https://github.com/lost-in-the/woods-map/issues/34); the Routes tab has a [design note](notes/routes-tab.md); remaining gaps include facts tiles for job, mailer, view, concern, serializer and table units; hover card; disambiguation popover; settings popover; keyboard help; Share menu contents.
 - **M2 · Passage (woods-map#3)**: mailer passage with templates (reuse the controller passage).
 - **M4b · Impact (woods-map#4)**: Overview tab at v8; Graph tab; pre-change mode; `?since=` highlighting on Code, Graph, Lifecycle, Passage, ERD and timeline views.
-- **M3 · Diagrams (woods-map#5)**: Landscape Context L1, Components L3, Domains; C4-dynamic in the Lifecycle view control; the renderer decision (woods-map#25).
+- **M3 · Diagrams (woods-map#5)**: Landscape Context L1, Components L3, Domains; C4-dynamic in the Lifecycle view control (needs W-9); the renderer decision (woods-map#25). The flowchart and lanes views follow the [lifecycle views note](notes/lifecycle-views.md).
 - **M4 · History (woods-map#6)**: `/woods/history` cross-unit timeline; generation picker; unit diff entry from the History tab.
 - **M5 · Graph (woods-map#7)**: [neighbourhood JSON contract](notes/neighbourhood-json.md); full-screen graph, list equivalent and flow overlay remain separate.
 - **M6 · Trail (woods-map#8)**: the board, end to end.

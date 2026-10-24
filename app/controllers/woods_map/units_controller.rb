@@ -81,10 +81,10 @@ module WoodsMap
         @lifecycle = lifecycle_for(@unit)
         @event = params[:event] if WoodsMap::Lifecycle::EVENTS.include?(params[:event])
         @event ||= @lifecycle.chains.keys.first || 'create'
-        if mermaid_request?
-          next render_tab_mermaid(@lifecycle.mermaid(@event), "lifecycle #{@event}",
-                                  refusal: @lifecycle.refusal(@event))
-        end
+        @view = WoodsMap::Lifecycle::VIEWS.include?(params[:view]) ? params[:view] : WoodsMap::Lifecycle::VIEWS.first
+        @state_machines = []
+        @state_machines = WoodsMap::StateMachineView.for_model(@repository, @page.identifier) if @page.type == 'model'
+        next render_lifecycle_mermaid if mermaid_request?
 
         render :lifecycle
       end
@@ -153,6 +153,18 @@ module WoodsMap
 
     def lens
       cookies[LENS_COOKIE].presence || 'written'
+    end
+
+    # The lifecycle's text for the requested view; a state_machine unit's
+    # lifecycle is its state diagram.
+    def render_lifecycle_mermaid
+      if @page.type == 'state_machine'
+        machine = WoodsMap::StateMachineView.new(@unit)
+        return render_tab_mermaid(machine.mermaid, 'state', refusal: machine.refusal)
+      end
+
+      render_tab_mermaid(@lifecycle.diagram(@view, @event), "lifecycle #{@event} #{@view}",
+                         refusal: @lifecycle.refusal(@event, view: @view))
     end
 
     # A tab's Mermaid text; a refused one names the page that lists everything.
