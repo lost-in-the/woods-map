@@ -18,7 +18,7 @@ module WoodsMap
 
     # @return [Boolean] whether every admitted action and rendered template has facts
     def runnable?
-      missing_actions.zero? && missing_templates.empty?
+      missing_actions.zero? && missing_templates.empty? && unresolved.empty?
     end
 
     # @return [Integer, String] finding count, or an explicit incomplete-coverage result
@@ -26,9 +26,13 @@ module WoodsMap
       return findings.size if runnable?
       return 'needs W-7' if passages.empty?
 
-      "#{findings.size} #{'finding'.pluralize(findings.size)}; incomplete: " \
-        "#{missing_actions} #{'action'.pluralize(missing_actions)}, " \
-        "#{missing_templates.size} #{'template'.pluralize(missing_templates.size)}"
+      "#{findings.size} #{'finding'.pluralize(findings.size)}; incomplete: #{incomplete_parts.join(', ')}"
+    end
+
+    # @return [Array<PassageTemplates::Unresolved>] dynamic render targets and unresolved partials of
+    #   the covered actions, each named once
+    def unresolved
+      @unresolved ||= passages.flat_map(&:unresolved_renders).uniq
     end
 
     # @return [Array<ImpactReview::Finding>] findings from actions whose facts are available
@@ -37,7 +41,24 @@ module WoodsMap
                             .uniq { |finding| [finding.where, finding.evidence] }
     end
 
+    # @return [Array<ImpactReview::Unknown>] each dynamic render target and unresolved partial (#47)
+    def unknowns
+      unresolved.map do |item|
+        next unknown_render(item) if item.render_target?
+
+        candidates = item.candidates.any? ? ", candidates #{item.candidates.join(', ')}" : ''
+        ImpactReview::Unknown.new(kind: 'unresolved partial', where: item.where,
+                                  why: "render #{item.name} (#{item.kind}#{candidates})",
+                                  resolves: "a literal partial path the template's callers agree on")
+      end
+    end
+
     private
+
+    def unknown_render(item)
+      ImpactReview::Unknown.new(kind: 'dynamic render', where: item.where, why: "render #{item.name}",
+                                resolves: 'a literal template or partial name')
+    end
 
     def owners
       @owners ||= owner_ids.uniq.filter_map { |id| @repository.unit(id, type: @radius.type_of(id)) }
@@ -49,6 +70,16 @@ module WoodsMap
           Passage.new(@repository, unit, action: action) if ActionFacts.for(unit, action)
         end
       end
+    end
+
+    def incomplete_parts
+      targets = unresolved.count(&:render_target?)
+      partials = unresolved.size - targets
+      parts = ["#{missing_actions} #{'action'.pluralize(missing_actions)}",
+               "#{missing_templates.size} #{'template'.pluralize(missing_templates.size)}"]
+      parts << "#{targets} dynamic render #{'target'.pluralize(targets)}" if targets.positive?
+      parts << "#{partials} unresolved #{'partial'.pluralize(partials)}" if partials.positive?
+      parts
     end
 
     def missing_actions

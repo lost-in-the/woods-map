@@ -93,11 +93,11 @@ Run this before a milestone issue is opened and again before it closes.
 | M1 follow-up: the undesigned reading pieces (units index, file view, Routes tab, type tiles, hover card, disambiguation, settings, keyboard help, share menu) | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34) |
 | Type-specific facts tiles (B-4); other M1 follow-ups remain separate | [woods-map#34](https://github.com/lost-in-the/woods-map/issues/34), [contract](notes/published-type-facts.md) |
 | Design system epic (tokens, fonts, components, responsive tiers) | [woods-map#23](https://github.com/lost-in-the/woods-map/issues/23) |
-| Inline links need a cue besides colour (needs-decision, amends D-11) | [woods-map#26](https://github.com/lost-in-the/woods-map/issues/26) |
-| Token contrast corrections for AA (needs-decision, amends D-11) | [woods-map#27](https://github.com/lost-in-the/woods-map/issues/27) |
+| D-22 Inline links need a cue besides colour (settled, amends D-11) | [woods-map#26](https://github.com/lost-in-the/woods-map/issues/26) |
+| D-23 Token contrast corrections for AA (settled, amends D-11); the hover tint follow-up is [woods-map#49](https://github.com/lost-in-the/woods-map/issues/49) | [woods-map#27](https://github.com/lost-in-the/woods-map/issues/27) |
 | M3 first slice: the Pele renderer, Schema ER, Lifecycle sequence and Graph neighbourhood panels with their budgets (R-4); other M3 work remains on #5 | [woods-map#5](https://github.com/lost-in-the/woods-map/issues/5), [woods-map#37](https://github.com/lost-in-the/woods-map/pull/37) |
-| Passage and impact coverage: unresolved render targets and partials stay incomplete (M2 B-17, B-18; M4b E-5) | [woods-map#47](https://github.com/lost-in-the/woods-map/issues/47) |
-| Code view scrolls as one region, not a line at a time (needs-decision, amends B8-Code) | [woods-map#29](https://github.com/lost-in-the/woods-map/issues/29) |
+| Passage and impact coverage: unresolved render targets and partials stay incomplete (M2 B-17, B-18; M4b E-5) | [woods-map#47](https://github.com/lost-in-the/woods-map/issues/47), fixed by [woods-map#51](https://github.com/lost-in-the/woods-map/pull/51) |
+| D-24 Code view scrolls as one region, not a line at a time (settled, amends B8-Code) | [woods-map#29](https://github.com/lost-in-the/woods-map/issues/29) |
 | D-10 Source of truth for visual tokens | [woods-map#12](https://github.com/lost-in-the/woods-map/issues/12) |
 | D-11 Colour meaning | [woods-map#13](https://github.com/lost-in-the/woods-map/issues/13) |
 | D-12 Typefaces | [woods-map#14](https://github.com/lost-in-the/woods-map/issues/14) |

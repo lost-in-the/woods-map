@@ -91,6 +91,15 @@ module WoodsMap
       renders.reject { |fact| fact['template'] || fact['partial'] }
     end
 
+    # Renders whose target only runtime knows (+render template: params[:t]+, +render @user+, a
+    # +mail+ with a computed template name): Woods publishes the expression under +object+. A
+    # format render, a +head+ and a redirect name their response and stay out of this list.
+    #
+    # @return [Array<Hash>] +object+, +line+, +method+, +file+
+    def dynamic_renders
+      other_renders.select { |fact| fact['object'] }
+    end
+
     # @return [Array<String>] the formats a respond_to block names
     def formats
       Array(@facts['formats'])
