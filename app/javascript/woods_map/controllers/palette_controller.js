@@ -99,7 +99,8 @@ export default class extends Controller {
         const response = await fetch(`${this.urlValue}?q=${encodeURIComponent(q)}`, { headers: { Accept: "application/json" } })
         const result = await response.json()
         if (request !== this.request) return
-        this.result = result
+        // A refusal (429 when the search budget is spent) keeps its message.
+        this.result = Array.isArray(result.groups) ? result : { query: q, groups: [], complete: false, message: result.message }
         this.selected = 0
         this.render()
       } catch (_) {
@@ -130,7 +131,7 @@ export default class extends Controller {
       html += "</div>"
     }
     const coverage = `${data.complete ? "complete" : "partial"}${data.generation ? `, gen ${data.generation}` : ""}`
-    const status = this.hits.length ? coverage : `no match for ${this.escape(data.query || "")}; ${coverage}`
+    const status = data.message ? this.escape(data.message) : this.hits.length ? coverage : `no match for ${this.escape(data.query || "")}; ${coverage}`
     this.renderPanel(html, status)
   }
 

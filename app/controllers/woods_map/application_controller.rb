@@ -5,11 +5,15 @@ module WoodsMap
   # repository every page reads from.
   #
   # Order of checks on every request:
+  # 0. the engine's Content-Security-Policy header, so every response under
+  #    the mount carries it, refusals included (M8);
   # 1. the host's `authorize` hook, when configured;
-  # 2. the origin check for non-GET requests;
+  # 2. the origin check for non-GET requests (Origin, Referer, Sec-Fetch-Site);
   # 3. a `?token=` on a GET, exchanged once for the signed cookie (D-4);
   # 4. the token gate: a bearer header, the exchanged cookie, or a loopback
-  #    request while no token is configured.
+  #    request naming a loopback host while no token is configured;
+  # 5. on search, the palette, graph JSON and impact: the per-client budget,
+  #    429 when it is spent.
   #
   # A refused request gets the 403 panel from the States board, rendered
   # without the frame and before the repository opens anything, so nothing
@@ -20,12 +24,23 @@ module WoodsMap
     protect_from_forgery with: :exception
     layout 'woods_map/application'
 
+    before_action :apply_content_security_policy
     before_action :authorize_host!
     before_action :check_origin!
     before_action :exchange_query_token!
     before_action :authenticate!
 
     helper_method :woods_map_config, :current_repository, :woods_map
+
+    # Count the named actions against the per-client budget of a group.
+    # Named apart from Rails 7.2's `rate_limit`, which the floor lacks.
+    #
+    # @param group [Symbol] the budget the actions share (:search, :graph, :impact)
+    # @param options [Hash] `only:` / `except:` as for before_action
+    # @return [void]
+    def self.woods_map_rate_limit(group, **options)
+      before_action(**options) { enforce_rate_limit!(group) }
+    end
 
     rescue_from WoodsMap::Repository::Unavailable, with: :render_unavailable
 
@@ -63,6 +78,59 @@ module WoodsMap
       end
     end
 
+    # The nonce the layout's inline scripts carry. It is the engine's own while
+    # the engine sends its policy, and the host's (Rails' nonce generator)
+    # when `config.content_security_policy = false` hands the header back.
+    #
+    # @return [String, nil]
+    def content_security_policy_nonce
+      return super if woods_map_config.content_security_policy == false
+
+      @content_security_policy_nonce ||= WoodsMap::ContentSecurityPolicy.nonce
+    end
+
+    def apply_content_security_policy
+      return if woods_map_config.content_security_policy == false
+
+      policy = WoodsMap::ContentSecurityPolicy.new(request, nonce: content_security_policy_nonce,
+                                                            config: woods_map_config)
+      response.headers['Content-Security-Policy'] = policy.header
+    end
+
+    def enforce_rate_limit!(group)
+      return unless woods_map_config.rate_limited?
+
+      client = woods_map_config.rate_limit_key.call(request)
+      decision = woods_map_config.rate_limiter.hit("#{group}:#{client}")
+      return if decision.allowed?
+
+      response.headers['Retry-After'] = decision.retry_after.to_s
+      render_rate_limited(group, decision)
+    end
+
+    # The 429 state: an empty state in the frame, before the repository opens.
+    #
+    # @param group [Symbol]
+    # @param decision [WoodsMap::RateLimiter::Decision]
+    def render_rate_limited(group, decision)
+      @rate_group = group
+      @rate_decision = decision
+      if request.format.json?
+        render json: { 'error' => 'rate_limited', 'retry_after' => decision.retry_after,
+                       'message' => rate_limited_message(decision) }, status: :too_many_requests
+      else
+        render 'woods_map/refusals/rate_limited', layout: 'woods_map/bare', status: :too_many_requests
+      end
+    end
+
+    # @param decision [WoodsMap::RateLimiter::Decision]
+    # @return [String] one sentence the palette and JSON clients can show
+    def rate_limited_message(decision)
+      "Too many requests: #{decision.limit} per #{woods_map_config.rate_limit_period.to_i}s; " \
+        "try again in #{decision.retry_after}s."
+    end
+    helper_method :rate_limited_message
+
     def authorize_host!
       hook = woods_map_config.authorize
       return if hook.nil? || hook.call(request)
@@ -70,14 +138,13 @@ module WoodsMap
       refuse(:host)
     end
 
-    # Cross-origin writes are refused outright. A missing Origin header is
-    # allowed (same-origin navigations and non-browser clients) because the
-    # token check still applies.
+    # Cross-origin writes are refused outright: Origin, else Referer, else
+    # Sec-Fetch-Site must name the map's own origin (or a configured one). A
+    # request with none of them is a non-browser client; the token check
+    # still applies to it.
     def check_origin!
       return if request.get? || request.head?
-
-      origin = request.headers['Origin']
-      return if origin.nil? || origin == request.base_url
+      return if same_origin_write?
 
       refuse(:origin)
     end
@@ -103,6 +170,8 @@ module WoodsMap
 
       if woods_map_config.token?
         respond_to_unauthenticated
+      elsif loopback_request? && !woods_map_config.require_token
+        refuse(:rebinding)
       else
         refuse(:token)
       end
@@ -119,7 +188,7 @@ module WoodsMap
 
     # The 403 panel: no frame and no index facts (States board, D-4).
     #
-    # @param reason [Symbol] :token, :host or :origin
+    # @param reason [Symbol] :token, :host, :origin or :rebinding
     def refuse(reason)
       @reason = reason
       render 'woods_map/refusals/show', layout: 'woods_map/bare', status: :forbidden

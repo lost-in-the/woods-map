@@ -8,9 +8,9 @@
   <% if local_assigns.fetch(:filter, true) %><input class="filter" type="search" placeholder="filter paths" aria-label="Filter paths" data-tree-target="filter" data-action="input->tree#filter" data-needs-js><% end %>
   <% rows.each do |row| %>
     <% if row[:kind] == :dir %>
-      <button class="d" type="button" style="--l:<%= row[:level] %>" data-level="<%= row[:level] %>" data-path="<%= row[:path] %>" aria-expanded="<%= row.fetch(:open, true) ? 'true' : 'false' %>" data-tree-target="row" data-action="tree#fold"><span class="c" aria-hidden="true"><%= row.fetch(:open, true) ? '▾' : '▸' %></span><span class="nm"><%= row[:name] %></span><% unless row[:count].nil? %><span class="ct"><%= row[:count] %></span><% end %></button>
+      <button class="d<%= ' deep' if row[:level].to_i > 24 %>" type="button" data-level="<%= row[:level] %>" data-path="<%= row[:path] %>" aria-expanded="<%= row.fetch(:open, true) ? 'true' : 'false' %>" data-tree-target="row" data-action="tree#fold"><span class="c" aria-hidden="true"><%= row.fetch(:open, true) ? '▾' : '▸' %></span><span class="nm"><%= row[:name] %></span><% unless row[:count].nil? %><span class="ct"><%= row[:count] %></span><% end %></button>
     <% else %>
-      <a class="f<%= ' unindexed' if row[:unindexed] %>" href="<%= row[:href] || '#' %>" style="--l:<%= row[:level] %>" data-level="<%= row[:level] %>" data-path="<%= row[:path] %>" data-owner-keys="<%= Array(row[:owner_keys]).to_json %>"<%= ' aria-current="true"'.html_safe if row[:current] %> data-tree-target="row"><span class="nm"><%= row[:name] %></span><%= row[:chips] %></a>
+      <a class="f<%= ' unindexed' if row[:unindexed] %><%= ' deep' if row[:level].to_i > 24 %>" href="<%= row[:href] || '#' %>" data-level="<%= row[:level] %>" data-path="<%= row[:path] %>" data-owner-keys="<%= Array(row[:owner_keys]).to_json %>"<%= ' aria-current="true"'.html_safe if row[:current] %> data-tree-target="row"><span class="nm"><%= row[:name] %></span><%= row[:chips] %></a>
     <% end %>
   <% end %>
 </nav>

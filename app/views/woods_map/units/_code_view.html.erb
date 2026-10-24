@@ -10,7 +10,7 @@
       <div class="fold"><%= row.fold == :concern ? '▾ ' : '' %><%= row.html.html_safe %> <span class="lyr"><%= row.fold == :concern ? 'not in the file' : 'schema header, not in the file' %></span></div>
     <% else %>
       <% note = row.note %>
-      <div class="row" style="display:contents"<%= " id=\"L#{row.number}\"".html_safe if row.number %>>
+      <div class="row contents"<%= " id=\"L#{row.number}\"".html_safe if row.number %>>
         <div class="heat"><i class="<%= heat %>"></i></div>
         <div class="ln<%= ' dim' if row.concern %>"><%= row.label %></div>
         <div class="src"><%= row.html.html_safe %></div>

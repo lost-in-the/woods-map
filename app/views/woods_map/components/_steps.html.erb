@@ -8,7 +8,7 @@
     <% if step[:boundary] %>
       <tr class="bnd"><td></td><td><%= step[:boundary] %></td></tr>
     <% else %>
-      <tr<%= ' class="proc"'.html_safe if step[:proc] %>><td class="n"><%= step[:n] %></td><td><div class="st" style="--d:<%= step[:depth] || 0 %>"><span class="ar<%= ' async' if step[:arrow] == :async %>"><%= { call: '→', async: '⇒', return: '⇢' }[step[:arrow]] %></span><span><%= step[:text] %><% if step[:mech] %><span class="mech"><%= step[:mech] %></span><% end %></span></div></td></tr>
+      <tr<%= ' class="proc"'.html_safe if step[:proc] %>><td class="n"><%= step[:n] %></td><td><div class="st" data-depth="<%= [step[:depth].to_i, 12].min %>"><span class="ar<%= ' async' if step[:arrow] == :async %>"><%= { call: '→', async: '⇒', return: '⇢' }[step[:arrow]] %></span><span><%= step[:text] %><% if step[:mech] %><span class="mech"><%= step[:mech] %></span><% end %></span></div></td></tr>
     <% end %>
   <% end %>
 </table>

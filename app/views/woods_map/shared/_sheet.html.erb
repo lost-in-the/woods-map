@@ -3,7 +3,7 @@
     while open. Locals: tree (FileTree or nil), current_path (String or nil). %>
 <div class="sheet-overlay" hidden data-sheet-target="overlay" data-action="click->sheet#outside">
   <div class="sheet" role="dialog" aria-modal="true" aria-label="Files and sections">
-    <div class="sh"><button class="tool" type="button" aria-label="Close" data-action="sheet#close" data-sheet-target="close">✕</button><span class="eyebrow">files</span><span class="eyebrow" style="margin-left:var(--s5);color:var(--dim)">on this page</span></div>
+    <div class="sh"><button class="tool" type="button" aria-label="Close" data-action="sheet#close" data-sheet-target="close">✕</button><span class="eyebrow">files</span><span class="eyebrow aside">on this page</span></div>
     <div data-sheet-target="body">
       <% if local_assigns[:tree] %>
         <%= render 'woods_map/components/tree', total: "#{tree.unit_count} units, #{tree.unresolved_count} unresolved", rows: tree.rows.map { |row| { kind: row.kind, name: row.name, level: row.level, path: row.path, count: row.count, owner_keys: row.owner_keys, open: row.level < 2, current: row.path == local_assigns[:current_path], unindexed: false, href: (row.kind == :file ? woods_map.file_path(path: row.path) : nil), chips: (row.kind == :file ? tag.span(" #{row.units} #{'unit'.pluralize(row.units)}, #{row.unresolved} unresolved", class: 'ct') : nil) } } %>

@@ -16,7 +16,7 @@
     <div class="dw hscroll" data-controller="cliff" data-diagram-target="scroller">
       <% if refusal %><p class="cap refusal"><%= refusal %></p><% else %><p class="cap refusal" role="status" data-diagram-target="message" hidden></p><% end %>
       <div class="pele-host" data-diagram-target="canvas" hidden></div>
-      <pre class="cmd" style="margin:0;border:0;background:none" role="region" aria-label="Mermaid source" data-controller="cliff" data-diagram-target="source"><%= mermaid %></pre>
+      <pre class="cmd bare" role="region" aria-label="Mermaid source" data-controller="cliff" data-diagram-target="source"><%= mermaid %></pre>
     </div>
   <% else %>
     <div class="dw hscroll" data-controller="cliff"><%= body %></div>

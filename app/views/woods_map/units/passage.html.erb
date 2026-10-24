@@ -119,11 +119,11 @@
       <section class="sec" aria-labelledby="fm">
         <header><h2 class="t2" id="fm">Filter matrix <span class="n">declared scope</span><%= info_tip('A ✓ means the filter\'s declared only/except names the action; the resolved chain (skip_before_action, inherited and concern-supplied filters, conditions) lands with W-8. The current action\'s column is marked in the head.') %></h2></header>
         <div class="tblwrap" data-controller="cliff">
-          <table class="tbl matrix" style="table-layout:fixed;min-width:<%= 200 + (66 * p.actions.size) %>px" aria-label="Filter matrix">
-            <thead><tr><th style="width:200px">filter, declared in</th><% p.actions.each do |a| %><th class="c<%= ' cur' if a == p.action %>" style="width:66px"><%= a %></th><% end %></tr></thead>
+          <table class="tbl matrix fixed fit" aria-label="Filter matrix">
+            <thead><tr><th width="200">filter, declared in</th><% p.actions.each do |a| %><th class="c<%= ' cur' if a == p.action %>" width="66"><%= a %></th><% end %></tr></thead>
             <tbody>
               <% p.filters.each do |f| %>
-                <tr><td class="id"><%= f.kind %> <%= code_line_link(f.file, f.line, text: f.name) %><br><span class="mut" style="font-weight:400"><%= f.file ? f.file.sub('app/controllers/', '') : f.scope %><%= f.file && f.scope != 'every action' ? ", #{f.scope}" : '' %></span></td><% p.actions.each do |a| %><% on = f.declared_for?(a) %><td class="c <%= on ? 'on' : 'off' %><%= ' cur' if a == p.action %>"><%= on ? '✓' : '·' %></td><% end %></tr>
+                <tr><td class="id"><%= f.kind %> <%= code_line_link(f.file, f.line, text: f.name) %><br><span class="mut regular"><%= f.file ? f.file.sub('app/controllers/', '') : f.scope %><%= f.file && f.scope != 'every action' ? ", #{f.scope}" : '' %></span></td><% p.actions.each do |a| %><% on = f.declared_for?(a) %><td class="c <%= on ? 'on' : 'off' %><%= ' cur' if a == p.action %>"><%= on ? '✓' : '·' %></td><% end %></tr>
               <% end %>
             </tbody>
           </table>
@@ -134,7 +134,7 @@
       <% ladder_steps = @ladder.steps(@ladder_event) %>
       <section class="sec" aria-labelledby="cl">
         <header><h2 class="t2" id="cl">Callback ladder, <%= unit_link(@ladder_model['identifier'], 'model') %> <span class="n">what a <%= @ladder_event %> runs</span><%= info_tip("Order is the resolved runtime chain, not file order. The model is the one #{p.permitted.any? ? 'the permitted params build' : 'the action references first'}; the event follows the action name, or pick one.") %></h2></header>
-        <div style="margin-bottom:var(--s3);display:flex;gap:var(--s3);align-items:center"><span class="lbl">event</span><span class="seg" role="group" aria-label="entry"><% WoodsMap::Lifecycle::EVENTS.each do |e| %><%= link_to(e, woods_map.unit_passage_path(type: @page.type, identifier: @page.identifier, action_name: p.action, event: e), 'aria-current': (e == @ladder_event ? 'true' : nil)) %><% end %></span></div>
+        <div class="event-pick"><span class="lbl">event</span><span class="seg" role="group" aria-label="entry"><% WoodsMap::Lifecycle::EVENTS.each do |e| %><%= link_to(e, woods_map.unit_passage_path(type: @page.type, identifier: @page.identifier, action_name: p.action, event: e), 'aria-current': (e == @ladder_event ? 'true' : nil)) %><% end %></span></div>
         <%= render 'woods_map/units/ladder', steps: ladder_steps, owner: @ladder_model['identifier'], label: "Callback ladder, #{@ladder_model['identifier']} #{@ladder_event}", event: @ladder_event %>
       </section>
     <% end %>

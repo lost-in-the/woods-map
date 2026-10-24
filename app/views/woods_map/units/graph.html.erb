@@ -7,17 +7,17 @@
     <form method="get" action="<%= woods_map.unit_graph_path(type: @page.type, identifier: @page.identifier) %>">
       <h2 class="t3 on">Neighbourhood</h2>
       <div class="grp">direction</div>
-      <div style="padding:var(--s1) var(--s5)"><span class="seg" role="group" aria-label="Direction"><% %w[both dependents dependencies].each do |d| %><a href="<%= woods_map.unit_graph_path(type: @page.type, identifier: @page.identifier, direction: d, depth: n.depth) %>"<%= ' aria-current="true"'.html_safe if n.direction == d %>><%= d %></a><% end %></span></div>
+      <div class="pad1"><span class="seg" role="group" aria-label="Direction"><% %w[both dependents dependencies].each do |d| %><a href="<%= woods_map.unit_graph_path(type: @page.type, identifier: @page.identifier, direction: d, depth: n.depth) %>"<%= ' aria-current="true"'.html_safe if n.direction == d %>><%= d %></a><% end %></span></div>
       <div class="grp">blast radius</div>
       <ol><li><span class="k">·</span><span><a href="<%= woods_map.impact_path(focus: @page.identifier, depth: 2) %>">what a change here reaches</a> <span class="own">impact, pre-change mode</span></span></li></ol>
       <div class="grp">depth</div>
-      <div style="padding:var(--s1) var(--s5)"><span class="seg" role="group" aria-label="Depth"><% [1, 2].each do |d| %><a href="<%= woods_map.unit_graph_path(type: @page.type, identifier: @page.identifier, direction: n.direction, depth: d) %>"<%= ' aria-current="true"'.html_safe if n.depth == d %>><%= d %></a><% end %></span></div>
+      <div class="pad1"><span class="seg" role="group" aria-label="Depth"><% [1, 2].each do |d| %><a href="<%= woods_map.unit_graph_path(type: @page.type, identifier: @page.identifier, direction: n.direction, depth: d) %>"<%= ' aria-current="true"'.html_safe if n.depth == d %>><%= d %></a><% end %></span></div>
       <input type="hidden" name="direction" value="<%= n.direction %>"><input type="hidden" name="depth" value="<%= n.depth %>">
       <div class="grp">types <span class="cnt"><%= n.type_counts.size %></span></div>
       <% n.type_counts.each do |type, count| %><label class="f"><input type="checkbox" name="types[]" value="<%= type %>"<%= ' checked'.html_safe if params[:types].nil? || Array(params[:types]).include?(type) %>> <%= type.to_s.tr('_', ' ') %> <span class="cnt"><%= count %></span></label><% end %>
       <div class="grp">via <span class="cnt"><%= n.via_counts.values.sum(&:size) %></span></div>
-      <% n.via_counts.each do |family, vias| %><div class="grp" style="border:0;padding-top:var(--s2)"><%= family %></div><% vias.each do |via, count| %><label class="f"><input type="checkbox" name="via[]" value="<%= via %>"<%= ' checked'.html_safe if params[:via].nil? || Array(params[:via]).include?(via) %>> <%= via %> <span class="cnt"><%= count %></span></label><% end %><% end %>
-      <div style="padding:var(--s3) var(--s5)"><button class="btn" type="submit">apply filters</button></div>
+      <% n.via_counts.each do |family, vias| %><div class="grp flush"><%= family %></div><% vias.each do |via, count| %><label class="f"><input type="checkbox" name="via[]" value="<%= via %>"<%= ' checked'.html_safe if params[:via].nil? || Array(params[:via]).include?(via) %>> <%= via %> <span class="cnt"><%= count %></span></label><% end %><% end %>
+      <div class="pad3"><button class="btn" type="submit">apply filters</button></div>
     </form>
   </nav>
   <div class="main">
@@ -26,7 +26,7 @@
             tools: tag.button('⎘ copy Mermaid', class: 'tool', type: 'button', data: { controller: 'copy', copy_text_value: n.mermaid, action: 'copy#copy', needs_js: true }),
             mermaid: n.mermaid, label: "Neighbourhood of #{@page.identifier} at depth #{n.depth}: #{n.edges.size} edges, each labelled with its mechanism; the list below has the same edges",
             refusal: (n.over_budget? ? "#{n.node_count} units is over the flowchart budget of #{WoodsMap::Neighbourhood::NODE_BUDGET}; narrow the types or mechanisms to draw it. The list below has every edge." : nil),
-            legend: [[tag.i(class: 'sw', style: 'border-color:var(--select)'), 'this unit'], [tag.span('→', class: 'ar'), 'edge, labelled with its mechanism']], provenance: ['typed edges', "gen #{@repository.generation_number}"] %>
+            legend: [[tag.i(class: 'sw self'), 'this unit'], [tag.span('→', class: 'ar'), 'edge, labelled with its mechanism']], provenance: ['typed edges', "gen #{@repository.generation_number}"] %>
     </section>
     <section class="sec" data-controller="rows">
       <header><h2 class="t2">List equivalent <%= count_tag("#{n.edges.size} of #{n.all_edges.size} edges") %><%= info_tip('The same edges the diagram draws, and the canvas will (M5); dependents point at this unit, dependencies away from it. Notes come from graph_analysis.json.') %></h2></header>

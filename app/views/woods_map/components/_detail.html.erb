@@ -1,5 +1,5 @@
 <%# A detail block (C2-Table): label column and values as hairline rows, no
     left bar. Locals: rows (Array of [label, value]), framed (Boolean). %>
-<dl class="det"<%= ' style="border:1px solid var(--rule2);border-radius:var(--r-ctl)"'.html_safe if local_assigns[:framed] %>>
+<dl class="det<%= ' framed' if local_assigns[:framed] %>">
   <% rows.each do |label, value| %><dt><%= label %></dt><dd><%= value %></dd><% end %>
 </dl>

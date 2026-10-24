@@ -5,11 +5,11 @@
 <% mode_links = WoodsMap::SearchResults::MODES.map { |m| link_to(m, woods_map.search_path(q: r.query, in: m), 'aria-current': (m == r.mode ? 'true' : nil)) } %>
 <%= render 'woods_map/shared/crumbs', crumbs: [['search', woods_map.search_path], [r.mode, nil]], trail: r.blank? ? nil : "query #{r.query}, #{r.hits.size} #{result_kind.pluralize(r.hits.size)}, gen #{@repository.generation_number}" %>
 <%= render 'woods_map/shared/ident', title: r.blank? ? 'Search' : r.query, subtitle: r.blank? ? 'names, code and paths of the pinned generation' : "#{r.mode} search, #{@repository.status['total_units']} units", controls: safe_join([tag.span('in', class: 'lbl'), tag.span(safe_join(mode_links), class: 'seg', role: 'group', 'aria-label': 'in')]) %>
-<div class="body" style="margin-top:var(--s4)">
+<div class="body gap-top">
   <nav class="rail" aria-label="Search filters">
     <form method="get" action="<%= woods_map.search_path %>">
       <h2 class="t3 on">Search</h2>
-      <div style="padding:var(--s2) var(--s5)"><input class="filter" type="search" name="q" value="<%= r.query %>" placeholder="name, code or path" aria-label="Query"></div>
+      <div class="pad2"><input class="filter" type="search" name="q" value="<%= r.query %>" placeholder="name, code or path" aria-label="Query"></div>
       <input type="hidden" name="in" value="<%= r.mode %>">
       <% if r.mode != 'path' && r.type_counts.any? %>
         <div class="grp">type <span class="cnt">filter</span></div>
@@ -21,7 +21,7 @@
         <li<%= ' aria-current="true"'.html_safe if r.mode == 'code' %>><span class="k">·</span><span><b>code</b> <span class="own">full text, source_code</span></span></li>
         <li<%= ' aria-current="true"'.html_safe if r.mode == 'path' %>><span class="k">·</span><span><b>path</b> <span class="own">file_map</span></span></li>
       </ol>
-      <div style="padding:var(--s3) var(--s5)"><button class="btn" type="submit">search</button></div>
+      <div class="pad3"><button class="btn" type="submit">search</button></div>
     </form>
   </nav>
   <div class="main">
@@ -38,7 +38,7 @@
                                                 detail: (h.snippet ? safe_join([tag.div(h.snippet.gsub(r.query, "\u0000#{r.query}\u0001").then { |t| ERB::Util.html_escape(t).gsub("\u0000", '<mark>').gsub("\u0001", '</mark>').html_safe }, class: 'snip codeview'), tag.div(safe_join(Array(h.lines).map { |l| link_to("open at L#{l}", "#{woods_map.unit_path(type: h.type, identifier: h.identifier)}#L#{l}") }, ', '), class: 'cap')]) : nil) } } %>
       </section>
     <% end %>
-    <% if r.notes.any? %><div class="cap" style="padding:0 var(--s5)"><%= r.notes.join('; ') %></div><% end %>
+    <% if r.notes.any? %><div class="cap padx"><%= r.notes.join('; ') %></div><% end %>
     <%= render 'woods_map/shared/status', items: ["#{r.complete? ? 'complete' : 'partial'}: #{@repository.status['total_units']} units", "gen #{@repository.generation_number}"], keys: [[%w[/], 'search'], [%w[j k], 'results'], [%w[enter], 'open']] %>
   </div>
 </div>
