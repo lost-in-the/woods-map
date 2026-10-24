@@ -15,7 +15,7 @@
   <% if @lens == 'graph' %>
     <%= render 'woods_map/impact/range/graph', rr: rr, range_url: range_url %>
   <% else %>
-    <div class="body" data-controller="trail keys" data-trail-title-value="<%= title %>">
+    <div class="body" data-controller="trail" data-trail-title-value="<%= title %>">
       <%= render 'woods_map/components/rail', heading: @lens.capitalize, groups: [
             { label: 'changed', count: rr.changed.size, items: rr.changed.first(10).map { |c| { key: (c['status'] == 'removed' ? '−' : (c['status'] == 'added' ? '+' : 'M')), text: impact_identity(c, rr, generation: rr.generation_of_change(c), since: rr.from_generation), own: c['type'].to_s.tr('_', ' '), current: rr.focused?(c) } } + (rr.changed.size > 10 ? [{ key: '·', text: "+#{rr.changed.size - 10} more" }] : []) },
             { label: 'affected', count: rr.affected.size, items: rr.affected.first(8).map { |a| { key: a['distance'] || '·', text: impact_identity(a, rr), own: a['type'].to_s.tr('_', ' ') } } + (rr.affected.size > 8 ? [{ key: '·', text: "+#{rr.affected.size - 8} more" }] : []) },
