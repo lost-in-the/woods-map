@@ -7,7 +7,7 @@ relationship graphs, schema and history, and get change-impact reports with
 sharable focus URLs. It reads the published index only: no live database, no
 runtime reflection, no git subprocess at request time.
 
-Status: M1 Reading, M2 Passage, M4b Impact on the map (pre-change and range modes, saved reports, Flows from W-13, retention pins, `?since=`; a CI pull-request comment is out of scope), M3 Diagrams slices (the Pele renderer, Schema ER, Lifecycle sequence, flowchart and lanes, `/woods/erd`, Mermaid export and `.mmd` URLs), the Landscape (Containers from W-9 with Mermaid, Structurizr DSL and LikeC4 exports, Hotspots, Domains), M4 History (History tab, gutter heat, generation picker and unit diff, `/woods/history`), M5 Graph (neighbourhood endpoint, Graph tab canvas, full-screen page with the clusters layout), M7 Guide (off by default; no real-provider run yet) and M8 Staging landed. The design study, decision log, boards
+Status: M1 Reading, M2 Passage, M4b Impact on the map (pre-change and range modes, saved reports, Flows from W-13, retention pins, `?since=`; a CI pull-request comment is out of scope), M3 Diagrams slices (the Pele renderer, Schema ER, Lifecycle sequence, flowchart and lanes, `/woods/erd`, Mermaid export and `.mmd` URLs), the Landscape (Containers from W-9 with Mermaid, Structurizr DSL and LikeC4 exports, Hotspots, Domains), M4 History (History tab, gutter heat, generation picker and unit diff, `/woods/history`), M5 Graph (neighbourhood endpoint, Graph tab canvas, full-screen page with the clusters layout), M6 Trail (`/woods/trail`), M7 Guide (off by default; no real-provider run yet) and M8 Staging landed. The design study, decision log, boards
 and milestone plan live in `docs/design/` and are the source of truth for
 scope; `docs/design/foundations/tokens.css` is the stylesheet the engine ships
 verbatim (a spec keeps the two copies identical).
@@ -59,6 +59,8 @@ lib/woods_map/{blast_radius,impact_review}.rb  # the impact page's pre-change mo
 lib/woods_map/{impact_range,range_report,since}.rb  # Woods' range or saved report, its tabs, and ?since= evidence for unit pages (E-6 to E-8)
 lib/woods_map/{impact_flows,retention,repository_flows}.rb  # the Flows tab from W-13 membership and flow documents; retention pins (W-11)
 lib/woods_map/{search_results,palette,file_tree}.rb  # search modes, the palette's groups, the per-generation file tree
+lib/woods_map/{trail_board,lifecycle_builder,lifecycle_reach,trail_lanes,trail_flags,pinned_views,trail_co_changes}.rb  # the Trail (M6): URL board, lifecycle across async hops, flags, pinned graph and ERD, co-change
+lib/woods_map/repository_assembled_flows.rb  # Woods' FlowAssembler over the pinned generation for the Trail, cached per generation and entry
 lib/woods_map/assets.rb          # engine-served files: roots, content digests, content types
 lib/woods_map/{content_security_policy,rate_limiter}.rb  # M8: the engine's CSP header, the in-process per-client budget
 lib/woods_map/guide.rb + guide/  # M7: status/backend (RubyLLM optional), actions + prompts/, context, store, budget, runner, answer; agent.rb only with ruby_llm
@@ -68,7 +70,7 @@ lib/woods_map/glyphs.rb          # the glyph vocabulary (D-20)
 app/controllers/woods_map/       # application (gate order, 403 panel, primary_nav), status, sessions, assets, guidelines, units (History tab in concerns/unit_history), search, impact, erd, graphs, neighbourhoods, history
 app/helpers/woods_map/           # asset URLs, date shorthand (D-15), short SHA; components (glyphs, chips, ⓘ, people)
 app/assets/stylesheets/woods_map/ # tokens.css (verbatim from docs/design/foundations), fonts.css, map.css (engine-only rules)
-app/javascript/woods_map/        # Stimulus controllers: cliff, tooltip, rows, tree, sheet, copy, share, palette, peek, card, settings, trail, keys, help, diagram (Pele, D-21), graph (Cytoscape canvas, M5)
+app/javascript/woods_map/        # Stimulus controllers: cliff, tooltip, rows, tree, sheet, copy, share, palette, peek, card, settings, trail, keys, help, diagram (Pele, D-21), graph (Cytoscape canvas, M5), pinboard (Trail notes, M6)
 app/views/woods_map/shared/      # the frame: bar, crumbs, ident, tabs, status, sheet
 app/views/woods_map/components/  # table, steps, detail, rail, tree, facts, legend, diagram, diff, banner, empty state
 app/views/woods_map/guidelines/  # the C1 to C5 boards rendered from the partials above
