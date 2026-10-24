@@ -44,4 +44,12 @@ RSpec.describe WoodsMap::Neighbourhood do
     expect(text.lines.grep(/-->/)).to all(match(/\A  n_\w+ -->\|\w+\| n_\w+\n?\z/))
     expect(text).to include('classDef focus').and match(/class n_\w+ focus\z/)
   end
+
+  it 'draws an edge without a mechanism as a plain arrow, as Woods does' do
+    n = neighbourhood
+    edge = n.edges.first
+    edge.via = ''
+    allow(n).to receive(:edges).and_return([edge])
+    expect(n.local_mermaid.lines.grep(/-->/)).to contain_exactly(/\A  n_\h+ --> n_\h+\n\z/)
+  end
 end
