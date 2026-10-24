@@ -16,8 +16,14 @@
       <section class="sec">
         <header><h2 class="t2">Hotspots <%= count_tag('churn × dependents') %><%= info_tip('Commits per unit come from Woods\' git enrichment of this generation; dependents from the graph. The most changed and most depended upon come first: review those first.') %></h2></header>
         <% if h.churn? %>
+          <% churn = h.churn %>
+          <%= render 'woods_map/components/diagram', title: 'Churn × dependents', facts: ["#{churn.size} units labelled", 'x = commits, y = dependents, log scale', 'review the top right first'],
+                name: 'landscape hotspots quadrant', mermaid_url: woods_map.landscape_diagram_mmd_path(diagram: 'quadrant'), mermaid: h.quadrant_mermaid,
+                label: "Quadrant of #{churn.size} units by commits and dependents; the table below ranks the same units",
+                legend: [[tag.span('·', class: 'ar'), 'unit'], ['', 'x = commits against the most changed'], ['', 'y = dependents, log scale']],
+                provenance: ['commit_count on graph nodes', 'graph', "gen #{@repository.generation_number}"] %>
           <%= render 'woods_map/components/table', label: 'Hotspots', min_width: '560px', columns: [{ label: 'unit', width: '40%' }, { label: 'commits', width: '16%' }, { label: 'dependents', width: '16%' }, { label: 'change frequency' }],
-                rows: h.churn.map { |row| { cells: [unit_link(row[:identifier], row[:type]), row[:commits].to_s, row[:dependents].to_s, row[:change_frequency] || empty_value(applicable: false)] } } %>
+                rows: churn.map { |row| { cells: [unit_link(row[:identifier], row[:type]), row[:commits].to_s, row[:dependents].to_s, row[:change_frequency] || empty_value(applicable: false)] } } %>
         <% else %>
           <%= render 'woods_map/components/empty_state', title: 'No commit history in this generation', text: 'Woods records commits per unit when it extracts inside a git checkout. This generation carries none, so churn cannot be weighed against dependents; the structure below still reads.' %>
         <% end %>
@@ -32,6 +38,18 @@
                 rows: coupling.map { |from, row| { cells: [tag.b(from.tr('_', ' ').pluralize)] + columns.map { |to| row[to].positive? ? row[to].to_s : WoodsMap::Glyphs[:none] } } } %>
         <% else %>
           <p class="cap">No edges between these layers in this generation.</p>
+        <% end %>
+      </section>
+      <section class="sec">
+        <% flow = h.forward_flow %>
+        <header><h2 class="t2">Forward flow <%= count_tag('the same edges, layering direction only') %><%= info_tip('The coupling above, keeping only edges from a layer to a later one (controllers, views, components, jobs, mailers, models), so the flow reads one way. Edges that run back up the layers are in the matrix, not here.') %></h2></header>
+        <% if flow.any? %>
+          <%= render 'woods_map/components/diagram', title: 'Forward flow', facts: ["#{flow.size} #{'flow'.pluralize(flow.size)}", "#{flow.sum(&:last)} edges"],
+                name: 'landscape forward flow', mermaid_url: woods_map.landscape_diagram_mmd_path(diagram: 'sankey'), mermaid: h.sankey_mermaid,
+                label: "Sankey of published edges between layers, layering direction only: #{flow.map { |from, to, n| "#{from} to #{to} #{n}" }.join(', ')}",
+                provenance: ['typed edges', "gen #{@repository.generation_number}"] %>
+        <% else %>
+          <p class="cap">No edge runs forward between these layers in this generation.</p>
         <% end %>
       </section>
       <section class="sec">

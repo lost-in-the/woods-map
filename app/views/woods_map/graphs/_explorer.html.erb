@@ -13,13 +13,21 @@
       mermaid_url        the flowchart's .mmd route (D-25), or nil
       hidden             Hash of extra GET fields the filter form keeps (the impact page's range)
       emphasis           :range when blast holds a range report's changed (distance 0)
-                         and affected units (E-3, E-8); the radius of this unit otherwise %>
+                         and affected units (E-3, E-8); the radius of this unit otherwise
+      flows              Hash from GraphFlow.entries, or nil (no flows group)
+      flow               WoodsMap::GraphFlow the page's ?flow= selects, or nil (A-4)
+      timeline           WoodsMap::GraphTimeline, or nil (A-6) %>
 <% blast = local_assigns[:blast] %>
+<% flows = local_assigns[:flows] %>
+<% flow = local_assigns[:flow] %>
+<% timeline = local_assigns[:timeline] %>
+<% keep = { flow: flow&.entry_point } %>
 <% clusters = Array(local_assigns[:clusters]) %>
 <% range = local_assigns[:emphasis] == :range %>
 <% blast_legend = range ? [['changed in this range', 0], ['affected directly', 1], ['affected transitively', 2]] : [['a change here reaches it directly', 1], ['transitively', 2]] %>
 <% page = local_assigns.fetch(:page, false) %>
 <% filters = { types: params[:types].presence, via: params[:via].presence } %>
+<% flow_link = ->(**opts) { link.call(direction: n.direction, depth: n.depth, blast: (blast && !range ? '1' : nil), **filters, **opts) } %>
 <% graph_label = "Neighbourhood of #{identifier} at depth #{n.depth}, #{n.direction}: units and their edges, each edge labelled with its mechanism. Arrow keys move along the edges, Enter opens a unit's graph; the list below has the same edges." %>
 <% cache_key = [@repository.generation_number, type, identifier, n.depth, n.direction, Array(filters[:types]).sort.join(','), Array(filters[:via]).sort.join(',')].join('|') %>
 <% blast_units = blast ? blast.affected.map { |a| { 'identifier' => a.identifier, 'type' => a.type, 'distance' => a.distance } } : nil %>
@@ -30,19 +38,21 @@
      data-graph-cache-value="<%= cache_key %>"<% if clusters.any? %>
      data-graph-clusters-value="<%= clusters.to_json %>"<% if params[:group] == 'clusters' %> data-graph-mode-value="clusters"<% end %><% end %><% if blast_units %>
      data-graph-blast-value="<%= blast_units.to_json %>"<% end %><% if range %>
-     data-graph-emphasis-value="range"<% end %>>
+     data-graph-emphasis-value="range"<% end %><% if flow&.found? %>
+     data-graph-flow-value="<%= flow.payload.to_json %>"<% end %><% if timeline&.commits&.any? %>
+     data-graph-timeline-value="<%= timeline.payload.to_json %>"<% end %>>
   <nav class="rail" aria-label="Graph filters">
     <form method="get" action="<%= link.call %>">
       <h2 class="t3 on">Neighbourhood</h2>
       <div class="grp">direction</div>
-      <div class="pad1"><span class="seg" role="group" aria-label="Direction"><% %w[both dependents dependencies].each do |d| %><a href="<%= link.call(direction: d, depth: n.depth) %>"<%= ' aria-current="true"'.html_safe if n.direction == d %>><%= d %></a><% end %></span></div>
+      <div class="pad1"><span class="seg" role="group" aria-label="Direction"><% %w[both dependents dependencies].each do |d| %><a href="<%= link.call(direction: d, depth: n.depth, **keep) %>"<%= ' aria-current="true"'.html_safe if n.direction == d %>><%= d %></a><% end %></span></div>
       <div class="grp">blast radius</div>
       <% if page %>
-        <div class="pad1"><span class="seg" role="group" aria-label="Blast radius"><% [['off', nil], ['tint', '1']].each do |label, value| %><a href="<%= link.call(direction: n.direction, depth: n.depth, blast: value, **filters) %>"<%= ' aria-current="true"'.html_safe if blast.nil? == value.nil? %>><%= label %></a><% end %></span></div>
+        <div class="pad1"><span class="seg" role="group" aria-label="Blast radius"><% [['off', nil], ['tint', '1']].each do |label, value| %><a href="<%= link.call(direction: n.direction, depth: n.depth, blast: value, **filters, **keep) %>"<%= ' aria-current="true"'.html_safe if blast.nil? == value.nil? %>><%= label %></a><% end %></span></div>
       <% end %>
       <ol><li><span class="k">·</span><span><a href="<%= woods_map.impact_path(focus: identifier, depth: 2) %>">what a change here reaches</a> <span class="own">impact, pre-change mode</span></span></li></ol>
       <div class="grp">depth</div>
-      <div class="pad1"><span class="seg" role="group" aria-label="Depth"><% [1, 2].each do |d| %><a href="<%= link.call(direction: n.direction, depth: d, blast: (blast ? '1' : nil)) %>"<%= ' aria-current="true"'.html_safe if n.depth == d %>><%= d %></a><% end %></span></div>
+      <div class="pad1"><span class="seg" role="group" aria-label="Depth"><% [1, 2].each do |d| %><a href="<%= link.call(direction: n.direction, depth: d, blast: (blast ? '1' : nil), **keep) %>"<%= ' aria-current="true"'.html_safe if n.depth == d %>><%= d %></a><% end %></span></div>
       <input type="hidden" name="direction" value="<%= n.direction %>"><input type="hidden" name="depth" value="<%= n.depth %>"><% if blast && !range %><input type="hidden" name="blast" value="1"><% end %>
       <% local_assigns.fetch(:hidden, {}).each do |name, value| %><input type="hidden" name="<%= name %>" value="<%= value %>"><% end %>
       <div class="grp">types <span class="cnt"><%= n.type_counts.size %></span></div>
@@ -55,6 +65,7 @@
         <div class="pad1"><span class="seg" role="group" aria-label="Layout"><% (%w[butterfly radial] + (clusters.any? ? %w[clusters] : [])).each do |mode| %><button type="button" aria-pressed="<%= mode == 'butterfly' %>" data-layout="<%= mode %>" data-graph-target="layout" data-action="graph#layout"><%= mode %></button><% end %></span></div>
         <p class="cap padx">Positions you drag are kept per generation in this browser. <button class="tool" type="button" data-action="graph#forget">reset positions</button></p>
       </div>
+      <% if flows %><% if params[:flow].present? %><input type="hidden" name="flow" value="<%= params[:flow] %>"><% end %><%= render 'woods_map/graphs/flows_rail', flows: flows, flow: flow, link: flow_link %><% end %>
       <%= local_assigns[:rail_extra] %>
     </form>
   </nav>
@@ -73,6 +84,8 @@
         <% legend = n.type_counts.keys.map { |t| [tag.i(class: 'sw gsw', data: { gtype: t }), t.to_s.tr('_', ' ')] } +
                     [[tag.span('──', class: 'ar'), 'association'], [tag.span('┄┄', class: 'ar'), 'other mechanisms'],
                      [tag.i(class: 'sw self'), 'this unit']] %>
+        <% legend << [tag.i(class: 'sw gflow'), 'a step of the flow, the edge that reached it'] if flow&.found? %>
+        <% legend << [tag.i(class: 'sw gtl'), 'changed in the timeline window'] if timeline&.commits&.any? %>
         <% if blast %><% legend += blast_legend.map { |text, distance| [tag.i(class: 'sw gblast', data: { distance: distance }), text] } %><% end %>
         <%= render 'woods_map/components/legend', entries: legend + [['', 'hub, cycle: graph_analysis, per identifier']],
                                                      provenance: ['typed edges', 'weight = pagerank', "gen #{@repository.generation_number}"] %>
@@ -86,6 +99,8 @@
             legend: [[tag.i(class: 'sw self'), 'this unit'], [tag.span('→', class: 'ar'), 'edge, labelled with its mechanism']], provenance: ['typed edges', "gen #{@repository.generation_number}"] %>
       </div>
     </section>
+    <% if flow %><%= render 'woods_map/graphs/flow', flow: flow, n: n %><% end %>
+    <% if timeline %><%= render 'woods_map/graphs/timeline', timeline: timeline %><% end %>
     <section class="sec" data-controller="rows" data-graph-target="list">
       <header><h2 class="t2">List equivalent <%= count_tag("#{n.edges.size} of #{n.all_edges.size} edges") %><%= info_tip('The same edges the canvas and the flowchart draw; dependents point at this unit, dependencies away from it. Notes come from graph_analysis.json, per identifier. Arrow keys move between rows; a row in focus lights its edge on the canvas.') %></h2></header>
       <% reached = blast ? blast.affected.to_h { |a| [[a.identifier, a.type], a.distance] } : {} %>

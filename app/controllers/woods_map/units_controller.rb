@@ -10,6 +10,7 @@ module WoodsMap
     include WoodsMap::MethodLinks
     include WoodsMap::UnitMermaid
     include WoodsMap::UnitHistory
+    include WoodsMap::GraphOverlays
 
     LENS_COOKIE = 'woods_map_lens'
 
@@ -109,6 +110,7 @@ module WoodsMap
         )
         next render_graph_mermaid if mermaid_request?
 
+        load_graph_overlays(@repository, @neighbourhood, @unit['identifier'], @unit['type'])
         render :graph
       end
     end
