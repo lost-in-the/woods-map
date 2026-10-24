@@ -29,7 +29,7 @@ module WoodsMap
     # @return [String]
     def current_page_url(**changes)
       query = request.query_parameters.except('token').merge(changes.stringify_keys).compact
-      query.empty? ? request.path : "#{request.path}?#{query.to_query}"
+      query.empty? ? raw_request_path : "#{raw_request_path}?#{query.to_query}"
     end
 
     # @param status [String]

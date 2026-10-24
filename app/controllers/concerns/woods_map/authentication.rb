@@ -138,8 +138,9 @@ module WoodsMap
 
     # @return [String] the current URL with the `token` parameter removed
     def url_without_token
-      path = request.path
-      path = path.chomp('/') if path.length > 1
+      path = raw_request_path
+      # The mount root may come as /woods/; a slash that ends an identifier stays.
+      path = path.chomp('/') if path.length > 1 && params[:identifier].blank?
       query = request.query_parameters.except('token')
       query.empty? ? path : "#{path}?#{query.to_query}"
     end

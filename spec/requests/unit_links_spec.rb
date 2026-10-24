@@ -62,6 +62,23 @@ RSpec.describe 'Links between unit pages', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
+    # Found by the final sweep on rails-6.0: links back to the current page
+    # (author filters, Share, ?since= clear, the token exchange) were built
+    # from Rails' normalized path and lost the identifier's slash.
+    it 'keeps the slash in the links back to the current page' do
+      get '/woods/units/route/GET%20//graph?depth=2'
+      share = html_response_document.at_css('[data-share-target="url"]').text
+      expect(share).to end_with('/woods/units/route/GET%20//graph?depth=2')
+    end
+
+    it 'keeps the slash through the token exchange' do
+      WoodsMap.configuration.token = 'secret-token'
+      get '/woods/units/route/GET%20//graph?token=secret-token&depth=2'
+      expect(response).to redirect_to('/woods/units/route/GET%20//graph?depth=2')
+    ensure
+      WoodsMap.configuration.token = nil
+    end
+
     it 'still finds a unit a reader typed with a trailing slash' do
       get '/woods/units/controller/PagesController/'
       expect(response).to have_http_status(:ok)

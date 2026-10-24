@@ -35,6 +35,14 @@ module WoodsMap
       safe_join(preloads + sheets, "\n")
     end
 
+    # The request's path as the client sent it (see RawRequestPath): Rails
+    # normalizes request.path, dropping the slash that ends an identifier.
+    #
+    # @return [String]
+    def raw_request_path
+      request.original_fullpath.split('?', 2).first
+    end
+
     # The focus URL of this page (E-6): its absolute address with the query
     # it was opened with, less any `token` (D-4 exchanges it for a cookie, and
     # a shared link must never carry it).
@@ -42,7 +50,7 @@ module WoodsMap
     # @return [String]
     def focus_url
       query = request.query_parameters.except('token')
-      "#{request.base_url}#{request.path}#{"?#{query.to_query}" if query.any?}"
+      "#{request.base_url}#{raw_request_path}#{"?#{query.to_query}" if query.any?}"
     end
 
     # A relative date in git's shorthand with the long form in the tooltip

@@ -20,6 +20,7 @@ module WoodsMap
   # from the index reaches a client that is not allowed in.
   class ApplicationController < ActionController::Base
     include WoodsMap::Authentication
+    include WoodsMap::RawRequestPath
     include WoodsMap::MermaidText
     include WoodsMap::SinceParam
     include WoodsMap::GuidePage
