@@ -138,7 +138,7 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .empty-state.refusal-panel{padding:var(--s6) var(--s5)}
 .wm .refusal-panel > .eyebrow{margin-bottom:var(--s3)}
 .wm .token-form{margin-top:var(--s4);display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap}
-.wm .token-form .filter{width:28ch;border:1px solid var(--rule2);border-radius:var(--r-ctl)}
+.wm .token-form .filter{box-sizing:border-box;width:min(260px,100%);margin:0;padding:var(--s2) var(--s4);border:1px solid var(--rule2);border-radius:var(--r-ctl);background:var(--ground2);color:var(--text);font:inherit;font-size:var(--fs-12)}
 .wm .filter.focus-input{width:min(100%,420px)}
 .wm .filter.auto{width:auto}
 .wm .tbl.fixed{table-layout:fixed}
