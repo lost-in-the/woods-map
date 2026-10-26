@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- An action whose name implies no model event (a `show`, an `edit`, a custom action) no longer draws a model save in its Across containers view or its `.mmd`. The map used to fall back to the model's first lifecycle chain, so an unrelated action showed a save and an INSERT it was never said to make. That lifecycle now appears below as a "Related lifecycle", labelled as not a step of the action. `create`, `update` and `destroy` still draw their save.
 - The reading trail keeps each page's full address, path and query, so returning through it restores the investigation (entry, pins, hops, generation, lens, range) instead of the bare page. The address never includes a `token`. Entries stored as a bare path by an earlier version still draw.
 - The Schema tab and the ERD say what the evidence means.
   - **Defaults:** a column whose index publishes only that a default exists says "exists, value not published" instead of "yes". A published value is shown as published, and an empty string, `false` and no default read differently.

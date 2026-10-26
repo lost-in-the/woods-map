@@ -165,12 +165,12 @@
     </section>
     <% dynamic = WoodsMap::DynamicView.new(@repository) unless p.mailer? %>
     <% if dynamic&.attributed? %>
-      <% dyn_steps = @ladder && @ladder_event ? @ladder.steps(@ladder_event) : [] %>
-      <% dyn_text = dynamic.passage(p, @ladder && @ladder_model, dyn_steps, @ladder && @ladder_event) %>
+      <% dyn_steps = @ladder_linked ? @ladder.steps(@ladder_event) : [] %>
+      <% dyn_text = dynamic.passage(p, @ladder_linked && @ladder_model, dyn_steps, @ladder_linked && @ladder_event) %>
       <% dyn_refusal = WoodsMap::DynamicView.refusal(dyn_text) %>
       <section class="sec" aria-labelledby="c4">
-        <header><h2 class="t2" id="c4">Across containers <span class="n">C4 dynamic</span><%= info_tip("The passage's steps in the containers W-9 attributes them to, as on the Landscape page. #{@ladder ? "With the callback ladder's #{@ladder_event} of #{@ladder_model['identifier']}: its write in the database and the jobs and mailers it hands work to." : 'No model save is implied, so nothing reaches the database here.'}") %></h2></header>
-        <%= render 'woods_map/components/diagram', title: 'C4 dynamic', facts: ["#{@page.identifier}##{p.action}", ("#{@ladder_model['identifier']} #{@ladder_event}" if @ladder)].compact, name: "#{@page.identifier} #{p.action} passage dynamic", mermaid_url: woods_map.unit_passage_mmd_path(type: @page.type, identifier: @page.identifier, action_name: p.action, view: 'dynamic', event: (@ladder ? @ladder_event : nil)), mermaid: dyn_text, label: "C4 dynamic view of #{@page.identifier}##{p.action}: the request in the web process#{@ladder ? ", the #{@ladder_event} of #{@ladder_model['identifier']} and its write in the database" : ''}", refusal: dyn_refusal && "#{dyn_refusal}; the passage above lists every step.", legend: [['▭', 'a container, with its technology'], [tag.span('→', class: 'ar'), 'call or write; callback numbers match the ladder'], [tag.span('⇢', class: 'ar'), 'async hop to another container']], provenance: ['W-9 containers', "gen #{@repository.generation_number}"] %>
+        <header><h2 class="t2" id="c4">Across containers <span class="n">C4 dynamic</span><%= info_tip("The passage's steps in the containers W-9 attributes them to, as on the Landscape page. #{@ladder_linked ? "With the callback ladder's #{@ladder_event} of #{@ladder_model['identifier']}: its write in the database and the jobs and mailers it hands work to." : "The name of #{p.action} implies no model save, so nothing reaches the database here; the lifecycle below is related, not a step of it."}") %></h2></header>
+        <%= render 'woods_map/components/diagram', title: 'C4 dynamic', facts: ["#{@page.identifier}##{p.action}", ("#{@ladder_model['identifier']} #{@ladder_event}" if @ladder_linked)].compact, name: "#{@page.identifier} #{p.action} passage dynamic", mermaid_url: woods_map.unit_passage_mmd_path(type: @page.type, identifier: @page.identifier, action_name: p.action, view: 'dynamic', event: (@ladder_linked ? @ladder_event : nil)), mermaid: dyn_text, label: "C4 dynamic view of #{@page.identifier}##{p.action}: the request in the web process#{@ladder_linked ? ", the #{@ladder_event} of #{@ladder_model['identifier']} and its write in the database" : ''}", refusal: dyn_refusal && "#{dyn_refusal}; the passage above lists every step.", legend: [['▭', 'a container, with its technology'], [tag.span('→', class: 'ar'), 'call or write; callback numbers match the ladder'], [tag.span('⇢', class: 'ar'), 'async hop to another container']], provenance: ['W-9 containers', "gen #{@repository.generation_number}"] %>
       </section>
     <% end %>
     <% unless p.mailer? || p.filters.empty? %>
@@ -198,7 +198,12 @@
     <% if @ladder %>
       <% ladder_steps = @ladder.steps(@ladder_event) %>
       <section class="sec" aria-labelledby="cl">
+        <% if @ladder_linked %>
         <header><h2 class="t2" id="cl">Callback ladder, <%= unit_link(@ladder_model['identifier'], 'model') %> <span class="n">what a <%= @ladder_event %> runs</span><%= info_tip("Order is the resolved runtime chain, not file order. The model is the one #{p.permitted.any? ? 'the permitted params build' : 'the action references first'}; the event follows the action name, or pick one.") %></h2></header>
+        <% else %>
+        <header><h2 class="t2" id="cl">Related lifecycle, <%= unit_link(@ladder_model['identifier'], 'model') %> <span class="n">what a <%= @ladder_event %> runs</span><%= info_tip("The name of #{p.action} implies no model event, so this is not a step of #{p.action}. The model is the one #{p.permitted.any? ? 'the permitted params build' : 'the action references first'} and the event is picked by default; pick another. Nothing here says #{p.action} saves it.") %></h2></header>
+        <p class="cap">Related lifecycle, not a step of <%= p.action %>: Woods does not say this action saves <%= @ladder_model['identifier'] %>. It shows what a <%= @ladder_event %> of that model runs.</p>
+        <% end %>
         <div class="event-pick"><span class="lbl">event</span><span class="seg" role="group" aria-label="entry"><% WoodsMap::Lifecycle::EVENTS.each do |e| %><%= link_to(e, woods_map.unit_passage_path(type: @page.type, identifier: @page.identifier, action_name: p.action, event: e), 'aria-current': (e == @ladder_event ? 'true' : nil)) %><% end %></span></div>
         <%= render 'woods_map/units/ladder', steps: ladder_steps, owner: @ladder_model['identifier'], label: "Callback ladder, #{@ladder_model['identifier']} #{@ladder_event}", event: @ladder_event %>
       </section>
