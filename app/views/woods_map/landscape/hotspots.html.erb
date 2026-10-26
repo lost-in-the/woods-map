@@ -13,6 +13,10 @@
             { eyebrow: safe_join(['orphans ', tag.b(h.orphans.size)]), rows: [['no dependents', h.orphans.size.to_s], ['dead ends', "#{h.dead_ends.size}, no dependencies"]] },
             { eyebrow: safe_join(['uncovered hubs ', tag.b(h.uncovered_hubs.size)]), rows: [['unit', h.uncovered_hubs.first ? unit_link(h.uncovered_hubs.first['identifier'], h.uncovered_hubs.first['type']) : empty_value], ['finding', 'no mapped test']] }
           ] %>
+      <% risks = h.risks %>
+      <% if risks.any? %>
+        <p class="cap named-findings">Named findings: <%= safe_join(risks.select(&:type).first(3).map { |risk| safe_join([risk.kind, ' ', unit_link(risk.identifier, risk.type)]) }, ', ') %>. <%= link_to("all #{risks.size} under Structural risk", '#structural-risk') %></p>
+      <% end %>
       <section class="sec">
         <header><h2 class="t2">Hotspots <%= count_tag('churn × dependents') %><%= info_tip('Commits per unit come from Woods\' git enrichment of this generation; dependents from the graph. The most changed and most depended upon come first: review those first.') %></h2></header>
         <% if h.churn? %>
@@ -73,8 +77,7 @@
           <%= render 'woods_map/components/empty_state', title: 'No application units to size', text: 'This generation has no container attribution (W-9), which marks the application\'s own units.' %>
         <% end %>
       </section>
-      <section class="sec">
-        <% risks = h.risks %>
+      <section class="sec" id="structural-risk">
         <header><h2 class="t2">Structural risk <%= count_tag(risks.size) %><%= info_tip('From graph_analysis.json, scoped to identifiers as Woods publishes it. Nothing here proves a path ran.') %></h2></header>
         <% if risks.any? %>
           <%= render 'woods_map/components/table', label: 'Structural risk', min_width: '720px', columns: [{ label: 'kind', width: '16%' }, { label: 'unit', width: '30%' }, { label: 'why' }, { label: 'do', width: '16%' }],
