@@ -1,0 +1,1 @@
+- CI runs the Chromium browser, layout and accessibility specs in their own job on Ruby 3.4. They only ran on developer machines before.
