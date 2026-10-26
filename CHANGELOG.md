@@ -11,7 +11,6 @@
   - **Unit summary:** at 960px and wider the tiles share the row instead of leaving empty columns, and a name wraps after `::` or `/` before it wraps inside a word.
   - **Pin notes:** a note box grows with its text, opens taller on focus, and its column is wider.
   - **Pinned graph:** both units of a small graph sit inside the canvas on the first view and after "fit". The fitted pan centred the first unit even when the extent filled the room exactly.
-||||||| fd02f04
 - The Code tab gives source the room it needs and says where it came from. A unit with no notes drops the empty notes lane, a wrapped view narrows the lane to 240px below 960px so the source keeps its width, and the narrow-screen gutters stay aligned when the lane is dropped. The as-written caption now says the source is what extraction read from the working tree, not necessarily a commit.
 - Pages say what their evidence covers.
   - **Schema:** the rail jumps to Columns and Database facts. The writers column is headed "recorded callback writers", an empty cell says no callback writer is recorded (or that the unit publishes no callbacks), and a note says writes from jobs, services and plain methods are not indexed there.
