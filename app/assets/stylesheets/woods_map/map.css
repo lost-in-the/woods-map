@@ -390,6 +390,8 @@ html.no-js .wm .amb-pop[hidden]{display:block}
 .wm .trail-form input[type=text]{flex:1 1 28ch}
 .wm .trail-form .cap{flex-basis:100%;margin:0}
 .wm .trail-note{width:100%;resize:vertical;display:block}
+.wm .trail-note{field-sizing:content;min-height:calc(var(--s6) + var(--s4));max-height:70vh}
+.wm .trail-note:focus{min-height:calc(var(--s7) * 2)}
 .wm .trail-lanes tr.bnd td{border-top:2px dashed var(--rule2)}
 .wm .trail-limits{margin:var(--s2) var(--s4);padding-left:var(--s5)}
 .wm .ident .t1{overflow-wrap:anywhere;min-width:0}
