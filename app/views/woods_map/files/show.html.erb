@@ -1,7 +1,8 @@
 <% content_for :title, "#{@file_path} · file · Woods Map" %>
 <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
 <%= render 'woods_map/shared/crumbs', crumbs: [['units', woods_map.units_path], ['file', nil]], path: @file_path %>
-<%= render 'woods_map/shared/ident', title: @file_path, subtitle: "Indexed file, #{pluralize(@owners.size, 'unit')}, gen #{@repository.generation_number}" %>
+<% sole = @owners.first if @owners.size == 1 && @unresolved.empty? %>
+<%= render 'woods_map/shared/ident', title: @file_path, subtitle: "Indexed file, #{pluralize(@owners.size, 'unit')}, gen #{@repository.generation_number}", controls: (link_to("Open #{sole['identifier']} source", woods_map.unit_path(type: sole['type'], identifier: sole['identifier']), class: 'btn primary') if sole) %>
 <div class="body gap-top">
   <div class="main">
     <section class="sec" aria-labelledby="file-owners">

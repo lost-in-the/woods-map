@@ -64,6 +64,19 @@ RSpec.describe 'Indexed navigation', type: :request do
     expect(response.body).to include('Indexed file, 1 unit, gen')
   end
 
+  it 'offers a direct source action for a file with one typed owner and keeps the ownership table' do
+    get '/woods/files/spec/report.rb'
+    document = html_response_document
+    action = document.at_css('.ident .ctl a.btn.primary')
+    expect([action['href'], action.text]).to eq(['/woods/units/factory/Report', 'Open Report source'])
+    expect(document.at_css('table[aria-label="Indexed file owners"]')).to be_present
+  end
+
+  it 'keeps the chooser alone for a file with several owners or unresolved membership' do
+    get WoodsMap::Engine.routes.url_helpers.file_path(path: path, script_name: '/woods')
+    expect(html_response_document.css('.ident .ctl a')).to be_empty
+  end
+
   it 'lays the ownership sections out in the page body, like the units index' do
     get WoodsMap::Engine.routes.url_helpers.file_path(path: path, script_name: '/woods')
     sections = html_response_document.css('.page-main > .body > .main > section.sec').pluck('aria-labelledby')
