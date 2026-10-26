@@ -1,0 +1,5 @@
+- M6 Trail (woods-map#8, C-1 to C-5): `/woods/trail` follows one entry (a job, a mailer action, a controller action or a model event such as `Post@create`) through Woods' flow and across each `perform_later` and mail delivery into the job or mailer that runs it, in lanes by unit type, with each mailer action's templates.
+  - Flags from published facts, each naming its evidence: no `retry_on`/`discard_on` and no `rescue_from` (W-4), conditional callbacks, `if` without else, dynamic dispatch, cross-database edges, hubs, and template ivars the mailer action never assigns.
+  - The board is its URL: entry, `pin[]=type:identifier`, `gen` and `hops`, token-free. A retained `gen` is read as the board was made.
+  - Pin notes stay in the browser. Graph of pinned reuses the Cytoscape explorer, ERD of pinned the ERD renderer, and co-change reads the commit table (W-3).
+  - The Share menu offers the URL and the lanes, graph and ERD as Mermaid with `.mmd` links (D-25). `Trail` joins the primary bar.

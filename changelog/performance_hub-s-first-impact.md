@@ -1,0 +1,3 @@
+- A hub's first impact view no longer opens every unit it reaches.
+  - **Render-by-name unknowns:** the Unknown tab opens only the reached units that Woods' graph lists as having unresolved renders (`unresolved_render_count`, woods#837), through `Repository#units_with`. A generation from an older Woods, or a Woods without the summary, still opens every reached unit.
+  - **Action templates:** the passages behind the unassigned-ivar rule find an action's templates through an index of the generation's view templates, built once per template list, instead of scanning every template for every action.

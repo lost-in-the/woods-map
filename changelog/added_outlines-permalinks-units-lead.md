@@ -1,0 +1,6 @@
+- Outlines, permalinks and units lead into their evidence.
+  - **Source-line permalinks:** a `#L<n>` address (from an outline entry, a caller, a history hunk or a typed address) scrolls the line into view on load and on later hash changes. The rows that carry the id own no box, so the browser had nothing to scroll to.
+  - **Controller outline:** each action links to the line its `action_sources` names and each filter to its recorded declaration line, in this file or the owning file. An entry the generation does not map stays plain text.
+  - **Job outline:** `perform(...)` is written as a signature from the published parameter records, with the same label as the facts tile (name, `*`/`**` splat, optional marker, never a default value).
+  - **Model outline:** an association links to its target model, with the association kind beside it. This is the declaration's related model, not a resolved call target: the index publishes no resolution for call chains such as `event.deliveries.create!`.
+  - **Impact:** a test gap links the unit it names (an identity with no typed unit stays text and says so), and every unit page has an Impact action that opens the blast radius for that unit.

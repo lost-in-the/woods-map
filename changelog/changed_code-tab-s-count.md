@@ -1,0 +1,1 @@
+- The Code tab's count says what it counts: `25 loc`, Woods' lines of code (neither blank nor a comment), where it said `25 lines` beside a code header of `37 lines` for the same file. The header now names both, `37 lines · 25 loc`, the loc explained on hover and focus.
