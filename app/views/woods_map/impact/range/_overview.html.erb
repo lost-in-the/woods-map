@@ -20,7 +20,7 @@
     <p>No records returned. Interpret this alongside coverage and unknowns below; unavailable or not_computed evidence is not a conclusive zero.</p>
   <% else %>
     <%= render 'woods_map/components/table', label: 'Changed typed units', min_width: '720px', columns: [{ label: 'unit', cell_class: 'id' }, { label: 'type', width: '130px', cell_class: 'nw mut' }, { label: 'status', width: '100px', cell_class: 'nw' }, { label: 'facets', width: '200px' }, { label: 'categories', width: '160px' }],
-          rows: rr.changed.first(sample).map { |c| { current: rr.focused?(c), classes: (rr.focused?(c) ? 'focus' : nil), cells: [impact_identity(c, rr, generation: rr.generation_of_change(c), since: rr.from_generation), c['type'].to_s.tr('_', ' '), c['status'].to_s, Array(c['facets']).join(', ').presence || empty_value, Array(c['categories']).join(', ').presence || empty_value] } } %>
+          rows: rr.changed.first(sample).map { |c| { tip: identity_tip(c['identifier'], c['type']), current: rr.focused?(c), classes: (rr.focused?(c) ? 'focus' : nil), cells: [impact_identity(c, rr, generation: rr.generation_of_change(c), since: rr.from_generation), c['type'].to_s.tr('_', ' '), c['status'].to_s, Array(c['facets']).join(', ').presence || empty_value, Array(c['categories']).join(', ').presence || empty_value] } } %>
     <% if rr.changed.size > sample %><p class="cap"><%= link_to("All #{rr.changed.size} changed units", range_url.call(lens: 'changed')) %></p><% end %>
   <% end %>
 </section>
@@ -31,7 +31,7 @@
     <p>No records returned. Interpret this alongside coverage and unknowns below; unavailable or not_computed evidence is not a conclusive zero.</p>
   <% else %>
     <%= render 'woods_map/components/table', label: 'Affected typed units', min_width: '720px', columns: [{ label: 'unit', cell_class: 'id' }, { label: 'type', width: '130px', cell_class: 'nw mut' }, { label: 'distance', width: '90px', cell_class: 'num' }, { label: 'weight', width: '100px', cell_class: 'num' }, { label: 'endpoint', width: '120px', cell_class: 'nw' }],
-          rows: rr.affected.first(sample).map { |a| { cells: [impact_identity(a, rr), a['type'].to_s.tr('_', ' '), a['distance'] || empty_value, impact_weight(a['weight']), impact_context(a)] } } %>
+          rows: rr.affected.first(sample).map { |a| { tip: identity_tip(a['identifier'], a['type'], record_mechanisms(a)), cells: [impact_identity(a, rr), a['type'].to_s.tr('_', ' '), a['distance'] || empty_value, impact_weight(a['weight']), impact_context(a)] } } %>
     <% if rr.affected.size > sample %><p class="cap"><%= link_to("All #{rr.affected.size} affected units", range_url.call(lens: 'changed', anchor: 'aff')) %></p><% end %>
   <% end %>
 </section>

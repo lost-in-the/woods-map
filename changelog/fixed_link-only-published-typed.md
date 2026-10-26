@@ -1,0 +1,1 @@
+- Link only published, typed-registry-verified constant spans; legacy source without span metadata stays highlighted but unlinked. Correct source-map run lengths so annotated source keeps the original file gutters.

@@ -1,0 +1,1 @@
+- Keep source gutters visible during horizontal scrolling; dismiss the search palette when focus leaves or Escape is pressed, reopen it on typing, ArrowDown or input click, and expose only actual choices as listbox options.

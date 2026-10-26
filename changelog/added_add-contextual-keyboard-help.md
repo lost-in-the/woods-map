@@ -1,0 +1,1 @@
+- Add contextual keyboard help (`?` and a primary-bar button), focus containment and return, typing/modal guards and Chromium keyboard regressions (NFR-3, #34). Remove the unimplemented source-line j/k hint.

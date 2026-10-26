@@ -21,6 +21,30 @@ module WoodsMap
       "min-#{px}"
     end
 
+    # The generation pair a table on a range page keeps in its sticky header.
+    #
+    # @param report [WoodsMap::RangeReport, nil] the page's range report
+    # @return [String, nil] "gen A → gen B", or nil outside a range report
+    def table_compare(report)
+      "gen #{report.from_generation} → gen #{report.to_generation}" if report
+    end
+
+    # The full identity of a truncated cell: name, type and the mechanism that links it.
+    #
+    # @param identifier [String]
+    # @param type [String, nil]
+    # @param mechanism [String, nil] an edge's `via`, or several joined
+    # @return [String] "Name, type, via mechanism"
+    def identity_tip(identifier, type, mechanism = nil)
+      ["#{identifier}, #{type.to_s.tr('_', ' ')}", ("via #{mechanism}" if mechanism.present?)].compact.join(', ')
+    end
+
+    # @param record [Hash] a range report record with witness paths
+    # @return [String] the distinct edge mechanisms along its paths
+    def record_mechanisms(record)
+      Array(record['paths']).flat_map { |path| Array(path['edges']).pluck('via') }.compact.uniq.join(', ')
+    end
+
     # A column width as the `width` attribute's presentational hint, which the
     # policy does not govern: `"150px"` becomes `150`, a percentage stays.
     #

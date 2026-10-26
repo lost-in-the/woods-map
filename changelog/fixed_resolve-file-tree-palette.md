@@ -1,0 +1,1 @@
+- Resolve file-tree, palette, path-search and source-line links by the typed unit recorded at each file, including additional source paths; keep cached file trees separate across indexes.
