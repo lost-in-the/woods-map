@@ -101,12 +101,29 @@ module WoodsMap
     # @param value [String, Hash]
     # @return [ActiveSupport::SafeBuffer, String]
     def tile_value(value)
-      return value.to_s unless value.is_a?(Hash)
-      return unit_link(value[:link][0], value[:link][1], label: value[:link][2]) if value[:link]
+      return value.html_safe? ? value : breakable(value) unless value.is_a?(Hash)
+      return linked_tile_value(*value[:link]) if value[:link]
       return tile_links(value[:links]) if value[:links]
       return layer_chip(value[:layer]) if value[:layer]
 
       tile_text(value)
+    end
+
+    # @param identifier [String]
+    # @param type [String]
+    # @param label [String, nil]
+    # @return [ActiveSupport::SafeBuffer, String]
+    def linked_tile_value(identifier, type, label = nil)
+      unit_link(identifier, type, label: breakable(label || identifier))
+    end
+
+    # A name with a line-break opportunity after each namespace or path separator, so a tile
+    # wraps it there before it wraps inside a word.
+    #
+    # @param text [#to_s]
+    # @return [ActiveSupport::SafeBuffer]
+    def breakable(text)
+      safe_join(text.to_s.split(%r{(?<=::|/)}), tag.wbr)
     end
 
     # @param value [Hash] a tile value with :who and :date, or :text and :hot
@@ -114,13 +131,13 @@ module WoodsMap
     def tile_text(value)
       return safe_join([who(value[:who]), ', ', date_abbr(value[:date])]) if value.key?(:who)
 
-      safe_join([value[:text], (value[:hot] ? chip(:hot) : nil)].compact, ' ')
+      safe_join([breakable(value[:text]), (value[:hot] ? chip(:hot) : nil)].compact, ' ')
     end
 
     # @param links [Array<Array(String, String)>] identifier, type pairs
     # @return [ActiveSupport::SafeBuffer] the first three as links, the rest as a count
     def tile_links(links)
-      shown = links.first(3).map { |identifier, type| unit_link(identifier, type) }
+      shown = links.first(3).map { |identifier, type| unit_link(identifier, type, label: breakable(identifier)) }
       rest = links.size - shown.size
       shown << tag.span("+#{rest} more", class: 'dim') if rest.positive?
       safe_join(shown, ', ')

@@ -121,6 +121,9 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .padx{padding:0 var(--s5)}
 .wm .main.inset{margin-left:var(--s5)}
 .wm .frame-facts{margin:var(--s4) var(--s5) 0}
+/* The tiles share the row between them rather than leaving empty tracks, and a name breaks at its <wbr> before it breaks mid-word. */
+.wm .facts dd{overflow-wrap:break-word}
+@container wm (min-width:960px){ .wm .frame-facts .facts{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)} }
 .wm .contents{display:contents}
 .wm .regular{font-weight:400}
 .wm .det.framed{border:1px solid var(--rule2);border-radius:var(--r-ctl)}
