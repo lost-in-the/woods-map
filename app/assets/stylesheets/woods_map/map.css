@@ -341,6 +341,9 @@ html.js .wm .guide .guide-nojs{display:none}
 .wm .pick-units .f{min-width:0}
 .wm .pick-units .f .pick-name{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
 .wm .pick-units .f .mut,.wm .pick-units .f .cnt{flex:none;white-space:nowrap}
+/* The detail toggle keeps its 14px glyph and answers a click anywhere in a 24px square; the coarse-pointer size is already 44px. */
+.wm .tgl::after{content:"";position:absolute;inset:-5px}
+@media (pointer:coarse){ .wm .tgl::after{inset:0} }
 /* The diff component (B8-Impact-Changed) beside a detail block: Woods' unified hunks (woods#802). */
 .wm .diff-block{margin-top:var(--s4)}
 .wm .main .sec + .dia{margin-top:var(--s5)}
