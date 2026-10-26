@@ -43,7 +43,8 @@ RSpec.describe 'Impact', type: :request do
 
     it 'scopes an empty Unknown tab to what the index reported within the depth' do
       get '/woods/impact', params: { focus: 'Micropost', depth: 1, lens: 'unknown' }
-      expect(html_response_document.at_css('.empty-state').text.squish).to include('Reported by the index within depth 1')
+      empty = html_response_document.at_css('.empty-state')
+      expect(empty.text.squish).to include('Reported by the index within depth 1')
     end
   end
 end
