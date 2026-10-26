@@ -77,6 +77,17 @@ RSpec.describe 'Landscape', type: :request do
       expect(html_response_document.at_css('table[aria-label="Structural risk"]')).not_to be_nil
     end
 
+    it 'names the first structural risks above the charts and jumps to the whole table' do
+      get '/woods/landscape/hotspots'
+      document = html_response_document
+      findings = document.at_css('.named-findings')
+      expect(findings.text.squish).to start_with('Named findings: uncovered hub UsersController, uncovered hub User')
+      expect(findings.css('a').pluck('href')).to include('/woods/units/controller/UsersController', '#structural-risk')
+      rows = document.css('table[aria-label="Structural risk"] tbody tr').size
+      expect(findings.css('a').last.text).to eq("all #{rows} under Structural risk")
+      expect(document.at_css('#structural-risk table[aria-label="Structural risk"]')).not_to be_nil
+    end
+
     it 'answers 422 for the exports' do
       get '/woods/landscape.dsl'
       expect(response).to have_http_status(:unprocessable_entity)

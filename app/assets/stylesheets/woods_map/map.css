@@ -126,6 +126,9 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .padx{padding:0 var(--s5)}
 .wm .main.inset{margin-left:var(--s5)}
 .wm .frame-facts{margin:var(--s4) var(--s5) 0}
+/* The tiles share the row between them rather than leaving empty tracks, and a name breaks at its <wbr> before it breaks mid-word. */
+.wm .facts dd{overflow-wrap:break-word}
+@container wm (min-width:960px){ .wm .frame-facts .facts{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)} }
 .wm .contents{display:contents}
 .wm .regular{font-weight:400}
 .wm .det.framed{border:1px solid var(--rule2);border-radius:var(--r-ctl)}
@@ -341,6 +344,15 @@ html.js .wm .guide .guide-nojs{display:none}
 .wm .tl-svg a:focus-visible{outline:2px solid var(--select)}
 .wm .pick-units fieldset{border:0;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(28ch,1fr));gap:var(--s2) var(--s5)}
 .wm .pick-units .f{display:flex;gap:var(--s2);align-items:center;font-family:var(--ff-data);font-size:var(--fs-12)}
+/* A long path or namespace wraps inside its label; the type and count keep their own cells. */
+.wm .pick-units fieldset{grid-template-columns:repeat(auto-fill,minmax(min(100%,28ch),1fr))}
+.wm .pick-units .f{min-width:0}
+.wm .pick-units .f .pick-name{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
+.wm .pick-units .f .mut,.wm .pick-units .f .cnt{flex:none;white-space:nowrap}
+.wm .det .more-files > summary{cursor:pointer;color:var(--link);font-size:var(--fs-12)}
+/* The detail toggle keeps its 14px glyph and answers a click anywhere in a 24px square; the coarse-pointer size is already 44px. */
+.wm .tgl::after{content:"";position:absolute;inset:-5px}
+@media (pointer:coarse){ .wm .tgl::after{inset:0} }
 /* The diff component (B8-Impact-Changed) beside a detail block: Woods' unified hunks (woods#802). */
 .wm .diff-block{margin-top:var(--s4)}
 .wm .main .sec + .dia{margin-top:var(--s5)}
@@ -387,6 +399,8 @@ html.no-js .wm .amb-pop[hidden]{display:block}
 .wm .trail-form input[type=text]{flex:1 1 28ch}
 .wm .trail-form .cap{flex-basis:100%;margin:0}
 .wm .trail-note{width:100%;resize:vertical;display:block}
+.wm .trail-note{field-sizing:content;min-height:calc(var(--s6) + var(--s4));max-height:70vh}
+.wm .trail-note:focus{min-height:calc(var(--s7) * 2)}
 .wm .trail-lanes tr.bnd td{border-top:2px dashed var(--rule2)}
 .wm .trail-limits{margin:var(--s2) var(--s4);padding-left:var(--s5)}
 .wm .ident .t1{overflow-wrap:anywhere;min-width:0}

@@ -79,22 +79,12 @@ module WoodsMap
     #
     # @param commit [WoodsMap::HistoryView::Commit]
     # @param own [Array(String, String)] the page's identifier and type, left out of co-changes
+    # @param paths [Array<String>] the files the page covers, listed first
     # @return [ActiveSupport::SafeBuffer]
-    def commit_detail(commit, own: nil)
-      rows = [description_row(commit), files_row(commit), hunks_row(commit),
+    def commit_detail(commit, own: nil, paths: [])
+      rows = [description_row(commit), scope_row(commit), files_row(commit, paths), hunks_row(commit),
               co_changed_row(commit, own), parents_row(commit)]
       render('woods_map/components/detail', rows: rows.compact)
-    end
-
-    # @param commit [WoodsMap::HistoryView::Commit]
-    # @return [ActiveSupport::SafeBuffer]
-    def commit_files(commit)
-      lines = commit.files.map do |file|
-        safe_join([tag.span(file.path, class: file.indexed ? nil : 'mut'), line_counts(file), file_status(file.status)]
-                    .compact, ' ')
-      end
-      lines << tag.span("#{commit.files_omitted} more not listed", class: 'mut') if commit.files_omitted.positive?
-      safe_join(lines, tag.br)
     end
 
     # @param file [WoodsMap::CommitRows::FileChange]
@@ -141,8 +131,15 @@ module WoodsMap
       ['description', tag.span(commit.description, class: 'desc')] if commit.description.present?
     end
 
-    def files_row(commit)
-      ['files', commit_files(commit)] if commit.files.any? || commit.files_omitted.positive?
+    def files_row(commit, paths)
+      ['files', commit_files(commit, first: paths)] if commit.files.any? || commit.files_omitted.positive?
+    end
+
+    def scope_row(commit)
+      return unless commit.file_count >= HistoryView::BROAD_COMMIT_FILES
+
+      ['scope', tag.span("broad commit, #{commit.file_count} files: a file shared here shows one commit, not coupling",
+                         class: 'mut')]
     end
 
     def co_changed_row(commit, own)
