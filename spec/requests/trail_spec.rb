@@ -2,8 +2,6 @@
 
 require_relative '../support/trail_index'
 
-require 'cgi'
-
 # The Trail (M6, notes/trail.md): design-study scenario 2 from one URL.
 RSpec.describe 'Trail', type: :request do
   include TrailIndex
@@ -84,7 +82,7 @@ RSpec.describe 'Trail', type: :request do
     html = page_for(scenario.merge(gen: '1', token: nil))
     toggles = html.css('table[aria-label=Steps] a.tool').pluck('href')
     expect(toggles).to all(start_with('/woods/trail?'))
-    query = CGI.parse(URI.parse(toggles.first).query)
+    query = parse_query(URI.parse(toggles.first).query)
     expect(query.keys).to all(match(/\A(entry|pin\[\]|gen|hops)\z/))
     expect(html.at_css('.share code').text).not_to include('token')
   end

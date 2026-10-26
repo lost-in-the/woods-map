@@ -21,7 +21,7 @@ RSpec.describe 'Filtering timelines by author', type: :request do
   end
 
   def query(href)
-    CGI.parse(URI(href).query.to_s)
+    parse_query(URI(href).query.to_s)
   end
 
   def author_links

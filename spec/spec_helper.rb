@@ -4,6 +4,7 @@ ENV['RAILS_ENV'] = 'test'
 require File.expand_path('dummy/config/environment', __dir__)
 require 'rspec/rails'
 require_relative 'support/html_response'
+require_relative 'support/query_params'
 require_relative 'support/landscape_index'
 require_relative 'support/flow_index'
 require_relative 'support/package_index'
@@ -18,6 +19,7 @@ FIXTURE_INDEX = File.expand_path('fixtures/index', __dir__)
 
 RSpec.configure do |config|
   config.include WoodsMap::HtmlResponse, type: :request
+  config.include WoodsMap::QueryParams, type: :request
   config.include WoodsMap::IndexDouble
   config.expect_with(:rspec) { |c| c.syntax = :expect }
   config.disable_monkey_patching!

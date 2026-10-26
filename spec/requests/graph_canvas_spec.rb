@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'cgi'
-
 # The Graph tab's Cytoscape canvas (M5): the server renders the hidden panel and the
 # query the graph controller fetches; the flowchart and the list stay the page without
 # JavaScript, and every list row names the edge the canvas draws.
@@ -16,8 +14,8 @@ RSpec.describe 'Graph tab canvas', type: :request do
     body = html.at_css('[data-controller~=graph]')
     url = URI.parse(body['data-graph-url-value'])
     expect(url.path).to eq('/woods/graph/neighbourhood')
-    expect(CGI.parse(url.query)).to eq('centre' => ['User'], 'type' => ['model'], 'depth' => ['2'],
-                                       'direction' => ['dependents'], 'types[]' => ['model'])
+    expect(parse_query(url.query)).to eq('centre' => ['User'], 'type' => ['model'], 'depth' => ['2'],
+                                         'direction' => ['dependents'], 'types[]' => ['model'])
     expect(body['data-graph-unit-url-value'])
       .to eq('/woods/units/__type__/__identifier__/graph?depth=2&direction=dependents')
     expect(body['data-graph-generation-value']).to match(/\A\d+\z/)
