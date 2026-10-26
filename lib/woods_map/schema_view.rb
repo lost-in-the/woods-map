@@ -181,7 +181,9 @@ module WoodsMap
       return 'polymorphic, no FK' if assoc['polymorphic']
 
       dependent = assoc.dig('options', 'dependent').to_s
-      "delete radius: dependent #{dependent}" if dependent.start_with?('destroy', 'delete')
+      return unless dependent.start_with?('destroy', 'delete')
+
+      "delete radius: Rails dependent #{dependent}; database delete action not published"
     end
 
     def index_for(column)

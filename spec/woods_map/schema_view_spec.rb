@@ -108,4 +108,15 @@ RSpec.describe WoodsMap::SchemaView do
       expect(enforced.values).not_to include('—')
     end
   end
+
+  describe 'Rails dependent behaviour' do
+    it 'is named as Rails behaviour, with the database delete action said to be unpublished' do
+      unit = { 'identifier' => 'User', 'type' => 'model', 'metadata' => { 'table_name' => 'users', 'associations' => [
+        { 'type' => 'has_many', 'name' => 'posts', 'target' => 'Post', 'foreign_key' => 'user_id',
+          'options' => { 'dependent' => 'destroy' } }
+      ] } }
+      finding = described_class.new(unit).associations.first.finding
+      expect(finding).to eq('delete radius: Rails dependent destroy; database delete action not published')
+    end
+  end
 end
