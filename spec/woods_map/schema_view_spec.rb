@@ -67,7 +67,7 @@ RSpec.describe WoodsMap::SchemaView do
                             { 'name' => 'd', 'has_default' => false },
                             { 'name' => 'e' }])
       expect(result).to eq('a' => 'false', 'b' => '0', 'c' => '""', 'd' => 'none', 'e' => nil,
-                         'f' => '"  "', 'g' => '"\\t"')
+                           'f' => '"  "', 'g' => '"\\t"')
     end
   end
 
