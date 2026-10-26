@@ -13,4 +13,10 @@ RSpec.describe WoodsMap::ImpactGapsHelper, type: :helper do
     expect(html).to eq('Ghost has no mapped test (not a typed unit in gen 3)')
     expect(html).not_to include('<a')
   end
+
+  it 'offers no Impact action for a unit the dependency graph does not hold' do
+    repository = instance_double(WoodsMap::Repository, graph_node: nil)
+    allow(helper).to receive(:current_repository).and_return(repository)
+    expect(helper.impact_action(instance_double(WoodsMap::UnitPage, identifier: 'Ghost', type: 'model'))).to be_nil
+  end
 end
