@@ -1,6 +1,6 @@
 <% content_for :title, "#{@landscape.system_name} · Domains · Landscape · Woods Map" %>
 <%= render 'woods_map/landscape/frame', crumb: 'domains' %>
-<div class="body" data-controller="trail">
+<div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>">
   <div class="main landscape">
     <section class="sec">
       <header><h2 class="t2">Domain clusters <%= count_tag(@clusters.size) %><%= info_tip('C4 level 3 by namespace: Woods seeds a cluster from each top-level namespace of the application\'s own units, adds the unnamespaced units most connected to it and merges clusters under three units (graph_analysis.json, per identifier).') %></h2></header>

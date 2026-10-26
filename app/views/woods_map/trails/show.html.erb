@@ -28,7 +28,7 @@
 <% end %>
 <% if banners.any? %><div class="frame-facts"><%= safe_join(banners) %></div><% end %>
 <% missing_pins = board.pins.reject { |pin| @pinned.identities.include?(pin.identity) } %>
-<div class="body" data-controller="trail pinboard" data-trail-title-value="Trail <%= title %>" data-pinboard-key-value="<%= board.key %>">
+<div class="body" data-controller="trail pinboard" data-trail-url-value="<%= trail_url %>" data-trail-title-value="Trail <%= title %>" data-pinboard-key-value="<%= board.key %>">
   <%= render 'woods_map/components/rail', label: 'Board', heading: 'On this board', groups: [
         { label: 'pins', count: board.pins.size, items: board.pins.map { |pin| { key: (@flags.for(pin.identity).any? ? WoodsMap::Glyphs[:flag] : '·'), text: unit_link(pin.identifier, pin.type), own: pin.type.tr('_', ' ') } } },
         { label: 'sections', count: 7, items: [['flags', 'trail-flags'], ['lanes', 'trail-lanes'], ['steps', 'trail-steps'], ['pinboard', 'trail-pins'], ['graph of pinned', 'trail-graph'], ['ERD of pinned', 'trail-erd'], ['changed together', 'trail-cochange']].map { |text, id| { text: text, href: "##{id}" } } }

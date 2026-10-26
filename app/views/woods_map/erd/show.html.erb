@@ -36,7 +36,7 @@
 <% inner = @erd.inner_relations(@chunk) %>
 <% crossing = @erd.crossing_relations(@chunk, @by) %>
 <% tables = @chunk.tables.map { |name| @erd.table_named(name) } %>
-<div class="body" data-controller="trail" data-trail-title-value="ERD <%= @chunk.label %>">
+<div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>" data-trail-title-value="ERD <%= @chunk.label %>">
   <%= render 'woods_map/components/rail', heading: "Chunks by #{@by}", groups: @erd.databases.map { |db|
         members = chunks.select { |c| c.database == db }
         { label: db, count: "#{members.sum { |c| c.tables.size }} tables", items: members.map { |c| { key: c.tables.size, text: link_to(c.label, here.call(chunk: c.number)), own: "#{c.tables.first(3).join(', ')}#{'…' if c.tables.size > 3}", current: c == @chunk } } }

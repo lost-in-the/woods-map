@@ -2,7 +2,7 @@
 <% content_for :banner, render('woods_map/shared/freshness', freshness: @freshness) %>
 <%= render 'woods_map/shared/crumbs', crumbs: [['trail', nil]], trail: tag.span('', data: { trail_target: 'list' }) %>
 <%= render 'woods_map/shared/ident', title: 'Trail', subtitle: "a lifecycle across async hops, gen #{@repository.generation_number}" %>
-<div class="body" data-controller="trail" data-trail-title-value="Trail">
+<div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>" data-trail-title-value="Trail">
   <div class="main inset">
     <% missing = @board.entry && !@repository.graph_node(@board.entry_unit) %>
     <%= render 'woods_map/components/empty_state',

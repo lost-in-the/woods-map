@@ -46,7 +46,7 @@
 <% extra_rows = param_flags.map { |key, model| ['param', safe_join([tag.span(key, class: 'iv bad'), ", no attribute on #{model}"])] } + local_flags.map { |f| ['local', safe_join([tag.span(f.local, class: 'iv bad'), ", passed to #{f.partial.delete_suffix('.html.erb')}, never read"])] } %>
 <% tiles << { eyebrow: flags || extra_flags.positive? ? "Flags #{Array(flags).size + extra_flags}#{', incomplete' unless complete}" : 'Flags', rows: extra_rows + flag_rows } %>
 <%= render 'woods_map/units/frame', page: @page, tab: 'passage', controls: controls, definition: p.declared&.dig('line') || @definition, title: "#{@page.identifier}##{p.action}", subtitle: p.request_label, tiles: tiles %>
-<div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>#<%= p.action %>">
+<div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>" data-trail-title-value="<%= @page.identifier %>#<%= p.action %>">
   <%= render 'woods_map/components/rail', heading: 'Passage', groups: [
         { label: 'stages', count: 6, items: [
           { key: '·', text: 'request', own: p.request_label },
