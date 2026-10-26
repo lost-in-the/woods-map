@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- The Code tab gives source the room it needs and says where it came from. A unit with no notes drops the empty notes lane, a wrapped view narrows the lane to 240px below 960px so the source keeps its width, and the narrow-screen gutters stay aligned when the lane is dropped. The as-written caption now says the source is what extraction read from the working tree, not necessarily a commit.
 - Pages say what their evidence covers.
   - **Schema:** the rail jumps to Columns and Database facts. The writers column is headed "recorded callback writers", an empty cell says no callback writer is recorded (or that the unit publishes no callbacks), and a note says writes from jobs, services and plain methods are not indexed there.
   - **Unit pages:** a candidate list whose types all come from one file reads "N indexed types" and keeps each link, with the cannot-tell wording kept for candidates at different paths. The job facts row is "enqueued jobs" and says mail deliveries are not counted. An added or removed unit's `?since=` banner no longer says its source lines did not move. The callers panel counts references, and a site with no method is a "class reference".
