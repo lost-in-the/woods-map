@@ -31,4 +31,20 @@ RSpec.describe 'Impact', type: :request do
     get '/woods/units/model/User/graph'
     expect(response.body).to include('href="/woods/impact?depth=2&amp;focus=User"')
   end
+
+  describe 'scope wording' do
+    it 'names the sidebar list as direct dependents beside the total reached within the depth' do
+      get '/woods/impact', params: { focus: 'User', depth: 2 }
+      groups = html_response_document.css('nav.rail .grp').map { |g| g.text.squish }
+      expect(groups).to include(a_string_starting_with('direct dependents'))
+      expect(groups).not_to include(a_string_starting_with('affected'))
+      expect(html_response_document.at_css('nav.rail').text).to match(/\d+ reached within depth 2/)
+    end
+
+    it 'scopes an empty Unknown tab to what the index reported within the depth' do
+      get '/woods/impact', params: { focus: 'Micropost', depth: 1, lens: 'unknown' }
+      empty = html_response_document.at_css('.empty-state')
+      expect(empty.text.squish).to include('Reported by the index within depth 1')
+    end
+  end
 end

@@ -40,10 +40,10 @@ module WoodsMap
       render_tab_mermaid(text, "#{@passage.action} passage dynamic", refusal: WoodsMap::DynamicView.refusal(text))
     end
 
-    # @return [String] the passage's C4 dynamic text, with its ladder model's chain when it has one
+    # @return [String] the passage's C4 dynamic text, with its ladder model's chain when the name implies an event
     def passage_dynamic
-      steps = @ladder && @ladder_event ? @ladder.steps(@ladder_event) : []
-      @dynamic.passage(@passage, @ladder && @ladder_model, steps, @ladder && @ladder_event)
+      steps = @ladder_linked ? @ladder.steps(@ladder_event) : []
+      @dynamic.passage(@passage, @ladder_linked && @ladder_model, steps, @ladder_linked && @ladder_event)
     end
 
     def render_graph_mermaid

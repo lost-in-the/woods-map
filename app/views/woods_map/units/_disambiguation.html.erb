@@ -5,7 +5,12 @@
     Locals: ambiguities (Array of References::Ambiguity). %>
 <% ambiguities.each do |ambiguity| %>
   <div class="amb-pop" id="<%= ambiguity.id %>" role="dialog" aria-label="Candidates for <%= ambiguity.text %>" data-disambiguation-target="popover" hidden>
-    <p class="cap"><b class="id"><%= ambiguity.text %><%= ".#{ambiguity.method}" if ambiguity.method %></b> names <%= ambiguity.candidates.size %> units; the index cannot tell which one runs.</p>
+    <% paths = ambiguity.candidates.map { |candidate| candidate[:path] }.uniq %>
+    <% if paths.size == 1 && paths.first %>
+      <p class="cap"><b class="id"><%= ambiguity.text %><%= ".#{ambiguity.method}" if ambiguity.method %></b> has <%= ambiguity.candidates.size %> indexed types extracted from <span class="dim"><%= paths.first %></span>. Each type keeps its own link; the index does not choose one.</p>
+    <% else %>
+      <p class="cap"><b class="id"><%= ambiguity.text %><%= ".#{ambiguity.method}" if ambiguity.method %></b> names <%= ambiguity.candidates.size %> units at different definitions; the index cannot tell which one runs.</p>
+    <% end %>
     <ul>
       <% ambiguity.candidates.each do |candidate| %>
         <li><%= link_to candidate[:identifier], woods_map.unit_path(type: candidate[:type], identifier: candidate[:identifier]), class: 'id' %> <span class="lyr"><%= candidate[:type].tr('_', ' ') %></span><% if candidate[:path] %> <span class="dim"><%= candidate[:path] %></span><% end %></li>
