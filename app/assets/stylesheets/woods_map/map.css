@@ -336,6 +336,11 @@ html.js .wm .guide .guide-nojs{display:none}
 .wm .tl-svg a:focus-visible{outline:2px solid var(--select)}
 .wm .pick-units fieldset{border:0;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(28ch,1fr));gap:var(--s2) var(--s5)}
 .wm .pick-units .f{display:flex;gap:var(--s2);align-items:center;font-family:var(--ff-data);font-size:var(--fs-12)}
+/* A long path or namespace wraps inside its label; the type and count keep their own cells. */
+.wm .pick-units fieldset{grid-template-columns:repeat(auto-fill,minmax(min(100%,28ch),1fr))}
+.wm .pick-units .f{min-width:0}
+.wm .pick-units .f .pick-name{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
+.wm .pick-units .f .mut,.wm .pick-units .f .cnt{flex:none;white-space:nowrap}
 /* The diff component (B8-Impact-Changed) beside a detail block: Woods' unified hunks (woods#802). */
 .wm .diff-block{margin-top:var(--s4)}
 .wm .main .sec + .dia{margin-top:var(--s5)}

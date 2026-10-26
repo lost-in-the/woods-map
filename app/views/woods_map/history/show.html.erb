@@ -15,7 +15,7 @@
       <%= render 'woods_map/components/empty_state', title: t.unknown.any? ? "No unit named #{t.unknown.join(', ')} in gen #{@repository.generation_number}" : 'Pick units to compare', text: 'One lane per unit across the window, a dot per commit that touched its files, and the commits that touched two of them drawn as a pair: which units change together. The most-changed units of the window are listed; a unit page\'s History tab links here with what moves with it.' %>
       <form method="get" action="<%= woods_map.history_path %>" class="pick-units gap-top">
         <fieldset><legend class="t3">most-changed units</legend>
-          <% t.suggestions.each_with_index do |s, i| %><label class="f"><input type="checkbox" name="units[]" value="<%= "#{s['type']}:#{s['identifier']}" %>"<%= ' checked'.html_safe if i < 3 %>> <%= s['identifier'] %> <span class="mut"><%= s['type'].tr('_', ' ') %></span> <span class="cnt"><%= s['commits'] %></span></label><% end %>
+          <% t.suggestions.each_with_index do |s, i| %><label class="f"><input type="checkbox" name="units[]" value="<%= "#{s['type']}:#{s['identifier']}" %>"<%= ' checked'.html_safe if i < 3 %>> <span class="pick-name"><%= s['identifier'] %></span> <span class="mut"><%= s['type'].tr('_', ' ') %></span> <span class="cnt"><%= s['commits'] %></span></label><% end %>
         </fieldset>
         <button class="btn primary" type="submit">Show timeline</button>
       </form>
