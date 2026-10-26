@@ -1,0 +1,8 @@
+- M3 close-out (woods-map#5).
+  - **Exit check:** `spec/support/m3_exit_check.rb` compares every entry Lifecycle (sequence, flowchart, lanes), model event chain and Schema ER with Woods' flow documents and model metadata. It runs on the fixture in CI, and on any index with `WOODS_MAP_EXIT_INDEX`. The testbed run is in docs/design/notes/m3-exit-check.md.
+  - The ER now draws an association to the table its target model reads (`active_storage_attachments`, not `active_storage/attachments`).
+  - **External services** (woods#814): Context and Containers draw each service the Gemfile declares a catalogued client gem for, or that the code calls through a client constant. Web and job processes get a relationship to the services their units call.
+  - **Schema class diagram:** columns, scopes and own methods, the parent class, included concerns and one hop of associations, beside the ER. Its text is at `schema.mmd?view=class`.
+  - **Domains mindmap** of the published clusters, at `/woods/landscape/mindmap.mmd`.
+  - Hotspots' treemap can also be sized by unit count or PageRank (`?size=`).
+  - **Landscape Status** tab: what the generation publishes for the Landscape and what each fact draws.

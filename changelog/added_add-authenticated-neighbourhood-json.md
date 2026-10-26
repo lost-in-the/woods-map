@@ -1,0 +1,1 @@
+- Add authenticated neighbourhood JSON with typed elements, pinned provenance, package filters and explicit node/edge truncation; traversal and graph rendering remain unchanged (FR-5, #7 endpoint slice).

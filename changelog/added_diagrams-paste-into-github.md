@@ -1,0 +1,7 @@
+- Diagrams paste into a GitHub pull-request comment and draw there (closes woods-map#76; D-25 amended; docs/design/notes/pr-comment-share.md).
+  - **GitHub's Mermaid:** 11.16.1, from the latest `info` check on record (GitHub Community discussion #70672). `spec/diagrams/github_mermaid_spec.rb` parses all 229 generated texts with that exact build, vendored for the spec only and run in Node in CI. With `WOODS_MAP_BROWSER` it also renders them in Chromium. Every type parses, and no GitHub variant is needed.
+  - **Lanes:** the lanes view (`swimlane-beta`) loses its "may not render on GitHub" mark, because 11.16.1 knows it. The mark is now kept for Mermaid 12's `usecase-beta` and `agentflow-beta`.
+  - **⎘ copy for PR comment:** on every diagram panel and in each Share menu row. It copies the text in a ```` ```mermaid ```` fence plus one line linking the token-free focus URL, the generation and the `.mmd` URL. A comment over GitHub's 65,536 characters says so instead of offering a broken paste.
+  - **`.md` URLs:** every `.mmd` route has a `.md` twin that answers with the comment as `text/markdown`, under the same auth, rate-limit and 422 rules. The Landscape's text routes now follow those rules too: a token in the URL is not exchanged, and they are rate limited.
+  - **`config.public_url`** (`WOODS_MAP_PUBLIC_URL`): the address absolute links start at, for maps behind a proxy or on a staging host (docs/DEPLOYMENT.md §5).
+  - **Woods side:** woods#826 proposes the same diagrams from the Index MCP server.

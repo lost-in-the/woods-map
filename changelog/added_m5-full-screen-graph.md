@@ -1,0 +1,6 @@
+- M5 full-screen graph (`/woods/graph`, docs/design/notes/graph-page.md): the Graph tab's explorer, extracted to `graphs/_explorer`, over the full viewport.
+  - Without a centre it lists the published hubs. Clicking a node re-centres the page.
+  - `blast=1` tints the units `BlastRadius` reaches, directly or transitively.
+  - Dragged positions are kept per generation and query in `localStorage`, with a reset (A-3).
+  - `Graph` joins the primary bar.
+  - Domain clusters wait on woods#799.

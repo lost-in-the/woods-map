@@ -1,0 +1,1 @@
+- Give explanation controls native button semantics, name Mermaid source regions, correct the Schema section label, and keep narrow page tabs reachable through contained keyboard-accessible scrolling. Use native scrollbars without fades that obscure text at scroll edges.

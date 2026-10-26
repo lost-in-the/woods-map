@@ -1,0 +1,1 @@
+- Dependents counts say what they count. The impact page's focus row counts the distinct typed units with an edge to the unit in this generation's graph ("6 typed units"). The hub notes, wherever they appear, carry graph_analysis' own per-identifier count ("hub, 19 dependents by identifier"). The two used to sit side by side with no label and read as a contradiction.

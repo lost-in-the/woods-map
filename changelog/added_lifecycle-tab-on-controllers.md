@@ -1,0 +1,4 @@
+- Lifecycle tab on controllers, jobs and mailers (FR-6, woods-map#91, docs/design/notes/entry-lifecycle.md). The tab draws one entry point's flow with the model chain's sequence, flowchart and lanes views: a controller or mailer action from a picker (`?action_name=`), or a job's `perform`. The flow is the precomputed document when the generation has one (W-14), assembled otherwise.
+  - The steps cross async hops, as the Trail's do. They list every operation with its line and the steps' flags.
+  - A controller's save runs the model event the Passage ladder reads (`PostsController#create` → `Post@create`), marked "save implies". The Trail does the same.
+  - "Open in the Trail" gives the cross-process view. `lifecycle.mmd` takes `action_name` and `view` (D-25).

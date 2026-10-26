@@ -1,0 +1,1 @@
+- Design study, decision log and milestone plan under `docs/design/`.

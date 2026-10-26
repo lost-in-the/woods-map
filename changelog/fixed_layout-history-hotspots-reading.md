@@ -1,0 +1,9 @@
+- Layout, History and Hotspots reading fixes.
+  - **History picker:** a long path or namespace wraps inside its checkbox label, and the type and count keep their own cells.
+  - **History:** a commit's detail lists the unit's own files first, then a few others, with a count that opens the rest in place. A commit touching twelve or more files is labelled broad. When every commit shown falls in a shorter range, the tab and the timeline offer "zoom to the last 30d".
+  - **Detail toggles:** the expand control answers a click in a 24px square (44px on coarse pointers).
+  - **Hotspots:** a line above the charts names the first structural risks, links each unit and jumps to the Structural risk table.
+  - **Files:** a file with one typed owner and no unresolved membership has an "Open <unit> source" action; other files keep the chooser alone.
+  - **Unit summary:** at 960px and wider the tiles share the row instead of leaving empty columns, and a name wraps after `::` or `/` before it wraps inside a word.
+  - **Pin notes:** a note box grows with its text, opens taller on focus, and its column is wider.
+  - **Pinned graph:** both units of a small graph sit inside the canvas on the first view and after "fit". The fitted pan centred the first unit even when the extent filled the room exactly.

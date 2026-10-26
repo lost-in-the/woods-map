@@ -1,0 +1,6 @@
+- Landscape (`/woods/landscape`, B8-Landscape, B6-Overview, docs/design/notes/landscape.md).
+  - **Containers:** C4 level 2 from each unit's container attribution (Woods W-9), with technologies from the BehavioralProfile unit and external systems from configuration and external consumers. Relationships are counted from the published edges between containers. The container diagram is drawn by Pele.
+  - **Exports:** the same model as Mermaid, Structurizr DSL and LikeC4 plain text at `/woods/landscape.mmd`, `.dsl` and `.c4` (D-25).
+  - **Hotspots:** structure tiles, a churn × dependents ranking, the layer coupling matrix and structural risk.
+  - **Domains:** the published domain clusters (woods#799). The full-screen graph's new *clusters* layout boxes each cluster's units.
+  - `Landscape` joins the primary bar. People and the application's name are host settings: `config.landscape_actors` and `config.system_name`.

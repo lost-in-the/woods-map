@@ -1,0 +1,5 @@
+- State machine transition callbacks per transition (woods#796).
+  - The Lifecycle tab's transitions table gains before, around and after columns. Each callback sits on the transitions its literal scope admits, with its method linked to its line (W-2 method table) and the side effects Woods analysed (`after_failure` reads "on failure").
+  - The state diagram, and its `.mmd` text, labels the transitions that carry callbacks.
+  - Callbacks whose scope is not literal are listed apart.
+  - Generations from before woods#796 keep the raw DSL lines.

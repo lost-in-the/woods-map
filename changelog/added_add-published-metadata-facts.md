@@ -1,0 +1,1 @@
+- Add published-metadata facts tiles for jobs, mailers, templates, concerns, serializers and tables, preserving missing/empty/false distinctions (B-4, #34).

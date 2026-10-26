@@ -1,0 +1,1 @@
+- Preserve incomplete Passage and Impact coverage: omitted action facts, missing templates or ivar metadata, and depth-limited partial chains stay unknown while available findings remain visible. Shared-partial focus follows render callers to their owners.

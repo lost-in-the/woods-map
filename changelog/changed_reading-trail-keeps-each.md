@@ -1,0 +1,1 @@
+- The reading trail keeps each page's full address, path and query, so returning through it restores the investigation (entry, pins, hops, generation, lens, range) instead of the bare page. The address never includes a `token`. Entries stored as a bare path by an earlier version still draw.

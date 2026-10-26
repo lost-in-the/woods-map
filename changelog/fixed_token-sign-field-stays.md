@@ -1,0 +1,1 @@
+- The token sign-in field stays visible below 640px. It was styled as the file tree, which the responsive rules hide on a narrow screen, so a phone reader could not enter the token. It now has its own styling, unchanged at desktop widths.

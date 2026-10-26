@@ -1,0 +1,7 @@
+- M7 guide (woods-map#9, FR-8). `config.guide_enabled` (off by default) docks a guide panel beside every framed page (B8-Guide). The panel is a RubyLLM 2.1 agent over the Woods Index MCP server: stdio to `woods-mcp` (D-7) or a deployed `woods-mcp-http`, with the twelve read-only tools only.
+  - Eight page-aware actions, as overridable prompt templates, plus free questions, seeded with a server-built context: generation, unit, selected lines, action, impact focus or range.
+  - Answers stream over server-sent events, with tool cards as calls start and end, and finish as Markdown rendered with links only to known identifiers.
+  - Per-answer tool-call, turn and time limits and a per-session token budget, all visible.
+  - Conversations are file-backed under `<index_dir>/explorer/chats`.
+  - RubyLLM stays out of the gemspec. Below Ruby 3.2, or without `ruby_llm`, the bar shows a disabled Guide button and one notice.
+  - The guide refuses non-loopback requests without the token and is rate limited.
