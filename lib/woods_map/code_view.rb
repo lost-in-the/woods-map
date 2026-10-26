@@ -39,6 +39,11 @@ module WoodsMap
       @rows ||= @lens == 'written' ? written_rows : effective_rows
     end
 
+    # @return [Boolean] whether any row carries a note, so the notes lane has something to show
+    def annotated?
+      rows.any?(&:note)
+    end
+
     # @return [Array<Array(String, String)>] identifier and type of every linked unit, in first-link order
     def linked_targets
       rows
