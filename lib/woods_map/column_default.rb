@@ -12,11 +12,18 @@ module WoodsMap
     def self.text(column)
       if column.key?('default')
         value = column['default']
-        return value.nil? ? nil : (value.to_s.presence || '""')
+        return value.nil? ? nil : display(value.to_s)
       end
       return PRESENCE_ONLY if column['has_default']
 
       column['has_default'] == false ? 'none' : nil
     end
+
+    # A value with no visible characters is quoted and escaped, so an empty
+    # string and whitespace stay apart from each other and from no default.
+    def self.display(text)
+      text.strip.empty? ? text.inspect : text
+    end
+    private_class_method :display
   end
 end

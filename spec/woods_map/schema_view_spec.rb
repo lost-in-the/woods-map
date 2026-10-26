@@ -62,9 +62,12 @@ RSpec.describe WoodsMap::SchemaView do
       result = defaults_of([{ 'name' => 'a', 'default' => false, 'has_default' => true },
                             { 'name' => 'b', 'default' => '0' },
                             { 'name' => 'c', 'default' => '' },
+                            { 'name' => 'f', 'default' => '  ' },
+                            { 'name' => 'g', 'default' => "\t" },
                             { 'name' => 'd', 'has_default' => false },
                             { 'name' => 'e' }])
-      expect(result).to eq('a' => 'false', 'b' => '0', 'c' => '""', 'd' => 'none', 'e' => nil)
+      expect(result).to eq('a' => 'false', 'b' => '0', 'c' => '""', 'd' => 'none', 'e' => nil,
+                         'f' => '"  "', 'g' => '"\\t"')
     end
   end
 
