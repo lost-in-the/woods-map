@@ -12,9 +12,6 @@ module WoodsMap
     # the text, rather than drawing a diagram nobody can read.
     TABLE_BUDGET = 40
 
-    # What a column's default cell says when the index publishes only that a default exists.
-    PRESENCE_ONLY = 'exists, value not published'
-
     # The Schema tab of a unit in one generation, its far tables read from the graph.
     #
     # @param repository [Repository]
@@ -22,8 +19,9 @@ module WoodsMap
     # @param table [Hash, nil]
     # @return [SchemaView]
     def self.for(repository, unit, table: nil)
+      lookup = ->(name) { repository.unit("table:#{name}", type: 'database_table') }
       new(unit, table: table, graph_analysis: repository.graph_analysis, tables: repository.model_tables,
-                repository: repository)
+                repository: repository, table_lookup: lookup)
     end
 
     # @param unit [Hash] a model or database_table unit
@@ -33,7 +31,9 @@ module WoodsMap
     #   the graph nodes' `table`, so an association's far side is the table the
     #   model reads rather than a guess from its name
     # @param repository [Repository, nil] when given, the ER text comes from Woods' builder (woods#826)
-    def initialize(unit, table: nil, graph_analysis: {}, tables: {}, repository: nil)
+    # @param table_lookup [#call, nil] table name => its database_table unit,
+    #   read now for the far side of has_many and has_one
+    def initialize(unit, table: nil, graph_analysis: {}, tables: {}, repository: nil, table_lookup: nil) # rubocop:disable Metrics/ParameterLists
       @unit = unit
       @repository = repository
       @tables = tables
@@ -41,6 +41,7 @@ module WoodsMap
       @table = table
       @table_metadata = (table || (unit['type'] == 'database_table' ? unit : nil))&.dig('metadata') || {}
       @analysis = graph_analysis
+      @incoming = IncomingForeignKeys.new(table_name, table_lookup, incoming_associations.map { |a| target_table(a) })
     end
 
     # @return [SchemaClassDiagram] the class diagram of the same model
@@ -65,7 +66,7 @@ module WoodsMap
     def columns
       Array(@metadata['columns'].presence || @table_metadata['columns']).map do |c|
         Column.new(name: c['name'], type: c['type'] || c['sql_type'], null: c['null'] == false ? 'no' : 'yes',
-                   default: default_text(c),
+                   default: ColumnDefault.text(c),
                    index: index_for(c['name']), written_by: writers[c['name'].to_s])
       end
     end
@@ -126,14 +127,6 @@ module WoodsMap
 
     private
 
-    # A published value as published; presence alone is never a value.
-    def default_text(column)
-      return column['default'].nil? ? nil : (column['default'].to_s.presence || '""') if column.key?('default')
-      return PRESENCE_ONLY if column['has_default']
-
-      column['has_default'] == false ? 'none' : nil
-    end
-
     # The far table of an association: the target model's published table,
     # else Rails' default for the name (`ActiveStorage::Attachment` reads
     # `active_storage_attachments`, not `active_storage/attachments`).
@@ -166,13 +159,18 @@ module WoodsMap
 
     def enforcement(assoc, key)
       return 'via join' if assoc['through']
-      return 'none' if key.nil? || assoc['polymorphic']
+      return 'none' if assoc['polymorphic'] || (key.nil? && owning?(assoc))
+      return @incoming.state(target_table(assoc), key) unless owning?(assoc)
 
-      if assoc['type'].to_s == 'belongs_to'
-        foreign_keys.find { |fkey| fkey['column'].to_s == key.to_s } ? '✓ enforced' : 'none'
-      else
-        '—'
-      end
+      foreign_keys.find { |fkey| fkey['column'].to_s == key.to_s } ? '✓ enforced' : 'none'
+    end
+
+    def owning?(assoc)
+      assoc['type'].to_s == 'belongs_to'
+    end
+
+    def incoming_associations
+      Array(@metadata['associations']).reject { |a| a['through'] || a['polymorphic'] || owning?(a) }
     end
 
     def foreign_keys
