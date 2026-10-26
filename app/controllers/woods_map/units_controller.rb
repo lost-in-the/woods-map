@@ -38,7 +38,9 @@ module WoodsMap
         @heat = @repository.git_commits && WoodsMap::PathHeat.new(@repository.git_commits)
         @concern_paths = WoodsMap::UnitPaths.concern_files(@repository, @unit)
         @outline = WoodsMap::Outline.new(@unit, lifecycle: @lifecycle, concern_methods: concern_methods(@unit),
-                                                method_href: method_href(@unit), callers: @callers)
+                                                callers: @callers,
+                                                links: { method: method_href(@unit),
+                                                         definition: definition_href(@unit) })
         @cards = WoodsMap::HoverCard.for(@repository, @code.linked_targets)
         render :show
       end

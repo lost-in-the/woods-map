@@ -29,6 +29,18 @@ module WoodsMap
       end
     end
 
+    # @param unit [Hash]
+    # @return [Proc] published file and file line => URL, or nil when the file has no typed owner
+    def definition_href(unit)
+      lambda do |file, line|
+        next unless file.is_a?(String) && line.is_a?(Integer)
+        next "#L#{line}" if file == unit['file_path']
+
+        owner = @repository.file_owner(file)
+        woods_map.unit_path(type: owner['type'], identifier: owner['identifier'], anchor: "L#{line}") if owner
+      end
+    end
+
     def own_method_href(unit, entry)
       line = entry['line'].is_a?(Integer) && WoodsMap::References.file_line(unit, entry['line'])
       "#L#{line}" if line

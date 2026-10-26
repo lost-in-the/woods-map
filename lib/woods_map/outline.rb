@@ -11,15 +11,16 @@ module WoodsMap
     # @param unit [Hash]
     # @param lifecycle [WoodsMap::Lifecycle, nil]
     # @param concern_methods [Hash{String => Array<String>}]
-    # @param method_href [#call, nil] method table entry => URL of its line, or nil
     # @param callers [Hash{String, nil => Array}] calls into the unit by method name
-    def initialize(unit, lifecycle: nil, concern_methods: {}, method_href: nil, callers: {})
+    # @param links [Hash{Symbol => #call}] resolvers for the links an item can carry; each answers nil for no link:
+    #   :method (method table entry => URL of its line), :definition (published file and file line => URL)
+    def initialize(unit, lifecycle: nil, concern_methods: {}, callers: {}, links: {})
       @unit = unit
       @metadata = unit['metadata'] || {}
       @lifecycle = lifecycle
       @concern_methods = concern_methods
-      @method_href = method_href
       @callers = callers
+      @links = links
     end
 
     # @return [Array<Group>]
@@ -103,7 +104,7 @@ module WoodsMap
       own = [(entry['visibility'] if entry['visibility'] && entry['visibility'] != 'public'),
              (entry['kind'] if entry['kind'] == 'module_function'),
              ("#{calls} #{calls == 1 ? 'caller' : 'callers'}" if calls&.positive?)].compact.join(', ').presence
-      Item.new(key: '·', text: name, own: own, href: @method_href&.call(entry))
+      Item.new(key: '·', text: name, own: own, href: link(:method, entry))
     end
 
     def scopes_group
@@ -115,39 +116,12 @@ module WoodsMap
       end)
     end
 
+    def link(kind, *arguments)
+      @links[kind]&.call(*arguments)
+    end
+
     def controller_groups
-      [actions_group, filters_group].compact
-    end
-
-    def actions_group
-      actions = Array(@metadata['actions']).map(&:to_s)
-      return nil if actions.empty?
-
-      Group.new(label: 'actions', count: actions.size,
-                items: actions.map { |a| Item.new(key: '·', text: a, own: route_label(a)) })
-    end
-
-    def filters_group
-      filters = Array(@metadata['filters']).reject { |f| f['filter'].to_s.match?(Lifecycle::INTERNAL) }
-      return nil if filters.empty?
-
-      items = filters.map { |f| Item.new(key: '·', text: "#{f['kind']} #{f['filter']}", own: filter_scope(f)) }
-      Group.new(label: 'filters', count: filters.size, items: items)
-    end
-
-    def route_label(action)
-      routes = Array(@metadata.dig('routes', action))
-      routes.map { |r| "#{r['verb']} #{r['path']}" }.first(2).join(', ')
-    end
-
-    def filter_scope(filter)
-      only = Array(filter['only']).presence
-      except = Array(filter['except']).presence
-      if only
-        "only #{only.join(', ')}"
-      else
-        (except ? "except #{except.join(', ')}" : nil)
-      end
+      ControllerOutline.new(@metadata, definition_href: @links[:definition]).groups
     end
 
     def job_groups
