@@ -344,6 +344,7 @@ html.js .wm .guide .guide-nojs{display:none}
 .wm .pick-units .f{min-width:0}
 .wm .pick-units .f .pick-name{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
 .wm .pick-units .f .mut,.wm .pick-units .f .cnt{flex:none;white-space:nowrap}
+.wm .det .more-files > summary{cursor:pointer;color:var(--link);font-size:var(--fs-12)}
 /* The detail toggle keeps its 14px glyph and answers a click anywhere in a 24px square; the coarse-pointer size is already 44px. */
 .wm .tgl::after{content:"";position:absolute;inset:-5px}
 @media (pointer:coarse){ .wm .tgl::after{inset:0} }

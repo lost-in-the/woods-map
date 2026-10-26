@@ -27,6 +27,8 @@ module WoodsMap
                      unreadable: 'the commit table could not be read',
                      unsupported: 'this Woods has no commit table reader' }.freeze
     SHOWN = 10
+    # Files a commit touches, from which it is labelled broad.
+    BROAD_COMMIT_FILES = 12
     ALL_LIMIT = 500
     CO_CHANGES_SHOWN = 8
 
@@ -118,6 +120,14 @@ module WoodsMap
     def commits
       list = table? ? narrow(window_commits) : window_commits
       @all || @week || @gen || @span ? list.first(ALL_LIMIT) : list.first(SHOWN)
+    end
+
+    # The shortest range that still holds every commit of the window, when it is
+    # shorter than the window shown.
+    #
+    # @return [String, nil] a key of {RANGES}
+    def zoom_range
+      HistoryZoom.range(RANGES, @days, window_commits.map(&:date), @now) if table?
     end
 
     # @return [Integer] commits in the window, or the unit's commit count without a table
