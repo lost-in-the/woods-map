@@ -12,6 +12,9 @@ module WoodsMap
     # the text, rather than drawing a diagram nobody can read.
     TABLE_BUDGET = 40
 
+    # What a column's default cell says when the index publishes only that a default exists.
+    PRESENCE_ONLY = 'exists, value not published'
+
     # The Schema tab of a unit in one generation, its far tables read from the graph.
     #
     # @param repository [Repository]
@@ -62,11 +65,7 @@ module WoodsMap
     def columns
       Array(@metadata['columns'].presence || @table_metadata['columns']).map do |c|
         Column.new(name: c['name'], type: c['type'] || c['sql_type'], null: c['null'] == false ? 'no' : 'yes',
-                   default: if c.key?('default')
-                              c['default']
-                            else
-                              (c['has_default'] ? 'yes' : nil)
-                            end,
+                   default: default_text(c),
                    index: index_for(c['name']), written_by: writers[c['name'].to_s])
       end
     end
@@ -126,6 +125,14 @@ module WoodsMap
     end
 
     private
+
+    # A published value as published; presence alone is never a value.
+    def default_text(column)
+      return column['default'].nil? ? nil : (column['default'].to_s.presence || '""') if column.key?('default')
+      return PRESENCE_ONLY if column['has_default']
+
+      column['has_default'] == false ? 'none' : nil
+    end
 
     # The far table of an association: the target model's published table,
     # else Rails' default for the name (`ActiveStorage::Attachment` reads

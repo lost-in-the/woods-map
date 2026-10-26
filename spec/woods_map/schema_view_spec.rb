@@ -46,4 +46,25 @@ RSpec.describe WoodsMap::SchemaView do
     expect(described_class.new(unit).table_count).to eq(WoodsMap::SchemaView::TABLE_BUDGET + 1)
     expect(described_class.new(unit)).to be_over_budget
   end
+
+  describe 'column defaults' do
+    def defaults_of(columns)
+      view = described_class.new({ 'identifier' => 'T', 'type' => 'model', 'metadata' => { 'columns' => columns } })
+      view.columns.to_h { |c| [c.name, c.default] }
+    end
+
+    it 'says a default exists and its value is not published when only presence is published' do
+      result = defaults_of([{ 'name' => 'state', 'has_default' => true, 'default_digest' => 'abc123' }])
+      expect(result['state']).to eq('exists, value not published')
+    end
+
+    it 'never reads a presence flag as a value, and keeps a published value as published' do
+      result = defaults_of([{ 'name' => 'a', 'default' => false, 'has_default' => true },
+                            { 'name' => 'b', 'default' => '0' },
+                            { 'name' => 'c', 'default' => '' },
+                            { 'name' => 'd', 'has_default' => false },
+                            { 'name' => 'e' }])
+      expect(result).to eq('a' => 'false', 'b' => '0', 'c' => '""', 'd' => 'none', 'e' => nil)
+    end
+  end
 end
