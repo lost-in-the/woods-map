@@ -87,6 +87,15 @@ The Share menu offers the board's focus URL and its Mermaid, nothing else:
 
 These follow [mermaid-text-urls.md](mermaid-text-urls.md): the same answers, budgets as 422, and a bearer header or cookie, never a token in the URL. D-25 replaces C-4's Markdown export: there is no Markdown or JSON report. Unit links stay in the focus URL's page, not in the text.
 
+## Handoff summary (woods-map#132, D-25 as amended)
+
+A recipient of a scope-only link loses the sender's reasoning, and free text in a URL invites injected content and length limits. So the Pinboard section ends with a conclusion field, an open question field and a *Copy handoff summary* button (all needing JavaScript).
+
+- **Built in the browser.** The `pinboard` controller joins the conclusion, each pin's note and the open question into Markdown. An empty conclusion or question is left out.
+- **Cited units.** Each pin is a link to its unit page at the absolute, token-free address (`config.public_url` when set). A pin the generation lacks stays text. The first line names the generation and the board's `focus_url`.
+- **Clipboard only.** A click is the consent. Nothing is stored beyond the notes already kept in this browser, nothing is fetched and no text enters a URL.
+- **Share panel.** It says before copying that the link carries the page and its query and not the notes, conclusion or questions, and that a generation or hop count in it is applied again on opening.
+
 ## Limits named on the page
 
 - Notes are per browser, and boards are not saved on the server (above).

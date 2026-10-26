@@ -28,7 +28,7 @@
 <% end %>
 <% if banners.any? %><div class="frame-facts"><%= safe_join(banners) %></div><% end %>
 <% missing_pins = board.pins.reject { |pin| @pinned.identities.include?(pin.identity) } %>
-<div class="body" data-controller="trail pinboard" data-trail-url-value="<%= trail_url %>" data-trail-title-value="Trail <%= title %>" data-pinboard-key-value="<%= board.key %>">
+<div class="body" data-controller="trail pinboard" data-trail-url-value="<%= trail_url %>" data-trail-title-value="Trail <%= title %>" data-pinboard-key-value="<%= board.key %>" data-pinboard-title-value="<%= title %>" data-pinboard-url-value="<%= focus_url %>" data-pinboard-generation-value="<%= gen %>" data-pinboard-units-value="<%= board.pins.map { |pin| { pin: pin.to_param, label: pin.identifier, type: pin.type, url: (@pinned.identities.include?(pin.identity) ? public_url_for(woods_map.unit_path(type: pin.type, identifier: pin.identifier)) : nil) } }.to_json %>">
   <%= render 'woods_map/components/rail', label: 'Board', heading: 'On this board', groups: [
         { label: 'pins', count: board.pins.size, items: board.pins.map { |pin| { key: (@flags.for(pin.identity).any? ? WoodsMap::Glyphs[:flag] : '·'), text: unit_link(pin.identifier, pin.type), own: pin.type.tr('_', ' ') } } },
         { label: 'sections', count: 7, items: [['flags', 'trail-flags'], ['lanes', 'trail-lanes'], ['steps', 'trail-steps'], ['pinboard', 'trail-pins'], ['graph of pinned', 'trail-graph'], ['ERD of pinned', 'trail-erd'], ['changed together', 'trail-cochange']].map { |text, id| { text: text, href: "##{id}" } } }
@@ -90,6 +90,14 @@
                 { cells: [present ? unit_link(pin.identifier, pin.type) : safe_join([pin.identifier, ' ', tag.span("not in gen #{gen}", class: 'dim')]), pin.type.tr('_', ' '), pin_flags.any? ? safe_join(pin_flags.map { |f| safe_join([trail_flag_chip(f), ' ', f.text]) }, tag.br) : empty_value(applicable: false), note, trail_pin_toggle(board, pin.identity)] }
               } %>
         <p class="cap" data-pinboard-target="status" data-needs-js>Notes are kept in this browser for this board only.</p>
+        <div class="trail-handoff" data-needs-js>
+          <label for="trail-conclusion">Conclusion</label>
+          <%= tag.textarea('', id: 'trail-conclusion', class: 'trail-note', rows: 2, data: { pinboard_target: 'note', pin: 'conclusion', action: 'input->pinboard#save' }) %>
+          <label for="trail-question">Open question</label>
+          <%= tag.textarea('', id: 'trail-question', class: 'trail-note', rows: 2, data: { pinboard_target: 'note', pin: 'question', action: 'input->pinboard#save' }) %>
+          <div><button class="tool" type="button" data-action="pinboard#copySummary" data-needs-js>⎘ Copy handoff summary</button></div>
+          <p class="cap" role="status" data-pinboard-target="handoff">Builds a summary from the notes above, the units as focus links and gen <%= gen %>. It goes to the clipboard only: nothing is stored or put in a URL.</p>
+        </div>
       <% else %>
         <p class="cap">Nothing pinned. Pin steps above, or a unit by <code>type:identifier</code>.</p>
       <% end %>

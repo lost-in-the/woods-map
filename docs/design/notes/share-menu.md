@@ -32,6 +32,8 @@ viewport.
 | `⎘ <diagram name>` and `⤓ .mmd` under *Mermaid*, one per distinct diagram export | each `components/mermaid_tools` copy tool (`data-mermaid-name`, `data-mermaid-href`): the Mermaid text the page already carries, unchanged, and the diagram's absolute, token-free `.mmd` URL (D-25) | absent; each panel shows its Mermaid text and its own `.mmd` link instead |
 | `⎘ for PR comment` after each diagram's `.mmd` | the panel's `⎘ copy for PR comment` (`data-pr-comment`): the text in a ```` ```mermaid ```` fence and one line linking this view, its generation and its `.mmd` URL (woods-map#76, [pr-comment-share.md](pr-comment-share.md)). A comment over GitHub's 65,536 characters is listed by name with the reason (`data-pr-comment-refusal`), never offered | absent; the panel's `.mmd` URL with `.md` for `.mmd` is the same text |
 
+**What the panel says.** Under the URL it states what the link carries (this page and its query: the entry and pins) and what it does not (notes, a conclusion or questions). It says a generation or hop count in the address is applied again on opening, not a frozen copy. A reasoned handoff is the Trail's *Copy handoff summary* ([trail.md](trail.md)), copied to the clipboard and never put in a URL.
+
 **What the menu does not do:**
 
 - It never renders, parses, derives or hands through a Markdown or JSON report (D-25), and the boards' *Markdown for PR* button is dropped. The PR comment is a diagram, not a report: the Mermaid in a fence and one line of links, nothing derived (D-25 as amended).

@@ -34,4 +34,12 @@ RSpec.describe 'The Share menu', type: :request do
     expect(menu.at_css('[data-share-target="diagrams"]')['hidden']).not_to be_nil
     expect(doc.css('.dia [data-diagram-target="source"]').size).to be_positive
   end
+
+  it 'says what the link carries and what it does not, without freezing a generation or hop count' do
+    get '/woods/units/model/User/schema'
+    note = menu.at_css('.sh-carries')
+    expect(note.text).to include('carries this page and its query', 'entry and pins')
+    expect(note.text).to include('does not carry notes, a conclusion or questions')
+    expect(note.text).to include('not a frozen copy')
+  end
 end

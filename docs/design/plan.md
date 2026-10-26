@@ -143,6 +143,7 @@ Run this before a milestone issue is opened and again before it closes.
 | History: filter the timeline by a commit's author on the History tab, `/woods/history` and the graph's timeline (scenario 2 step 4), closed by [woods-map#97](https://github.com/lost-in-the/woods-map/pull/97) | [woods-map#92](https://github.com/lost-in-the/woods-map/issues/92) |
 | Schema tab shows the published foreign-key `on_delete`/`on_update` beside the Rails `dependent:` finding (nil is none declared, a missing key is not reported; woods#850) | [woods-map#134](https://github.com/lost-in-the/woods-map/issues/134) |
 | D-30 amended: the Graph tab never shows an unnamed overview; readable first view centred on the focus, minimum zoom clamped to it, zoom buttons and `+`/`-` keys | [woods-map#133](https://github.com/lost-in-the/woods-map/issues/133), [note](notes/graph-page.md) |
+| D-25 amended narrowly: the Share panel states what travels, and the Trail copies a handoff summary (Markdown built in the browser from local notes, clipboard only, no free text in a URL) | [woods-map#132](https://github.com/lost-in-the/woods-map/issues/132), [note](notes/trail.md) |
 | D-10 Source of truth for visual tokens | [woods-map#12](https://github.com/lost-in-the/woods-map/issues/12) |
 | D-11 Colour meaning | [woods-map#13](https://github.com/lost-in-the/woods-map/issues/13) |
 | D-12 Typefaces | [woods-map#14](https://github.com/lost-in-the/woods-map/issues/14) |

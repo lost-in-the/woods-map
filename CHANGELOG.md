@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- The Share menu says what travels, and the Trail can hand off its reasoning.
+  - **Share:** the panel states that the link carries the page and its query (entry and pins), not notes, a conclusion or questions, and that a generation or hop count in it is applied again on opening.
+  - **Trail:** a conclusion field, an open question field and *Copy handoff summary*. The Markdown is built in the browser from the reader's own notes, with the cited units as token-free focus links and the generation, and goes to the clipboard only. No free text is stored, sent or put in a URL.
 - The Graph tab never shows unnamed boxes.
   - **First view:** centred on the focus unit at a zoom where names render. The minimum zoom is that readable zoom, so the reader pans to the rest of the neighbourhood.
   - **Controls:** zoom in and zoom out buttons and the `+` and `-` keys, plus a link to the typed relationship list. The butterfly layout, bounded traversal and cached positions are unchanged.
