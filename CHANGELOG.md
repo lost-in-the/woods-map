@@ -3,7 +3,6 @@
 ## [Unreleased]
 
 - The Code tab gives source the room it needs and says where it came from. A unit with no notes drops the empty notes lane, a wrapped view narrows the lane to 240px below 960px so the source keeps its width, and the narrow-screen gutters stay aligned when the lane is dropped. The as-written caption now says the source is what extraction read from the working tree, not necessarily a commit.
-||||||| 37f0fc3
 - The reading trail keeps each page's full address, path and query, so returning through it restores the investigation (entry, pins, hops, generation, lens, range) instead of the bare page. The address never includes a `token`. Entries stored as a bare path by an earlier version still draw.
 - The Schema tab and the ERD say what the evidence means.
   - **Defaults:** a column whose index publishes only that a default exists says "exists, value not published" instead of "yes". A published value is shown as published, and an empty string, `false` and no default read differently.
