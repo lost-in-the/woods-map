@@ -4,11 +4,11 @@
     Callers::Call), page (UnitPage). %>
 <% calls = callers.values.flatten %>
 <section class="sec" aria-labelledby="callers-h">
-  <header><h2 class="t2" id="callers-h">Callers <%= count_tag(calls.empty? ? 'none published' : "#{calls.size} #{'call'.pluralize(calls.size)} from #{calls.map(&:caller).uniq.size} #{'unit'.pluralize(calls.map(&:caller).uniq.size)}") %><%= info_tip('Published reference spans that name this unit, with the method each one calls when the source names one. Dynamic dispatch, receiverless calls and ambiguous names publish no caller here, so an empty list does not prove the code is unused.') %></h2></header>
+  <header><h2 class="t2" id="callers-h">Callers <%= count_tag(calls.empty? ? 'none published' : "#{calls.size} #{'reference'.pluralize(calls.size)} from #{calls.map(&:caller).uniq.size} #{'unit'.pluralize(calls.map(&:caller).uniq.size)}") %><%= info_tip('Published reference spans that name this unit, with the method each one names when the source names one. A reference with no method is a reference to the class itself, which may be an include; the index publishes no span kind that says so. Dynamic dispatch, receiverless calls and ambiguous names publish no caller here, so an empty list does not prove the code is unused.') %></h2></header>
   <% if calls.empty? %>
     <p class="cap">No published reference names <%= page.identifier %> in this generation.</p>
   <% else %>
     <%= render 'woods_map/components/table', label: "Callers of #{page.identifier}", min_width: '640px', columns: [{ label: 'method', width: '200px', cell_class: 'nw id' }, { label: 'caller' }, { label: 'line', width: '80px' }, { label: 'evidence', width: '170px' }],
-          rows: callers.sort_by { |method, _| method.to_s }.flat_map { |method, list| list.map { |call| { cells: [method ? ".#{method}" : tag.span('the class itself', class: 'dim'), link_to(call.caller, woods_map.unit_path(type: call.caller_type, identifier: call.caller, anchor: (call.line ? "L#{call.line}" : nil))), call.line || empty_value(applicable: false), layer_chip(call.confidence == 'static' ? 'static span' : 'verified span')] } } } %>
+          rows: callers.sort_by { |method, _| method.to_s }.flat_map { |method, list| list.map { |call| { cells: [method ? ".#{method}" : tag.span('class reference', class: 'dim'), link_to(call.caller, woods_map.unit_path(type: call.caller_type, identifier: call.caller, anchor: (call.line ? "L#{call.line}" : nil))), call.line || empty_value(applicable: false), layer_chip(call.confidence == 'static' ? 'static span' : 'verified span')] } } } %>
   <% end %>
 </section>

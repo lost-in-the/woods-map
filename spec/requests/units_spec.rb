@@ -164,7 +164,7 @@ RSpec.describe 'Unit pages', type: :request do
     expect(response.body).to include(title).and include('Filter matrix')
     expect(response.body).to include('href="/woods/units/controller/UsersController#L2">logged_in_user</a>')
     expect(response.body).to include('<th class="c cur" width="66">edit</th>')
-    expect(response.body).to include('Callback ladder, <a href="/woods/units/model/User">User</a>')
+    expect(response.body).to include('Related lifecycle, <a href="/woods/units/model/User">User</a>')
   end
 
   it 'renders the passage of a mailer action from its templates' do

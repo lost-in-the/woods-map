@@ -66,10 +66,12 @@ module WoodsMap
     def columns
       Array(@metadata['columns'].presence || @table_metadata['columns']).map do |c|
         Column.new(name: c['name'], type: c['type'] || c['sql_type'], null: c['null'] == false ? 'no' : 'yes',
-                   default: ColumnDefault.text(c),
-                   index: index_for(c['name']), written_by: writers[c['name'].to_s])
+                   default: ColumnDefault.text(c), index: index_for(c['name']), written_by: writers[c['name'].to_s])
       end
     end
+
+    # @return [Boolean] whether the unit publishes its callbacks, so an empty writer list is a finding
+    def callbacks_published? = @metadata['callbacks'].is_a?(Array)
 
     # @return [Array<Hash>] the indexes of the table
     def indexes

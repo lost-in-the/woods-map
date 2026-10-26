@@ -20,6 +20,26 @@ RSpec.describe 'C4 dynamic views', type: :request do
       get '/woods/units/controller/UsersController/passage.mmd?action_name=create&view=dynamic&event=create'
       expect(response.body).to start_with('flowchart LR').and include('action -->|"save User"|')
     end
+
+    it 'draws no save for an action whose name implies no model event, on the page or in the .mmd' do
+      get '/woods/units/controller/UsersController/passage?action_name=edit'
+      document = html_response_document
+      c4 = document.at_css('[data-controller~=diagram] pre').text
+      expect(c4).to include('subgraph web').and not_include('save User').and not_include('INSERT')
+      expect(response.body).to include('implies no model save')
+      get '/woods/units/controller/UsersController/passage.mmd?action_name=edit&view=dynamic'
+      expect(response.body).to start_with('flowchart LR').and not_include('save User').and not_include('INSERT')
+      get '/woods/units/controller/UsersController/passage.mmd?action_name=edit&view=dynamic&event=create'
+      expect(response.body).not_to include('save User')
+    end
+
+    it 'labels the ladder of an action with no implied event as a related lifecycle, not a step of the action' do
+      get '/woods/units/controller/UsersController/passage?action_name=edit'
+      expect(response.body).to include('Related lifecycle, <a href="/woods/units/model/User">User</a>')
+      expect(response.body).to include('not a step of edit')
+      get '/woods/units/controller/UsersController/passage?action_name=create'
+      expect(response.body).not_to include('Related lifecycle')
+    end
   end
 
   it 'keeps the dynamic view out of an index without containers, naming W-9 as the limit' do
