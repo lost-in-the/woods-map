@@ -30,7 +30,7 @@
           <% src = @diff.source %>
           <% if src.state == :available && src.hunks.any? %>
             <% counts = src.changes %>
-            <%= render 'woods_map/components/diff', name: @page.path || @page.identifier, hunks: src.hunks, coverage: counts['coverage'],
+            <%= render 'woods_map/components/diff', name: @page.path || @page.identifier, hunks: src.hunks, coverage: counts['coverage'], compare: "gen #{@diff.from} → gen #{@diff.to}",
                        eyebrow: "diff, #{@page.identifier}, #{counts['added_lines']} #{counts['added_lines'] == 1 ? 'line' : 'lines'} added, #{counts['removed_lines']} removed" %>
           <% elsif src.state == :available %>
             <%= render 'woods_map/components/diff', name: @page.identifier, hunks: [], coverage: src.changes['coverage'], eyebrow: "diff, #{@page.identifier}: the annotated source did not change" %>

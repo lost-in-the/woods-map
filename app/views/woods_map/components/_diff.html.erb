@@ -4,13 +4,14 @@
     Woods' (Woods::Impact::UnitDiff); the view only lays them out. Locals:
     name (String, the file or unit), hunks (Array of Hash with 'before',
     'after' and 'lines' of {'op', 'before', 'after', 'text'}), eyebrow
-    (String), coverage (String or nil: complete, truncated, too_large). %>
+    (String), coverage (String or nil: complete, truncated, too_large),
+    compare (String or nil: the "gen A → gen B" pair, kept in each sticky hunk header). %>
 <div class="diff-block">
   <div class="eyebrow"><%= eyebrow %></div>
   <% if hunks.any? %>
     <div class="difft" role="table" tabindex="0" aria-label="<%= "Diff of #{name}" %>">
       <% hunks.each do |hunk| %>
-        <div class="dl hunk" role="row"><span role="cell"></span><span role="cell"></span><span role="cell"></span><span role="cell"><%= "@@ -#{hunk['before'].join(',')} +#{hunk['after'].join(',')} @@ #{name}" %></span></div>
+        <div class="dl hunk" role="row"><span role="cell"></span><span role="cell"></span><span role="cell"></span><span role="cell"><%= "@@ -#{hunk['before'].join(',')} +#{hunk['after'].join(',')} @@ #{name}#{" (#{local_assigns[:compare]})" if local_assigns[:compare]}" %></span></div>
         <% Array(hunk['lines']).each do |line| %>
           <% kind = { '+' => 'add', '-' => 'del' }[line['op']] %>
           <div class="dl<%= " #{kind}" if kind %>" role="row"><span role="cell"><%= line['before'] %></span><span role="cell"><%= line['after'] %></span><span role="cell"><%= { '+' => '+', '-' => '−' }[line['op']] %><% if kind %><span class="sr-only"><%= kind == 'add' ? ' added' : ' removed' %></span><% end %></span><span role="cell"><%= line['text'] %></span></div>

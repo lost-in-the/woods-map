@@ -11,12 +11,14 @@
                :data (Hash of data attributes for the row, or nil)
       grouped: Boolean (the 34px toggle column), sticky: Boolean, cards: Boolean,
       min_width: one of TABLE_MIN_WIDTHS in px, below which the wrap scrolls past the cliff,
-      caption: HTML or nil, label: accessible name %>
+      caption: HTML or nil, label: accessible name,
+      compare: the "gen A → gen B" pair of a range report, kept in the sticky header (the page's by default) %>
 <% grouped = local_assigns.fetch(:grouped) { rows.any? { |row| row[:detail] || row[:checkbox] } } %>
+<% compare = local_assigns.fetch(:compare) { table_compare } %>
 <% classes = ['tbl', 'fixed', ('grouped' if grouped), ('sticky' if local_assigns[:sticky]), ('cards' if local_assigns[:cards]), table_min_width_class(local_assigns[:min_width])].compact.join(' ') %>
 <div class="tblwrap" role="region" aria-label="<%= local_assigns[:label] || 'Table' %>" tabindex="0" data-controller="cliff">
   <table class="<%= classes %>"<%= " aria-label=\"#{ERB::Util.html_escape(label)}\"".html_safe if local_assigns[:label] %>>
-    <thead><tr><% if grouped %><th class="tg"><span class="sr-only"><%= [('select' if rows.any? { |row| row[:checkbox] }), ('details' if rows.any? { |row| row[:detail] })].compact.join(', ') %></span></th><% end %><% columns.each do |column| %><th<%= " width=\"#{table_column_width(column[:width])}\"".html_safe if column[:width] %><%= " class=\"#{column[:class]}\"".html_safe if column[:class] %>><% if column[:abbr] %><abbr title="<%= column[:abbr] %>"><%= column[:label] %></abbr><% else %><%= column[:label] %><% end %></th><% end %></tr></thead>
+    <thead><% if compare %><tr class="cmp"><th colspan="<%= columns.size + (grouped ? 1 : 0) %>"><%= compare %></th></tr><% end %><tr><% if grouped %><th class="tg"><span class="sr-only"><%= [('select' if rows.any? { |row| row[:checkbox] }), ('details' if rows.any? { |row| row[:detail] })].compact.join(', ') %></span></th><% end %><% columns.each do |column| %><th<%= " width=\"#{table_column_width(column[:width])}\"".html_safe if column[:width] %><%= " class=\"#{column[:class]}\"".html_safe if column[:class] %>><% if column[:abbr] %><abbr title="<%= column[:abbr] %>"><%= column[:label] %></abbr><% else %><%= column[:label] %><% end %></th><% end %></tr></thead>
     <tbody>
       <% rows.each_with_index do |row, index| %>
         <% parity = index.odd? ? 'odd' : '' %>

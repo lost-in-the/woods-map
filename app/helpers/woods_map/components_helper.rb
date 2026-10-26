@@ -21,6 +21,14 @@ module WoodsMap
       "min-#{px}"
     end
 
+    # The generation pair a table on a range page keeps in its sticky header.
+    #
+    # @return [String, nil] "gen A → gen B", or nil outside a range report
+    def table_compare
+      report = @range_report
+      "gen #{report.from_generation} → gen #{report.to_generation}" if report
+    end
+
     # A column width as the `width` attribute's presentational hint, which the
     # policy does not govern: `"150px"` becomes `150`, a percentage stays.
     #
