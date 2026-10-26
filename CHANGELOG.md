@@ -8,7 +8,6 @@
   - **Job outline:** `perform(...)` is written as a signature from the published parameter records, with the same label as the facts tile (name, `*`/`**` splat, optional marker, never a default value).
   - **Model outline:** an association links to its target model, with the association kind beside it. This is the declaration's related model, not a resolved call target: the index publishes no resolution for call chains such as `event.deliveries.create!`.
   - **Impact:** a test gap links the unit it names (an identity with no typed unit stays text and says so), and every unit page has an Impact action that opens the blast radius for that unit.
-||||||| fd02f04
 - Pages say what their evidence covers.
   - **Schema:** the rail jumps to Columns and Database facts. The writers column is headed "recorded callback writers", an empty cell says no callback writer is recorded (or that the unit publishes no callbacks), and a note says writes from jobs, services and plain methods are not indexed there.
   - **Unit pages:** a candidate list whose types all come from one file reads "N indexed types" and keeps each link, with the cannot-tell wording kept for candidates at different paths. The job facts row is "enqueued jobs" and says mail deliveries are not counted. An added or removed unit's `?since=` banner no longer says its source lines did not move. The callers panel counts references, and a site with no method is a "class reference".
