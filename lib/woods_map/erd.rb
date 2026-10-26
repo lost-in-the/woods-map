@@ -75,12 +75,17 @@ module WoodsMap
       @models = models.index_by { |m| m['identifier'] }
       @model_tables = @models.transform_values { |m| m.dig('metadata', 'table_name') }.compact
       @tables = tables.filter_map { |unit| table(unit) }.sort_by(&:name).index_by(&:name)
-      @unmodelled = (unmodelled + @tables.values.select(&:model_less).map(&:name)).uniq.sort
+      resolved, @unresolved_unmodelled = resolve_analysis_names(unmodelled)
+      @unmodelled = (resolved + @tables.values.select(&:model_less).map(&:name)).uniq.sort
       @chunks = {}
     end
 
-    # @return [Array<String>] tables no model maps
+    # @return [Array<String>] published tables no model maps, by name
     attr_reader :unmodelled
+
+    # @return [Array<String>] names the graph analysis calls unmodelled that
+    #   no published table answers to; kept out of every physical count
+    attr_reader :unresolved_unmodelled
 
     # @return [Array<Hash>] the model units
     def models
@@ -187,6 +192,14 @@ module WoodsMap
     end
 
     private
+
+    # The analysis names a table typed ("table:x") or bare ("x"). Each name
+    # is resolved to a published table; a name that matches none stays a name.
+    def resolve_analysis_names(names)
+      found = names.map { |raw| [raw, @tables[raw.delete_prefix('table:')]&.name] }
+      unresolved = found.select { |_, name| name.nil? }.map { |raw, _| raw.delete_prefix('table:') }
+      [found.filter_map(&:last), unresolved.uniq.sort]
+    end
 
     def table(unit)
       meta = unit['metadata'] || {}
