@@ -33,6 +33,28 @@ jobs:
       - run: bundle exec rspec spec/woods_map/engine_http_server_spec.rb
         env:
           WOODS_MAP_RUN_HTTP_SERVER: '1'
+  browser:
+    name: Browser specs (Chromium)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+      # The specs pass no sandbox flag and the runner's user namespaces are
+      # restricted, so they get Chrome through a wrapper (see AGENTS.md).
+      - name: Chromium wrapper
+        run: |
+          wrapper="$RUNNER_TEMP/chromium-no-sandbox"
+          printf '#!/bin/sh\nexec google-chrome --no-sandbox "$@"\n' > "$wrapper"
+          chmod +x "$wrapper"
+          echo "WOODS_MAP_BROWSER=$wrapper" >> "$GITHUB_ENV"
+      # Every spec file that gates on WOODS_MAP_BROWSER; the Specs jobs skip
+      # them, so nothing runs twice and a new browser spec is picked up.
+      - run: bundle exec rspec $(grep -rl --include='*_spec.rb' WOODS_MAP_BROWSER spec | sort)
+        env:
+          WOODS_MAP_RENDER_SPEC: '1'
   lint:
     name: RuboCop
     runs-on: ubuntu-latest
