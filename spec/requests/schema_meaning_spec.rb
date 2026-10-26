@@ -45,4 +45,14 @@ RSpec.describe 'What the Schema tab says the evidence means', type: :request do
       expect(er_section.at_css('.dh').text).not_to include('1 tables')
     end
   end
+
+  describe 'reaching the columns and database facts' do
+    it 'names Columns and Database facts in the rail, each linking to its section' do
+      get '/woods/units/model/User/schema'
+      links = html_response_document.css('nav.rail a').to_h { |a| [a.text, a['href']] }
+      expect(links).to include('Columns' => '#colsh', 'Database facts' => '#dbh')
+      expect(html_response_document.at_css('#colsh')).to be_present
+      expect(html_response_document.at_css('#dbh')).to be_present
+    end
+  end
 end

@@ -6,6 +6,7 @@
 <div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>" data-trail-title-value="<%= @page.identifier %>">
   <%= render 'woods_map/components/rail', heading: 'Schema, as the database has it', groups: [
         { label: 'table', count: @schema.table_name, items: [{ key: '·', text: "#{@schema.columns.size} #{'column'.pluralize(@schema.columns.size)}, #{@schema.indexes.size} #{'index'.pluralize(@schema.indexes.size)}" }] },
+        { label: 'jump to', count: 2, items: [{ key: '·', text: 'Columns', href: '#colsh', own: "#{@schema.columns.size} with types and defaults" }, { key: '·', text: 'Database facts', href: '#dbh', own: 'indexes, keys, constraints' }] },
         { label: 'associations', count: assocs.size, items: assocs.each_with_index.map { |a, i| { key: i + 1, text: unit_link(a.target), own: a.macro } } }
       ].reject { |g| g[:items].empty? } %>
   <div class="main">
