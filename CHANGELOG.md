@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- The reading trail keeps each page's full address, path and query, so returning through it restores the investigation (entry, pins, hops, generation, lens, range) instead of the bare page. The address never includes a `token`. Entries stored as a bare path by an earlier version still draw.
 - The Schema tab and the ERD say what the evidence means.
   - **Defaults:** a column whose index publishes only that a default exists says "exists, value not published" instead of "yes". A published value is shown as published, and an empty string, `false` and no default read differently.
   - **ER scope:** the model Schema diagram is labelled "model associations only", counts the distinct tables it draws, and links to the ERD for the database's foreign keys.

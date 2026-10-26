@@ -1,7 +1,7 @@
 <% content_for :title, "#{@landscape.system_name} · Containers · Landscape · Woods Map" %>
 <% l = @landscape %>
 <%= render 'woods_map/landscape/frame', crumb: 'containers' %>
-<div class="body" data-controller="trail">
+<div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>">
   <div class="main landscape">
     <% unless l.attributed? %>
       <%= render 'woods_map/components/banner', severity: :warn, lead: 'No container attribution.', text: safe_join(['This generation was extracted by a Woods that does not publish ', tag.code('metadata.container'), ' (W-9, ', link_to('woods#759', 'https://github.com/lost-in-the/woods/issues/759'), '). Extract again to draw the containers; hotspots and domains still read.']) %>

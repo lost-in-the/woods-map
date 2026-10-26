@@ -31,7 +31,7 @@
 <% graph_label = "Neighbourhood of #{identifier} at depth #{n.depth}, #{n.direction}: units and their edges, each edge labelled with its mechanism. Arrow keys move along the edges, Enter opens a unit's graph; the list below has the same edges." %>
 <% cache_key = [@repository.generation_number, type, identifier, n.depth, n.direction, Array(filters[:types]).sort.join(','), Array(filters[:via]).sort.join(',')].join('|') %>
 <% blast_units = blast ? blast.affected.map { |a| { 'identifier' => a.identifier, 'type' => a.type, 'distance' => a.distance } } : nil %>
-<div class="body<%= ' graph-page' if page %>" data-controller="trail graph" data-trail-title-value="<%= identifier %>"
+<div class="body<%= ' graph-page' if page %>" data-controller="trail graph" data-trail-url-value="<%= trail_url %>" data-trail-title-value="<%= identifier %>"
      data-graph-url-value="<%= woods_map.neighbourhood_path(centre: identifier, type: type, depth: n.depth, direction: n.direction, **filters) %>"
      data-graph-unit-url-value="<%= unit_url %>"
      data-graph-generation-value="<%= @repository.generation_number %>"

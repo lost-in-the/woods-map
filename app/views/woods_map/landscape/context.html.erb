@@ -2,7 +2,7 @@
 <% l = @landscape %>
 <% ctx = @context %>
 <%= render 'woods_map/landscape/frame', crumb: 'context' %>
-<div class="body" data-controller="trail">
+<div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>">
   <div class="main landscape">
     <section class="sec">
       <header>

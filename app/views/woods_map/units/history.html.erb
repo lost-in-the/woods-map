@@ -9,7 +9,7 @@
 <% by_seg = h.table? ? tag.span(class: 'seg', role: 'group', 'aria-label': 'Group commits by') { safe_join(WoodsMap::HistoryView::BY.map { |key| link_to(key, history_tab_url(@page, by: (key == WoodsMap::HistoryView::BY.first ? nil : key), week: nil, gen: nil, span: nil, anchor: 'commits'), 'aria-current': (h.by == key ? 'true' : nil)) }) } : nil %>
 <% diff_link = diff_pair && link_to("Diff gen #{diff_pair.first} → #{diff_pair.last}", history_tab_url(@page, from: diff_pair.first, to: diff_pair.last, anchor: 'diff'), class: 'btn primary') %>
 <%= render 'woods_map/units/frame', page: @page, tab: 'history', definition: (diff_link ? nil : @definition), controls: safe_join([tag.span('range', class: 'mut'), range_seg, (by_seg && tag.span('by', class: 'mut')), by_seg, diff_link].compact, ' ') %>
-<div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
+<div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>" data-trail-title-value="<%= @page.identifier %>">
   <% groups = [] %>
   <% if h.table? && h.generations.any? %>
     <% groups << { label: "generations touching #{@page.identifier}", count: h.generations.size, items: h.generations.map { |g| { key: g.number, text: short_sha(g.head), own: safe_join([(g.extracted_at ? date_abbr(g.extracted_at) : nil), (g.baseline ? 'and earlier' : nil), (@repository.retention.pinned?(g.number) ? 'pinned' : nil)].compact, ', '), current: g.number == @repository.generation_number } } } %>

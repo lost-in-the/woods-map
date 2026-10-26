@@ -7,7 +7,7 @@
 <% range_seg = tag.span(class: 'seg', role: 'group', 'aria-label': 'Range') do %><% WoodsMap::HistoryView::RANGES.each do |key, days| %><%= link_to(key, woods_map.history_path(query.call(range: key)), 'aria-current': (t.days == days ? 'true' : nil)) %><% end %><% end %>
 <%= render 'woods_map/shared/crumbs', crumbs: [['history', woods_map.history_path], [t.empty? ? 'pick units' : "#{t.lanes.size} units", nil]], trail: tag.span('', data: { trail_target: 'list' }) %>
 <%= render 'woods_map/shared/ident', title: 'History', subtitle: "commits across units, HEAD-reachable, gen #{@repository.generation_number}", controls: safe_join([(t.empty? ? nil : safe_join([tag.span('range', class: 'mut'), range_seg], ' ')), render('woods_map/shared/share')].compact, ' ') %>
-<div class="body" data-controller="trail">
+<div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>">
   <div class="main inset">
     <% if !t.table? %>
       <%= render 'woods_map/components/empty_state', title: "Generation #{@repository.generation_number} has no commit table", text: 'Woods writes git_commits.json when the extraction can read the application\'s git history (W-3). This index was extracted without it: a container with no .git, a shallow clone, or a Woods version before the table. Each unit\'s History tab still shows its five latest commits.' %>
