@@ -8,7 +8,8 @@
       rows:    Array of Hash with :cells (Array of HTML), :detail (HTML or nil),
                :checkbox (String label or nil), :classes (String or nil), :id (the
                row's anchor), :current (true for the row a focus URL selects),
-               :data (Hash of data attributes for the row, or nil)
+               :data (Hash of data attributes for the row, or nil), :tip (the full identity: name, type,
+               mechanism; the first cell of an `id` column carries it for hover and focus)
       grouped: Boolean (the 34px toggle column), sticky: Boolean, cards: Boolean,
       min_width: one of TABLE_MIN_WIDTHS in px, below which the wrap scrolls past the cliff,
       caption: HTML or nil, label: accessible name,
@@ -30,9 +31,12 @@
               <% if row[:detail] %><button class="tgl" type="button" aria-expanded="<%= open ? 'true' : 'false' %>" aria-label="<%= open ? 'Collapse' : 'Expand' %> details" data-action="rows#toggle">+</button><% end %>
             </div></td>
           <% end %>
+          <% tip = row[:tip] %>
           <% row[:cells].each_with_index do |cell, cell_index| %>
             <% column = columns[cell_index] || {} %>
-            <td<%= " class=\"#{column[:cell_class]}\"".html_safe if column[:cell_class] %> data-h="<%= column[:label] %>"><%= cell %></td>
+            <% cell_tip = nil %>
+            <% cell_tip, tip = tip, nil if tip && column[:cell_class].to_s.split.include?('id') %>
+            <td<%= " class=\"#{column[:cell_class]}\"".html_safe if column[:cell_class] %><%= " title=\"#{ERB::Util.html_escape(cell_tip)}\"".html_safe if cell_tip %> data-h="<%= column[:label] %>"><%= cell %></td>
           <% end %>
         </tr>
         <% if row[:detail] %>

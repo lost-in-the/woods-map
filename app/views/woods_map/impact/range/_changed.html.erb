@@ -29,7 +29,7 @@
            tag.dt('diff'), tag.dd(changed_diff(c, rr, range_url)),
            tag.dt("reaches #{reached.size}"), tag.dd(reached.any? ? safe_join(reached.first(12).map { |a| safe_join([impact_identity(a, rr), ' ', tag.span("#{a['distance']} #{'hop'.pluralize(a['distance'].to_i)}", class: 'mut')]) }, ', ') : 'no witness path recorded', class: 'p')
          ]), class: 'det') %>
-      <% { id: "changed-#{offset + i + 1}", current: rr.focused?(c), open: rr.focused?(c), classes: (rr.focused?(c) ? 'focus' : nil), detail: detail,
+      <% { tip: identity_tip(c['identifier'], c['type']), id: "changed-#{offset + i + 1}", current: rr.focused?(c), open: rr.focused?(c), classes: (rr.focused?(c) ? 'focus' : nil), detail: detail,
            cells: [impact_identity(c, rr, generation: rr.generation_of_change(c), since: rr.from_generation), c['type'].to_s.tr('_', ' '), c['status'].to_s, Array(c['facets']).join(', ').presence || empty_value, Array(c['categories']).join(', ').presence || empty_value, lines.call(c), "gen #{rr.generation_of_change(c)}"] } %>
     <% end %>
     <%= render 'woods_map/components/table', label: 'Changed units', min_width: '860px', grouped: true,
@@ -46,7 +46,7 @@
     <% affected_page = impact_page(rr.affected, :apage, WoodsMap::RangeReport::PAGE['affected']) %>
     <% rows = affected_page.records.map do |a| %>
       <% detail = tag.dl(safe_join(Array(a['paths']).first(3).flat_map { |path| [tag.dt("from #{path.dig('root', 'identifier')}"), tag.dd(impact_path(path), class: 'p')] }), class: 'det') %>
-      <% { detail: (Array(a['paths']).any? ? detail : nil), cells: [impact_identity(a, rr), a['type'].to_s.tr('_', ' '), a['distance'] == 1 ? 'direct' : "#{a['distance']} hops", impact_weight(a['weight']), impact_context(a)] } %>
+      <% { tip: identity_tip(a['identifier'], a['type'], record_mechanisms(a)), detail: (Array(a['paths']).any? ? detail : nil), cells: [impact_identity(a, rr), a['type'].to_s.tr('_', ' '), a['distance'] == 1 ? 'direct' : "#{a['distance']} hops", impact_weight(a['weight']), impact_context(a)] } %>
     <% end %>
     <%= render 'woods_map/components/table', label: 'Affected units', min_width: '760px', grouped: true,
                columns: [{ label: 'unit', cell_class: 'id' }, { label: 'type', width: '130px', cell_class: 'nw mut' }, { label: 'distance', width: '100px', cell_class: 'nw' }, { label: 'weight', width: '100px', cell_class: 'num' }, { label: 'endpoint', width: '120px', cell_class: 'nw' }],

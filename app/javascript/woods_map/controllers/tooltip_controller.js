@@ -8,8 +8,9 @@ import { Controller } from "@hotwired/stimulus"
 // Lives on the .wm root. Triggers are abbr, .info and .who elements with a
 // title (moved to data-tip so the native tooltip stays quiet) and anything
 // with data-tip; data-tip-html carries server-rendered markup with links, and
-// data-tip-delay overrides the hover delay (hover cards open at 100 ms, B-3).
-const TRIGGERS = "abbr[title], .info[title], .who[title], .mg[title], .bar-fresh .why[title]"
+// data-tip-delay overrides the hover delay (hover cards open at 100 ms, B-3). An identity cell of a
+// table (td.id) carries the full name, type and mechanism and opens only while its text is cut off.
+const TRIGGERS = "abbr[title], .info[title], .who[title], .mg[title], .bar-fresh .why[title], .tbl td.id[title]"
 
 export default class extends Controller {
   static values = { delay: { type: Number, default: 300 } }
@@ -39,7 +40,7 @@ export default class extends Controller {
     this.element.querySelectorAll(TRIGGERS).forEach((el) => {
       el.dataset.tip = el.getAttribute("title")
       el.removeAttribute("title")
-      if (!el.matches("a, button, input, [tabindex]")) el.tabIndex = 0
+      if (!el.matches("a, button, input, [tabindex]") && !el.querySelector("a, button, input, [tabindex]")) el.tabIndex = 0
     })
   }
 
@@ -88,6 +89,7 @@ export default class extends Controller {
     this.cancel()
     this.cancelClose()
     if (this.tip && this.anchor === trigger) return
+    if (trigger.matches("td") && trigger.scrollWidth <= trigger.clientWidth) return
     this.close()
     const tip = document.createElement("div")
     tip.className = "tip"
