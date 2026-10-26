@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+- Long pages keep their reading context.
+  - **Unit pages:** a one-line bar under the tabs names the unit, its file, the generation (and lens) and links back to the top. It sticks while the page scrolls, never narrows the source, and fragment targets scroll clear of it.
+  - **Tables and diffs:** the header row sticks inside its own scroll region, and on an impact range page it carries the from and to generation pair (a diff names it in each hunk header). Below 640 only the unit bar sticks.
+  - **Truncated identities:** the full name, type and mechanism of an impact list's unit show on hover and keyboard focus once the text is cut off.
 - Layout, History and Hotspots reading fixes.
   - **History picker:** a long path or namespace wraps inside its checkbox label, and the type and count keep their own cells.
   - **History:** a commit's detail lists the unit's own files first, then a few others, with a count that opens the rest in place. A commit touching twelve or more files is labelled broad. When every commit shown falls in a shorter range, the tab and the timeline offer "zoom to the last 30d".
