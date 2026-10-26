@@ -9,7 +9,7 @@ module WoodsMap
     Finding = Struct.new(:severity, :text, :where, :evidence, :layer, :rule, keyword_init: true)
     Rule = Struct.new(:name, :severity, :needs, :layer, :result, keyword_init: true)
     TestRow = Struct.new(:spec, :covers, :reaches, :layer, keyword_init: true)
-    Gap = Struct.new(:severity, :text, :why, :layer, keyword_init: true)
+    Gap = Struct.new(:severity, :text, :why, :layer, :identifier, :type, keyword_init: true)
     Unknown = Struct.new(:kind, :where, :why, :resolves, keyword_init: true)
 
     # The rule registry of B8-Impact-Risks: name, severity, what it needs, layer, and what blocks it here.
@@ -98,6 +98,7 @@ module WoodsMap
       ids.select { |id| TESTABLE.include?(@radius.type_of(id)) && coverage_of(id).empty? }.map do |id|
         blocking = findings.any? { |f| f.where == id && f.severity == 'blocking' }
         Gap.new(severity: blocking ? 'blocking' : 'note', text: "#{id} has no mapped test", layer: 'test_mapping',
+                identifier: id, type: @radius.type_of(id),
                 why: blocking ? 'a blocking finding names it; no spec reaches it' : 'no test_coverage edge reaches it')
       end
     end

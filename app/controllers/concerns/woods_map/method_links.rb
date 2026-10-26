@@ -29,6 +29,28 @@ module WoodsMap
       end
     end
 
+    # @param unit [Hash]
+    # @return [Proc] published file and file line => URL, or nil when the file has no typed owner
+    def definition_href(unit)
+      lambda do |file, line|
+        next unless file.is_a?(String) && line.is_a?(Integer)
+        next "#L#{line}" if file == unit['file_path']
+
+        owner = @repository.file_owner(file)
+        woods_map.unit_path(type: owner['type'], identifier: owner['identifier'], anchor: "L#{line}") if owner
+      end
+    end
+
+    # @return [Proc] an association's target class name => the model's URL, or nil when the generation has no such model
+    def association_href
+      lambda do |target|
+        next unless target.is_a?(String) && target.present?
+        next unless @repository.graph_node(target, type: 'model') || @repository.unit(target, type: 'model')
+
+        woods_map.unit_path(type: 'model', identifier: target)
+      end
+    end
+
     def own_method_href(unit, entry)
       line = entry['line'].is_a?(Integer) && WoodsMap::References.file_line(unit, entry['line'])
       "#L#{line}" if line

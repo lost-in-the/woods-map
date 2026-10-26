@@ -16,6 +16,6 @@
   <% else %>
     <%= render 'woods_map/components/table', label: 'Gaps', min_width: '900px',
                columns: [{ label: 'severity', width: '96px', cell_class: 'nw' }, { label: 'gap', width: '320px', cell_class: 'id p' }, { label: 'why it matters', cell_class: 'p' }, { label: 'layer', width: '150px', cell_class: 'nw' }],
-               rows: v.gaps.map { |g| { cells: [tag.span(g.severity, class: "fl#{' note' if g.severity == 'note'}"), g.text, g.why, layer_chip(g.layer)] } } %>
+               rows: v.gaps.map { |g| { cells: [tag.span(g.severity, class: "fl#{' note' if g.severity == 'note'}"), gap_text(g), g.why, layer_chip(g.layer)] } } %>
   <% end %>
 </section>

@@ -44,6 +44,13 @@ module WoodsMap
       @metadata = unit['metadata'] || {}
     end
 
+    # @param parameter [Hash] a published parameter record (name, splat, has_default)
+    # @return [String] its name, a splat prefix and an optional marker, never a default value
+    def self.parameter_label(parameter)
+      prefix = { 'single' => '*', 'double' => '**' }[parameter['splat']]
+      "#{prefix}#{parameter['name']}#{' (optional)' if parameter['has_default']}"
+    end
+
     # @return [Hash, nil] a facts tile, or nil for types with existing generic tiles
     def tile
       title, fields = FIELDS[@type]
@@ -78,10 +85,7 @@ module WoodsMap
       return 'not recorded' unless raw.is_a?(Array) && raw.all? { |v| v.is_a?(Hash) && v['name'].is_a?(String) }
       return 'none recorded' if raw.empty?
 
-      raw.map do |parameter|
-        prefix = { 'single' => '*', 'double' => '**' }[parameter['splat']]
-        "#{prefix}#{parameter['name']}#{' (optional)' if parameter['has_default']}"
-      end.join(', ')
+      raw.map { |parameter| self.class.parameter_label(parameter) }.join(', ')
     end
 
     def template_count(raw)
