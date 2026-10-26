@@ -82,7 +82,7 @@
         <button class="btn" type="submit">Pin</button>
       </form>
       <% if board.pins.any? %>
-        <%= render 'woods_map/components/table', label: 'Pins', min_width: '860px', columns: [{ label: 'unit', width: '30%', cell_class: 'id' }, { label: 'type', width: '120px' }, { label: 'flags', width: '30%' }, { label: 'note' }, { label: 'pin', width: '70px' }],
+        <%= render 'woods_map/components/table', label: 'Pins', min_width: '860px', columns: [{ label: 'unit', width: '22%', cell_class: 'id' }, { label: 'type', width: '120px' }, { label: 'flags', width: '22%' }, { label: 'note' }, { label: 'pin', width: '70px' }],
               rows: board.pins.map { |pin|
                 present = @pinned.identities.include?(pin.identity)
                 pin_flags = @flags.for(pin.identity)

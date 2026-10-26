@@ -111,7 +111,7 @@ RSpec.describe 'Links between unit pages', type: :request do
       hrefs = html_response_document.css('a').pluck('href')
       expect(hrefs).not_to include('/woods/units/view/pages/home', '/woods/units/framework/ActionCable',
                                    '/woods/units/controller/Rails::WelcomeController')
-      expect(response.body).to include('pages/home', 'ActionCable', 'Rails::WelcomeController')
+      expect(html_response_document.text).to include('pages/home', 'ActionCable', 'Rails::WelcomeController')
     end
   end
 end

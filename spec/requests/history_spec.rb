@@ -79,6 +79,26 @@ RSpec.describe 'History', type: :request do
       expect(doc.at_css('#commits').text).to include('2 in 365d')
     end
 
+    it 'lists the unit\'s own file first in a broad commit, labels it and counts the files left folded' do
+      get '/woods/units/job/ApplicationJob/history'
+      broad = doc.css('table[aria-label="Commits"] tbody tr.sub').find { |row| row.text.include?('broad commit') }
+      files = broad.css('dd').find { |dd| dd.text.include?('app/jobs/application_job.rb') }
+      expect(files.children.first.text).to eq('app/jobs/application_job.rb')
+      expect(files.at_css('details summary').text).to eq('8 more files')
+      expect(broad.text).to include('broad commit, 15 files')
+      expect(files.css('details').text).to include('config/routes.rb', 'db/migrate/20220408200125_create_users.rb')
+    end
+
+    it 'offers the shortest range that still holds every commit shown, and no more' do
+      get '/woods/units/job/ApplicationJob/history'
+      expect(doc.css('a').map(&:text)).not_to include('zoom to the last 30d')
+      get '/woods/units/job/ApplicationJob/history', params: { author: 'Sam Okafor-Whitfield' }
+      zoom = doc.css('a').find { |a| a.text == 'zoom to the last 30d' }
+      expect(CGI.unescape(zoom['href'])).to include('range=30d', 'author=Sam Okafor-Whitfield')
+      get '/woods/units/job/ApplicationJob/history', params: { author: 'Sam Okafor-Whitfield', range: '30d' }
+      expect(doc.css('a').map(&:text)).not_to include('zoom to the last 30d')
+    end
+
     it 'serves the timeline and the XY chart as Mermaid text' do
       get '/woods/units/model/Micropost/history.mmd'
       expect(response.media_type).to eq('text/plain')
@@ -213,6 +233,16 @@ RSpec.describe 'History', type: :request do
       plot = doc.at_css('.tl-plot[data-controller="brush"]')
       expect(CGI.unescape(plot['data-brush-url'])).to include('units[]=job:ApplicationJob', 'span=__SPAN__')
       expect(plot.css('a[data-index]').size).to eq(1)
+    end
+
+    it 'offers the same zoom on the timeline when every commit shown is recent' do
+      units = %w[job:ApplicationJob mailer:MailingListMailer]
+      get '/woods/history', params: { units: units }
+      expect(doc.css('a').map(&:text)).not_to include('zoom to the last 30d')
+      get '/woods/history', params: { units: units, author: 'Sam Okafor-Whitfield' }
+      zoom = doc.css('a').find { |a| a.text == 'zoom to the last 30d' }
+      expect(CGI.unescape(zoom['href']))
+        .to include('range=30d', 'author=Sam Okafor-Whitfield', 'units[]=job:ApplicationJob')
     end
 
     it 'serves the timeline as Mermaid text and asks for units without them' do

@@ -757,9 +757,11 @@ tintWindow(from, to) {
     const zoom = sides ? Math.max(centred, 0.75 * plain) : plain
     const pan = (size, at, low, high) => {
       const ideal = size / 2 - zoom * at
-      const most = pad - zoom * low
-      const least = size - pad - zoom * high
-      return least <= most ? Math.min(most, Math.max(least, ideal)) : ideal
+      const lowest = pad - zoom * low
+      const highest = size - pad - zoom * high
+      // The extent fits the room exactly when the plain zoom decides: the two bounds then differ by rounding only.
+      if (lowest > highest + 1) return ideal
+      return Math.min(Math.max(lowest, highest), Math.max(Math.min(lowest, highest), ideal))
     }
     return { zoom, pan: { x: pan(width, focus.x, box.x1, box.x2), y: pan(height, focus.y, box.y1, box.y2) } }
   }
