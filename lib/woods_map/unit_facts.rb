@@ -8,7 +8,7 @@ module WoodsMap
       'job' => ['Job', [
         ['kind', 'job_type'], ['queue', 'queue'], ['perform params', 'perform_params', :parameters],
         ['scheduled', 'scheduled'], ['retry on', 'retry_on', :list], ['discard on', 'discard_on', :list],
-        ['enqueues', 'enqueues_jobs', :list]
+        ['enqueued jobs', 'enqueues_jobs', :list]
       ]],
       'mailer' => ['Mailer', [
         ['actions', 'actions', :list], %w[delivery delivery_method], %w[layout layout],
@@ -34,6 +34,10 @@ module WoodsMap
       ]]
     }.freeze
 
+    NOTES = {
+      'job' => [['not counted', 'mail deliveries (deliver_later) are outside the enqueued jobs list']]
+    }.freeze
+
     # @param unit [Hash] a typed unit from the pinned generation
     def initialize(unit)
       @type = unit['type']
@@ -46,7 +50,7 @@ module WoodsMap
       return nil unless fields
 
       rows = fields.map { |label, key, format| [label, value(@metadata[key], format)] }
-      { eyebrow: title, rows: rows + [['source', { layer: 'published unit metadata' }]] }
+      { eyebrow: title, rows: rows + NOTES.fetch(@type, []) + [['source', { layer: 'published unit metadata' }]] }
     end
 
     private
