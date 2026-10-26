@@ -88,8 +88,40 @@ RSpec.describe WoodsMap do
 
   it 'centres this unit alone in its band, dependents left and dependencies right, and names the hidden units (D-30)' do
     expect(drawing['butterfly']).to eq('centred' => true, 'alone' => true, 'dependentsLeft' => true,
-                                       'dependenciesRight' => true, 'overview' => true)
+                                       'dependenciesRight' => true)
     expect(drawing['facts']).to include('300 units', '1000 edges', '40 more units and 100 edges hidden')
+  end
+
+  describe 'the readable zoom (D-30)' do
+    %w[wide mid narrow narrowBig].each do |view|
+      context "with the #{view} neighbourhood" do
+        let(:readable) { drawing.dig('readable', view) }
+
+        it 'starts centred on this unit at a zoom where every unit in view is named, never in overview' do
+          expect(readable).to include('focusInView' => true, 'named' => true, 'namedInView' => true,
+                                      'overview' => false)
+          expect(readable['zoom']).to be >= readable['minZoom']
+        end
+
+        it 'draws edges in full, or in full only while lit past the light-renderer thresholds' do
+          expect(readable).to include('edgesDetailed' => !readable['heavy'], 'litDetailed' => true,
+                                      'unlitPlain' => true)
+          expect(readable['litEdges']).to be_positive
+        end
+
+        it 'clamps the minimum zoom to the readable zoom, and the buttons and keys zoom within it' do
+          expect(readable['minZoom']).to be >= 0.5
+          expect(readable).to include('floorHeld' => true, 'keyIn' => true, 'buttonIn' => true, 'keyOut' => true)
+          expect(readable['floor']).to eq(readable['minZoom'])
+          expect(readable['fitted']).to be >= readable['minZoom']
+        end
+      end
+    end
+
+    it 'measures the narrow canvases at the narrow width' do
+      expect(drawing.dig('readable', 'narrow', 'width')).to be < 400
+      expect(drawing.dig('readable', 'narrowBig', 'width')).to be < 400
+    end
   end
 
   it 'opens units at the paths Rails routes' do

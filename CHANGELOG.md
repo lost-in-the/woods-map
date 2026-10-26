@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+- The Graph tab never shows unnamed boxes.
+  - **First view:** centred on the focus unit at a zoom where names render. The minimum zoom is that readable zoom, so the reader pans to the rest of the neighbourhood.
+  - **Controls:** zoom in and zoom out buttons and the `+` and `-` keys, plus a link to the typed relationship list. The butterfly layout, bounded traversal and cached positions are unchanged.
+  - **Large neighbourhoods:** past 120 units or 150 edges edges stay plain until one is lit, so the first frame stays inside its budget.
 - The Schema tab shows the database delete action beside a Rails `dependent:` finding when the index publishes it: `on_delete cascade`, or `none declared` when the key reports no action. A key without an `on_delete` entry keeps "database delete action not published" (the adapter did not report it).
 - Layout, History and Hotspots reading fixes.
   - **History picker:** a long path or namespace wraps inside its checkbox label, and the type and count keep their own cells.
