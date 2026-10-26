@@ -58,7 +58,7 @@ module WoodsMap
         fk = a['through'] ? nil : a['foreign_key']
         Association.new(macro: "#{a['type']} :#{a['name']}", name: a['name'], target: a['target'],
                         options: options_text(a), foreign_key: fk && key_text(a, fk),
-                        enforced: enforcement(a, fk), finding: finding_for(a))
+                        enforced: enforcement(a, fk), finding: DeleteFinding.text(a, key: published_key(a)))
       end
     end
 
@@ -177,32 +177,12 @@ module WoodsMap
       Array(@table_metadata['foreign_keys'].presence || @metadata['foreign_keys'])
     end
 
-    def finding_for(assoc)
-      return 'polymorphic, no FK' if assoc['polymorphic']
-
-      dependent = assoc.dig('options', 'dependent').to_s
-      return unless dependent.start_with?('destroy', 'delete')
-
-      "delete radius: Rails dependent #{dependent}; #{database_delete_action(published_key(assoc))}"
-    end
-
     def published_key(assoc)
-      key = assoc['foreign_key']
-      return if key.blank?
+      column = assoc['foreign_key']
+      return if column.blank?
+      return @incoming.key_for(target_table(assoc), column) unless owning?(assoc)
 
-      if owning?(assoc)
-        foreign_keys.find { |fkey| fkey['column'].to_s == key.to_s }
-      else
-        @incoming.key_for(target_table(assoc), key)
-      end
-    end
-
-    # A nil action is a declared absence; a missing key is an adapter that
-    # did not report one.
-    def database_delete_action(fkey)
-      return 'database delete action not published' unless fkey&.key?('on_delete')
-
-      "database on_delete #{fkey['on_delete'] || 'none declared'}"
+      foreign_keys.find { |fkey| fkey['column'].to_s == column.to_s }
     end
 
     def index_for(column)
