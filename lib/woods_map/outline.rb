@@ -13,7 +13,8 @@ module WoodsMap
     # @param concern_methods [Hash{String => Array<String>}]
     # @param callers [Hash{String, nil => Array}] calls into the unit by method name
     # @param links [Hash{Symbol => #call}] resolvers for the links an item can carry; each answers nil for no link:
-    #   :method (method table entry => URL of its line), :definition (published file and file line => URL)
+    #   :method (method table entry => URL of its line), :definition (published file and file line => URL),
+    #   :association (an association's target class name => URL of that model)
     def initialize(unit, lifecycle: nil, concern_methods: {}, callers: {}, links: {})
       @unit = unit
       @metadata = unit['metadata'] || {}
@@ -58,7 +59,7 @@ module WoodsMap
 
       items = assocs.map do |a|
         detail = [a['type'], (a['through'] ? "through #{a['through']}" : a['target'])].join(' ')
-        Item.new(key: '·', text: a['name'].to_s, own: detail)
+        Item.new(key: '·', text: a['name'].to_s, own: detail, href: link(:association, a['target']))
       end
       Group.new(label: 'associations', count: assocs.size, items: items)
     end

@@ -40,7 +40,8 @@ module WoodsMap
         @outline = WoodsMap::Outline.new(@unit, lifecycle: @lifecycle, concern_methods: concern_methods(@unit),
                                                 callers: @callers,
                                                 links: { method: method_href(@unit),
-                                                         definition: definition_href(@unit) })
+                                                         definition: definition_href(@unit),
+                                                         association: association_href })
         @cards = WoodsMap::HoverCard.for(@repository, @code.linked_targets)
         render :show
       end
