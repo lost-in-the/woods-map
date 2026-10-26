@@ -7,7 +7,7 @@
 <% primary = local_assigns[:definition] ? link_to("Code at L#{local_assigns[:definition]}", "#{woods_map.unit_path(type: page.type, identifier: page.identifier)}#L#{local_assigns[:definition]}", class: 'btn primary', data: (local_assigns[:editor] ? { settings_target: 'code' } : {})) : nil %>
 <%# On the Code tab the primary action becomes "In editor at L…" only when this browser names an editor (D-6, B-15); the settings controller shows it. %>
 <% if local_assigns[:editor] && page.path %><% primary = safe_join([primary, tag.a("In editor at L#{local_assigns[:definition] || 1}", class: 'btn primary', hidden: true, data: { settings_target: 'editor', file: page.path, line: local_assigns[:definition] || 1 })].compact) %><% end %>
-<%= render 'woods_map/shared/ident', title: local_assigns.fetch(:title, page.identifier), subtitle: local_assigns.fetch(:subtitle, page.subtitle), controls: safe_join([local_assigns[:controls], impact_action(page), render('woods_map/shared/share'), primary].compact, ' ') %>
+<%= render 'woods_map/shared/ident', title: local_assigns.fetch(:title, page.identifier), subtitle: local_assigns.fetch(:subtitle, page.subtitle), controls: safe_join([local_assigns[:controls], render('woods_map/shared/share'), primary, impact_action(page)].compact, ' ') %>
 <%= render 'woods_map/shared/tabs', tabs: unit_tabs(page, tab) %>
 <% if current_since %><%= render 'woods_map/units/since', page: page, since: current_since %><% end %>
 <% tiles = local_assigns[:tiles] || page.tiles.map { |tile| { eyebrow: tile[:eyebrow], rows: tile[:rows].map { |label, value| [label, tile_value(value)] } } } %>
