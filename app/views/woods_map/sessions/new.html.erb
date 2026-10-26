@@ -6,7 +6,7 @@
   <% if flash[:alert] %><div class="finding gap-top"><b>⚑ <%= flash[:alert] %></b></div><% end %>
   <%= form_with url: woods_map.session_path, method: :post, local: true, html: { class: 'token-form' } do |form| %>
     <%= form.label :token, 'Token', class: 'eyebrow' %>
-    <%= form.password_field :token, autocomplete: 'off', required: true, class: 'tree filter' %>
+    <%= form.password_field :token, autocomplete: 'off', required: true, class: 'filter' %>
     <%= form.submit 'Open session', class: 'btn primary' %>
   <% end %>
 </div>
