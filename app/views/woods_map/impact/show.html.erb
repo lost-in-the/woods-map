@@ -22,7 +22,7 @@
     <div class="body"><div class="main inset"><%= render 'woods_map/components/empty_state', title: 'No focus unit in this generation', text: "None of #{r.focus.join(', ')} is a unit of gen #{@repository.generation_number}." %></div></div>
   <% end %>
 <% else %>
-<div class="body" data-controller="trail" data-trail-title-value="Blast radius of <%= r.focus.join(', ') %>">
+<div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>" data-trail-title-value="Blast radius of <%= r.focus.join(', ') %>">
   <%= render 'woods_map/components/rail', heading: @lens.capitalize, groups: [
         { label: 'focus', count: r.focus.size, items: r.focus.map { |id| { key: '·', text: unit_link(id, r.type_of(id)), own: safe_join([r.type_of(id).tr('_', ' '), (v.findings.count { |f| f.where == id }.positive? ? safe_join([', ', tag.span('⚑', class: 'flag'), " #{v.findings.count { |f| f.where == id }}"]) : nil)].compact) } } },
         { label: 'affected', count: r.direct.size, items: r.direct.first(8).map { |a| { key: '·', text: unit_link(a.identifier, a.type), own: a.via } } + (r.direct.size > 8 ? [{ key: '·', text: "+#{r.direct.size - 8} more" }] : []) },

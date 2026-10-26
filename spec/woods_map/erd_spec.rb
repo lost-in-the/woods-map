@@ -97,4 +97,32 @@ RSpec.describe WoodsMap::Erd do
       expect(erd.findings.cross_database_pairs).to eq(['analytics ↔ primary'])
     end
   end
+
+  describe 'unmodelled tables named by the graph analysis' do
+    def table_unit(name, model: nil)
+      { 'identifier' => "table:#{name}", 'type' => 'database_table',
+        'metadata' => { 'table_name' => name, 'database' => 'primary', 'model' => model, 'model_less' => model.nil?,
+                        'columns' => [], 'indexes' => [], 'foreign_keys' => [] } }
+    end
+
+    let(:tables) { [table_unit('gen_hubs'), table_unit('gen_records'), table_unit('users', model: 'User')] }
+    let(:models) { [{ 'identifier' => 'User', 'type' => 'model', 'metadata' => { 'table_name' => 'users' } }] }
+
+    it 'counts a table once whether the analysis names it typed, bare or both' do
+      erd = described_class.new(tables: tables, models: models,
+                                unmodelled: %w[table:gen_hubs table:gen_records gen_hubs])
+      expect(erd.unmodelled).to eq(%w[gen_hubs gen_records])
+      expect(erd.findings.counts.values_at(:tables, :modelled, :unmodelled)).to eq([3, 1, 2])
+      unmodelled = erd.findings.select { |f| f.rule == 'unmodelled table' }
+      expect(unmodelled.map(&:where)).to eq([['gen_hubs'], ['gen_records']])
+    end
+
+    it 'keeps a name the index does not publish out of the physical count, and names it apart' do
+      erd = described_class.new(tables: tables, models: models, unmodelled: %w[table:gen_hubs table:ghost])
+      expect(erd.unmodelled).to eq(%w[gen_hubs gen_records])
+      expect(erd.unresolved_unmodelled).to eq(%w[ghost])
+      expect(erd.findings.counts[:unmodelled]).to eq(2)
+      expect(erd.findings.map(&:rule)).to include('analysis names a table the index does not publish')
+    end
+  end
 end

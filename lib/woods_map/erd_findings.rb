@@ -12,7 +12,7 @@ module WoodsMap
     # @param erd [Erd]
     def initialize(erd)
       @erd = erd
-      @list = unenforced + orphan_keys + cross_database_findings + unmodelled + polymorphic_findings
+      @list = unenforced + orphan_keys + cross_database_findings + unmodelled + unresolved + polymorphic_findings
     end
 
     # @yieldparam finding [Finding]
@@ -83,6 +83,13 @@ module WoodsMap
     def unmodelled
       @erd.unmodelled.map do |name|
         Finding.new(severity: :note, rule: 'unmodelled table', where: [name], evidence: 'database_table, no model')
+      end
+    end
+
+    def unresolved
+      @erd.unresolved_unmodelled.map do |name|
+        Finding.new(severity: :note, rule: 'analysis names a table the index does not publish', where: [name],
+                    evidence: 'graph_analysis.unmodelled_tables')
       end
     end
 

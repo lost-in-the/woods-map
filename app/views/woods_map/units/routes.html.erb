@@ -8,7 +8,7 @@
 <% helpers = ->(route) { route.helpers.any? ? safe_join(route.helpers.map { |h| tag.code(h) }, ', ') : empty_value(applicable: false) } %>
 <% uses = ->(ref) { ref.uses.nil? ? tag.span('not in this generation', class: 'dim') : (ref.uses.any? ? safe_join(ref.uses.map { |u| safe_join([tag.code(u.helper), ' → ', u.action.present? ? passage.call(u.action) : empty_value]) }, tag.br) : empty_value) } %>
 <% finding = ->(route) { route.finding ? safe_join([chip(:note), ' ', route.finding.tr('_', ' ')]) : empty_value(applicable: false) } %>
-<div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
+<div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>" data-trail-title-value="<%= @page.identifier %>">
   <%= render 'woods_map/components/rail', heading: 'Routes, as the router declares them', groups: [
         { label: 'verbs', count: r.count, items: r.routes.group_by(&:verb).map { |verb, list| { key: list.size, text: verb } } },
         { label: 'actions', count: r.actions.size, items: r.actions.map { |a| { key: a.routes.size, text: a.name, own: (a.routes.empty? ? 'no route' : nil) } } },

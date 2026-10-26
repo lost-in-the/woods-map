@@ -1,7 +1,7 @@
 <% content_for :title, "#{@landscape.system_name} · Hotspots · Landscape · Woods Map" %>
 <% h = @hotspots %>
 <%= render 'woods_map/landscape/frame', crumb: 'hotspots' %>
-<div class="body" data-controller="trail">
+<div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>">
   <div class="main landscape">
     <% if h.analysed? %>
       <% longest = h.cycles.max_by { |cycle| cycle.uniq.size } %>

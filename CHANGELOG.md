@@ -3,6 +3,14 @@
 ## [Unreleased]
 
 - The Code tab gives source the room it needs and says where it came from. A unit with no notes drops the empty notes lane, a wrapped view narrows the lane to 240px below 960px so the source keeps its width, and the narrow-screen gutters stay aligned when the lane is dropped. The as-written caption now says the source is what extraction read from the working tree, not necessarily a commit.
+||||||| 37f0fc3
+- The reading trail keeps each page's full address, path and query, so returning through it restores the investigation (entry, pins, hops, generation, lens, range) instead of the bare page. The address never includes a `token`. Entries stored as a bare path by an earlier version still draw.
+- The Schema tab and the ERD say what the evidence means.
+  - **Defaults:** a column whose index publishes only that a default exists says "exists, value not published" instead of "yes". A published value is shown as published, and an empty string, `false` and no default read differently.
+  - **ER scope:** the model Schema diagram is labelled "model associations only", counts the distinct tables it draws, and links to the ERD for the database's foreign keys.
+  - **Incoming keys:** a has_many or has_one shows the foreign key its table publishes to this one. Otherwise it says "unchecked" and why, instead of a dash.
+  - **Delete behaviour:** the finding beside a Rails `dependent:` option says the database delete action is not published.
+  - **ERD totals:** the graph analysis's typed table names (`table:x`) are resolved to the published table before the unmodelled count, so a table counts once. A name no published table answers to is listed as its own finding and stays out of the counts.
 - The token sign-in field stays visible below 640px. It was styled as the file tree, which the responsive rules hide on a narrow screen, so a phone reader could not enter the token. It now has its own styling, unchanged at desktop widths.
 - A hub's first impact view no longer opens every unit it reaches.
   - **Render-by-name unknowns:** the Unknown tab opens only the reached units that Woods' graph lists as having unresolved renders (`unresolved_render_count`, woods#837), through `Repository#units_with`. A generation from an older Woods, or a Woods without the summary, still opens every reached unit.

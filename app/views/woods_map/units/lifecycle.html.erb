@@ -9,7 +9,7 @@
    ], ' ') %>
 <%= render 'woods_map/units/frame', page: @page, tab: 'lifecycle', controls: controls, definition: @definition %>
 <% transitions = @state_machines.flat_map { |machine| machine.transitions.map { |t| [machine, t] } } %>
-<div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
+<div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>" data-trail-title-value="<%= @page.identifier %>">
   <%= render 'woods_map/components/rail', heading: 'Lifecycle, as Rails runs it', groups: [
         { label: 'events', count: 'steps', items: chains.map { |event, list| { key: '·', text: link_to(event, here.call(event: event)), own: "#{list.size} #{'step'.pluralize(list.size)}#{list.any?(&:async?) ? ', async' : ''}", current: event == @event } } },
         ({ label: 'transitions', count: 'state machine', items: transitions.map { |_, t| { key: '·', text: t.event || 'transition', own: "#{t.from} → #{t.to}#{", guard #{t.guard}" if t.guard}" } } } if transitions.any?),
