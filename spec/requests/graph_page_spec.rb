@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'cgi'
-
 # The full-screen graph (M5, notes/graph-page.md): a typed centre by identifier and
 # type, the shared explorer, the blast radius on request, hubs without a centre.
 RSpec.describe 'Full-screen graph', type: :request do
@@ -26,7 +24,7 @@ RSpec.describe 'Full-screen graph', type: :request do
   it 'draws the centre with the explorer, re-centring the page from the canvas' do
     body = page_for('/woods/graph', centre: 'User', type: 'model',
                                     depth: 2).at_css('.graph-page[data-controller~=graph]')
-    expect(CGI.parse(URI.parse(body['data-graph-url-value']).query))
+    expect(parse_query(URI.parse(body['data-graph-url-value']).query))
       .to include('centre' => ['User'], 'type' => ['model'], 'depth' => ['2'])
     expect(body['data-graph-unit-url-value']).to start_with('/woods/graph?').and include('centre=__identifier__')
     expect(body['data-graph-cache-value']).to match(/\A\d+\|model\|User\|2\|both\|\|\z/)

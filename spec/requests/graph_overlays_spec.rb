@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'cgi'
-
 # The explorer's overlays (A-4, A-6; notes/graph-page.md): the flows the centre
 # takes part in from Woods W-13 with the one ?flow= lays over the canvas, and
 # the commits of the W-3 commit table that touched the units drawn.
@@ -22,7 +20,7 @@ RSpec.describe 'Graph overlays', type: :request do
       html = page_for('/woods/units/model/Micropost/graph', depth: '2')
       links = html.css('nav.rail ol.flows a')
       expect(links.map(&:text)).to eq(['MicropostsController#create'])
-      query = CGI.parse(URI.parse(links.first['href']).query)
+      query = parse_query(URI.parse(links.first['href']).query)
       expect(query).to include('flow' => ['MicropostsController#create'], 'depth' => ['2'])
     end
 
