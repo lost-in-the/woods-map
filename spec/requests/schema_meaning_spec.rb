@@ -55,4 +55,33 @@ RSpec.describe 'What the Schema tab says the evidence means', type: :request do
       expect(html_response_document.at_css('#dbh')).to be_present
     end
   end
+
+  describe 'the writers column' do
+    def columns_table
+      html_response_document.at_css('table[aria-label="Columns"]')
+    end
+
+    def writer_cell(column)
+      columns_table.css('tbody tr').find { |row| row.at_css('td').text.squish == column }.css('td').last.text.squish
+    end
+
+    it 'is headed as recorded callback writers and says what an empty cell means' do
+      get '/woods/units/model/User/schema'
+      expect(columns_table.css('th').map { |th| th.text.squish }).to include('recorded callback writers')
+      expect(columns_table.css('th').map { |th| th.text.squish }).not_to include('written by')
+      expect(writer_cell('id')).to include('no callback writer recorded')
+      expect(writer_cell('id')).not_to match(/never|no writes/)
+      expect(columns_table.ancestors('section').first.text).to include('Callbacks only')
+    end
+
+    it 'keeps a published callback writer named' do
+      get '/woods/units/model/User/schema'
+      expect(writer_cell('email')).to include('before_save :downcase_email')
+    end
+
+    it 'says the callbacks are not published when the unit has none to read' do
+      get '/woods/units/database_table/table:users/schema'
+      expect(writer_cell('id')).to include('callbacks not published')
+    end
+  end
 end

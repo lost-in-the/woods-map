@@ -71,6 +71,11 @@ module WoodsMap
       end
     end
 
+    # @return [Boolean] whether the unit publishes its callbacks, so an empty writer list is a finding
+    def callbacks_published?
+      @metadata['callbacks'].is_a?(Array)
+    end
+
     # @return [Array<Hash>] the indexes of the table
     def indexes
       Array(@table_metadata['indexes'])
