@@ -125,9 +125,15 @@ module WoodsMap
     end
 
     def job_groups
-      params = Array(@metadata['perform_params']).join(', ')
+      params = Array(@metadata['perform_params']).filter_map { |param| parameter_label(param) }.join(', ')
       queue = @metadata['queue'] && "queue #{@metadata['queue']}"
       [Group.new(label: 'perform', count: 1, items: [Item.new(key: '·', text: "perform(#{params})", own: queue)])]
+    end
+
+    def parameter_label(param)
+      return param if param.is_a?(String)
+
+      UnitFacts.parameter_label(param) if param.is_a?(Hash) && param['name'].is_a?(String)
     end
 
     def template_groups
