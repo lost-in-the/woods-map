@@ -1,0 +1,5 @@
+- Graph flow overlay and timeline (woods-map#7, A-4, A-6, docs/design/notes/graph-page.md). Both appear on the Graph tab and on `/woods/graph`.
+  - **Flows:** the rail lists the precomputed flows that expanded a step of the centre (Woods W-13, `flows/by_unit.json`). `?flow=` lays one over the canvas: each step's unit, and the drawn edge between consecutive steps, are outlined in the link colour. *Play the flow* lights the steps in order; with reduced motion the whole path is lit at once.
+  - A side list gives every step with its operation count, whether the canvas draws it, and the edge that reached it. Steps with no graph edge are marked, never invented.
+  - Without W-13 readers or published flows, the rail says why.
+  - **Timeline:** the commits in the commit table (W-3) that touched the units drawn. Two range inputs choose a window of commits, and the units those commits touched are filled with `--mod`. A *tint* button narrows the window to one commit. Without a script, the commit list names the units.

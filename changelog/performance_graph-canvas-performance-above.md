@@ -1,0 +1,4 @@
+- Graph canvas performance:
+  - Above 120 units or 150 edges, the first draw skips labels, arrows and edge routing until the reader zooms in.
+  - Cytoscape warms on a small off-screen graph while the neighbourhood request is in flight.
+  - On the 300-unit, 1,000-edge benchmark, the first draw drops from a median of 853 ms (min 693) to a median of 366 ms (min 318) at load average 4.4.

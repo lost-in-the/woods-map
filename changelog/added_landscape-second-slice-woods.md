@@ -1,0 +1,4 @@
+- Landscape, second slice (woods-map#5, docs/design/notes/landscape.md).
+  - **Components (C4 level 3):** the board's group control groups application units by Packwerk package, top-level namespace or published domain cluster. Each component box shows its hub and, for a package, its declared dependencies. The component diagram is drawn by Pele, with a relationships table that marks undeclared package edges. Without packages or clusters, the tab names the limit.
+  - **Hotspots:** a churn × dependents quadrant and a forward-flow sankey between layers, drawn by Pele. The LOC treemap waits on woods#810.
+  - **Share menu** on every tab: the focus URL and the tab's text exports as plain links. The new diagram texts are at `/woods/landscape/components.mmd?group=`, `/quadrant.mmd` and `/sankey.mmd`; a diagram the generation cannot draw answers 422.

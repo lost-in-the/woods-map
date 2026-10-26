@@ -1,0 +1,1 @@
+- Links back to the current page keep an identifier's trailing slash. On the pages of the root route (`GET /`) the author filters, the Share URL, the `?since=` clear link, the token exchange and a refused `.mmd`'s page link were built from Rails' normalized path and led to 404s. Found by the final sweep on rails-6.0.

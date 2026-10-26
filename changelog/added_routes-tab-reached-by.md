@@ -1,0 +1,1 @@
+- Routes tab: *Reached by a route helper* shows each helper a referencing unit calls and the action it reaches, linked to that action's Passage, from the unit's `route_helper_references` (woods#795). On a generation extracted before them the column reads *not in this generation* and the controller-level limit stays named.

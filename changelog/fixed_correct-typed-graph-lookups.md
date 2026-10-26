@@ -1,0 +1,1 @@
+- Correct typed graph lookups for the published flat variants array: unknown constants remain unresolved and typed search results retain their own file paths.

@@ -28,6 +28,14 @@ New features follow TDD: a failing spec first. Bug fixes add a regression
 spec. Validate anything that touches rendering against a `woods-testbed`
 variant with the engine mounted.
 
+## Changelog
+
+Add a file `changelog/<type>_<slug>.md` for every user-visible change. Never
+edit `CHANGELOG.md` directly: parallel pull requests would all edit its
+Unreleased block and conflict. [changelog/README.md](changelog/README.md)
+gives the types and format, and `bin/rake "changelog:fold[<version>]"` folds
+the files into `CHANGELOG.md` at release.
+
 ## Pull requests
 
 Describe the requirement identifiers the change covers, link the milestone

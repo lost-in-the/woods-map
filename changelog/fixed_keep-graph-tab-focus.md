@@ -1,0 +1,1 @@
+- Keep the Graph tab focus, variant edges, two-hop traversal, deduplication, links and Mermaid node identities typed. Type filters follow the newly reached endpoint; reverse relationships retain their published destination type.
