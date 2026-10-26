@@ -1,7 +1,7 @@
 <% content_for :title, "#{@landscape.system_name} · Status · Landscape · Woods Map" %>
 <% s = @status %>
 <%= render 'woods_map/landscape/frame', crumb: 'status' %>
-<div class="body" data-controller="trail">
+<div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>">
   <div class="main landscape">
     <section class="sec">
       <header><h2 class="t2">What this generation publishes <%= count_tag("#{s.available} of #{s.items.size}") %><%= info_tip('Each fact the Landscape reads, whether gen ' + @repository.generation_number.to_s + ' publishes it, the Woods work that does, and what the tabs draw from it. A missing fact is a limit the tabs name, never something the map derives.') %></h2></header>

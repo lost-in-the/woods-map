@@ -3,7 +3,7 @@
 <%= render 'woods_map/units/frame', page: @page, tab: 'schema', definition: @definition %>
 <% assocs = @schema.associations %>
 <% classes = @schema.class_diagram %>
-<div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
+<div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>" data-trail-title-value="<%= @page.identifier %>">
   <%= render 'woods_map/components/rail', heading: 'Schema, as the database has it', groups: [
         { label: 'table', count: @schema.table_name, items: [{ key: '·', text: "#{@schema.columns.size} #{'column'.pluralize(@schema.columns.size)}, #{@schema.indexes.size} #{'index'.pluralize(@schema.indexes.size)}" }] },
         { label: 'associations', count: assocs.size, items: assocs.each_with_index.map { |a, i| { key: i + 1, text: unit_link(a.target), own: a.macro } } }

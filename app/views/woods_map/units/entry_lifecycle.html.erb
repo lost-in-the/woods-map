@@ -13,7 +13,7 @@
      (link_to('Open in the Trail', trail, class: 'btn') if trail)
    ].compact, ' ') %>
 <%= render 'woods_map/units/frame', page: @page, tab: 'lifecycle', controls: controls, definition: @definition %>
-<div class="body" data-controller="trail" data-trail-title-value="<%= @page.identifier %>">
+<div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>" data-trail-title-value="<%= @page.identifier %>">
   <% lc = el.builder %>
   <%= render 'woods_map/components/rail', heading: 'Lifecycle, as the flow runs it', groups: [
         ({ label: (@page.type == 'job' ? 'entry' : 'actions'), count: el.actions.size, items: el.actions.map { |a| { key: '·', text: link_to(a, here.call(action_name: a)), current: a == el.action } } } if el.actions.any?),

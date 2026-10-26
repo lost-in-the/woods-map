@@ -54,6 +54,15 @@ module WoodsMap
       "#{WoodsMap::PublicUrl.base(request)}#{raw_request_path}#{"?#{query.to_query}" if query.any?}"
     end
 
+    # The page's path and query for the reading trail, less any `token`. It is
+    # relative, so a trail entry stays on the origin the reader opened it from.
+    #
+    # @return [String]
+    def trail_url
+      query = request.query_parameters.except('token')
+      "#{raw_request_path}#{"?#{query.to_query}" if query.any?}"
+    end
+
     # A relative date in git's shorthand with the long form in the tooltip
     # (D-15): `<abbr class="date" title="3 days ago, 2026-10-13">3d</abbr>`.
     #

@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- The reading trail keeps each page's full address, path and query, so returning through it restores the investigation (entry, pins, hops, generation, lens, range) instead of the bare page. The address never includes a `token`. Entries stored as a bare path by an earlier version still draw.
 - The token sign-in field stays visible below 640px. It was styled as the file tree, which the responsive rules hide on a narrow screen, so a phone reader could not enter the token. It now has its own styling, unchanged at desktop widths.
 - A hub's first impact view no longer opens every unit it reaches.
   - **Render-by-name unknowns:** the Unknown tab opens only the reached units that Woods' graph lists as having unresolved renders (`unresolved_render_count`, woods#837), through `Repository#units_with`. A generation from an older Woods, or a Woods without the summary, still opens every reached unit.
