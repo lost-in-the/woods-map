@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- The Code tab gives source the room it needs and says where it came from. A unit with no notes drops the empty notes lane, a wrapped view narrows the lane to 240px below 960px so the source keeps its width, and the narrow-screen gutters stay aligned when the lane is dropped. The as-written caption now says the source is what extraction read from the working tree, not necessarily a commit.
 - The token sign-in field stays visible below 640px. It was styled as the file tree, which the responsive rules hide on a narrow screen, so a phone reader could not enter the token. It now has its own styling, unchanged at desktop widths.
 - A hub's first impact view no longer opens every unit it reaches.
   - **Render-by-name unknowns:** the Unknown tab opens only the reached units that Woods' graph lists as having unresolved renders (`unresolved_render_count`, woods#837), through `Repository#units_with`. A generation from an older Woods, or a Woods without the summary, still opens every reached unit.
