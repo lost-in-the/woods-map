@@ -6,6 +6,7 @@
 <div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>" data-trail-title-value="<%= @page.identifier %>">
   <%= render 'woods_map/components/rail', heading: 'Schema, as the database has it', groups: [
         { label: 'table', count: @schema.table_name, items: [{ key: '·', text: "#{@schema.columns.size} #{'column'.pluralize(@schema.columns.size)}, #{@schema.indexes.size} #{'index'.pluralize(@schema.indexes.size)}" }] },
+        { label: 'jump to', count: 2, items: [{ key: '·', text: 'Columns', href: '#colsh', own: "#{@schema.columns.size} with types and defaults" }, { key: '·', text: 'Database facts', href: '#dbh', own: 'indexes, keys, constraints' }] },
         { label: 'associations', count: assocs.size, items: assocs.each_with_index.map { |a, i| { key: i + 1, text: unit_link(a.target), own: a.macro } } }
       ].reject { |g| g[:items].empty? } %>
   <div class="main">
@@ -25,9 +26,10 @@
       <% since_from = current_since&.available? ? current_since.from_generation : nil %>
       <% col_marks = since_from && (current_since.column_marks(@page.identifier, @page.type) || (@schema.table_name && current_since.column_marks("table:#{@schema.table_name}", 'database_table'))) %>
       <header><h2 class="t2" id="colsh">Columns <%= count_tag(@schema.columns.size) %></h2></header>
-      <%= render 'woods_map/components/table', label: 'Columns', min_width: '760px', columns: [{ label: 'column', width: '180px', cell_class: 'nw id' }, { label: 'type', width: '110px' }, { label: 'null', width: '60px' }, { label: 'default', width: '110px' }, { label: 'index' }, { label: 'written by' }],
+      <%= render 'woods_map/components/table', label: 'Columns', min_width: '760px', columns: [{ label: 'column', width: '180px', cell_class: 'nw id' }, { label: 'type', width: '110px' }, { label: 'null', width: '60px' }, { label: 'default', width: '110px' }, { label: 'index' }, { label: 'recorded callback writers' }],
             caption: (col_marks&.removed&.any? ? "removed since gen #{since_from}: #{col_marks.removed.sort.join(', ')}" : nil),
-            rows: @schema.columns.map { |c| kind = col_marks && col_marks[c.name]; { classes: (kind ? 'chg' : nil), cells: [(kind ? safe_join([chip(:modified, "#{kind} since gen #{since_from}"), tag.span(" #{kind} since gen #{since_from}: ", class: 'sr-only'), ' ', c.name]) : c.name), c.type, c.null, c.default.nil? ? empty_value(applicable: false) : c.default.to_s, c.index || empty_value(applicable: false), Array(c.written_by).any? ? c.written_by.join(', ') : empty_value(applicable: false)] } } %>
+            rows: @schema.columns.map { |c| kind = col_marks && col_marks[c.name]; { classes: (kind ? 'chg' : nil), cells: [(kind ? safe_join([chip(:modified, "#{kind} since gen #{since_from}"), tag.span(" #{kind} since gen #{since_from}: ", class: 'sr-only'), ' ', c.name]) : c.name), c.type, c.null, c.default.nil? ? empty_value(applicable: false) : c.default.to_s, c.index || empty_value(applicable: false), Array(c.written_by).any? ? c.written_by.join(', ') : tag.span(@schema.callbacks_published? ? 'no callback writer recorded' : 'callbacks not published', class: 'dim')] } } %>
+      <p class="cap">Callbacks only: writers come from this model's published callbacks. A job, service or plain method that writes a column is not indexed here, so an empty cell does not mean the column is never written.</p>
     </section>
     <section class="sec" aria-labelledby="dbh">
       <header><h2 class="t2" id="dbh">Database facts <%= count_tag('what the schema enforces') %></h2></header>
