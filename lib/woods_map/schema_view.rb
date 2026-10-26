@@ -165,9 +165,7 @@ module WoodsMap
       foreign_keys.find { |fkey| fkey['column'].to_s == key.to_s } ? '✓ enforced' : 'none'
     end
 
-    def owning?(assoc)
-      assoc['type'].to_s == 'belongs_to'
-    end
+    def owning?(assoc) = assoc['type'].to_s == 'belongs_to'
 
     def incoming_associations
       Array(@metadata['associations']).reject { |a| a['through'] || a['polymorphic'] || owning?(a) }
