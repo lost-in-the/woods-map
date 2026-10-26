@@ -13,6 +13,7 @@
       <button class="tool" type="button" data-controller="copy" data-copy-text-value="<%= url %>" data-share-target="copyUrl" data-action="copy#copy" data-needs-js>⎘ copy URL</button>
     </div>
     <code class="sh-url" data-share-target="url"><%= url %></code>
+    <p class="cap sh-carries">The link carries this page and its query: the entry and pins. It does not carry notes, a conclusion or questions. A generation or hop count in the address is applied again on opening, not a frozen copy of what you saw.</p>
     <% if local_assigns[:texts].present? %>
       <div class="sh-dia sh-texts"><span class="eyebrow">text</span><% texts.each do |label, href| %><%= link_to label, href, class: 'tool', type: 'text/plain', rel: 'alternate', data: { share_text: true } %><% end %></div>
     <% end %>

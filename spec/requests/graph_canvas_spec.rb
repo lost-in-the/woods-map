@@ -30,6 +30,14 @@ RSpec.describe 'Graph tab canvas', type: :request do
     expect(panel.at_css('#graph-status[role=status]')).not_to be_nil
   end
 
+  it 'offers zoom buttons and a link to the typed list beside the canvas, and says how to pan and zoom' do
+    panel = page_for('/woods/units/model/User/graph').at_css('[data-graph-target=panel]')
+    expect(panel.css('button[data-action="graph#zoomIn"]').pluck('aria-label')).to eq(['Zoom in'])
+    expect(panel.css('button[data-action="graph#zoomOut"]').pluck('aria-label')).to eq(['Zoom out'])
+    expect(panel.at_css('a[href="#edge-list"]').text).to include('list')
+    expect(panel.at_css('#graph-status').text).to include('Drag to pan')
+  end
+
   it 'keeps the flowchart and the list as the page without JavaScript' do
     html = page_for('/woods/units/model/User/graph')
     fallback = html.at_css('#graph-flowchart[data-graph-target=fallback]')

@@ -33,15 +33,17 @@ import { Controller } from "@hotwired/stimulus"
 // carries the set and "woods-map:graph-pick-clear" empties it.
 export default class extends Controller {
   static targets = ["panel", "canvas", "facts", "status", "message", "fallback", "flowchart", "positions", "list", "play", "scrub", "scrubFrom", "scrubTo", "window"]
-  static values = { url: String, unitUrl: String, label: String, generation: Number, cache: String, blast: Array, emphasis: String, flow: Object, timeline: Array, pick: Boolean }
+  static values = { url: String, unitUrl: String, label: String, generation: Number, cache: String, blast: Array, emphasis: String, flow: Object, timeline: Array, pick: Boolean, fitAll: Boolean }
 
   static POSITIONS_KEY = "woods-map:graph-positions"
   static POSITIONS_KEPT = 24
   static ASSOCIATIONS = new Set(["belongs_to", "has_many", "has_one", "has_and_belongs_to_many", "through", "polymorphic"])
   static TINT = 0.18
-  static DETAILED_NODES = 120
-  static DETAILED_EDGES = 150
-  static DETAIL_ZOOM = 0.5
+  static LIGHT_NODES = 120
+  static LIGHT_EDGES = 150
+  static READABLE_ZOOM = 0.75
+  static MAX_ZOOM = 1.6
+  static FIT_ZOOM = 0.02
 
   connect() {
     this.picked = new Map()
@@ -184,29 +186,27 @@ export default class extends Controller {
     // Copies: Cytoscape keeps the object it is given and moves it with the node.
     for (const element of elements) element.position = { ...positions.get(element.data.id) }
 
-    // Overview mode: below DETAIL_ZOOM, where Cytoscape stops drawing unit
-    // names (6px), units are drawn without names and edges without arrows,
-    // dashes or labels; zooming in past it brings them in. A neighbourhood
-    // that fits below that zoom starts in overview, and so does one past
-    // DETAILED_NODES units or DETAILED_EDGES edges, which also draws with
-    // the lighter renderer settings: measuring and drawing detail no one
-    // can read is most of a cold draw. The status line and the list name
-    // every unit and edge regardless.
-    const heavy = nodes.length > this.constructor.DETAILED_NODES || edges.length > this.constructor.DETAILED_EDGES
-    const fitted = this.constructor.view(this.constructor.extent(elements), [...positions.values()], positions.get(this.focusId) || { x: 0, y: 0 }, this.canvasTarget.clientWidth, this.canvasTarget.clientHeight)
-    this.detailed = !heavy && fitted.zoom >= this.constructor.DETAIL_ZOOM
-    this.overview = !this.detailed
+    // Names never go away (D-30): the first view is centred on this unit at
+    // READABLE_ZOOM or closer, which is also the minimum zoom, and the rest
+    // of the neighbourhood is reached by panning. A neighbourhood past
+    // LIGHT_NODES units or LIGHT_EDGES edges draws with the lighter renderer
+    // settings and plain edges (no arrows, dashes or labels) until one is
+    // lit; the status line and the list name every unit and edge.
+    const heavy = nodes.length > this.constructor.LIGHT_NODES || edges.length > this.constructor.LIGHT_EDGES
+    const fitted = this.constructor.view(this.constructor.extent(elements), [...positions.values()], positions.get(this.focusId) || { x: 0, y: 0 }, this.canvasTarget.clientWidth, this.canvasTarget.clientHeight, this.floor())
     const labelFont = { css: `${font.size - 1.5}px ${font.family}` }
     const offset = (label) => (label ? Math.ceil(this.measure(label, labelFont) / 2) + 10 : 0)
-    if (this.detailed) for (const element of elements) element.classes = `${element.classes} detail`.trim()
+    this.lightEdges = heavy
+    this.edgeOffset = offset
+    for (const element of elements) element.classes = `${element.classes} detail`.trim()
     const routes = this.constructor.routes(edges, positions, new Map(elements.map((e) => [e.data.id, e.data.w])), this.focusId)
     for (const edge of edges) {
       const d = edge.data
       const route = routes.get(d.id)
       elements.push({
         group: "edges",
-        data: { id: d.id, source: d.source, target: d.target, via: d.via, label: route.label, turn: route.turn, off: this.detailed ? offset(route.label) : 0 },
-        classes: [this.constructor.ASSOCIATIONS.has(d.via) ? "assoc" : "dep", this.detailed ? "detail" : "", route.classes].join(" ").trim()
+        data: { id: d.id, source: d.source, target: d.target, via: d.via, label: route.label, turn: route.turn, off: heavy ? 0 : offset(route.label) },
+        classes: [this.constructor.ASSOCIATIONS.has(d.via) ? "assoc" : "dep", heavy ? "" : "detail", route.classes].join(" ").trim()
       })
     }
 
@@ -217,8 +217,8 @@ export default class extends Controller {
       elements,
       style: this.stylesheet(font),
       layout: { name: "preset", fit: false },
-      minZoom: 0.02,
-      maxZoom: 1.6,
+      minZoom: this.floor(),
+      maxZoom: this.constructor.MAX_ZOOM,
       userZoomingEnabled: false,
       boxSelectionEnabled: false,
       autoungrabify: false,
@@ -228,15 +228,6 @@ export default class extends Controller {
       hideEdgesOnViewport: heavy
     })
     this.cy.viewport(fitted)
-    this.cy.on("zoom", () => {
-      const detailed = this.cy.zoom() >= this.constructor.DETAIL_ZOOM
-      if (detailed === this.detailed) return
-      this.detailed = detailed
-      this.cy.batch(() => {
-        if (detailed) this.cy.edges().forEach((edge) => edge.data("off", offset(edge.data("label"))))
-        this.cy.elements().toggleClass("detail", detailed)
-      })
-    })
     this.cy.on("tap", "node", (event) => {
       const pointer = event.originalEvent
       if (this.pickValue && pointer && (pointer.shiftKey || pointer.ctrlKey || pointer.metaKey)) this.togglePick(event.target.id())
@@ -738,18 +729,20 @@ tintWindow(from, to) {
     const focus = this.cy.getElementById(this.focusId)
     if (!focus.nonempty()) { this.cy.fit(undefined, 21); return }
     const box = this.cy.nodes().boundingBox({ includeLabels: false, includeOverlays: false })
-    this.cy.viewport(this.constructor.view(box, this.cy.nodes().map((node) => node.position()), focus.position(), this.cy.width(), this.cy.height()))
+    this.cy.viewport(this.constructor.view(box, this.cy.nodes().map((node) => node.position()), focus.position(), this.cy.width(), this.cy.height(), this.floor()))
   }
 
   // The fitted view with this unit in the middle of the canvas. The zoom
   // takes the extent symmetrically around the focus, but gives up at most
   // a quarter of the plain fit for it; the focus then moves toward the
   // middle as far as keeps every unit in view. A neighbourhood with units
-  // on one side only has no middle to keep, and takes the plain fit.
-  static view(box, points, focus, width, height) {
+  // on one side only has no middle to keep, and takes the plain fit. No
+  // zoom goes below READABLE_ZOOM: a neighbourhood too large for the canvas
+  // at that zoom keeps this unit in the middle and is reached by panning.
+  static view(box, points, focus, width, height, floor = this.READABLE_ZOOM) {
     const pad = 21
     const room = [Math.max(1, width - 2 * pad), Math.max(1, height - 2 * pad)]
-    const clamp = (zoom) => Math.min(1.6, Math.max(0.02, zoom))
+    const clamp = (zoom) => Math.min(this.MAX_ZOOM, Math.max(floor, zoom))
     const plain = clamp(Math.min(room[0] / Math.max(1, box.x2 - box.x1), room[1] / Math.max(1, box.y2 - box.y1)))
     const half = [Math.max(focus.x - box.x1, box.x2 - focus.x, 1), Math.max(focus.y - box.y1, box.y2 - focus.y, 1)]
     const centred = clamp(Math.min(room[0] / (2 * half[0]), room[1] / (2 * half[1])))
@@ -778,6 +771,10 @@ tintWindow(from, to) {
     }
     return Number.isFinite(box.x1) ? box : { x1: 0, y1: 0, x2: 1, y2: 1 }
   }
+
+  // The lowest zoom. Graph of pinned (fitAll) must show every pinned unit, so
+  // its floor is the fit zoom; every neighbourhood's is the readable zoom.
+  floor() { return this.fitAllValue ? this.constructor.FIT_ZOOM : this.constructor.READABLE_ZOOM }
 
   zoomIn() { this.zoom(1.25) }
   zoomOut() { this.zoom(0.8) }
@@ -871,8 +868,16 @@ tintWindow(from, to) {
 
   light(node) {
     if (!this.cy) return
-    this.cy.edges(".lit").removeClass("lit")
-    if (node?.nonempty?.()) node.connectedEdges().addClass("lit")
+    const lit = this.cy.edges(".lit")
+    lit.removeClass("lit")
+    if (this.lightEdges) lit.removeClass("detail")
+    if (!node?.nonempty?.()) return
+    const next = node.connectedEdges()
+    next.addClass("lit")
+    if (this.lightEdges) {
+      next.forEach((edge) => edge.data("off", this.edgeOffset(edge.data("label"))))
+      next.addClass("detail")
+    }
   }
 
   announce(id, extra = null) {

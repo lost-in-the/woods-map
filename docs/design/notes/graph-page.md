@@ -67,12 +67,18 @@ most of their drawings were illegible at real sizes.
   the other end's own segment. When that end is shared too, it shows only while the edge is
   lit (hover, selection, or a list row in focus).
 - **Fit.** The fitted view centres this unit, giving up at most a quarter of the plain fit
-  to do so. A neighbourhood with units on one side only takes the plain fit.
-- **Overview.** Below zoom 0.5, Cytoscape stops drawing names. Units are then drawn
-  without names, and edges without arrows, dashes or labels. A neighbourhood that fits
-  below that zoom starts in overview, as does one over 120 units or 150 edges, which also
-  draws with lighter renderer settings. Zooming in past 0.5 brings the detail back. The
-  status line and the list name every unit and edge regardless.
+  to do so. A neighbourhood with units on one side only takes the plain fit. The zoom never
+  goes below the readable zoom, so a neighbourhood too large for the canvas keeps this unit
+  in the middle and is reached by dragging to pan.
+- **Readable zoom.** There is no unnamed overview. The minimum zoom is 0.75 (names about
+  9px, well above the 6px where Cytoscape stops drawing them), and the first view is
+  centred on this unit at that zoom or closer. The panel has zoom in and zoom out buttons,
+  the `+` and `-` keys do the same, `0` fits this unit in view, and a *list* link jumps to
+  the typed relationship list. A selection that is out of view pans to it.
+- **Large neighbourhoods.** Over 120 units or 150 edges the canvas keeps the lighter
+  renderer settings, and edges are plain (no arrows, dashes or labels) until a unit is
+  selected or hovered, which draws its edges in full. Names are always drawn. The status
+  line and the list name every unit and edge regardless.
 
 The 300-unit fixture draws its first frame in about 130 to 160 ms on the harness
 (minimum to median of nine), against 122 to 147 ms before these changes.

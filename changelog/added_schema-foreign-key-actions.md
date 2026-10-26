@@ -1,0 +1,1 @@
+- The Schema tab shows the database delete action beside a Rails `dependent:` finding when the index publishes it: `on_delete cascade`, or `none declared` when the key reports no action. A key without an `on_delete` entry keeps "database delete action not published" (the adapter did not report it).

@@ -19,6 +19,16 @@ RSpec.describe 'What the Schema tab says the evidence means', type: :request do
       .to include('unchecked: no foreign key to users published on relationships')
   end
 
+  it 'shows the published delete action beside the Rails dependent behaviour' do
+    get '/woods/units/model/User/schema'
+    expect(association_row('microposts')).to include('Rails dependent destroy; database on_delete cascade')
+  end
+
+  it 'says a key without a published action is not published, never none declared' do
+    get '/woods/units/model/User/schema'
+    expect(association_row('active_relationships')).not_to include('none declared')
+  end
+
   describe 'the entity relationship diagram scope' do
     def er_section
       body = response.parsed_body

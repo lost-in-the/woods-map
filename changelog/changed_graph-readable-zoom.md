@@ -1,0 +1,4 @@
+- The Graph tab never shows unnamed boxes.
+  - **First view:** centred on the focus unit at a zoom where names render. The minimum zoom is that readable zoom, so the reader pans to the rest of the neighbourhood.
+  - **Controls:** zoom in and zoom out buttons and the `+` and `-` keys, plus a link to the typed relationship list. The butterfly layout, bounded traversal and cached positions are unchanged.
+  - **Large neighbourhoods:** past 120 units or 150 edges edges stay plain until one is lit, so the first frame stays inside its budget.

@@ -140,9 +140,64 @@ function drawing(cytoscape) {
     alone: crowding.length === 0,
     // A unit that is both (an edge each way) stands with the dependencies.
     dependentsLeft: focusNode.incomers("node").difference(focusNode.outgoers("node")).every((node) => node.position().x < fp.x),
-    dependenciesRight: focusNode.outgoers("node").every((node) => node.position().x > fp.x),
-    overview: big.overview
+    dependenciesRight: focusNode.outgoers("node").every((node) => node.position().x > fp.x)
   }
+
+  // Readable zoom (D-30): the first view of any neighbourhood is centred on this unit at a
+  // zoom where names render, the minimum zoom is that zoom, and the buttons and + / - keys
+  // zoom within it.
+  const readability = (controller, width) => {
+    const cy = controller.cy
+    const focus = cy.getElementById(controller.focusId)
+    const fontSize = (node) => Number.parseFloat(node.style("font-size")) * cy.zoom()
+    const floor = () => Number.parseFloat(focus.style("min-zoomed-font-size"))
+    const first = { zoom: cy.zoom(), minZoom: cy.minZoom(), named: focus.hasClass("detail") && fontSize(focus) >= floor() }
+    const rendered = focus.renderedPosition()
+    first.focusInView = rendered.x > 0 && rendered.x < cy.width() && rendered.y > 0 && rendered.y < cy.height()
+    first.namedInView = cy.nodes().filter((node) => {
+      const p = node.renderedPosition()
+      return p.x >= 0 && p.x <= cy.width() && p.y >= 0 && p.y <= cy.height()
+    }).every((node) => node.hasClass("detail") && fontSize(node) >= floor())
+    first.width = cy.width()
+    first.edgesDetailed = cy.edges().every((edge) => edge.hasClass("detail"))
+    first.overview = controller.overview === true
+    first.heavy = cy.nodes().length > 120 || cy.edges().length > 150
+    controller.select(controller.focusId)
+    first.litEdges = cy.edges(".lit").length
+    first.litDetailed = cy.edges(".lit").every((edge) => edge.hasClass("detail"))
+    controller.light(cy.collection())
+    first.unlitPlain = cy.edges().every((edge) => edge.hasClass("detail") === !first.heavy)
+    const canvas = controller.canvasTarget
+    for (let i = 0; i < 40; i++) press(canvas, "-")
+    first.floor = cy.zoom()
+    controller.zoomOut()
+    first.floorHeld = cy.zoom() === first.floor
+    press(canvas, "+")
+    first.keyIn = cy.zoom() > first.floor
+    const raised = cy.zoom()
+    controller.zoomIn()
+    first.buttonIn = cy.zoom() > raised
+    const higher = cy.zoom()
+    press(canvas, "-")
+    first.keyOut = cy.zoom() < higher
+    controller.fit()
+    first.fitted = cy.zoom()
+    first.requested = width
+    return first
+  }
+  const readable = { wide: readability(big, 1440) }
+  const small42 = neighbourhood(42, 80)
+  const mid = mount("mid")
+  mid.draw(cytoscape, small42)
+  readable.mid = readability(mid, 1440)
+  const narrow = mount("narrow")
+  narrow.canvasTarget.style.width = "390px"
+  narrow.draw(cytoscape, small42)
+  readable.narrow = readability(narrow, 390)
+  const narrowBig = mount("narrow-big")
+  narrowBig.canvasTarget.style.width = "390px"
+  narrowBig.draw(cytoscape, data)
+  readable.narrowBig = readability(narrowBig, 390)
 
   // Layout stability (A-3): a dragged position is kept per generation and query and
   // restored by the next draw of the same query; forgetting it lays out afresh.
@@ -281,7 +336,7 @@ timeline.cleared = timed.cy.nodes(".tl").length
   const recentre = blasted.unitUrl({ type: "route", identifier: "GET /users/:id?x=1&y" })
 
   return {
-    restored, forgotten, tinted, ranges, recentre, routes, butterfly, flow, timeline, loop, pick,
+    readable, restored, forgotten, tinted, ranges, recentre, routes, butterfly, flow, timeline, loop, pick,
     ms: Number(big.element.dataset.graphRenderMs), wall, calibrationMs, warmMs, timings: big.timings,
     drawn: big.element.dataset.graphDrawn === "true",
     nodes: big.cy.nodes().length, edges: big.cy.edges().length,

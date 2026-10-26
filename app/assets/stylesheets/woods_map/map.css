@@ -108,6 +108,7 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .share-panel .sh-row,.wm .share-panel .sh-dia{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);align-items:center}
 .wm .share-panel .sh-row .tool{margin-left:auto}
 .wm .share-panel .sh-dia[hidden]{display:none}
+.wm .share-panel .sh-carries{margin:0;padding:0;font-size:var(--fs-12);color:var(--mut)}
 .wm .share-panel .sh-url{font-family:var(--ff-data);font-size:var(--fs-11);overflow-wrap:anywhere;user-select:all}
 /* Why a diagram has no PR comment copy (woods-map#76): a sentence on its own line, wrapped in the panel. */
 .wm .share-panel .sh-dia .lyr{white-space:normal;margin-left:0;flex-basis:100%}
@@ -398,6 +399,9 @@ html.no-js .wm .amb-pop[hidden]{display:block}
 .wm .trail-form input[type=text],.wm .trail-note{font:inherit;font-family:var(--ff-data);font-size:var(--fs-12);color:var(--text);background:var(--ground2);border:1px solid var(--rule2);border-radius:var(--r-ctl);padding:var(--s1) var(--s2);min-width:0}
 .wm .trail-form input[type=text]{flex:1 1 28ch}
 .wm .trail-form .cap{flex-basis:100%;margin:0}
+.wm .trail-handoff{display:grid;gap:var(--s2);padding:var(--s3) var(--s4)}
+.wm .trail-handoff label{font-family:var(--ff-ui);font-size:var(--fs-11);color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+.wm .trail-handoff .cap{margin:0}
 .wm .trail-note{width:100%;resize:vertical;display:block}
 .wm .trail-note{field-sizing:content;min-height:calc(var(--s6) + var(--s4));max-height:70vh}
 .wm .trail-note:focus{min-height:calc(var(--s7) * 2)}

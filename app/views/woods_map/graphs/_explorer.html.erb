@@ -75,11 +75,12 @@
           <button class="tool" type="button" aria-label="Zoom in" data-action="graph#zoomIn">+</button>
           <button class="tool" type="button" aria-label="Zoom out" data-action="graph#zoomOut">−</button>
           <button class="tool" type="button" data-action="graph#fit">fit</button>
+          <a class="tool" href="#edge-list">list</a>
           <%= render 'woods_map/components/mermaid_tools', text: n.mermaid, name: "#{identifier} neighbourhood depth #{n.depth}", url: local_assigns[:mermaid_url], refused: n.refusal.present? %>
           <button class="tool" type="button" aria-pressed="false" aria-controls="graph-flowchart" data-graph-target="flowchart" data-action="graph#flowchart">flowchart</button>
         </span></div>
         <div class="gcanvas" tabindex="0" role="application" aria-roledescription="graph" aria-label="<%= graph_label %>" aria-describedby="graph-status" data-graph-target="canvas"></div>
-        <p class="gstatus" id="graph-status" role="status" data-graph-target="status">Tab to the canvas: arrow keys move along the edges, Enter opens a unit's graph, + and − zoom, 0 fits.<% if pick %> Space or Shift+click adds a unit to the guide's context.<% end %></p>
+        <p class="gstatus" id="graph-status" role="status" data-graph-target="status">Drag to pan to the rest. Tab to the canvas: arrow keys move along the edges, Enter opens a unit's graph, + and − zoom, 0 fits this unit in view.<% if pick %> Space or Shift+click adds a unit to the guide's context.<% end %></p>
         <% legend = n.type_counts.keys.map { |t| [tag.i(class: 'sw gsw', data: { gtype: t }), t.to_s.tr('_', ' ')] } +
                     [[tag.span('──', class: 'ar'), 'association'], [tag.span('┄┄', class: 'ar'), 'other mechanisms'],
                      [tag.i(class: 'sw self'), 'this unit']] %>

@@ -58,7 +58,7 @@ module WoodsMap
         fk = a['through'] ? nil : a['foreign_key']
         Association.new(macro: "#{a['type']} :#{a['name']}", name: a['name'], target: a['target'],
                         options: options_text(a), foreign_key: fk && key_text(a, fk),
-                        enforced: enforcement(a, fk), finding: finding_for(a))
+                        enforced: enforcement(a, fk), finding: DeleteFinding.text(a, key: published_key(a)))
       end
     end
 
@@ -177,13 +177,12 @@ module WoodsMap
       Array(@table_metadata['foreign_keys'].presence || @metadata['foreign_keys'])
     end
 
-    def finding_for(assoc)
-      return 'polymorphic, no FK' if assoc['polymorphic']
+    def published_key(assoc)
+      column = assoc['foreign_key']
+      return if column.blank?
+      return @incoming.key_for(target_table(assoc), column) unless owning?(assoc)
 
-      dependent = assoc.dig('options', 'dependent').to_s
-      return unless dependent.start_with?('destroy', 'delete')
-
-      "delete radius: Rails dependent #{dependent}; database delete action not published"
+      foreign_keys.find { |fkey| fkey['column'].to_s == column.to_s }
     end
 
     def index_for(column)
