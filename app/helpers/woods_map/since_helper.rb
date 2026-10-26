@@ -4,6 +4,10 @@ module WoodsMap
   # Words for `?since=` (E-8) from Woods' range report.
   module SinceHelper
     MARGIN = 'Notes on a changed line, or reading a metadata key that moved, are marked M.'
+    PRESENCE_LINES = {
+      'added' => 'It is new in this range, so there is no earlier source to mark lines against.',
+      'removed' => 'It is gone in the later generation, so there are no lines to mark.'
+    }.freeze
 
     # What the banner says about the unit's changed lines.
     #
@@ -11,6 +15,9 @@ module WoodsMap
     # @param page [WoodsMap::UnitPage]
     # @return [String]
     def since_lines_sentence(since, page)
+      status = since.change(page.identifier, page.type)&.dig('status')
+      return "#{PRESENCE_LINES[status]} " if PRESENCE_LINES.key?(status)
+
       changes = since.source_changes(page.identifier, page.type)
       marks = since.line_marks(page.identifier, page.type)
       lines = if marks then marked_lines(marks)

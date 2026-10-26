@@ -48,6 +48,18 @@ RSpec.describe 'Landscape', type: :request do
       expect(table.css('a').pluck('href')).not_to include(a_string_including('group='))
     end
 
+    it 'says in visible copy that the clusters are inferred, not declared ownership' do
+      get '/woods/landscape/domains'
+      intro = html_response_document.css('p.cap').find { |p| p.text.include?('Inferred relationship groups') }
+      expect(intro.text).to include('Inferred relationship groups', 'not declared ownership')
+    end
+
+    it 'names the basis of each cluster beside it' do
+      get '/woods/landscape/domains'
+      row = html_response_document.at_css('table[aria-label="Domain clusters"] tbody tr')
+      expect(row.css('td').map { |td| td.text.squish }).to include('namespace Users')
+    end
+
     it 'gives the graph page one layout and no clusters layout (D-30)' do
       get '/woods/graph', params: { centre: 'User', type: 'model', group: 'clusters' }
       body = html_response_document.at_css('[data-controller~=graph]')

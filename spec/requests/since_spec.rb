@@ -18,6 +18,31 @@ RSpec.describe '?since= highlighting from Woods\' range report', type: :request 
     expect(banner).to include('Modified since gen 1.', 'metadata keys: callbacks, loc', 'source lines did not move')
   end
 
+  describe 'the banner for a unit that is new or gone' do
+    def banner_for(status)
+      changes = range_report_changes.map { |c| c['identifier'] == 'User' ? c.merge('status' => status) : c }
+      stub_range_report(range_report_data.merge('changed' => changes))
+      get '/woods/units/model/User', params: { since: 'gen:1' }
+      doc.at_css('.banner.mod').text.squish
+    end
+
+    it 'says an added unit is new and does not claim its source did not move' do
+      banner = banner_for('added')
+      expect(banner).to include('Added since gen 1.', 'new in this range')
+      expect(banner).not_to include('did not move')
+    end
+
+    it 'says a removed unit is gone without describing line movement' do
+      banner = banner_for('removed')
+      expect(banner).to include('Removed since gen 1.')
+      expect(banner).not_to include('did not move')
+    end
+
+    it 'still says a modified unit with no line report did not move its lines' do
+      expect(banner_for('modified')).to include('source lines did not move')
+    end
+  end
+
   describe 'the diff gutter' do
     let(:lines) do
       { 'hunks' => [{ 'before' => [25, 1], 'after' => [25, 1] }, { 'before' => [35, 2], 'after' => [34, 0] }],
