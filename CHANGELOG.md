@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- An action whose name implies no model event (a `show`, an `edit`, a custom action) no longer draws a model save in its Across containers view or its `.mmd`. The map used to fall back to the model's first lifecycle chain, so an unrelated action showed a save and an INSERT it was never said to make. That lifecycle now appears below as a "Related lifecycle", labelled as not a step of the action. `create`, `update` and `destroy` still draw their save.
 - The token sign-in field stays visible below 640px. It was styled as the file tree, which the responsive rules hide on a narrow screen, so a phone reader could not enter the token. It now has its own styling, unchanged at desktop widths.
 - A hub's first impact view no longer opens every unit it reaches.
   - **Render-by-name unknowns:** the Unknown tab opens only the reached units that Woods' graph lists as having unresolved renders (`unresolved_render_count`, woods#837), through `Repository#units_with`. A generation from an older Woods, or a Woods without the summary, still opens every reached unit.
