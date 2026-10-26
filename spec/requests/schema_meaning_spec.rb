@@ -67,10 +67,15 @@ RSpec.describe 'What the Schema tab says the evidence means', type: :request do
 
     it 'is headed as recorded callback writers and says what an empty cell means' do
       get '/woods/units/model/User/schema'
-      expect(columns_table.css('th').map { |th| th.text.squish }).to include('recorded callback writers')
-      expect(columns_table.css('th').map { |th| th.text.squish }).not_to include('written by')
+      headers = columns_table.css('th').map { |th| th.text.squish }
+      expect(headers).to include('recorded callback writers')
+      expect(headers).not_to include('written by')
       expect(writer_cell('id')).to include('no callback writer recorded')
       expect(writer_cell('id')).not_to match(/never|no writes/)
+    end
+
+    it 'explains beside the table that only callback writers are indexed' do
+      get '/woods/units/model/User/schema'
       expect(columns_table.ancestors('section').first.text).to include('Callbacks only')
     end
 

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+- Pages say what their evidence covers.
+  - **Schema:** the rail jumps to Columns and Database facts. The writers column is headed "recorded callback writers", an empty cell says no callback writer is recorded (or that the unit publishes no callbacks), and a note says writes from jobs, services and plain methods are not indexed there.
+  - **Unit pages:** a candidate list whose types all come from one file reads "N indexed types" and keeps each link, with the cannot-tell wording kept for candidates at different paths. The job facts row is "enqueued jobs" and says mail deliveries are not counted. An added or removed unit's `?since=` banner no longer says its source lines did not move. The callers panel counts references, and a site with no method is a "class reference".
+  - **Landscape and Impact:** Domains opens with visible copy that the clusters are inferred relationship groups, not declared ownership, and shows the namespace each is named for. The Impact sidebar lists direct dependents and the total reached within the depth, and an empty Unknown tab says it covers what the index reported within the depth.
 - The reading trail keeps each page's full address, path and query, so returning through it restores the investigation (entry, pins, hops, generation, lens, range) instead of the bare page. The address never includes a `token`. Entries stored as a bare path by an earlier version still draw.
 - The Schema tab and the ERD say what the evidence means.
   - **Defaults:** a column whose index publishes only that a default exists says "exists, value not published" instead of "yes". A published value is shown as published, and an empty string, `false` and no default read differently.
