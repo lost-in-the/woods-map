@@ -8,15 +8,18 @@
       rows:    Array of Hash with :cells (Array of HTML), :detail (HTML or nil),
                :checkbox (String label or nil), :classes (String or nil), :id (the
                row's anchor), :current (true for the row a focus URL selects),
-               :data (Hash of data attributes for the row, or nil)
+               :data (Hash of data attributes for the row, or nil), :tip (the full identity: name, type,
+               mechanism; the first cell of an `id` column carries it for hover and focus)
       grouped: Boolean (the 34px toggle column), sticky: Boolean, cards: Boolean,
       min_width: one of TABLE_MIN_WIDTHS in px, below which the wrap scrolls past the cliff,
-      caption: HTML or nil, label: accessible name %>
+      caption: HTML or nil, label: accessible name,
+      compare: the "gen A → gen B" pair of a range report, kept in the sticky header (the page's by default) %>
 <% grouped = local_assigns.fetch(:grouped) { rows.any? { |row| row[:detail] || row[:checkbox] } } %>
+<% compare = local_assigns.fetch(:compare) { table_compare(@range_report) } %>
 <% classes = ['tbl', 'fixed', ('grouped' if grouped), ('sticky' if local_assigns[:sticky]), ('cards' if local_assigns[:cards]), table_min_width_class(local_assigns[:min_width])].compact.join(' ') %>
 <div class="tblwrap" role="region" aria-label="<%= local_assigns[:label] || 'Table' %>" tabindex="0" data-controller="cliff">
   <table class="<%= classes %>"<%= " aria-label=\"#{ERB::Util.html_escape(label)}\"".html_safe if local_assigns[:label] %>>
-    <thead><tr><% if grouped %><th class="tg"><span class="sr-only"><%= [('select' if rows.any? { |row| row[:checkbox] }), ('details' if rows.any? { |row| row[:detail] })].compact.join(', ') %></span></th><% end %><% columns.each do |column| %><th<%= " width=\"#{table_column_width(column[:width])}\"".html_safe if column[:width] %><%= " class=\"#{column[:class]}\"".html_safe if column[:class] %>><% if column[:abbr] %><abbr title="<%= column[:abbr] %>"><%= column[:label] %></abbr><% else %><%= column[:label] %><% end %></th><% end %></tr></thead>
+    <thead><% if compare %><tr class="cmp"><th colspan="<%= columns.size + (grouped ? 1 : 0) %>"><%= compare %></th></tr><% end %><tr><% if grouped %><th class="tg"><span class="sr-only"><%= [('select' if rows.any? { |row| row[:checkbox] }), ('details' if rows.any? { |row| row[:detail] })].compact.join(', ') %></span></th><% end %><% columns.each do |column| %><th<%= " width=\"#{table_column_width(column[:width])}\"".html_safe if column[:width] %><%= " class=\"#{column[:class]}\"".html_safe if column[:class] %>><% if column[:abbr] %><abbr title="<%= column[:abbr] %>"><%= column[:label] %></abbr><% else %><%= column[:label] %><% end %></th><% end %></tr></thead>
     <tbody>
       <% rows.each_with_index do |row, index| %>
         <% parity = index.odd? ? 'odd' : '' %>
@@ -28,9 +31,12 @@
               <% if row[:detail] %><button class="tgl" type="button" aria-expanded="<%= open ? 'true' : 'false' %>" aria-label="<%= open ? 'Collapse' : 'Expand' %> details" data-action="rows#toggle">+</button><% end %>
             </div></td>
           <% end %>
+          <% tip = row[:tip] %>
           <% row[:cells].each_with_index do |cell, cell_index| %>
             <% column = columns[cell_index] || {} %>
-            <td<%= " class=\"#{column[:cell_class]}\"".html_safe if column[:cell_class] %> data-h="<%= column[:label] %>"><%= cell %></td>
+            <% cell_tip = nil %>
+            <% cell_tip, tip = tip, nil if tip && column[:cell_class].to_s.split.include?('id') %>
+            <td<%= " class=\"#{column[:cell_class]}\"".html_safe if column[:cell_class] %><%= " title=\"#{ERB::Util.html_escape(cell_tip)}\"".html_safe if cell_tip %> data-h="<%= column[:label] %>"><%= cell %></td>
           <% end %>
         </tr>
         <% if row[:detail] %>

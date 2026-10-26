@@ -34,7 +34,7 @@ export default class extends Controller {
     el.classList.toggle("more", overflow > 1 && el.scrollLeft < overflow - 1)
     el.classList.toggle("more-left", el.scrollLeft > 1)
     // A region that scrolls must be reachable with the keyboard.
-    if (overflow > 1) el.setAttribute("tabindex", "0")
+    if (overflow > 1 || el.scrollHeight - el.clientHeight > 1) el.setAttribute("tabindex", "0")
     else el.removeAttribute("tabindex")
   }
 }
