@@ -8,16 +8,16 @@ RSpec.describe 'Sticky table headers in Chromium', type: :request do
   include RangeReportFixture
 
   # The layout width the breakpoints see is the window less the classic scrollbar headless Chromium draws.
-  SCROLLBAR = 15
+  let(:scrollbar) { 15 }
 
   before { stub_range_report }
 
   { 1440 => true, 960 => true, 640 => true, 390 => false }.each do |width, sticks|
-    it "#{sticks ? 'keeps' : 'does not keep'} the header and the generation pair in view of a scrolled table at #{width}" do
+    it "#{sticks ? 'keeps' : 'does not keep'} the header and pair in view of a scrolled table at #{width}" do
       skip 'Set WOODS_MAP_BROWSER to run the Chromium DOM/CSS regression' unless ENV['WOODS_MAP_BROWSER']
 
       get '/woods/impact', params: { from: 'gen:1', lens: 'changed' }
-      result = run_page(response.body, runner: table_runner, width: width + SCROLLBAR, height: 700)
+      result = run_page(response.body, runner: table_runner, width: width + scrollbar, height: 700)
       expect(result).to include('headerStays' => sticks, 'pairInHeader' => true, 'firstColumnStays' => true,
                                 'keyboardRegion' => true)
     end

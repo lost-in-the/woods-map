@@ -13,7 +13,8 @@ RSpec.describe 'The sticky diff header in Chromium', type: :request do
              { 'op' => '+', 'before' => nil, 'after' => 4, 'text' => '  queue_as :default' }]
     instance_double(WoodsMap::SourceDiff, state: :available, status: 'modified', categories: ['behaviour'],
                                           hunks: [{ 'before' => [3, 1], 'after' => [3, 2], 'lines' => lines }],
-                                          changes: { 'added_lines' => 1, 'removed_lines' => 0, 'coverage' => 'complete' })
+                                          changes: { 'added_lines' => 1, 'removed_lines' => 0,
+                                                     'coverage' => 'complete' })
   end
 
   before do

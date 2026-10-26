@@ -14,7 +14,7 @@
       caption: HTML or nil, label: accessible name,
       compare: the "gen A → gen B" pair of a range report, kept in the sticky header (the page's by default) %>
 <% grouped = local_assigns.fetch(:grouped) { rows.any? { |row| row[:detail] || row[:checkbox] } } %>
-<% compare = local_assigns.fetch(:compare) { table_compare } %>
+<% compare = local_assigns.fetch(:compare) { table_compare(@range_report) } %>
 <% classes = ['tbl', 'fixed', ('grouped' if grouped), ('sticky' if local_assigns[:sticky]), ('cards' if local_assigns[:cards]), table_min_width_class(local_assigns[:min_width])].compact.join(' ') %>
 <div class="tblwrap" role="region" aria-label="<%= local_assigns[:label] || 'Table' %>" tabindex="0" data-controller="cliff">
   <table class="<%= classes %>"<%= " aria-label=\"#{ERB::Util.html_escape(label)}\"".html_safe if local_assigns[:label] %>>

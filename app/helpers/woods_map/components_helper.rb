@@ -23,9 +23,9 @@ module WoodsMap
 
     # The generation pair a table on a range page keeps in its sticky header.
     #
+    # @param report [WoodsMap::RangeReport, nil] the page's range report
     # @return [String, nil] "gen A → gen B", or nil outside a range report
-    def table_compare
-      report = @range_report
+    def table_compare(report)
       "gen #{report.from_generation} → gen #{report.to_generation}" if report
     end
 
