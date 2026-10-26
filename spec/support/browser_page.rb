@@ -13,7 +13,7 @@ module WoodsMap
   # body that may await; it ends by calling report(result).
   module BrowserPage
     CONTROLLERS = %w[cliff tooltip rows tree sheet copy share palette peek card trail keys help settings
-                     disambiguation pinboard brush matrix].freeze
+                     disambiguation pinboard brush matrix graph].freeze
 
     # @param html [String] a full page from a request
     # @return [Hash] the runner's report
@@ -61,7 +61,8 @@ module WoodsMap
       controllers = CONTROLLERS.to_h do |name|
         ["wm/#{name}", data.call("app/javascript/woods_map/controllers/#{name}_controller.js")]
       end
-      controllers.merge('@hotwired/stimulus' => data.call('vendor/javascript/stimulus.js'))
+      controllers.merge('@hotwired/stimulus' => data.call('vendor/javascript/stimulus.js'),
+                        'cytoscape' => data.call('vendor/javascript/cytoscape.esm.min.mjs'))
     end
 
     def page_boot(fetches)

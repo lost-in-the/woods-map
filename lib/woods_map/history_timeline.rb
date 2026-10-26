@@ -83,6 +83,11 @@ module WoodsMap
       found.sort_by { |pair| -pair.shas.size }
     end
 
+    # @return [String, nil] the shortest range that still holds every commit shown, when shorter than the window
+    def zoom_range
+      HistoryZoom.range(HistoryView::RANGES, @days, events.map(&:date), @now) if table?
+    end
+
     # @return [CommitStrip] the window's axis
     def strip
       @strip ||= CommitStrip.new(events.map(&:date), days: @days, now: @now)
