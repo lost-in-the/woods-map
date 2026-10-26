@@ -24,6 +24,7 @@ import GuideController from "./controllers/guide_controller.js"
 import PinboardController from "./controllers/pinboard_controller.js"
 import BrushController from "./controllers/brush_controller.js"
 import MatrixController from "./controllers/matrix_controller.js"
+import RevealController from "./controllers/reveal_controller.js"
 
 const application = Application.start()
 application.register("cliff", CliffController)
@@ -47,5 +48,6 @@ application.register("guide", GuideController)
 application.register("pinboard", PinboardController)
 application.register("brush", BrushController)
 application.register("matrix", MatrixController)
+application.register("reveal", RevealController)
 
 document.documentElement.dataset.woodsMap = "ready"
