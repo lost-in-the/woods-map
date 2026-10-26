@@ -141,6 +141,7 @@ Run this before a milestone issue is opened and again before it closes.
 | D-31 Guide: no fallback when an event stream cannot open, for now; re-evaluate later (settled); the heartbeat and DEPLOYMENT §8 are built | [woods-map#101](https://github.com/lost-in-the/woods-map/issues/101) |
 | F-3 measured on `rails-8.0-large` (+2.2% payload, spans inline) and D-29 editor links settled, recorded in `decisions.md` | [woods-map#1](https://github.com/lost-in-the/woods-map/issues/1), [woods#751](https://github.com/lost-in-the/woods/issues/751) |
 | History: filter the timeline by a commit's author on the History tab, `/woods/history` and the graph's timeline (scenario 2 step 4), closed by [woods-map#97](https://github.com/lost-in-the/woods-map/pull/97) | [woods-map#92](https://github.com/lost-in-the/woods-map/issues/92) |
+| Schema tab shows the published foreign-key `on_delete`/`on_update` beside the Rails `dependent:` finding (nil is none declared, a missing key is not reported; woods#850) | [woods-map#134](https://github.com/lost-in-the/woods-map/issues/134) |
 | D-10 Source of truth for visual tokens | [woods-map#12](https://github.com/lost-in-the/woods-map/issues/12) |
 | D-11 Colour meaning | [woods-map#13](https://github.com/lost-in-the/woods-map/issues/13) |
 | D-12 Typefaces | [woods-map#14](https://github.com/lost-in-the/woods-map/issues/14) |

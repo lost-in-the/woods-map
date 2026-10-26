@@ -121,5 +121,41 @@ RSpec.describe WoodsMap::SchemaView do
       finding = described_class.new(unit).associations.first.finding
       expect(finding).to eq('delete radius: Rails dependent destroy; database delete action not published')
     end
+
+    describe 'with the foreign key the far table publishes' do
+      def finding_with(key)
+        user = { 'identifier' => 'User', 'type' => 'model', 'metadata' => { 'table_name' => 'users', 'associations' => [
+          { 'type' => 'has_many', 'name' => 'posts', 'target' => 'Post', 'foreign_key' => 'user_id',
+            'options' => { 'dependent' => 'destroy' } }
+        ] } }
+        posts = { 'metadata' => { 'foreign_keys' => [{ 'column' => 'user_id', 'to_table' => 'users' }.merge(key)] } }
+        lookup = ->(name) { { 'posts' => posts }[name] }
+        view = described_class.new(user, tables: { 'Post' => 'posts' }, table_lookup: lookup)
+        view.associations.first.finding
+      end
+
+      it 'shows the published delete action beside the Rails behaviour' do
+        expect(finding_with('on_delete' => 'cascade'))
+          .to eq('delete radius: Rails dependent destroy; database on_delete cascade')
+      end
+
+      it 'reads a nil action as none declared' do
+        expect(finding_with('on_delete' => nil))
+          .to eq('delete radius: Rails dependent destroy; database on_delete none declared')
+      end
+
+      it 'keeps the not published wording when the key carries no on_delete' do
+        expect(finding_with({})).to eq('delete radius: Rails dependent destroy; database delete action not published')
+      end
+    end
+
+    it 'reads the action off this table for a belongs_to' do
+      post = { 'identifier' => 'Post', 'type' => 'model', 'metadata' => { 'table_name' => 'posts', 'associations' => [
+        { 'type' => 'belongs_to', 'name' => 'user', 'target' => 'User', 'foreign_key' => 'user_id',
+          'options' => { 'dependent' => 'destroy' } }
+      ], 'foreign_keys' => [{ 'column' => 'user_id', 'to_table' => 'users', 'on_delete' => 'restrict' }] } }
+      expect(described_class.new(post).associations.first.finding)
+        .to eq('delete radius: Rails dependent destroy; database on_delete restrict')
+    end
   end
 end

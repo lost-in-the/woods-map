@@ -183,7 +183,26 @@ module WoodsMap
       dependent = assoc.dig('options', 'dependent').to_s
       return unless dependent.start_with?('destroy', 'delete')
 
-      "delete radius: Rails dependent #{dependent}; database delete action not published"
+      "delete radius: Rails dependent #{dependent}; #{database_delete_action(published_key(assoc))}"
+    end
+
+    def published_key(assoc)
+      key = assoc['foreign_key']
+      return if key.blank?
+
+      if owning?(assoc)
+        foreign_keys.find { |fkey| fkey['column'].to_s == key.to_s }
+      else
+        @incoming.key_for(target_table(assoc), key)
+      end
+    end
+
+    # A nil action is a declared absence; a missing key is an adapter that
+    # did not report one.
+    def database_delete_action(fkey)
+      return 'database delete action not published' unless fkey&.key?('on_delete')
+
+      "database on_delete #{fkey['on_delete'] || 'none declared'}"
     end
 
     def index_for(column)

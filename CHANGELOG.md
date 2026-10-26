@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- The Schema tab shows the database delete action beside a Rails `dependent:` finding when the index publishes it: `on_delete cascade`, or `none declared` when the key reports no action. A key without an `on_delete` entry keeps "database delete action not published" (the adapter did not report it).
 - Layout, History and Hotspots reading fixes.
   - **History picker:** a long path or namespace wraps inside its checkbox label, and the type and count keep their own cells.
   - **History:** a commit's detail lists the unit's own files first, then a few others, with a count that opens the rest in place. A commit touching twelve or more files is labelled broad. When every commit shown falls in a shorter range, the tab and the timeline offer "zoom to the last 30d".

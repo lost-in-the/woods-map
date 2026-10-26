@@ -24,12 +24,22 @@ module WoodsMap
       unit = @far_tables[far_table]
       return "unchecked: table #{far_table} not in the index" unless unit
 
-      key = Array(unit.dig('metadata', 'foreign_keys')).find do |fk|
-        fk['column'].to_s == column.to_s && fk['to_table'].to_s == @table_name.to_s
-      end
+      key = key_for(far_table, column)
       return "✓ FK #{far_table}.#{column} → #{@table_name}" if key
 
       "unchecked: no foreign key to #{@table_name} published on #{far_table}"
+    end
+
+    # @param far_table [String]
+    # @param column [String, nil]
+    # @return [Hash, nil] the published foreign key from far_table.column to this table
+    def key_for(far_table, column)
+      unit = @far_tables[far_table]
+      return unless unit
+
+      Array(unit.dig('metadata', 'foreign_keys')).find do |fk|
+        fk['column'].to_s == column.to_s && fk['to_table'].to_s == @table_name.to_s
+      end
     end
   end
 end
