@@ -79,6 +79,15 @@ RSpec.describe WoodsMap::Neighbourhood do
                                                           ['Caller', 'service', 'Report', 'factory', 1])
   end
 
+  # Woods labels a class's edge to its application-defined parent `inheritance`
+  # (Extractors::SuperclassDependency, woods#936); no generation publishes `inherits`.
+  it 'files an inheritance edge under the structure family' do
+    graph['variants'].first['edges'] << { 'target' => 'BaseReport', 'type' => 'model', 'via' => 'inheritance' }
+    neighbourhood = described_class.new(repository, 'Report', type: 'model', direction: 'dependencies')
+    expect(neighbourhood.via_counts['structure']).to eq('code_reference' => 2, 'inheritance' => 1)
+    expect(described_class::FAMILIES.values.flatten).not_to include('inherits')
+  end
+
   it 'does not borrow primary edges when the selected variant has no dependencies' do
     graph['variants'].first['edges'] = []
     neighbourhood = described_class.new(repository, 'Report', type: 'model', direction: 'dependencies')
