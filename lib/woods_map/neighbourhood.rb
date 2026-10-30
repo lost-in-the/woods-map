@@ -10,10 +10,12 @@ module WoodsMap
     # reached_type records the endpoint reached on this edge's first breadth-first visit.
     Edge = Struct.new(:from, :from_type, :via, :to, :to_type, :depth, :reached_type, keyword_init: true)
 
-    # Mechanism families (A1 to A5 on the board).
+    # Mechanism families (A1 to A5 on the board), by Woods' published `via`
+    # labels. A class's edge to its application-defined parent is
+    # `inheritance` (Woods' SuperclassDependency, woods#936).
     FAMILIES = {
       'data model' => %w[belongs_to has_many has_one has_and_belongs_to_many through polymorphic],
-      'structure' => %w[include extend code_reference inherits],
+      'structure' => %w[include extend code_reference inheritance],
       'request' => %w[render view_render link_to redirect_to form_action route_dispatch],
       'async' => %w[job_enqueue mailer_call deliver],
       'cross-cutting' => %w[test_coverage]
