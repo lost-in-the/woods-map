@@ -6,6 +6,10 @@ module WoodsMap
   module UnitsHelper
     TAB_LABELS = { 'code' => 'Code', 'routes' => 'Routes', 'schema' => 'Schema', 'passage' => 'Passage',
                    'lifecycle' => 'Lifecycle', 'graph' => 'Graph', 'history' => 'History' }.freeze
+    # Published callback origin (woods#936) => who wrote it and what the Lifecycle tab did with it.
+    CALLBACK_ORIGIN_PHRASES = { 'framework' => %w[framework hidden], 'gem' => %w[gem hidden],
+                                'app' => ['application', 'not drawn: a proc or a macro'],
+                                'unknown' => %w[unknown-origin hidden] }.freeze
 
     # @param identifier [String]
     # @param type [String, nil]
@@ -95,6 +99,29 @@ module WoodsMap
       end
     end
 
+    # What the Lifecycle tab leaves undrawn, as rail items. With the `origin`
+    # Woods publishes (woods#936) each origin is counted apart, so a gem's
+    # callback never reads as the framework's or the application's; without
+    # it the count is inferred from the method not being defined here, and
+    # the missing field is named as a limit.
+    #
+    # @param lifecycle [WoodsMap::Lifecycle]
+    # @return [Array<Hash>] rail items: key, text and own
+    def lifecycle_callback_limits(lifecycle)
+      return inferred_callback_limits(lifecycle) unless lifecycle.origin?
+
+      items = lifecycle.hidden.map do |origin, list|
+        who, what = CALLBACK_ORIGIN_PHRASES.fetch(origin)
+        { key: '·', text: "#{list.size} #{who} #{'callback'.pluralize(list.size)} #{what}",
+          own: layer_chip("origin #{origin}") }
+      end
+      elsewhere = lifecycle.drawn_elsewhere.size
+      return items unless elsewhere.positive?
+
+      items << { key: '·', text: "#{elsewhere} drawn #{'step'.pluralize(elsewhere)} Woods places outside the app",
+                 own: layer_chip('origin') }
+    end
+
     # Render one value of a facts tile: a string, a link, links, a layer chip,
     # a person with a date, or a count with a hot chip.
     #
@@ -141,6 +168,17 @@ module WoodsMap
       rest = links.size - shown.size
       shown << tag.span("+#{rest} more", class: 'dim') if rest.positive?
       safe_join(shown, ', ')
+    end
+
+    private
+
+    # Without `origin`: the inferred framework count, and the missing field named.
+    def inferred_callback_limits(lifecycle)
+      count = lifecycle.framework.size
+      [{ key: '·', text: "#{count} framework #{'callback'.pluralize(count)} hidden",
+         own: layer_chip('not defined here') },
+       { key: '·', text: "no callback origin in this generation: a gem's callback counts as the framework's",
+         own: layer_chip('origin, woods#936') }]
     end
   end
 end

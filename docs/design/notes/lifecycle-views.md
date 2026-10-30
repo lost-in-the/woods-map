@@ -55,6 +55,42 @@ designs it, so this note records what it shows (`WoodsMap::DynamicView`):
 - `DynamicView::BUDGET` (150 nodes) is the budget. Both texts have `.mmd`
   URLs: `lifecycle.mmd?view=dynamic` and `passage.mmd?view=dynamic`.
 
+## Which callbacks are steps
+
+A step is a callback whose method the model's source or an inlined concern
+defines, the rule Woods' own builder draws by (`Woods::Diagrams::Lifecycle`,
+woods#826). The map keeps that rule so the sequence, which Woods draws, and
+the steps table number alike. Rails' internal methods (`_`,
+`autosave_associated_records_for_`) and every proc are never steps. A proc is
+labelled by its source site. An application proc is root-relative
+(`#<Proc app/models/post.rb:12>`), and a gem's is gem-relative
+(`#<lambda activerecord-7.1.6/lib/active_record/associations/builder/association.rb:93>`).
+Woods never publishes an absolute path there (woods#936).
+
+What is not drawn is counted in the rail's limits:
+
+- **With `origin`** (woods#936). Woods publishes who wrote each model,
+  controller and mailer callback beside `analysis_status`: `app`,
+  `framework`, `gem` or `unknown`. When every callback of the unit carries
+  it (`Lifecycle#origin?`), the rail counts the undrawn callbacks by origin
+  (`Lifecycle#hidden`). A gem's callback, such as one Devise adds, is
+  counted as a gem's, never as the framework's. An application callback
+  that is not drawn is a proc or one a macro defines. A drawn step whose
+  origin is not `app` (a method the source defines that a gem or Rails
+  overrides) stays drawn, as Woods draws it, and the rail names it
+  (`Lifecycle#drawn_elsewhere`).
+- **Without `origin`** (an older generation), the map keeps the inference:
+  a callback the unit does not define is counted as the framework's, procs
+  and internal methods are left out of the count, and the rail names the
+  missing field as a limit.
+
+The Passage tab reads the same field on controller filters and mailer
+callbacks (`Passage#origin?`). Framework filters and every proc are hidden
+and counted by origin, and a gem's filter, such as Devise's
+`authenticate_user!`, is listed with a `gem` chip. Without `origin`, framework
+filters are recognised by name (`Passage::FRAMEWORK`), a gem's filters are
+listed as the application's, and the filters stage names the limit.
+
 ## State diagrams
 
 A model's state machines are the `state_machine` units with a reverse

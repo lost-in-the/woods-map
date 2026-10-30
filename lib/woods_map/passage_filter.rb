@@ -1,10 +1,16 @@
 # frozen_string_literal: true
 
 module WoodsMap
-  # One application filter: its declared scope and, from W-8, the actions it
-  # applies to, its owner and its applicability.
+  # One listed filter: its declared scope and, from W-8, the actions it
+  # applies to, its owner and its applicability; with woods#936, who wrote it
+  # (`origin`: app or gem on a listed filter, nil on an older generation).
   PassageFilter = Struct.new(:kind, :name, :only, :except, :if_condition, :unless_condition, :file, :line,
-                             :owner, :applies_to, :applicability, :declaration, keyword_init: true) do
+                             :owner, :applies_to, :applicability, :declaration, :origin, keyword_init: true) do
+    # @return [Boolean] whether Woods places the filter in a gem (Devise's authenticate_user!), not the application
+    def gem?
+      origin == 'gem'
+    end
+
     # @return [Hash] the shape {Since::Changed#callback} reads: name and declaration (woods#820)
     def since_entry
       { 'filter' => name, 'declaration' => declaration }

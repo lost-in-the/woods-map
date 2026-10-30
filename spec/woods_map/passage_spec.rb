@@ -72,6 +72,41 @@ RSpec.describe WoodsMap::Passage do
     expect(passage('UsersController', action: 'edit').filters.map(&:owner)).to all(be_nil)
   end
 
+  # Woods publishes who wrote each filter (`origin`, woods#936): a gem's filter
+  # such as Devise's authenticate_user! is neither the application's nor the framework's.
+  def origin_passage(action)
+    WoodsMap::Repository.open(FIXTURE_INDEX) do |repository|
+      unit = repository.unit('UsersController', type: 'controller').deep_dup
+      filters = unit['metadata']['filters']
+      filters.each { |f| f['origin'] = f['file'] ? 'app' : 'framework' }
+      filters << { 'kind' => 'before', 'filter' => 'authenticate_user!', 'origin' => 'gem' }
+      filters << { 'kind' => 'before', 'filter' => 'set_locale_from_rails', 'origin' => 'framework' }
+      filters << { 'kind' => 'before', 'filter' => '#<Proc app/controllers/users_controller.rb:7>', 'origin' => 'app' }
+      described_class.new(repository, unit, action: action)
+    end
+  end
+
+  it 'reads the published origin: a gem filter listed as a gem\'s, never as the application\'s' do
+    show = origin_passage('show')
+    expect(show).to be_origin
+    expect(show.filters.map(&:name)).to eq(%w[logged_in_user correct_user admin_user authenticate_user!])
+    expect(show.filters.map(&:origin)).to eq(%w[app app app gem])
+    expect(show.filters.map(&:gem?)).to eq([false, false, false, true])
+  end
+
+  it 'hides the framework\'s filters and every proc, counted by origin' do
+    show = origin_passage('show')
+    expect(show.hidden_filter_counts).to eq('framework' => 5, 'app' => 1)
+    expect(show.framework_filter_count).to eq(6)
+  end
+
+  it 'recognises framework filters by name on a generation without origin' do
+    show = passage('UsersController', action: 'show')
+    expect(show).not_to be_origin
+    expect(show.hidden_filter_counts).to eq({})
+    expect(show.filters.map(&:origin)).to all(be_nil)
+  end
+
   it 'ties the templates to the action through the view_render edge and follows their partials' do
     show = passage('UsersController', action: 'show')
     expect(show.action_templates.map(&:identifier)).to eq(['users/show.html.erb'])

@@ -9,11 +9,12 @@
    ], ' ') %>
 <%= render 'woods_map/units/frame', page: @page, tab: 'lifecycle', controls: controls, definition: @definition %>
 <% transitions = @state_machines.flat_map { |machine| machine.transitions.map { |t| [machine, t] } } %>
+<% limits = lifecycle_callback_limits(@lifecycle) + [{ key: '·', text: 'proc callbacks are not analysed', own: layer_chip('CallbackAnalyzer') }, (@lifecycle.views.include?('dynamic') ? { key: '·', text: 'which process saves the model is not in the index', own: layer_chip('C4 dynamic') } : { key: '·', text: 'no C4-dynamic view: it needs container attribution', own: layer_chip('W-9') }), { key: '·', text: 'nothing here proves a path ran', own: layer_chip('static') }] %>
 <div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>" data-trail-title-value="<%= @page.identifier %>">
   <%= render 'woods_map/components/rail', heading: 'Lifecycle, as Rails runs it', groups: [
         { label: 'events', count: 'steps', items: chains.map { |event, list| { key: '·', text: link_to(event, here.call(event: event)), own: "#{list.size} #{'step'.pluralize(list.size)}#{list.any?(&:async?) ? ', async' : ''}", current: event == @event } } },
         ({ label: 'transitions', count: 'state machine', items: transitions.map { |_, t| { key: '·', text: t.event || 'transition', own: "#{t.from} → #{t.to}#{", guard #{t.guard}" if t.guard}" } } } if transitions.any?),
-        { label: 'limits', count: 4, items: [{ key: '·', text: "#{@lifecycle.framework.size} framework #{'callback'.pluralize(@lifecycle.framework.size)} hidden", own: layer_chip('not defined here') }, { key: '·', text: 'proc callbacks are not analysed', own: layer_chip('CallbackAnalyzer') }, (@lifecycle.views.include?('dynamic') ? { key: '·', text: 'which process saves the model is not in the index', own: layer_chip('C4 dynamic') } : { key: '·', text: 'no C4-dynamic view: it needs container attribution', own: layer_chip('W-9') }), { key: '·', text: 'nothing here proves a path ran', own: layer_chip('static') }] }
+        { label: 'limits', count: limits.size, items: limits }
       ].compact %>
   <div class="main">
     <% mermaid = @lifecycle.diagram(@view, @event) %>

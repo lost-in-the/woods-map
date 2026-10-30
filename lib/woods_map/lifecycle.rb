@@ -4,6 +4,13 @@ module WoodsMap
   # Model callbacks in the order Rails runs them for one event (create,
   # update, destroy), from the resolved chain the extractor published. Each
   # step keeps its side effects, conditions and the concern it came from.
+  #
+  # A step is a callback whose method the unit's source or an inlined concern
+  # defines, as Woods' own builder draws it (woods#826), so the sequence and
+  # the steps table number alike. What is not drawn is counted: by the
+  # `origin` Woods publishes on each callback (woods#936) when the generation
+  # has it, else as the framework's, inferred from the method not being
+  # defined here.
   class Lifecycle
     EVENTS = %w[create update destroy].freeze
 
@@ -32,7 +39,12 @@ module WoodsMap
       'destroy' => %w[before_destroy after_destroy after_commit after_destroy_commit]
     }.freeze
 
-    # Framework callbacks the chain carries but a reader never wrote.
+    # Callbacks never drawn as steps: Rails' internal methods and every proc.
+    # A proc is labelled by its source site, root-relative for the
+    # application (`#<Proc app/models/post.rb:12>`) and gem-relative
+    # otherwise (`#<lambda activerecord-7.1.6/lib/active_record/...:93>`),
+    # never an absolute path (woods#936). Without a published `origin` they
+    # are left out of the count as well ({LifecycleCallbacks}).
     INTERNAL = /\A(_|autosave_associated_records_for_|#<)/
 
     DEFINITION = /^\s*def\s+(?:self\.)?([a-z_]\w*[?!=]?)/
@@ -100,26 +112,29 @@ module WoodsMap
       @repository = repository
       @changed = changed
       @dynamic = dynamic
-      defined = unit['source_code'].to_s.scan(DEFINITION).flatten.to_set | concern_methods.values.flatten.to_set
-      all = Array(unit.dig('metadata', 'callbacks')).reject { |cb| cb['filter'].to_s.match?(INTERNAL) }
-      @callbacks, @framework = all.partition { |cb| defined.include?(cb['filter'].to_s) }
       @concern_methods = concern_methods
+      @split = LifecycleCallbacks.new(unit, concern_methods)
       @owner = unit['identifier']
     end
 
-    # @return [Array<Hash>] the application's own callbacks, file order
-    attr_reader :callbacks
-
-    # @return [Array<Hash>] callbacks whose method the unit does not define (a
-    #   gem's or Rails' own), kept out of the chains and counted in the limits
-    attr_reader :framework
+    # @!method callbacks
+    #   @return (see LifecycleCallbacks#callbacks)
+    # @!method hidden
+    #   @return (see LifecycleCallbacks#hidden)
+    # @!method origin?
+    #   @return (see LifecycleCallbacks#origin?)
+    # @!method framework
+    #   @return (see LifecycleCallbacks#framework)
+    # @!method drawn_elsewhere
+    #   @return (see LifecycleCallbacks#drawn_elsewhere)
+    delegate :callbacks, :hidden, :origin?, :framework, :drawn_elsewhere, to: :@split
 
     # The chain for one event, numbered from 1.
     #
     # @param event [String] create, update or destroy
     # @return [Array<Step>]
     def steps(event)
-      ORDER.fetch(event, []).flat_map { |type| @callbacks.select { |cb| fires?(cb, type, event) } }
+      ORDER.fetch(event, []).flat_map { |type| callbacks.select { |cb| fires?(cb, type, event) } }
            .each_with_index.map { |cb, index| step(cb, index + 1) }
     end
 

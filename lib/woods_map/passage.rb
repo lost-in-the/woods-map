@@ -17,7 +17,8 @@ module WoodsMap
     # A template ivar mention with no assignment recorded in the action or its filters.
     Flag = Struct.new(:ivar, :template, keyword_init: true)
 
-    # Framework filters: procs from engines, the CSRF and origin checks.
+    # Framework filters by name, for a generation without `origin`: procs
+    # from engines, the CSRF and origin checks.
     FRAMEWORK = /\A(#<|verify_authenticity_token\z|verify_same_origin_request\z)/
     # The model event an action name implies, for the callback ladder.
     EVENT_BY_ACTION = { 'create' => 'create', 'update' => 'update', 'destroy' => 'destroy' }.freeze
@@ -75,8 +76,23 @@ module WoodsMap
         Filter.new(kind: f['kind'] || f['type'].to_s.sub('_action', ''), name: f['filter'].to_s,
                    only: f['only'], except: f['except'], if_condition: f['if'], unless_condition: f['unless'],
                    file: f['file'], line: f['line'], owner: f['owner'], applies_to: f['applies_to'],
-                   applicability: f['applicability'], declaration: f['declaration'])
+                   applicability: f['applicability'], declaration: f['declaration'], origin: f['origin'])
       end
+    end
+
+    # @return [Boolean] whether every filter carries the `origin` Woods publishes (woods#936);
+    #   false on an older generation, where framework filters are recognised by name
+    #   ({FRAMEWORK}), a gem's filters are listed as the application's and the page names the limit
+    def origin?
+      return @origin if defined?(@origin)
+
+      @origin = CallbackOrigin.published?(raw_filters)
+    end
+
+    # @return [Hash{String => Integer}] origin => filters hidden from the passage: the
+    #   framework's and every proc; empty on a generation without `origin`
+    def hidden_filter_counts
+      origin? ? CallbackOrigin.group(raw_filters.select { |f| framework?(f) }).transform_values(&:size) : {}
     end
 
     # @return [Boolean] whether every filter carries the resolved chain (W-8); false on an older
@@ -85,7 +101,8 @@ module WoodsMap
       raw_filters.any? && raw_filters.all? { |f| f['applies_to'].is_a?(Array) }
     end
 
-    # @return [Integer] filters the framework adds (engines, CSRF, origin), hidden from the passage
+    # @return [Integer] filters hidden from the passage: those the framework adds (engines, CSRF,
+    #   origin) and, with `origin`, procs whoever wrote them ({#hidden_filter_counts})
     def framework_filter_count
       raw_filters.count { |f| framework?(f) }
     end
@@ -219,8 +236,10 @@ module WoodsMap
       Array(@metadata['filters'] || @metadata['callbacks'])
     end
 
+    # With `origin`, the framework's filters and every proc; a gem's and the
+    # application's symbol filters are listed. Without it, by name.
     def framework?(filter)
-      filter['filter'].to_s.match?(FRAMEWORK)
+      CallbackOrigin.hidden?(filter, published: origin?, by_name: FRAMEWORK)
     end
   end
 end

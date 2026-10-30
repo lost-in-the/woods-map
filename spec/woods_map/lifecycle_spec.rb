@@ -96,6 +96,51 @@ RSpec.describe WoodsMap::Lifecycle do
     expect(lifecycle.framework.pluck('filter')).to eq(['normalize_changed_in_place_attributes'])
   end
 
+  # Woods publishes who wrote each callback (`origin`, woods#936) beside
+  # `analysis_status`; proc labels name a gem-relative site, never an absolute path.
+  context 'with the callback origin Woods publishes' do
+    def origin_unit
+      callbacks = [
+        %w[before_save set_slug app], %w[after_save autosave_associated_records_for_posts framework],
+        ['before_destroy', '#<lambda activerecord-7.1.6/lib/active_record/associations/builder/association.rb:93>',
+         'framework'],
+        %w[before_create generate_confirmation_token gem], ['after_create', '#<Proc app/models/account.rb:4>', 'app'],
+        %w[after_create_commit send_welcome gem], %w[before_validation legacy_hook unknown]
+      ].map { |type, filter, origin| { 'type' => type, 'filter' => filter, 'origin' => origin } }
+      { 'identifier' => 'Account', 'metadata' => { 'callbacks' => callbacks },
+        'source_code' => "class Account\n  def set_slug; end\n  def send_welcome; end\nend\n" }
+    end
+
+    def with_origin
+      described_class.new(origin_unit)
+    end
+
+    it 'counts what it does not draw by who wrote it, a gem apart from the framework' do
+      expect(with_origin).to be_origin
+      expect(with_origin.hidden.transform_values { |list| list.pluck('filter') }).to eq(
+        'app' => ['#<Proc app/models/account.rb:4>'],
+        'framework' => ['autosave_associated_records_for_posts',
+                        '#<lambda activerecord-7.1.6/lib/active_record/associations/builder/association.rb:93>'],
+        'gem' => ['generate_confirmation_token'], 'unknown' => ['legacy_hook']
+      )
+      expect(with_origin.framework.pluck('filter')).not_to include('generate_confirmation_token')
+    end
+
+    it 'draws the steps Woods draws and names a drawn one Woods places outside the application' do
+      stripped = origin_unit.deep_dup.tap { |u| u['metadata']['callbacks'].each { |cb| cb.delete('origin') } }
+      expect(with_origin.steps('create').map(&:filter)).to eq(%w[set_slug send_welcome])
+      without = described_class.new(stripped)
+      expect(with_origin.steps('create').map(&:filter)).to eq(without.steps('create').map(&:filter))
+      expect(with_origin.drawn_elsewhere.pluck('filter')).to eq(['send_welcome'])
+    end
+
+    it 'keeps the inference on a generation without origin' do
+      expect(lifecycle).not_to be_origin
+      expect(lifecycle.hidden).to eq({})
+      expect(lifecycle.drawn_elsewhere).to eq([])
+    end
+  end
+
   it 'names the concern a step comes from, its condition and its effects' do
     step = lifecycle.steps('create').find { |s| s.filter == 'normalize_tags' }
     expect(step.owner).to eq('Taggable')
