@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require 'open3'
-require 'tmpdir'
+require_relative 'support/browser_session'
 require_relative 'support/hover_card_index'
 
 RSpec.describe 'Hover cards in Chromium', type: :request do
@@ -16,21 +15,7 @@ RSpec.describe 'Hover cards in Chromium', type: :request do
   end
 
   def card_browser_result
-    Dir.mktmpdir('woods-map-cards') do |directory|
-      fixture = File.join(directory, 'cards.html')
-      File.write(fixture, card_browser_fixture)
-      output, error, status = Open3.capture3(
-        ENV.fetch('WOODS_MAP_BROWSER'), '--headless', '--disable-gpu', '--disable-background-networking',
-        '--no-first-run', '--virtual-time-budget=30000', "--user-data-dir=#{File.join(directory, 'profile')}",
-        '--dump-dom', "file://#{fixture}"
-      )
-      result = Nokogiri::HTML(output).at_css('#result')
-      unless status.success? && result && !result.text.empty?
-        raise "Hover card regression did not produce results: #{error}"
-      end
-
-      JSON.parse(result.text)
-    end
+    WoodsMap::BrowserSession.run(card_browser_fixture)
   end
 
   def card_browser_fixture

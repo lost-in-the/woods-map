@@ -35,7 +35,13 @@ async function runHoverCardRegression() {
     check(links.every(l => !l.hasAttribute('title') && !l.hasAttribute('tabindex')), 'links keep native semantics')
 
     const [widget] = links
-    widget.focus(); widget.dispatchEvent(new win.FocusEvent('focusin', { bubbles: true }))
+    // A synthetic focusin can race the browser's later native focus event,
+    // reopening Widget after Escape and cancelling Gadget's pending hover.
+    // Observe it after it bubbles through the tooltip's listener on the body.
+    await new Promise(resolve => {
+      doc.addEventListener('focusin', resolve, { once: true })
+      widget.focus()
+    })
     check(tip() && tip().querySelector('.hcard b')?.textContent === 'Domain::Widget', 'focus opens the card at once')
     check(tip() && widget.getAttribute('aria-describedby') === tip().id && tip().getAttribute('role') === 'tooltip', 'card describes the focused link')
     if (tip()) {
