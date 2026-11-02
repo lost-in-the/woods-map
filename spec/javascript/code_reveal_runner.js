@@ -13,23 +13,25 @@ const visible = (id) => {
   const rect = document.querySelector(`#${id} .src`).getBoundingClientRect()
   return rect.top >= 0 && rect.bottom <= innerHeight
 }
-const settle = () => new Promise((resolve) => setTimeout(resolve, 150))
+const changeHash = (hash) => new Promise((resolve) => {
+  window.addEventListener("hashchange", resolve, { once: true })
+  location.hash = hash
+})
 const result = {}
 
-await settle()
+// The controller schedules its initial reveal on a frame; elapsed timer time
+// does not prove that frame has run, especially under Chromium virtual time.
+await new Promise((resolve) => requestAnimationFrame(resolve))
 result.initialScrolled = scrollY > 0
 result.initialVisible = visible("L53")
 
-location.hash = "#L97"
-await settle()
+await changeHash("#L97")
 result.hashchangeVisible = visible("L97")
 
-location.hash = "#L2"
-await settle()
+await changeHash("#L2")
 result.backwardVisible = visible("L2")
 
-location.hash = "#L9999"
-await settle()
+await changeHash("#L9999")
 result.missingIsQuiet = true
 
 document.getElementById("result").textContent = JSON.stringify(result)

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require 'open3'
-require 'tmpdir'
+require_relative 'support/browser_session'
 
 RSpec.describe WoodsMap do
   it 'brings a source-line permalink into view on load and on later hash changes' do
@@ -12,19 +11,7 @@ RSpec.describe WoodsMap do
   end
 
   def reveal_result
-    Dir.mktmpdir('woods-map-reveal') do |directory|
-      fixture = File.join(directory, 'reveal.html')
-      File.write(fixture, reveal_fixture)
-      output, _error, status = Open3.capture3(
-        ENV.fetch('WOODS_MAP_BROWSER'), '--headless', '--disable-gpu', '--disable-background-networking',
-        '--no-first-run', '--virtual-time-budget=5000', "--user-data-dir=#{File.join(directory, 'profile')}",
-        '--dump-dom', "file://#{fixture}#L53"
-      )
-      result = Nokogiri::HTML(output).at_css('#result')
-      raise 'Browser regression did not produce results' unless status.success? && result && !result.text.empty?
-
-      JSON.parse(result.text)
-    end
+    WoodsMap::BrowserSession.run(reveal_fixture, fragment: '#L53')
   end
 
   def reveal_fixture
