@@ -14,7 +14,7 @@ module WoodsMap
     ASSOCIATION = /\A\s*(belongs_to|has_many|has_one|has_and_belongs_to_many)\s+:(\w+)/
     CALLBACK = /\A\s*((?:before|after|around)_\w+)\s+:(\w+)/
     VALIDATION = /\A\s*validates?(?:_\w+)?\s+:(\w+)/
-    INCLUDE = /\A\s*include\s+([A-Z]\w*(?:::\w+)*)/
+    INCLUDE = /\A\s*include\s+((?:::)?[A-Z]\w*(?:::\w+)*)/
     DEFINITION = /\A\s*def\s+(self\.)?(\w+)/
 
     # @param unit [Hash]
@@ -102,22 +102,29 @@ module WoodsMap
     def include_note(name)
       inlined = inlined_concern?(name)
       Note.new(text: inlined ? "concern #{name}, inlined below" : "concern #{name}, not in the index",
-               layer: inlined ? 'resolved ancestors' : nil, link: name, area: :concerns)
+               layer: inlined ? 'resolved ancestors' : nil, link: name.delete_prefix('::'), area: :concerns)
     end
 
     # Whether +name+, the constant as an `include` line writes it, is one of
-    # the unit's inlined concerns. Woods records full names; an index written
-    # before that records short ones, and an `include` may name a concern
-    # relative to its namespace, so match the written name against either.
+    # the unit's inlined concerns. Woods records full names.
+    #
+    # - A rooted name (`::Canopy::MoneyColumns`) is absolute: only that exact
+    #   full name matches.
+    # - A relative name (`MoneyColumns` inside `module Canopy`) matches a full
+    #   entry it is the trailing part of.
+    # - An index written before Woods recorded full names carries short
+    #   entries; a short entry still matches the written name's last segment.
     #
     # @param name [String]
     # @return [Boolean]
     def inlined_concern?(name)
+      entries = Array(@metadata['inlined_concerns'])
       written = name.delete_prefix('::')
+      return true if entries.include?(written)
+      return true if !name.start_with?('::') && entries.any? { |entry| entry.end_with?("::#{written}") }
+
       short = written.split('::').last
-      Array(@metadata['inlined_concerns']).any? do |entry|
-        entry == written || entry.end_with?("::#{written}") || (entry.exclude?('::') && entry == short)
-      end
+      entries.any? { |entry| entry.exclude?('::') && entry == short }
     end
   end
 end
