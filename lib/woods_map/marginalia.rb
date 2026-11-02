@@ -100,9 +100,24 @@ module WoodsMap
     end
 
     def include_note(name)
-      inlined = Array(@metadata['inlined_concerns']).include?(name.split('::').last)
+      inlined = inlined_concern?(name)
       Note.new(text: inlined ? "concern #{name}, inlined below" : "concern #{name}, not in the index",
                layer: inlined ? 'resolved ancestors' : nil, link: name, area: :concerns)
+    end
+
+    # Whether +name+, the constant as an `include` line writes it, is one of
+    # the unit's inlined concerns. Woods records full names; an index written
+    # before that records short ones, and an `include` may name a concern
+    # relative to its namespace, so match the written name against either.
+    #
+    # @param name [String]
+    # @return [Boolean]
+    def inlined_concern?(name)
+      written = name.delete_prefix('::')
+      short = written.split('::').last
+      Array(@metadata['inlined_concerns']).any? do |entry|
+        entry == written || entry.end_with?("::#{written}") || (entry.exclude?('::') && entry == short)
+      end
     end
   end
 end
