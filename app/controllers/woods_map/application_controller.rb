@@ -38,7 +38,7 @@ module WoodsMap
     # The `.mmd` text routes (D-25) are paced like the JSON endpoints.
     before_action(if: :mermaid_request?) { enforce_rate_limit!(:mermaid) }
 
-    helper_method :woods_map_config, :current_repository, :woods_map, :primary_nav
+    helper_method :woods_map_config, :current_repository, :woods_map, :primary_nav, :index_read_failure?
 
     # Count the named actions against the per-client budget of a group.
     # Named apart from Rails 7.2's `rate_limit`, which the floor lacks.
@@ -86,6 +86,11 @@ module WoodsMap
     # @return [WoodsMap::Repository, nil] the generation this request reads
     def current_repository
       @repository
+    end
+
+    # @return [Boolean] whether the response is the typed-read refusal page
+    def index_read_failure?
+      @index_read_failure == true
     end
 
     # Open the configured index pinned to one generation for this request.

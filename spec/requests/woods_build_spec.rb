@@ -72,6 +72,32 @@ RSpec.describe 'Index build compatibility', type: :request do
     expect(response.body).to include('branch not recorded')
   end
 
+  it 'renders the refusal without retrying a failing Guide context read' do
+    WoodsMap.configuration.guide_enabled = true
+    WoodsMap.configuration.guide_chat_factory = -> { WoodsMap::FakeGuideChat.new([]) }
+    allow(index).to receive(:unit).with('User', type: 'model').and_raise(IOError)
+    get '/woods/graph', params: { centre: 'User', type: 'model' }
+    expect(response).to have_http_status(:service_unavailable)
+    expect(response.body).to include('Index could not be read')
+    expect(response.body).not_to include('id="wm-guide"', 'aria-controls="wm-guide"')
+    expect(index).to have_received(:unit).with('User', type: 'model').once
+  end
+
+  it 'shows a known reader revision even when the version strings differ' do
+    writer(revision: 'a' * 40)
+    stub_woods_build(revision: 'b' * 40)
+    get '/woods'
+    row = html_response_document.css('dt').find { |term| term.text == 'index build' }.next_element.text
+    expect(row).to include('version_mismatch', "writer 2.1.0 #{'a' * 40}", "reader 2.2.0.alpha #{'b' * 40}")
+  end
+
+  it 'names an unrequested reader revision without looking it up' do
+    identity = Woods::BuildIdentity.current
+    get '/woods'
+    expect(identity).not_to have_received(:revision)
+    expect(html_response_document.text).to include('reader 2.2.0.alpha revision not compared')
+  end
+
   it 'keeps Mermaid failures plain text' do
     writer
     allow(index).to receive(:units).and_raise(IOError)

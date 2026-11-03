@@ -16,6 +16,8 @@ module WoodsMap
                          'The published index is corrupt or incomplete. Run woods:extract or request a re-index.'
                        end
       @build_comparison = nil
+      @repository = nil
+      @files_sheet = false
       return render_text(:service_unavailable, @build_message) if mermaid_request?
 
       render_unavailable(error)
