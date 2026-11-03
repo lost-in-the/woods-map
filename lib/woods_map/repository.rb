@@ -3,9 +3,11 @@
 require 'active_support/core_ext/enumerable'
 require 'active_support/core_ext/module/delegation'
 require 'woods/published_index'
+require 'woods/build_identity'
 require 'woods/mcp/index_reader'
 require 'woods/source_inputs/status'
 require_relative 'repository_history'
+require_relative 'repository_build'
 require_relative 'repository_flows'
 require_relative 'repository_assembled_flows'
 require_relative 'retention'
@@ -21,6 +23,7 @@ module WoodsMap
   # deleting a payload mid-render. Every read below goes through the index
   # reader of that one generation; nothing is resolved from a path.
   class Repository
+    include RepositoryBuild
     include RepositoryHistory
     include RepositoryFlows
     include RepositoryAssembledFlows
@@ -28,6 +31,9 @@ module WoodsMap
 
     # Raised when no published generation can be opened at the configured root.
     class Unavailable < StandardError; end
+
+    # A failed typed payload read; local IOError rescues still degrade gracefully.
+    class UnreadableIndex < IOError; end
 
     # Open the configured index for one block.
     #
@@ -93,7 +99,7 @@ module WoodsMap
     # @param type [String, nil]
     # @return [Array<Hash>] unit index entries
     def units(type: nil)
-      snapshot.fetch([:units, type&.to_s]) { @index.units(type: type) }
+      snapshot.fetch([:units, type&.to_s]) { typed_read { @index.units(type: type) } }
     end
 
     # Every typed identity of this generation, sorted and grouped by type:
@@ -114,7 +120,9 @@ module WoodsMap
     # @param type [String, nil]
     # @return [Hash, nil]
     def unit(identifier, type: nil)
-      @units.fetch([identifier, type]) { @units[[identifier, type]] = @index.unit(identifier, type: type) }
+      @units.fetch([identifier, type]) do
+        @units[[identifier, type]] = typed_read { @index.unit(identifier, type: type) }
+      end
     end
 
     # Resolve a constant or identifier to the unit types that own it, from

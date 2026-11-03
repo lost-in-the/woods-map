@@ -19,6 +19,7 @@ module WoodsMap
   # without the frame and before the repository opens anything, so nothing
   # from the index reaches a client that is not allowed in.
   class ApplicationController < ActionController::Base
+    include WoodsMap::IndexAvailability
     include WoodsMap::Authentication
     include WoodsMap::RawRequestPath
     include WoodsMap::MermaidText
@@ -50,6 +51,8 @@ module WoodsMap
     end
 
     rescue_from WoodsMap::Repository::Unavailable, with: :render_unavailable
+
+    rescue_from WoodsMap::Repository::UnreadableIndex, with: :render_unreadable_index
 
     private
 
@@ -94,6 +97,7 @@ module WoodsMap
       WoodsMap::Repository.open do |repository|
         @repository = repository
         @generation = repository.generation_facts
+        @build_comparison = repository.build_comparison
         yield repository
       end
     end

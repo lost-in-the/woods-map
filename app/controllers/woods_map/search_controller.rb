@@ -25,7 +25,7 @@ module WoodsMap
         end
         render json: hits
       end
-    rescue WoodsMap::Repository::Unavailable
+    rescue WoodsMap::Repository::Unavailable, WoodsMap::Repository::UnreadableIndex
       render json: { 'query' => params[:q].to_s, 'groups' => [], 'complete' => false, 'error' => 'no index' },
              status: :service_unavailable
     end
