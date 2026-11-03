@@ -29,6 +29,13 @@ RSpec.describe 'Impact documentation family', type: :request do
     expect(doc.at_css('section[aria-labelledby="docs"]').text).not_to include('covered by', 'no mapped test')
   end
 
+  it 'gives the code and documentation table regions distinct accessible names' do
+    get '/woods/impact', params: { focus: 'UsersController', depth: 1 }
+    names = html_response_document.css('section[aria-labelledby="aff"] .tblwrap[role="region"]')
+                                  .pluck('aria-label')
+    expect(names).to contain_exactly('Affected units', 'Documentation units')
+  end
+
   it 'keeps no-mapped-test wording for model rows' do
     get '/woods/impact', params: { focus: 'UsersController', depth: 1 }
     expect(html_response_document.at_css('table[aria-label="Affected units"]').text).to include('no mapped test')
