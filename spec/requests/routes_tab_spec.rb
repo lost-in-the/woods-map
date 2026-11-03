@@ -21,7 +21,7 @@ RSpec.describe 'The controller Routes tab', type: :request do
     expect(rows.find { |row| row.first == 'GET /users' }[3]).to eq('config/routes.rb:14')
   end
 
-  it 'shows the actual published route draw file and line' do
+  def publish_draw_file_location
     allow(Woods::PublishedIndex).to receive(:open).and_wrap_original do |original, *args, &block|
       original.call(*args) do |index|
         allow(index).to receive(:unit).and_wrap_original do |read, identifier, **options|
@@ -36,6 +36,10 @@ RSpec.describe 'The controller Routes tab', type: :request do
         block.call(index)
       end
     end
+  end
+
+  it 'shows the actual published route draw file and line' do
+    publish_draw_file_location
     get '/woods/units/controller/UsersController/routes'
     expect(doc.at_css('table[aria-label="Routes"]').text).to include('config/routes/admin.rb:3')
   end
