@@ -1,10 +1,10 @@
 <%# The Tests tab: specs mapped to the focus, its direct dependents and the units further out within the depth, then the gaps. %>
 <section class="sec" aria-labelledby="tr">
-  <header><h2 class="t2" id="tr">Tests to run first <%= count_tag(v.tests.size) %><%= info_tip("test_coverage edges from the focus, its direct dependents and the units further out within depth #{r.depth}, nearest first. The mapping is heuristic; fixture facts are not in the index, so what a spec seeds is not known here.") %></h2></header>
+  <header><h2 class="t2" id="tr">Mapped tests <%= count_tag(v.tests.size) %><%= info_tip("test_coverage edges from the focus, its direct dependents and the units further out within depth #{r.depth}, nearest first. The mapping is heuristic; fixture facts are not in the index, so what a spec seeds is not known here.") %></h2></header>
   <% if v.tests.empty? %>
     <%= render 'woods_map/components/empty_state', title: "No mapped test reaches the focus or the units within depth #{r.depth}", text: 'No test_coverage edge points at them in this generation; see the gaps below.' %>
   <% else %>
-    <%= render 'woods_map/components/table', label: 'Tests to run first', min_width: '900px',
+    <%= render 'woods_map/components/table', label: 'Mapped tests', min_width: '900px',
                columns: [{ label: 'spec', width: '330px', cell_class: 'id' }, { label: 'covers' }, { label: 'reaches', width: '170px' }, { label: 'layer', width: '150px', cell_class: 'nw' }],
                rows: v.tests.map { |t| { cells: [unit_link(t.spec, 'test_mapping'), safe_join(t.covers.map { |id| unit_link(id, r.type_of(id)) }, ', '), t.reaches, layer_chip(t.layer)] } } %>
   <% end %>

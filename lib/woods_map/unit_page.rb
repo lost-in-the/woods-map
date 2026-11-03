@@ -159,10 +159,21 @@ module WoodsMap
       groups = dependents.group_by { |d| d['source_type'].to_s }
       return nil if groups.empty?
 
-      rows = groups.sort_by { |_, list| -list.size }.first(4).map do |source_type, list|
-        [source_type.pluralize.tr('_', ' '), { links: list.map { |d| [d['source'], source_type] }.uniq }]
+      selected = groups.except('doc').sort_by { |_, list| -list.size }.first(groups.key?('doc') ? 3 : 4)
+      selected << ['doc', groups['doc']] if groups.key?('doc')
+      rows = selected.map do |source_type, list|
+        label = source_type == 'doc' ? 'documentation' : source_type.pluralize.tr('_', ' ')
+        [label, { links: list.map { |d| [d['source'], source_type] }.uniq }]
       end
-      { eyebrow: "Used by #{dependents.pluck('source').uniq.size}", rows: rows }
+      { eyebrow: used_by_label(groups), rows: rows }
+    end
+
+    # @param groups [Hash] reverse edges grouped by published source type
+    # @return [String] code and documentation counts labelled apart
+    def used_by_label(groups)
+      count = groups.except('doc').values.flatten.pluck('source').uniq.size
+      docs = groups.fetch('doc', []).pluck('source').uniq.size
+      ["Used by #{count}", ("#{docs} documentation" if docs.positive?)].compact.join(', ')
     end
 
     def depends_on_tile
