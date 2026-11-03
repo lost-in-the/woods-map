@@ -106,14 +106,15 @@ module WoodsMap
     end
 
     # Whether +name+, the constant as an `include` line writes it, is one of
-    # the unit's inlined concerns. Woods records full names.
+    # the unit's inlined concerns, which Woods records by full name.
     #
     # - A rooted name (`::Canopy::MoneyColumns`) is absolute: only that exact
     #   full name matches.
     # - A relative name (`MoneyColumns` inside `module Canopy`) matches a full
     #   entry it is the trailing part of.
-    # - An index written before Woods recorded full names carries short
-    #   entries; a short entry still matches the written name's last segment.
+    #
+    # An index written before Woods recorded full names carries short entries;
+    # a namespaced include reads "not in the index" there until it is rebuilt.
     #
     # @param name [String]
     # @return [Boolean]
@@ -121,10 +122,9 @@ module WoodsMap
       entries = Array(@metadata['inlined_concerns'])
       written = name.delete_prefix('::')
       return true if entries.include?(written)
-      return true if !name.start_with?('::') && entries.any? { |entry| entry.end_with?("::#{written}") }
+      return false if name.start_with?('::')
 
-      short = written.split('::').last
-      entries.any? { |entry| entry.exclude?('::') && entry == short }
+      entries.any? { |entry| entry.end_with?("::#{written}") }
     end
   end
 end

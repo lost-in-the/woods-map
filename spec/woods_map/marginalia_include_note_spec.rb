@@ -45,8 +45,13 @@ RSpec.describe WoodsMap::Marginalia do
     expect(note.layer).to be_nil
   end
 
-  it 'still reads an index written before full names were recorded' do
-    expect(note_for('  include Canopy::MoneyColumns', ['MoneyColumns']).text).to end_with('inlined below')
+  it 'does not match a namespaced include to a short entry, which may be a different top-level concern' do
+    expect(note_for('  include Canopy::MoneyColumns', ['MoneyColumns']).text).to end_with('not in the index')
+    expect(note_for('  include ::Canopy::MoneyColumns', ['MoneyColumns']).text).to end_with('not in the index')
+  end
+
+  it 'matches an unnamespaced concern exactly' do
+    expect(note_for('  include MoneyColumns', ['MoneyColumns']).text).to end_with('inlined below')
   end
 
   it 'notes a rooted include through CodeView with a real Marginalia' do
