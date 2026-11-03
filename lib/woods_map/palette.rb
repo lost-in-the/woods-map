@@ -43,9 +43,12 @@ module WoodsMap
       end)
     end
 
+    # Route units only, labelled with each result's own type. Woods before
+    # #969 also returns the route_file units that share routes/ for this
+    # filter; those stay in the units group, where they already appear.
     def routes_group
-      results = search(%w[route])
-      group('routes', results.map { |r| { 'label' => r['identifier'], 'type' => 'route', 'detail' => 'route' } })
+      results = search(%w[route]).select { |r| r['type'] == 'route' }
+      group('routes', results.map { |r| { 'label' => r['identifier'], 'type' => r['type'], 'detail' => 'route' } })
     end
 
     def tables_group

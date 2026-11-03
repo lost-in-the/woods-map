@@ -1,0 +1,1 @@
+- The search palette's Routes group lists route units only, each labelled with its own type. Woods before #969 also returned the routes file (`config/routes.rb`) for the `route` filter, and the palette labelled it a route. It stays in the Units group as a `route_file`.
