@@ -1,0 +1,1 @@
+- Keep route files in the palette’s units group with their actual type and link; list only route units in the routes group.

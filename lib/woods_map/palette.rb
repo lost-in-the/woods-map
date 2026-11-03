@@ -44,8 +44,8 @@ module WoodsMap
     end
 
     def routes_group
-      results = search(%w[route])
-      group('routes', results.map { |r| { 'label' => r['identifier'], 'type' => 'route', 'detail' => 'route' } })
+      results = search(%w[route]).select { |r| r['type'] == 'route' }
+      group('routes', results.map { |r| { 'label' => r['identifier'], 'type' => r['type'], 'detail' => r['type'] } })
     end
 
     def tables_group
