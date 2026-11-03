@@ -1,0 +1,1 @@
+- Re-extract after upgrading Woods. Some units have new types in Woods 2.2; cross-generation comparisons can show a deletion and an addition, and saved typed Trail URLs for an older generation may need to be recreated.

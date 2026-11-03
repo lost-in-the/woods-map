@@ -15,6 +15,10 @@ module WoodsMap
       'slim' => Rouge::Lexers::Slim,
       'yaml' => Rouge::Lexers::YAML,
       'js' => Rouge::Lexers::Javascript,
+      'ts' => Rouge::Lexers::Typescript,
+      'tsx' => Rouge::Lexers::TSX,
+      'jsx' => Rouge::Lexers::JSX,
+      'md' => Rouge::Lexers::Markdown,
       'sql' => Rouge::Lexers::SQL
     }.freeze
 
@@ -27,7 +31,8 @@ module WoodsMap
     ].freeze
 
     EXTENSIONS = { '.erb' => 'erb', '.haml' => 'haml', '.slim' => 'slim', '.yml' => 'yaml', '.yaml' => 'yaml',
-                   '.js' => 'js', '.sql' => 'sql' }.freeze
+                   '.js' => 'js', '.mjs' => 'js', '.ts' => 'ts', '.tsx' => 'tsx', '.jsx' => 'jsx',
+                   '.md' => 'md', '.sql' => 'sql' }.freeze
 
     module_function
 

@@ -4,7 +4,7 @@
     Callers::Call), page (UnitPage). %>
 <% calls = callers.values.flatten %>
 <section class="sec" aria-labelledby="callers-h">
-  <header><h2 class="t2" id="callers-h">Callers <%= count_tag(calls.empty? ? 'none published' : "#{calls.size} #{'reference'.pluralize(calls.size)} from #{calls.map(&:caller).uniq.size} #{'unit'.pluralize(calls.map(&:caller).uniq.size)}") %><%= info_tip('Published reference spans that name this unit, with the method each one names when the source names one. A reference with no method is a reference to the class itself, which may be an include; the index publishes no span kind that says so. Dynamic dispatch, receiverless calls and ambiguous names publish no caller here, so an empty list does not prove the code is unused.') %></h2></header>
+  <header><h2 class="t2" id="callers-h">Callers <%= count_tag(calls.empty? ? 'none published' : "#{calls.size} #{'reference'.pluralize(calls.size)} from #{calls.map(&:caller).uniq.size} #{'unit'.pluralize(calls.map(&:caller).uniq.size)}") %><%= info_tip('Published reference spans that name this unit, with the method each one names when the source names one. A reference with no method is a reference to the class itself, which may be a mixin reference. Newer indexes can tag include, prepend and extend references; this panel groups them as class references. Dynamic dispatch, receiverless calls and ambiguous names publish no caller here, so an empty list does not prove the code is unused.') %></h2></header>
   <% if calls.empty? %>
     <p class="cap">No published reference names <%= page.identifier %> in this generation.</p>
   <% else %>

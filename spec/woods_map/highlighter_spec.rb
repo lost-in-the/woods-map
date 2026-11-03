@@ -34,6 +34,15 @@ RSpec.describe WoodsMap::Highlighter do
     expect(described_class.language_for('app/models/user.rb')).to eq('ruby')
   end
 
+  { '.ts' => 'ts', '.tsx' => 'tsx', '.jsx' => 'jsx', '.mjs' => 'js', '.md' => 'md' }.each do |extension, language|
+    it "uses the published #{extension} source language without changing its bytes" do
+      source = '<Component value="example" />'
+      expect(described_class.language_for("source#{extension}")).to eq(language)
+      expect(described_class.syntax_tokens(source, language).map(&:last).join).to eq(source)
+      expect(described_class::LEXERS).to have_key(language)
+    end
+  end
+
   it 'wraps a qualified constant across syntax tokens in one balanced link' do
     row = render('::Space::Target.call', { 1 => [reference(0, 15)] }).first
     anchor = row.at_css('a')

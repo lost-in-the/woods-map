@@ -15,7 +15,7 @@ module WoodsMap
 
     # One route to the controller: as the controller's metadata declares it,
     # joined to the route unit of the same verb and path when the index has one.
-    Route = Struct.new(:verb, :path, :action, :name, :constraints, :key, :unit, :line, :finding,
+    Route = Struct.new(:verb, :path, :action, :name, :constraints, :key, :unit, :line, :file, :finding,
                        keyword_init: true) do
       # @return [Array<String>] the named-route helpers Rails defines for the name
       def helpers
@@ -180,6 +180,7 @@ module WoodsMap
       unit = @repository.unit(route.identifier, type: 'route')
       route.unit = unit && route.identifier
       route.line = unit&.dig('metadata', 'line_number')
+      route.file = unit&.fetch('file_path', nil)
       route.finding = findings[route.identifier]
       route
     end
