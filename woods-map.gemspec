@@ -28,7 +28,8 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir[
     'lib/**/*', 'app/**/*', 'config/**/*', 'vendor/javascript/**/*', 'vendor/fonts/**/*',
-    'docs/design/*.md', 'LICENSE.txt', 'README.md', 'CHANGELOG.md', 'CONTRIBUTING.md'
+    'docs/*.md', 'docs/design/*.md', 'docs/design/notes/*.md',
+    'LICENSE.txt', 'README.md', 'CHANGELOG.md', 'CONTRIBUTING.md'
   ]
   spec.require_paths = ['lib']
 
