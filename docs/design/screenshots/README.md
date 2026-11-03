@@ -1,6 +1,6 @@
 # Engine screenshots
 
-What the engine renders, taken with Playwright (Chromium) against the
+What the engine renders, taken with Chromium-based browsers against the
 `woods-testbed` `rails-8.0` variant after `woods:extract`, so each page can be
 read beside the board that designs it. Every screenshot in this folder was
 taken on a page where axe-core (WCAG 2.0 A/AA, 2.1 AA, best practice) reported
