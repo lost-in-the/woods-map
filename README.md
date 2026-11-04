@@ -134,7 +134,10 @@ and never hard-code a colour or a size: everything comes from the token sheet.
 ## Principles
 
 - Reads the published index only; no live database, no runtime reflection.
-- Same floors as Woods: Rails 6.0+, Ruby 3.0+.
+- CI tests Ruby 3.0, 3.2 and 3.4 with the newest Rails allowed by each
+  bundle resolution. Other Rails/Ruby combinations are not exercised by CI.
+  The gemspec floors remain Ruby 3.0 and railties 6.0; those floors are not a
+  claim that every supported combination has been tested.
 - No build step: every JavaScript library is vendored and served by the engine.
 - Read-only, loopback by default, bearer token plus origin guard elsewhere.
 
