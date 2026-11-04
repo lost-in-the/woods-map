@@ -9,6 +9,6 @@ RSpec.describe 'Impact dependents', type: :request do
     section = html_response_document.at_css('#chg').ancestors('section').first
     cells = section.css('tbody tr').first.css('td').map { |td| td.text.strip }
     expect(cells).to include('6 typed units', 'hub, 19 dependents by identifier, in a cycle')
-    expect(section.at_css('thead abbr[title*="typed units"]').text).to eq('dependents')
+    expect(section.at_css('thead abbr[title*="typed units"]').text).to eq('recorded dependents')
   end
 end

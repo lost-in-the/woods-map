@@ -4,7 +4,7 @@
 <% impact_url = ->(**changes) { woods_map.impact_path({ focus: r.focus.join(','), depth: r.depth, show: (r.show == 'all' ? nil : r.show), types: params[:types].presence, via: params[:via].presence, lens: (@lens == 'changed' ? nil : @lens) }.merge(changes).compact) } %>
 <% controls = safe_join([
      tag.span('depth', class: 'lbl'), tag.span(safe_join((1..WoodsMap::BlastRadius::MAX_DEPTH).map { |d| link_to(d, impact_url.call(depth: d), 'aria-current': (d == r.depth ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'Depth'),
-     tag.span('show', class: 'lbl'), tag.span(safe_join([['all', nil], ['no tests', 'no_tests'], ['no views', 'no_views']].map { |label, value| link_to(label, impact_url.call(show: value), 'aria-current': ((value || 'all') == r.show ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'Show'),
+     tag.span('show', class: 'lbl'), tag.span(safe_join([['all', nil], ['no tests', 'no_tests'], ['no views', 'no_views'], ['count docs', 'with_docs']].map { |label, value| link_to(label, impact_url.call(show: value), 'aria-current': ((value || 'all') == r.show ? 'true' : nil)) }), class: 'seg', role: 'group', 'aria-label': 'Show'),
      render('woods_map/shared/share'),
      tag.button('⎘ copy focus URL', class: 'btn primary', type: 'button', data: { controller: 'copy', copy_text_value: focus_url, action: 'copy#copy', key: 'y' }, 'data-needs-js': '')
    ], ' ') %>
@@ -17,7 +17,7 @@
           hidden: { lens: 'graph', focus: r.focus.join(','), show: (r.show == 'all' ? nil : r.show) }.compact,
           link: ->(**opts) { impact_url.call(**opts.slice(:direction, :depth, :types, :via).merge(lens: 'graph')) },
           unit_url: woods_map.unit_graph_path(type: '__type__', identifier: '__identifier__'),
-          rail_extra: tag.div('blast radius', class: 'grp') + tag.ol(tag.li(safe_join([tag.span('·', class: 'k'), tag.span("#{r.affected.size} reached within depth #{r.depth} of #{r.focus.join(', ')}, gen #{@repository.generation_number}")]))) %>
+          rail_extra: tag.div('blast radius', class: 'grp') + tag.ol(tag.li(safe_join([tag.span('·', class: 'k'), tag.span("#{r.counted.size} recorded dependents within depth #{r.depth} of #{r.focus.join(', ')}, gen #{@repository.generation_number}")]))) %>
   <% else %>
     <div class="body"><div class="main inset"><%= render 'woods_map/components/empty_state', title: 'No focus unit in this generation', text: "None of #{r.focus.join(', ')} is a unit of gen #{@repository.generation_number}." %></div></div>
   <% end %>
@@ -25,7 +25,8 @@
 <div class="body" data-controller="trail" data-trail-url-value="<%= trail_url %>" data-trail-title-value="Blast radius of <%= r.focus.join(', ') %>">
   <%= render 'woods_map/components/rail', heading: @lens.capitalize, groups: [
         { label: 'focus', count: r.focus.size, items: r.focus.map { |id| { key: '·', text: unit_link(id, r.type_of(id)), own: safe_join([r.type_of(id).tr('_', ' '), (v.findings.count { |f| f.where == id }.positive? ? safe_join([', ', tag.span('⚑', class: 'flag'), " #{v.findings.count { |f| f.where == id }}"]) : nil)].compact) } } },
-        { label: 'direct dependents', count: r.direct.size, items: r.direct.first(8).map { |a| { key: '·', text: unit_link(a.identifier, a.type), own: a.via } } + (r.direct.size > 8 ? [{ key: '·', text: "+#{r.direct.size - 8} more" }] : []) + [{ key: '·', text: "#{r.affected.size} reached within depth #{r.depth} in all" }] },
+        { label: 'direct dependents', count: r.direct.size, items: r.direct.first(8).map { |a| { key: '·', text: unit_link(a.identifier, a.type), own: a.via } } + (r.direct.size > 8 ? [{ key: '·', text: "+#{r.direct.size - 8} more" }] : []) + [{ key: '·', text: "#{r.counted.size} recorded dependents within depth #{r.depth} in all" }] },
+        { label: 'documentation', count: r.documentation.size, items: r.documentation.first(8).map { |a| { key: '·', text: unit_link(a.identifier, a.type), own: a.via } } },
         { label: 'limits', count: 3, items: [
           { key: '·', text: 'no range: one generation', own: layer_chip('woods:impact is W-12, woods#762') },
           flow_limit(@flows&.state),
@@ -37,7 +38,7 @@
       <%= render 'woods_map/components/banner', severity: :mod, lead: "Not in gen #{@repository.generation_number}: #{r.unknown.join(', ')}.", text: "The radius starts from #{r.focus.join(', ')}." %>
     <% end %>
     <%= render "woods_map/impact/#{@lens}", r: r, v: v, impact_url: impact_url %>
-    <%= render 'woods_map/shared/status', items: ['static: one generation, no range', "reverse edges to depth #{r.depth}, #{r.reached.size} reached, #{r.affected.size} shown", "gen #{@repository.generation_number}"], keys: [[%w[1 2 3], 'depth'], [%w[y], 'copy URL'], [%w[/], 'search']] %>
+    <%= render 'woods_map/shared/status', items: ['static: one generation, no range', "reverse edges to depth #{r.depth}, #{r.reached.size} reached including documentation, #{r.affected.size} shown", "gen #{@repository.generation_number}"], keys: [[%w[1 2 3], 'depth'], [%w[y], 'copy URL'], [%w[/], 'search']] %>
   </div>
 </div>
 <% end %>
