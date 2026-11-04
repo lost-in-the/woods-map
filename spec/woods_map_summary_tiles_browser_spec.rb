@@ -19,7 +19,7 @@ RSpec.describe 'The unit summary tiles in Chromium', type: :request do
     <<~JS
       const facts = document.querySelector(".frame-facts .facts")
       const tiles = [...facts.children]
-      const value = facts.querySelector("dd")
+      const value = facts.querySelector("dd .fact-value") || facts.querySelector("dd")
       value.innerHTML = "<a href='#'>Newsletter::<wbr>CampaignsController</a> and <a href='#'>Admin::<wbr>Newsletters::<wbr>CampaignRecipientsController</a>"
       await settle()
       const midWord = []
