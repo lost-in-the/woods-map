@@ -49,6 +49,7 @@ instead of resizing or sharpening existing images.
 | No such unit (404) | [B8-States](../boards/B8-States.html), *empty results* panel | [1440](missing-1440.png) |
 | Search page: name, code, empty | [B8-Search](../boards/B8-Search.html) | [name](search-name-1440.png), [code](search-code-1440.png), [empty](search-empty-1440.png), [390](search-390.png) |
 | Search palette | [B8-Search](../boards/B8-Search.html), *the palette* panel | [1440](search-palette-1440.png) |
+| Release palette route identities, query visual (Map code 0b8b243; extracted route draw-file probe) | [B8-Search](../boards/B8-Search.html) | [1440](release-palette-route-types-1440.png), [960](release-palette-route-types-960.png), [640](release-palette-route-types-640.png), [390](release-palette-route-types-390.png); [axe/provenance](release-palette-route-types-axe.json) |
 | Freshness words with Woods' reasons | [C5-Chrome](../boards/C5-Chrome.html), the bar | [tooltip open](freshness-tip-1440.png) |
 | Routes tab, controller (`…/UsersController/routes`) | [Routes tab note](../notes/routes-tab.md) (no board) | [1440](routes-1440.png), [390](routes-390.png), [helper → action, StaticPagesController](routes-helper-uses-1440.png) (Woods with woods#795) |
 | Hover card on a reference, Code tab (`…/model/User`, hovered at 1440, focused at 390) | [Hover card note](../notes/hover-card.md) (no board) | [1440](hover-card-1440.png), [390](hover-card-390.png) |
