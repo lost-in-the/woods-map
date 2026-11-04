@@ -1,0 +1,284 @@
+{
+  "map_code_revision": "2a5fadb1de23c7728cd9fc6d816b4b7765b85778",
+  "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "testbed_base": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
+  "rails": "8.0.0",
+  "ruby": "3.3.1",
+  "index_generation": 3,
+  "browser": "157.0.8103.38",
+  "capture_note": "Native PNGs at scale1; fonts ready, dimensions checked. Mounted real sign-in, invalid-token error via real form submit. No reader stubs or index changes.",
+  "captures": [
+    {
+      "file": "sign-in-centered-1440.png",
+      "width": 1440,
+      "height": 1000,
+      "error": false,
+      "geometry": {
+        "left": 465.765625,
+        "top": 384.71875,
+        "width": 508.46875,
+        "height": 230.5625,
+        "mainTop": 0,
+        "mainHeight": 1000,
+        "mainWidth": 1440,
+        "scroll": 1440,
+        "client": 1440
+      },
+      "keyboard": {
+        "focused": true,
+        "top": 550.6875,
+        "bottom": 580.6875
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": []
+      }
+    },
+    {
+      "file": "sign-in-centered-960.png",
+      "width": 960,
+      "height": 1000,
+      "error": false,
+      "geometry": {
+        "left": 225.765625,
+        "top": 384.71875,
+        "width": 508.46875,
+        "height": 230.5625,
+        "mainTop": 0,
+        "mainHeight": 1000,
+        "mainWidth": 960,
+        "scroll": 960,
+        "client": 960
+      },
+      "keyboard": {
+        "focused": true,
+        "top": 550.6875,
+        "bottom": 580.6875
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": []
+      }
+    },
+    {
+      "file": "sign-in-centered-640.png",
+      "width": 640,
+      "height": 1000,
+      "error": false,
+      "geometry": {
+        "left": 65.765625,
+        "top": 384.71875,
+        "width": 508.46875,
+        "height": 230.5625,
+        "mainTop": 0,
+        "mainHeight": 1000,
+        "mainWidth": 640,
+        "scroll": 640,
+        "client": 640
+      },
+      "keyboard": {
+        "focused": true,
+        "top": 550.6875,
+        "bottom": 580.6875
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": []
+      }
+    },
+    {
+      "file": "sign-in-centered-390.png",
+      "width": 390,
+      "height": 1000,
+      "error": false,
+      "geometry": {
+        "left": 0,
+        "top": 357.265625,
+        "width": 390,
+        "height": 285.46875,
+        "mainTop": 0,
+        "mainHeight": 1000,
+        "mainWidth": 390,
+        "scroll": 390,
+        "client": 390
+      },
+      "keyboard": {
+        "focused": true,
+        "top": 578.734375,
+        "bottom": 608.734375
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": []
+      }
+    },
+    {
+      "file": "sign-in-centered-1440-error.png",
+      "width": 1440,
+      "height": 1000,
+      "error": true,
+      "geometry": {
+        "left": 465.765625,
+        "top": 360.21875,
+        "width": 508.46875,
+        "height": 279.5625,
+        "mainTop": 0,
+        "mainHeight": 1000,
+        "mainWidth": 1440,
+        "scroll": 1440,
+        "client": 1440
+      },
+      "keyboard": {
+        "focused": true,
+        "top": 575.1875,
+        "bottom": 605.1875
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": []
+      }
+    },
+    {
+      "file": "sign-in-centered-960-error.png",
+      "width": 960,
+      "height": 1000,
+      "error": true,
+      "geometry": {
+        "left": 225.765625,
+        "top": 360.21875,
+        "width": 508.46875,
+        "height": 279.5625,
+        "mainTop": 0,
+        "mainHeight": 1000,
+        "mainWidth": 960,
+        "scroll": 960,
+        "client": 960
+      },
+      "keyboard": {
+        "focused": true,
+        "top": 575.1875,
+        "bottom": 605.1875
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": []
+      }
+    },
+    {
+      "file": "sign-in-centered-640-error.png",
+      "width": 640,
+      "height": 1000,
+      "error": true,
+      "geometry": {
+        "left": 65.765625,
+        "top": 360.21875,
+        "width": 508.46875,
+        "height": 279.5625,
+        "mainTop": 0,
+        "mainHeight": 1000,
+        "mainWidth": 640,
+        "scroll": 640,
+        "client": 640
+      },
+      "keyboard": {
+        "focused": true,
+        "top": 575.1875,
+        "bottom": 605.1875
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": []
+      }
+    },
+    {
+      "file": "sign-in-centered-390-error.png",
+      "width": 390,
+      "height": 1000,
+      "error": true,
+      "geometry": {
+        "left": 0,
+        "top": 332.765625,
+        "width": 390,
+        "height": 334.46875,
+        "mainTop": 0,
+        "mainHeight": 1000,
+        "mainWidth": 390,
+        "scroll": 390,
+        "client": 390
+      },
+      "keyboard": {
+        "focused": true,
+        "top": 603.234375,
+        "bottom": 633.234375
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": []
+      }
+    },
+    {
+      "file": "sign-in-centered-1440-h120.png",
+      "width": 1440,
+      "height": 120,
+      "error": false,
+      "geometry": {
+        "left": 465.765625,
+        "top": 0,
+        "width": 508.46875,
+        "height": 230.5625,
+        "mainTop": 0,
+        "mainHeight": 230.5625,
+        "mainWidth": 1440,
+        "scroll": 1440,
+        "client": 1440
+      },
+      "keyboard": {
+        "focused": true,
+        "top": 54.96875,
+        "bottom": 84.96875
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": []
+      }
+    },
+    {
+      "file": "sign-in-centered-390-h120.png",
+      "width": 390,
+      "height": 120,
+      "error": false,
+      "geometry": {
+        "left": 0,
+        "top": 0,
+        "width": 390,
+        "height": 285.46875,
+        "mainTop": 0,
+        "mainHeight": 285.46875,
+        "mainWidth": 390,
+        "scroll": 390,
+        "client": 390
+      },
+      "keyboard": {
+        "focused": true,
+        "top": 83.46875,
+        "bottom": 113.46875
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": []
+      }
+    }
+  ],
+  "audit_injection_note": "Axe source fetched from testbed visual-axe.min.js and evaluated through the browser driver solely for auditing the bare layout; no CSP or production asset changes."
+}
