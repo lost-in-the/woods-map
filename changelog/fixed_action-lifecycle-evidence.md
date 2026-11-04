@@ -1,0 +1,1 @@
+- Link Passage database writes only to explicit model operations in the published action flow; keep other lifecycle selections as related exploration.

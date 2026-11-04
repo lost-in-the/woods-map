@@ -1,0 +1,401 @@
+{
+  "phase": "Automated accessibility engineering gate after separate browser-interaction-only acceptance review",
+  "captures": [
+    {
+      "width": 1440,
+      "height": 1000,
+      "url": "http://localhost:3147/woods/units/controller/UsersController/passage?action_name=create&event=destroy",
+      "version": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "button[aria-label=\"Keyboard shortcuts\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".menu-toggle"
+            ],
+            [
+              "form > span[aria-hidden=\"true\"]:nth-child(1)"
+            ],
+            [
+              ".why > .dim"
+            ],
+            [
+              ".files > span[aria-hidden=\"true\"]"
+            ],
+            [
+              "button[aria-label=\"Copy path\"]"
+            ],
+            [
+              "#ps > .info[aria-label=\"Explain\"]"
+            ],
+            [
+              ".flag"
+            ],
+            [
+              "#c4 > .info[aria-label=\"Explain\"]"
+            ],
+            [
+              ".pele-cluster-label"
+            ],
+            [
+              "g[data-id=\"request\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "g[data-id=\"action\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "g[data-id=\"t0\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "g[data-id=\"response\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "span:nth-child(2) > .ar"
+            ],
+            [
+              "span:nth-child(3) > .ar"
+            ],
+            [
+              "#fm > .info[aria-label=\"Explain\"]"
+            ],
+            [
+              "tr:nth-child(1) > .on:nth-child(3)"
+            ],
+            [
+              "tr:nth-child(1) > .on:nth-child(4)"
+            ],
+            [
+              ".on:nth-child(5)"
+            ],
+            [
+              ".on:nth-child(6)"
+            ],
+            [
+              ".on:nth-child(7)"
+            ],
+            [
+              "tr:nth-child(1) > .on:nth-child(10)"
+            ],
+            [
+              ".on[title=\"only: edit, update\"]:nth-child(4)"
+            ],
+            [
+              ".on[title=\"only: edit, update\"]:nth-child(10)"
+            ],
+            [
+              "td[title=\"only: destroy\"]"
+            ],
+            [
+              "#cl > .info[aria-label=\"Explain\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 960,
+      "height": 1000,
+      "url": "http://localhost:3147/woods/units/controller/UsersController/passage?action_name=create&event=destroy",
+      "version": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "button[aria-label=\"Keyboard shortcuts\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".menu-toggle"
+            ],
+            [
+              "form > span[aria-hidden=\"true\"]:nth-child(1)"
+            ],
+            [
+              ".why > .dim"
+            ],
+            [
+              ".files > span[aria-hidden=\"true\"]"
+            ],
+            [
+              "button[aria-label=\"Copy path\"]"
+            ],
+            [
+              "div[aria-label=\"Flags 0: rule\"]"
+            ],
+            [
+              "#ps > .info[aria-label=\"Explain\"]"
+            ],
+            [
+              ".flag"
+            ],
+            [
+              "#c4 > .info[aria-label=\"Explain\"]"
+            ],
+            [
+              ".pele-cluster-label"
+            ],
+            [
+              "g[data-id=\"request\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "g[data-id=\"action\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "g[data-id=\"t0\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "g[data-id=\"response\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "span:nth-child(2) > .ar"
+            ],
+            [
+              "span:nth-child(3) > .ar"
+            ],
+            [
+              "#fm > .info[aria-label=\"Explain\"]"
+            ],
+            [
+              "th[width=\"66\"]:nth-child(5)"
+            ],
+            [
+              "th[width=\"66\"]:nth-child(6)"
+            ],
+            [
+              "tr:nth-child(1) > .on:nth-child(3)"
+            ],
+            [
+              "tr:nth-child(1) > .on:nth-child(4)"
+            ],
+            [
+              ".on:nth-child(5)"
+            ],
+            [
+              ".on:nth-child(6)"
+            ],
+            [
+              ".on:nth-child(7)"
+            ],
+            [
+              ".on[title=\"only: edit, update\"]:nth-child(4)"
+            ],
+            [
+              "td[title=\"only: destroy\"]"
+            ],
+            [
+              "#cl > .info[aria-label=\"Explain\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 640,
+      "height": 1000,
+      "url": "http://localhost:3147/woods/units/controller/UsersController/passage?action_name=create&event=destroy",
+      "version": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "button[aria-label=\"Keyboard shortcuts\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".menu-toggle"
+            ],
+            [
+              "form > span[aria-hidden=\"true\"]:nth-child(1)"
+            ],
+            [
+              ".why > .dim"
+            ],
+            [
+              ".files > span[aria-hidden=\"true\"]"
+            ],
+            [
+              "#ps > .info[aria-label=\"Explain\"]"
+            ],
+            [
+              ".flag"
+            ],
+            [
+              "#c4 > .info[aria-label=\"Explain\"]"
+            ],
+            [
+              ".pele-cluster-label"
+            ],
+            [
+              "g[data-id=\"request\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "g[data-id=\"action\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "g[data-id=\"t0\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "g[data-id=\"response\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "span:nth-child(2) > .ar"
+            ],
+            [
+              "span:nth-child(3) > .ar"
+            ],
+            [
+              "#fm > .info[aria-label=\"Explain\"]"
+            ],
+            [
+              "th[width=\"66\"]:nth-child(5)"
+            ],
+            [
+              "th[width=\"66\"]:nth-child(6)"
+            ],
+            [
+              "tr:nth-child(1) > .on:nth-child(3)"
+            ],
+            [
+              "tr:nth-child(1) > .on:nth-child(4)"
+            ],
+            [
+              ".on:nth-child(5)"
+            ],
+            [
+              ".on:nth-child(6)"
+            ],
+            [
+              ".on:nth-child(7)"
+            ],
+            [
+              ".on[title=\"only: edit, update\"]:nth-child(4)"
+            ],
+            [
+              "td[title=\"only: destroy\"]"
+            ],
+            [
+              "#cl > .info[aria-label=\"Explain\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "height": 1000,
+      "url": "http://localhost:3147/woods/units/controller/UsersController/passage?action_name=create&event=destroy",
+      "version": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "button[aria-label=\"Keyboard shortcuts\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".menu-toggle"
+            ],
+            [
+              "form > span[aria-hidden=\"true\"]:nth-child(1)"
+            ],
+            [
+              ".why > .dim"
+            ],
+            [
+              ".files > span[aria-hidden=\"true\"]"
+            ],
+            [
+              ".tab:nth-child(5)"
+            ],
+            [
+              ".tab:nth-child(5) > .cnt"
+            ],
+            [
+              ".tab:nth-child(6)"
+            ],
+            [
+              ".tab:nth-child(6) > .cnt"
+            ],
+            [
+              ".ctx-top"
+            ],
+            [
+              "#ps > .info[aria-label=\"Explain\"]"
+            ],
+            [
+              ".flag"
+            ],
+            [
+              "#c4 > .info[aria-label=\"Explain\"]"
+            ],
+            [
+              ".pele-cluster-label"
+            ],
+            [
+              "g[data-id=\"request\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "g[data-id=\"action\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "g[data-id=\"t0\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "g[data-id=\"response\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+            ],
+            [
+              "span:nth-child(2) > .ar"
+            ],
+            [
+              "span:nth-child(3) > .ar"
+            ],
+            [
+              "#fm > .info[aria-label=\"Explain\"]"
+            ],
+            [
+              "tr:nth-child(1) > .on:nth-child(3)"
+            ],
+            [
+              "td[title=\"only: destroy\"]"
+            ],
+            [
+              "#cl > .info[aria-label=\"Explain\"]"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "map_code_revision": "df6b2a13786b8adc19bf02135300f32405b4e90c",
+  "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "rails": "8.0.0",
+  "ruby": "3.3.1"
+}
