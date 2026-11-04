@@ -19,6 +19,7 @@ module WoodsMap
   # without the frame and before the repository opens anything, so nothing
   # from the index reaches a client that is not allowed in.
   class ApplicationController < ActionController::Base
+    include WoodsMap::IndexAvailability
     include WoodsMap::Authentication
     include WoodsMap::RawRequestPath
     include WoodsMap::MermaidText
@@ -37,7 +38,7 @@ module WoodsMap
     # The `.mmd` text routes (D-25) are paced like the JSON endpoints.
     before_action(if: :mermaid_request?) { enforce_rate_limit!(:mermaid) }
 
-    helper_method :woods_map_config, :current_repository, :woods_map, :primary_nav
+    helper_method :woods_map_config, :current_repository, :woods_map, :primary_nav, :index_read_failure?
 
     # Count the named actions against the per-client budget of a group.
     # Named apart from Rails 7.2's `rate_limit`, which the floor lacks.
@@ -50,6 +51,8 @@ module WoodsMap
     end
 
     rescue_from WoodsMap::Repository::Unavailable, with: :render_unavailable
+
+    rescue_from WoodsMap::Repository::UnreadableIndex, with: :render_unreadable_index
 
     private
 
@@ -85,6 +88,11 @@ module WoodsMap
       @repository
     end
 
+    # @return [Boolean] whether the response is the typed-read refusal page
+    def index_read_failure?
+      @index_read_failure == true
+    end
+
     # Open the configured index pinned to one generation for this request.
     # The generation facts are kept for the bar; the block gets the repository.
     #
@@ -94,6 +102,7 @@ module WoodsMap
       WoodsMap::Repository.open do |repository|
         @repository = repository
         @generation = repository.generation_facts
+        @build_comparison = repository.build_comparison
         yield repository
       end
     end

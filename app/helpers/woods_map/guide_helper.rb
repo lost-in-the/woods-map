@@ -5,6 +5,8 @@ module WoodsMap
   module GuideHelper
     # @return [Symbol] :disabled, :ruby, :missing or :ready
     def guide_status
+      return :disabled if index_read_failure?
+
       WoodsMap::Guide.status(woods_map_config)
     end
 

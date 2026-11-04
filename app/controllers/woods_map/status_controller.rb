@@ -7,6 +7,7 @@ module WoodsMap
     def show
       with_repository do |repository|
         @status = repository.status
+        @reader_revision = repository.reader_revision
         @freshness = repository.freshness
         @retention = repository.retention
         @files_sheet = true

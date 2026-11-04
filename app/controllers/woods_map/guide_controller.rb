@@ -145,7 +145,7 @@ module WoodsMap
     end
 
     def render_unavailable(_error)
-      render json: { 'error' => 'index_unavailable', 'message' => 'No published Woods index.' },
+      render json: { 'error' => 'index_unavailable', 'message' => @build_message || 'No published Woods index.' },
              status: :service_unavailable
     end
 
