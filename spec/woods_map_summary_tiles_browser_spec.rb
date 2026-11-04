@@ -34,7 +34,7 @@ RSpec.describe 'The unit summary tiles in Chromium', type: :request do
       value.scrollLeft = value.scrollWidth
       report({ region: value.getAttribute("role"), labeled: !!value.getAttribute("aria-label"),
                focused: value === document.activeElement, scrolled: value.scrollLeft > 0,
-               contained: document.documentElement.scrollWidth === innerWidth })
+               contained: document.documentElement.scrollWidth <= document.documentElement.clientWidth })
     JS
   end
 
