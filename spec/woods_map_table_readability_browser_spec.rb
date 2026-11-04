@@ -13,7 +13,7 @@ RSpec.describe 'ERD and Impact table readability in Chromium', type: :request do
     it "keeps ERD headers separated and full identifiers scrollable at #{width}px" do
       get '/woods/erd'
       report = run_page(response.body, width: width, runner: erd_runner)
-      expect(report).to eq('overlap' => [], 'fullValues' => true, 'contained' => true)
+      expect(report).to eq('overlap' => [], 'fullValues' => true, 'contained' => true, 'uniqueLabels' => true)
     end
 
     it "reserves readable notes and nonoverlapping headers in Impact at #{width}px" do
@@ -54,7 +54,8 @@ RSpec.describe 'ERD and Impact table readability in Chromium', type: :request do
         return value.getAttribute("aria-label") && value === document.activeElement && value.scrollLeft > 0 &&
           value.scrollWidth > value.clientWidth && link.textContent === "PublishedIdentifierWithoutBreaks".repeat(8)
       })
-      report({ overlap, fullValues, contained })
+      const labels = [...table.querySelectorAll('[role="region"]')].map((el) => el.getAttribute("aria-label"))
+      report({ overlap, fullValues, contained, uniqueLabels: new Set(labels).size === labels.length })
     JS
   end
 

@@ -37,7 +37,7 @@
             <% column = columns[cell_index] || {} %>
             <% cell_tip = nil %>
             <% cell_tip, tip = tip, nil if tip && column[:cell_class].to_s.split.include?('id') %>
-            <td<%= " class=\"#{column[:cell_class]}\"".html_safe if column[:cell_class] %><%= " title=\"#{ERB::Util.html_escape(cell_tip)}\"".html_safe if cell_tip %> data-h="<%= column[:label] %>"><% if column[:scroll] %><div class="table-value" role="region" aria-label="Full <%= column[:label] %>" tabindex="0" data-controller="cliff"><%= cell %></div><% else %><%= cell %><% end %></td>
+            <td<%= " class=\"#{column[:cell_class]}\"".html_safe if column[:cell_class] %><%= " title=\"#{ERB::Util.html_escape(cell_tip)}\"".html_safe if cell_tip %> data-h="<%= column[:label] %>"><% if column[:scroll] %><div class="table-value" role="region" aria-label="<%= local_assigns[:label] || 'Table' %>, row <%= index + 1 %>: full <%= column[:label] %>" tabindex="0" data-controller="cliff"><%= cell %></div><% else %><%= cell %><% end %></td>
           <% end %>
         </tr>
         <% if row[:detail] %>
