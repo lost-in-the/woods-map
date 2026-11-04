@@ -481,3 +481,6 @@ html.no-js .wm .amb-pop[hidden]{display:block}
 .wm .difft{max-height:calc(100vh - var(--s7));isolation:isolate}
 .wm .difft .dl.hunk{position:sticky;top:0;z-index:1}
 @container wm (max-width:639px){ .wm .tblwrap,.wm .difft{max-height:none} .wm .tbl thead,.wm .difft .dl.hunk{position:static} }
+
+/* Published route locations remain readable within the scrollable table. */
+.wm .tbl td.route-location{white-space:normal;overflow-wrap:anywhere}
