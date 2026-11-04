@@ -17,7 +17,10 @@ RSpec.describe 'The pinned graph in Chromium', type: :request do
 
       report = pinned_report(width)
       canvas = report.fetch('canvas')
-      expect(canvas.fetch('width')).to be > 300
+      expect(canvas.fetch('width')).to be_positive
+      expect(canvas.fetch('width')).to be_within(1).of(report.fetch('available'))
+      expect(report.fetch('panning')).to be(true)
+      expect(report.fetch('drawn').size).to eq(2)
       %w[drawn fitted].each do |moment|
         report.fetch(moment).each do |box|
           expect(box.values_at('x1', 'y1')).to all(be >= 0)
@@ -40,13 +43,17 @@ RSpec.describe 'The pinned graph in Chromium', type: :request do
       await settle(1500)
       const graph = application.getControllerForElementAndIdentifier(document.querySelector("[data-controller~=graph]"), "graph")
       const canvas = document.querySelector(".gcanvas").getBoundingClientRect()
+      const host = document.querySelector(".gcanvas").parentElement
+      const style = getComputedStyle(host)
+      const available = host.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
       const boxes = () => graph.cy.nodes().map((node) => {
         const box = node.renderedBoundingBox({ includeLabels: true })
         return { x1: box.x1, y1: box.y1, x2: box.x2, y2: box.y2 }
       })
       const drawn = boxes()
       graph.fit()
-      report({ canvas: { width: canvas.width, height: canvas.height }, drawn, fitted: boxes() })
+      report({ canvas: { width: canvas.width, height: canvas.height }, available,
+               panning: graph.cy.userPanningEnabled(), drawn, fitted: boxes() })
     JS
   end
 end

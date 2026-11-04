@@ -46,9 +46,18 @@ module WoodsMap
     def page_root = File.expand_path('../..', __dir__)
 
     def page_styles
-      %w[tokens.css map.css].map do |name|
+      [page_fonts, *%w[tokens.css map.css].map do |name|
         File.read(File.join(page_root, 'app/assets/stylesheets/woods_map', name))
-      end.join("\n")
+      end].join("\n")
+    end
+
+    # @return [String] shipped faces embedded so fixture metrics match the mounted engine
+    def page_fonts
+      css = File.read(File.join(page_root, 'app/assets/stylesheets/woods_map/fonts.css'))
+      css.gsub(%r{url\(\.\./([^)]*)\)}) do
+        bytes = File.binread(File.join(page_root, 'vendor/fonts', Regexp.last_match(1)))
+        "url(data:font/woff2;base64,#{Base64.strict_encode64(bytes)})"
+      end
     end
 
     def page_imports
@@ -81,6 +90,7 @@ module WoodsMap
         const key = (target, init) => { const event = new KeyboardEvent("keydown", { bubbles: true, cancelable: true, ...init }); target.dispatchEvent(event); return event }
         window.addEventListener("error", (event) => report({ error: String(event.message) }))
         window.addEventListener("unhandledrejection", (event) => report({ error: String(event.reason && event.reason.stack || event.reason) }))
+        await document.fonts.ready
         await settle()
       JS
     end
