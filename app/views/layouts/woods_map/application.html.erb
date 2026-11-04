@@ -13,6 +13,7 @@
 <body class="wm page" data-theme="dark" data-controller="tooltip sheet keys help settings reveal<%= ' guide' if guide_status == :ready %>">
   <%= render 'woods_map/shared/bar', generation: @generation, nav: @nav, freshness: @freshness, query: params[:q] %>
   <% if flash[:alert] %><%= render 'woods_map/components/banner', severity: :risk, lead: 'Refused.', text: flash[:alert] %><% end %>
+  <% if @build_comparison&.mismatch? %><%= render 'woods_map/components/banner', severity: :warn, lead: 'Index build differs.', text: @build_comparison.message, tools: link_to('Build status', woods_map.root_path) %><% end %>
   <%= yield :banner %>
   <% if guide_visible? && guide_status != :ready %><%= render 'woods_map/components/banner', severity: :mod, lead: 'Guide unavailable.', text: WoodsMap::Guide.notice(woods_map_config) %><% end %>
   <div class="page-row">

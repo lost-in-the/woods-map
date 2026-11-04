@@ -12,6 +12,7 @@ require_relative 'support/m3_exit_check'
 require_relative 'support/fake_guide_chat'
 require_relative 'support/woods_line_stats'
 require_relative 'support/index_double'
+require_relative 'support/woods_build'
 
 RSpec::Matchers.define_negated_matcher :not_include, :include
 

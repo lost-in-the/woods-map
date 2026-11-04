@@ -1,0 +1,455 @@
+{
+  "map_code_revision": "7ac21dfc3ed9c65f14ccde6b8467944c4f7e01ac",
+  "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "testbed_base": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
+  "rails": "8.0.0",
+  "ruby": "3.3.1",
+  "index_generation": 3,
+  "browser": "157.0.8103.38",
+  "note": "Native PNG, scale1, fonts ready. Real mounted User page after extraction. Synthetic cases replace first fact value in DOM with an oversized identifier; no index or reader alteration.",
+  "captures": [
+    {
+      "file": "fact-values-natural-1440.png",
+      "width": 1440,
+      "height": 1000,
+      "synthetic": false,
+      "keyboard": null,
+      "axe": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "button[aria-label=\"Keyboard shortcuts\"]"
+            ],
+            [
+              "button[aria-controls=\"wm-settings\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".menu-toggle"
+            ],
+            [
+              ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+            ],
+            [
+              ".why > .dim"
+            ],
+            [
+              ".files > span[aria-hidden=\"true\"]"
+            ],
+            [
+              "button[aria-label=\"Copy path\"]"
+            ],
+            [
+              ".info"
+            ]
+          ]
+        }
+      ],
+      "scrollWidth": 1440,
+      "viewport": 1440
+    },
+    {
+      "file": "fact-values-synthetic-1440.png",
+      "width": 1440,
+      "height": 1000,
+      "synthetic": true,
+      "keyboard": {
+        "left": 282,
+        "width": 257,
+        "scroll": 539,
+        "focused": true,
+        "tabindex": "0"
+      },
+      "axe": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "button[aria-label=\"Keyboard shortcuts\"]"
+            ],
+            [
+              "button[aria-controls=\"wm-settings\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".menu-toggle"
+            ],
+            [
+              ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+            ],
+            [
+              ".why > .dim"
+            ],
+            [
+              ".files > span[aria-hidden=\"true\"]"
+            ],
+            [
+              "button[aria-label=\"Copy path\"]"
+            ],
+            [
+              ".info"
+            ]
+          ]
+        }
+      ],
+      "scrollWidth": 1440,
+      "viewport": 1440
+    },
+    {
+      "file": "fact-values-natural-960.png",
+      "width": 960,
+      "height": 1000,
+      "synthetic": false,
+      "keyboard": null,
+      "axe": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "button[aria-label=\"Keyboard shortcuts\"]"
+            ],
+            [
+              "button[aria-controls=\"wm-settings\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".menu-toggle"
+            ],
+            [
+              ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+            ],
+            [
+              ".why > .dim"
+            ],
+            [
+              ".files > span[aria-hidden=\"true\"]"
+            ],
+            [
+              "button[aria-label=\"Copy path\"]"
+            ],
+            [
+              ".info"
+            ],
+            [
+              "tr:nth-child(9) > td[data-h=\"line\"]"
+            ]
+          ]
+        }
+      ],
+      "scrollWidth": 960,
+      "viewport": 960
+    },
+    {
+      "file": "fact-values-synthetic-960.png",
+      "width": 960,
+      "height": 1000,
+      "synthetic": true,
+      "keyboard": {
+        "left": 402,
+        "width": 137,
+        "scroll": 539,
+        "focused": true,
+        "tabindex": "0"
+      },
+      "axe": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "button[aria-label=\"Keyboard shortcuts\"]"
+            ],
+            [
+              "button[aria-controls=\"wm-settings\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".menu-toggle"
+            ],
+            [
+              ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+            ],
+            [
+              ".why > .dim"
+            ],
+            [
+              ".files > span[aria-hidden=\"true\"]"
+            ],
+            [
+              "button[aria-label=\"Copy path\"]"
+            ],
+            [
+              ".info"
+            ],
+            [
+              "tr:nth-child(9) > td[data-h=\"line\"]"
+            ]
+          ]
+        }
+      ],
+      "scrollWidth": 960,
+      "viewport": 960
+    },
+    {
+      "file": "fact-values-natural-640.png",
+      "width": 640,
+      "height": 1000,
+      "synthetic": false,
+      "keyboard": null,
+      "axe": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "button[aria-label=\"Keyboard shortcuts\"]"
+            ],
+            [
+              "button[aria-controls=\"wm-settings\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".menu-toggle"
+            ],
+            [
+              ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+            ],
+            [
+              ".why > .dim"
+            ],
+            [
+              ".files > span[aria-hidden=\"true\"]"
+            ],
+            [
+              "div[aria-label=\"Used by 20: controllers\"] > a:nth-child(1)"
+            ],
+            [
+              "#L3 > .mg > .lyr"
+            ],
+            [
+              "#L6 > .mg > .lyr"
+            ],
+            [
+              ".info"
+            ],
+            [
+              "tr:nth-child(9) > td[data-h=\"line\"]"
+            ]
+          ]
+        }
+      ],
+      "scrollWidth": 640,
+      "viewport": 640
+    },
+    {
+      "file": "fact-values-synthetic-640.png",
+      "width": 640,
+      "height": 1000,
+      "synthetic": true,
+      "keyboard": {
+        "left": 333,
+        "width": 206,
+        "scroll": 539,
+        "focused": true,
+        "tabindex": "0"
+      },
+      "axe": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "button[aria-label=\"Keyboard shortcuts\"]"
+            ],
+            [
+              "button[aria-controls=\"wm-settings\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".menu-toggle"
+            ],
+            [
+              ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+            ],
+            [
+              ".why > .dim"
+            ],
+            [
+              ".files > span[aria-hidden=\"true\"]"
+            ],
+            [
+              "div[aria-label=\"Table: name\"] > a[href=\"#\"]"
+            ],
+            [
+              "div[aria-label=\"Used by 20: controllers\"] > a:nth-child(1)"
+            ],
+            [
+              "#L3 > .mg > .lyr"
+            ],
+            [
+              "#L6 > .mg > .lyr"
+            ],
+            [
+              ".info"
+            ],
+            [
+              "tr:nth-child(9) > td[data-h=\"line\"]"
+            ]
+          ]
+        }
+      ],
+      "scrollWidth": 640,
+      "viewport": 640
+    },
+    {
+      "file": "fact-values-natural-390.png",
+      "width": 390,
+      "height": 1000,
+      "synthetic": false,
+      "keyboard": null,
+      "axe": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "button[aria-label=\"Keyboard shortcuts\"]"
+            ],
+            [
+              "button[aria-controls=\"wm-settings\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".menu-toggle"
+            ],
+            [
+              ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+            ],
+            [
+              ".why > .dim"
+            ],
+            [
+              ".files > span[aria-hidden=\"true\"]"
+            ],
+            [
+              ".tab[href$=\"graph\"] > .cnt"
+            ],
+            [
+              ".tab:nth-child(5)"
+            ],
+            [
+              ".tab:nth-child(5) > .cnt"
+            ],
+            [
+              ".info"
+            ]
+          ]
+        }
+      ],
+      "scrollWidth": 390,
+      "viewport": 390
+    },
+    {
+      "file": "fact-values-synthetic-390.png",
+      "width": 390,
+      "height": 1000,
+      "synthetic": true,
+      "keyboard": {
+        "left": 285,
+        "width": 254,
+        "scroll": 539,
+        "focused": true,
+        "tabindex": "0"
+      },
+      "axe": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "button[aria-label=\"Keyboard shortcuts\"]"
+            ],
+            [
+              "button[aria-controls=\"wm-settings\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".menu-toggle"
+            ],
+            [
+              ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+            ],
+            [
+              ".why > .dim"
+            ],
+            [
+              ".files > span[aria-hidden=\"true\"]"
+            ],
+            [
+              ".tab[href$=\"graph\"] > .cnt"
+            ],
+            [
+              ".tab:nth-child(5)"
+            ],
+            [
+              ".tab:nth-child(5) > .cnt"
+            ],
+            [
+              "div[aria-label=\"Table: name\"] > a[href=\"#\"]"
+            ],
+            [
+              ".info"
+            ]
+          ]
+        }
+      ],
+      "scrollWidth": 390,
+      "viewport": 390
+    }
+  ]
+}

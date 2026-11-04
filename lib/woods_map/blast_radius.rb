@@ -30,7 +30,7 @@ module WoodsMap
       @depth = depth.to_i.clamp(1, MAX_DEPTH)
       @types = list(filters[:types]).presence
       @via = list(filters[:via]).presence
-      @show = HIDDEN.key?(filters[:show].to_s) ? filters[:show].to_s : 'all'
+      @show = (HIDDEN.keys + ['with_docs']).include?(filters[:show].to_s) ? filters[:show].to_s : 'all'
     end
 
     attr_reader :focus, :unknown, :depth, :show
@@ -60,6 +60,7 @@ module WoodsMap
     # @return [Integer] typed units that depend on it
     def dependent_count(identifier)
       Array(@graph.dig('reverse_via', identifier))
+        .reject { |record| (record['source_type'] || type_of(record['source'].to_s)) == 'doc' }
         .map { |record| [record['source'], record['source_type'] || type_of(record['source'].to_s)] }.uniq.size
     end
 
@@ -78,9 +79,19 @@ module WoodsMap
                            .sort_by { |a| [a.distance, -weight(a.identifier), a.type, a.identifier] }
     end
 
+    # @return [Array<Affected>] documentation remains listed apart from recorded dependents
+    def documentation
+      affected.select { |unit| unit.type == 'doc' }
+    end
+
+    # @return [Array<Affected>] headline count, including documentation only by explicit choice
+    def counted
+      show == 'with_docs' ? affected : affected.reject { |unit| unit.type == 'doc' }
+    end
+
     # @return [Array<Affected>] one edge away from the focus
     def direct
-      affected.select { |a| a.distance == 1 }
+      counted.select { |a| a.distance == 1 }
     end
 
     # @return [Array<Affected>] further away

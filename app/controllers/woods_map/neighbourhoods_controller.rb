@@ -32,7 +32,9 @@ module WoodsMap
     end
 
     def render_unavailable(_error)
-      render json: { error: 'index_unavailable' }, status: :service_unavailable
+      body = { error: 'index_unavailable' }
+      body[:message] = @build_message if @build_message
+      render json: body, status: :service_unavailable
     end
 
     def refuse(_reason)

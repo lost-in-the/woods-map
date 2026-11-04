@@ -1,0 +1,1 @@
+- Warn when a published index was written by another Woods build, and explain failed payload reads with a re-extraction panel instead of a server error. Show the published branch and build comparison in status.

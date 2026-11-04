@@ -1,0 +1,1 @@
+- Include deployment, threat-model and design-note documentation linked by the README in the gem. Clarify which Ruby/Rails combinations CI exercises.

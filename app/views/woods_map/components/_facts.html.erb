@@ -2,6 +2,6 @@
     Locals: tiles (Array of Hash with :eyebrow and :rows, each row [label, value]). %>
 <div class="facts">
   <% tiles.each do |tile| %>
-    <div><span class="eyebrow"><%= tile[:eyebrow] %></span><dl><% tile[:rows].each do |label, value| %><dt><%= label %></dt><dd><%= value %></dd><% end %></dl></div>
+    <div><span class="eyebrow"><%= tile[:eyebrow] %></span><dl><% tile[:rows].each do |label, value| %><dt><%= label %></dt><dd><div class="fact-value" role="region" aria-label="<%= tile[:eyebrow] %>: <%= label %>" tabindex="0" data-controller="cliff"><%= value %></div></dd><% end %></dl></div>
   <% end %>
 </div>

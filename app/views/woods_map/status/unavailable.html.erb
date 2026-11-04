@@ -1,10 +1,16 @@
-<% content_for :title, 'Woods Map · no index' %>
-<% content_for :centered_state, true %>
+<% content_for :title, @index_read_failure ? 'Woods Map · unreadable index' : 'Woods Map · no index' %>
+<% content_for :centered_state, true unless @index_read_failure %>
 <div class="empty-state">
+  <% if @index_read_failure %>
+  <h1 class="t2">Index could not be read</h1>
+  <p><%= @build_message %></p>
+  <pre class="cmd">bin/rails woods:extract</pre>
+  <% else %>
   <h1 class="t2">No published index yet</h1>
   The map reads a published Woods generation and nothing else. Extract one, then reload; the status bar shows the generation and HEAD once it exists.
   <pre class="cmd" role="region" aria-label="Extraction commands" tabindex="0" data-controller="cliff">bin/rails woods:extract        # full run, publishes gen 1
 bin/rails woods:incremental    # after that, changed files only</pre>
   <div class="cap">Looking in <code><%= woods_map_config.index_path %></code> (config.index_dir). <%= woods_map_config.token? ? 'Token configured.' : 'Loopback host, no token required.' %> <a href="https://github.com/lost-in-the/woods#readme">Woods README ↗</a></div>
   <div class="cap"><%= @error.message %></div>
+  <% end %>
 </div>
