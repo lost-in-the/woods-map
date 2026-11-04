@@ -74,6 +74,8 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .hcard dt{color:var(--dim)}.wm .hcard dd{margin:0;overflow-wrap:anywhere}
 .wm .hcard .hcf{margin-top:var(--s1);color:var(--mut);font-size:var(--fs-11)}
 .wm .hcard .hcf .lyr{margin:0}
+/* Keep activity ink at the board's 4px width when the responsive gutter widens. */
+.wm .cv .heat i{width:4px;right:auto}
 /* Reading settings (B-15): the dialog shares the keyboard help's frame. Wrap is opt-in and keeps the code view's one
    scroll region (D-24): the source column fits the region instead of growing to the longest line. */
 .wm .btn[hidden]{display:none}
@@ -487,3 +489,6 @@ html.no-js .wm .amb-pop[hidden]{display:block}
 .wm .difft{max-height:calc(100vh - var(--s7));isolation:isolate}
 .wm .difft .dl.hunk{position:sticky;top:0;z-index:1}
 @container wm (max-width:639px){ .wm .tblwrap,.wm .difft{max-height:none} .wm .tbl thead,.wm .difft .dl.hunk{position:static} }
+
+/* Published route locations remain readable within the scrollable table. */
+.wm .tbl td.route-location{white-space:normal;overflow-wrap:anywhere}

@@ -1,0 +1,1496 @@
+{
+  "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed_base_revision": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
+  "isolated_testbed_probe_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "rails": "8.0.0",
+  "ruby": "3.3.1",
+  "browser": "Native headless Google Chrome 157.0.8103.38 via Playwright 1.56.1",
+  "index_generation": 3,
+  "axe_tags": [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21aa",
+    "best-practice"
+  ],
+  "capture_note": "Native PNG screenshots: device scale factor 1, one CSS pixel per PNG pixel, scale css, no resampling. Fonts loaded before capture. Pixel dimensions verified against viewport. Replaces blurred preview captures.",
+  "incomplete_review_note": "axe incomplete results retained, including non-text glyph contrast and the closed keyboard-help dialog reference. Zero violations is not a complete WCAG certification.",
+  "map_code_revision": "a71e09acf67d0a2981bbc7081e86273903fe4abc",
+  "provisioning_note": "Fresh woods-extract full on an isolated Rails 8.0 testbed copy. Route draw-file, Markdown and TypeScript JSX probe sources are committed in the isolated testbed and extracted normally. No reader stubs or graph edits.",
+  "captures": [
+    {
+      "pr": 153,
+      "state": "Routes tab with real extracted config/routes/visual.rb:2 source location",
+      "screenshot": "release-reading-routes-1440.png",
+      "height": 1999,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "button[aria-label=\"Copy path\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "#routesh > .info[aria-label=\"Explain\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "#actionsh > .info[aria-label=\"Explain\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "#refsh > .info[aria-label=\"Explain\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "tr:nth-child(1) > .uses[data-h=\"helper \u2192 action\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".odd:nth-child(2) > .uses[data-h=\"helper \u2192 action\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "tr:nth-child(3) > .uses[data-h=\"helper \u2192 action\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".odd:nth-child(4) > .uses[data-h=\"helper \u2192 action\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "tr:nth-child(5) > .uses[data-h=\"helper \u2192 action\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "title": "UsersController \u00b7 Routes \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/controller/UsersController/routes",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 1440,
+      "png_width": 1440,
+      "png_height": 1999,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200,
+      "location_readability": {
+        "wrap": "normal",
+        "client": 259,
+        "scroll": 259
+      },
+      "keyboard_scroll": {
+        "left": 0,
+        "width": 1093,
+        "scrollWidth": 1093
+      }
+    },
+    {
+      "pr": 153,
+      "state": "Routes tab with real extracted config/routes/visual.rb:2 source location",
+      "screenshot": "release-reading-routes-960.png",
+      "height": 2111,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "button[aria-label=\"Copy path\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "#routesh > .info[aria-label=\"Explain\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "#actionsh > .info[aria-label=\"Explain\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "#refsh > .info[aria-label=\"Explain\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "tr:nth-child(1) > .uses[data-h=\"helper \u2192 action\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".odd:nth-child(2) > .uses[data-h=\"helper \u2192 action\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "tr:nth-child(3) > .uses[data-h=\"helper \u2192 action\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".odd:nth-child(4) > .uses[data-h=\"helper \u2192 action\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "tr:nth-child(5) > .uses[data-h=\"helper \u2192 action\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "title": "UsersController \u00b7 Routes \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/controller/UsersController/routes",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 960,
+      "png_width": 960,
+      "png_height": 2111,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200,
+      "location_readability": {
+        "wrap": "normal",
+        "client": 259,
+        "scroll": 259
+      },
+      "keyboard_scroll": {
+        "left": 0,
+        "width": 613,
+        "scrollWidth": 820
+      }
+    },
+    {
+      "pr": 153,
+      "state": "Routes tab with real extracted config/routes/visual.rb:2 source location",
+      "screenshot": "release-reading-routes-640.png",
+      "height": 2320,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "#routesh > .info[aria-label=\"Explain\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "#actionsh > .info[aria-label=\"Explain\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "#refsh > .info[aria-label=\"Explain\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "tr:nth-child(1) > .uses[data-h=\"helper \u2192 action\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".odd:nth-child(2) > .uses[data-h=\"helper \u2192 action\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "tr:nth-child(3) > .uses[data-h=\"helper \u2192 action\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".odd:nth-child(4) > .uses[data-h=\"helper \u2192 action\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "tr:nth-child(5) > .uses[data-h=\"helper \u2192 action\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "title": "UsersController \u00b7 Routes \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/controller/UsersController/routes",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 640,
+      "png_width": 640,
+      "png_height": 2320,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200,
+      "location_readability": {
+        "wrap": "normal",
+        "client": 259,
+        "scroll": 259
+      },
+      "keyboard_scroll": {
+        "left": 0,
+        "width": 554,
+        "scrollWidth": 820
+      }
+    },
+    {
+      "pr": 153,
+      "state": "Routes tab with real extracted config/routes/visual.rb:2 source location",
+      "screenshot": "release-reading-routes-390.png",
+      "height": 2398,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".tab:nth-child(5)"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
+            },
+            {
+              "target": [
+                ".tab:nth-child(5) > .cnt"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
+            },
+            {
+              "target": [
+                ".tab:nth-child(6)"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
+            },
+            {
+              "target": [
+                ".tab:nth-child(6) > .cnt"
+              ],
+              "summary": "Fix any of the following:\n  Element content is too short to determine if it is actual text content"
+            },
+            {
+              "target": [
+                ".ctx-top"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it is overlapped by another element"
+            },
+            {
+              "target": [
+                "#routesh > .info[aria-label=\"Explain\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "#actionsh > .info[aria-label=\"Explain\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "#refsh > .info[aria-label=\"Explain\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "title": "UsersController \u00b7 Routes \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/controller/UsersController/routes",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 390,
+      "png_width": 390,
+      "png_height": 2398,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200,
+      "location_readability": {
+        "wrap": "normal",
+        "client": 259,
+        "scroll": 259
+      },
+      "keyboard_scroll": {
+        "left": 0,
+        "width": 304,
+        "scrollWidth": 820
+      }
+    },
+    {
+      "pr": 153,
+      "state": "Markdown document Code view, real extracted probe",
+      "screenshot": "release-reading-markdown-1440.png",
+      "height": 1000,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"wm-settings\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-settings\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "button[aria-label=\"Copy path\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".info"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "title": "docs/visual-impact.md \u00b7 Code \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/doc/docs/visual-impact.md",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 1440,
+      "png_width": 1440,
+      "png_height": 1000,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200
+    },
+    {
+      "pr": 153,
+      "state": "Markdown document Code view, real extracted probe",
+      "screenshot": "release-reading-markdown-960.png",
+      "height": 1000,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"wm-settings\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-settings\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "button[aria-label=\"Copy path\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".info"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "title": "docs/visual-impact.md \u00b7 Code \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/doc/docs/visual-impact.md",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 960,
+      "png_width": 960,
+      "png_height": 1000,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200
+    },
+    {
+      "pr": 153,
+      "state": "Markdown document Code view, real extracted probe",
+      "screenshot": "release-reading-markdown-640.png",
+      "height": 1000,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"wm-settings\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-settings\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".info"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "title": "docs/visual-impact.md \u00b7 Code \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/doc/docs/visual-impact.md",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 640,
+      "png_width": 640,
+      "png_height": 1000,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200
+    },
+    {
+      "pr": 153,
+      "state": "Markdown document Code view, real extracted probe",
+      "screenshot": "release-reading-markdown-390.png",
+      "height": 1000,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"wm-settings\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-settings\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".info"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "title": "docs/visual-impact.md \u00b7 Code \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/doc/docs/visual-impact.md",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 390,
+      "png_width": 390,
+      "png_height": 1000,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200
+    },
+    {
+      "pr": 153,
+      "state": "TypeScript JSX Code view, real extracted VisualCard probe",
+      "screenshot": "release-reading-tsx-1440.png",
+      "height": 1000,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"wm-settings\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-settings\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "button[aria-label=\"Copy path\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".info"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "title": "app/javascript/components/visual_card.tsx \u00b7 Code \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/js_module/app/javascript/components/visual_card.tsx",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 1440,
+      "png_width": 1440,
+      "png_height": 1000,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200
+    },
+    {
+      "pr": 153,
+      "state": "TypeScript JSX Code view, real extracted VisualCard probe",
+      "screenshot": "release-reading-tsx-960.png",
+      "height": 1000,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"wm-settings\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-settings\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "button[aria-label=\"Copy path\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".info"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "title": "app/javascript/components/visual_card.tsx \u00b7 Code \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/js_module/app/javascript/components/visual_card.tsx",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 960,
+      "png_width": 960,
+      "png_height": 1000,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200
+    },
+    {
+      "pr": 153,
+      "state": "TypeScript JSX Code view, real extracted VisualCard probe",
+      "screenshot": "release-reading-tsx-640.png",
+      "height": 1000,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"wm-settings\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-settings\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".info"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "title": "app/javascript/components/visual_card.tsx \u00b7 Code \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/js_module/app/javascript/components/visual_card.tsx",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 640,
+      "png_width": 640,
+      "png_height": 1000,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200
+    },
+    {
+      "pr": 153,
+      "state": "TypeScript JSX Code view, real extracted VisualCard probe",
+      "screenshot": "release-reading-tsx-390.png",
+      "height": 1000,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"wm-settings\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-settings\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".ctx-top"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it is overlapped by another element"
+            },
+            {
+              "target": [
+                ".info"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "title": "app/javascript/components/visual_card.tsx \u00b7 Code \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/js_module/app/javascript/components/visual_card.tsx",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 390,
+      "png_width": 390,
+      "png_height": 1000,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200
+    },
+    {
+      "pr": 153,
+      "state": "Callers help tooltip open on User Code view",
+      "tooltip": [
+        {
+          "text": "Published reference spans that name this unit, with the method each one names when the source names one. A reference with no method is a reference to the class itself, which may be a mixin reference. Newer indexes can tag include, prepend and extend references; this panel groups them as class references. Dynamic dispatch, receiverless calls and ambiguous names publish no caller here, so an empty list does not prove the code is unused.",
+          "visible": true
+        }
+      ],
+      "screenshot": "release-reading-callers-1440.png",
+      "height": 1000,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"wm-settings\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-settings\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "button[aria-label=\"Copy path\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".info"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "tr:nth-child(1) > td[data-h=\"caller\"] > a"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it is overlapped by another element"
+            },
+            {
+              "target": [
+                "#wm-tip-mw2frri5"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ],
+      "title": "User \u00b7 Code \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/model/User",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 1440,
+      "png_width": 1440,
+      "png_height": 1000,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200,
+      "activity_ink": 4
+    },
+    {
+      "pr": 153,
+      "state": "Callers help tooltip open on User Code view",
+      "tooltip": [
+        {
+          "text": "Published reference spans that name this unit, with the method each one names when the source names one. A reference with no method is a reference to the class itself, which may be a mixin reference. Newer indexes can tag include, prepend and extend references; this panel groups them as class references. Dynamic dispatch, receiverless calls and ambiguous names publish no caller here, so an empty list does not prove the code is unused.",
+          "visible": true
+        }
+      ],
+      "screenshot": "release-reading-callers-960.png",
+      "height": 1000,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"wm-settings\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-settings\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "button[aria-label=\"Copy path\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".info"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "tr:nth-child(9) > td[data-h=\"line\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content is too short to determine if it is actual text content"
+            }
+          ]
+        }
+      ],
+      "title": "User \u00b7 Code \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/model/User",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 960,
+      "png_width": 960,
+      "png_height": 1000,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200,
+      "activity_ink": 4
+    },
+    {
+      "pr": 153,
+      "state": "Callers help tooltip open on User Code view",
+      "tooltip": [
+        {
+          "text": "Published reference spans that name this unit, with the method each one names when the source names one. A reference with no method is a reference to the class itself, which may be a mixin reference. Newer indexes can tag include, prepend and extend references; this panel groups them as class references. Dynamic dispatch, receiverless calls and ambiguous names publish no caller here, so an empty list does not prove the code is unused.",
+          "visible": true
+        }
+      ],
+      "screenshot": "release-reading-callers-640.png",
+      "height": 1000,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"wm-settings\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-settings\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "#L3 > .mg > .lyr"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                "#L6 > .mg > .lyr"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".info"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "tr:nth-child(9) > td[data-h=\"line\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content is too short to determine if it is actual text content"
+            }
+          ]
+        }
+      ],
+      "title": "User \u00b7 Code \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/model/User",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 640,
+      "png_width": 640,
+      "png_height": 1000,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200,
+      "activity_ink": 4
+    },
+    {
+      "pr": 153,
+      "state": "Callers help tooltip open on User Code view",
+      "tooltip": [
+        {
+          "text": "Published reference spans that name this unit, with the method each one names when the source names one. A reference with no method is a reference to the class itself, which may be a mixin reference. Newer indexes can tag include, prepend and extend references; this panel groups them as class references. Dynamic dispatch, receiverless calls and ambiguous names publish no caller here, so an empty list does not prove the code is unused.",
+          "visible": true
+        }
+      ],
+      "screenshot": "release-reading-callers-390.png",
+      "height": 1000,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"wm-settings\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-settings\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".fresh"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".tab[href$=\"graph\"] > .cnt"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
+            },
+            {
+              "target": [
+                ".tab:nth-child(5)"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
+            },
+            {
+              "target": [
+                ".tab:nth-child(5) > .cnt"
+              ],
+              "summary": "Fix any of the following:\n  Element content is too short to determine if it is actual text content"
+            },
+            {
+              "target": [
+                ".info"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "title": "User \u00b7 Code \u00b7 Woods Map",
+      "url": "http://localhost:3153/woods/units/model/User",
+      "version": "4.10.3",
+      "violations": [],
+      "width": 390,
+      "png_width": 390,
+      "png_height": 1000,
+      "dpr": 1,
+      "fonts": "loaded",
+      "http_status": 200,
+      "activity_ink": 4
+    }
+  ],
+  "hosted_testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "keyboard_checks": [
+    {
+      "width": 1093,
+      "key": "ArrowRight",
+      "left": 0,
+      "scrollWidth": 1093,
+      "focused": false,
+      "complete_location": true
+    },
+    {
+      "width": 613,
+      "key": "ArrowRight",
+      "left": 207,
+      "scrollWidth": 820,
+      "focused": true,
+      "complete_location": true
+    },
+    {
+      "width": 554,
+      "key": "ArrowRight",
+      "left": 266,
+      "scrollWidth": 820,
+      "focused": true,
+      "complete_location": true
+    },
+    {
+      "width": 304,
+      "key": "ArrowRight",
+      "left": 516,
+      "scrollWidth": 820,
+      "focused": true,
+      "complete_location": true
+    }
+  ]
+}

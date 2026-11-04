@@ -18,7 +18,30 @@ RSpec.describe 'The controller Routes tab', type: :request do
     expect(rows).to include(['GET /users/:id/edit', 'edit', 'edit_user_path, edit_user_url', 'no route unit', '—'])
     show = doc.at_css('table[aria-label="Routes"] a[href="/woods/units/route/GET%20/users/:id"]')
     expect(show&.text).to eq('GET /users/:id')
-    expect(rows.find { |row| row.first == 'GET /users' }[3]).to eq('L14')
+    expect(rows.find { |row| row.first == 'GET /users' }[3]).to eq('config/routes.rb:14')
+  end
+
+  def publish_draw_file_location
+    allow(Woods::PublishedIndex).to receive(:open).and_wrap_original do |original, *args, &block|
+      original.call(*args) do |index|
+        allow(index).to receive(:unit).and_wrap_original do |read, identifier, **options|
+          unit = read.call(identifier, **options)
+          next unit unless unit && identifier == 'GET /users'
+
+          unit.deep_dup.tap do |copy|
+            copy['file_path'] = 'config/routes/admin.rb'
+            copy['metadata']['line_number'] = 3
+          end
+        end
+        block.call(index)
+      end
+    end
+  end
+
+  it 'shows the actual published route draw file and line' do
+    publish_draw_file_location
+    get '/woods/units/controller/UsersController/routes'
+    expect(doc.at_css('table[aria-label="Routes"]').text).to include('config/routes/admin.rb:3')
   end
 
   it 'lists action sources with their lines and passage links' do
