@@ -14,7 +14,7 @@
   ],
   "capture_note": "Native PNG screenshots: device scale factor 1, one CSS pixel per PNG pixel, scale css, no resampling. Fonts loaded before capture. Pixel dimensions verified against viewport. Replaces blurred preview captures.",
   "incomplete_review_note": "axe incomplete results retained, including non-text glyph contrast and the closed keyboard-help dialog reference. Zero violations is not a complete WCAG certification.",
-  "map_code_revision": "848f270c90274fa59388722121c44284918f1c2e",
+  "map_code_revision": "f10d52446c7a06e45d4d2fdfeed6cdcd6e65448d",
   "provisioning_note": "Fresh woods-extract full on an isolated Rails 8.0 testbed copy. docs/visual-impact.md contains real code mentions of UsersController and User, resolved normally by Woods. No graph or reader stubs.",
   "regression_note": "Initial mounted audit found landmark-unique because both table regions were named Affected units. The documentation table now has its own accessible label; the captures below were retaken after that code fix.",
   "captures": [
@@ -76,12 +76,6 @@
             },
             {
               "target": [
-                "abbr"
-              ],
-              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
-            },
-            {
-              "target": [
                 "td[data-h=\"flags\"] > .flag"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
@@ -101,7 +95,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController · Impact · Woods Map",
+      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1",
       "version": "4.10.3",
       "violations": [],
@@ -110,7 +104,16 @@
       "png_height": 1577,
       "dpr": 1,
       "fonts": "loaded",
-      "http_status": 200
+      "http_status": 200,
+      "heading_readability": {
+        "textRight": 845.484375,
+        "weightLeft": 854.5
+      },
+      "keyboard_scroll": {
+        "left": 0,
+        "width": 1093,
+        "scrollWidth": 1093
+      }
     },
     {
       "pr": 151,
@@ -170,12 +173,6 @@
             },
             {
               "target": [
-                "abbr"
-              ],
-              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
-            },
-            {
-              "target": [
                 "#aff > .info[aria-label=\"Explain\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
@@ -189,7 +186,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController · Impact · Woods Map",
+      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1",
       "version": "4.10.3",
       "violations": [],
@@ -198,7 +195,16 @@
       "png_height": 1758,
       "dpr": 1,
       "fonts": "loaded",
-      "http_status": 200
+      "http_status": 200,
+      "heading_readability": {
+        "textRight": 845.484375,
+        "weightLeft": 854.5
+      },
+      "keyboard_scroll": {
+        "left": 0,
+        "width": 613,
+        "scrollWidth": 760
+      }
     },
     {
       "pr": 151,
@@ -252,12 +258,6 @@
             },
             {
               "target": [
-                "abbr"
-              ],
-              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
-            },
-            {
-              "target": [
                 "#aff > .info[aria-label=\"Explain\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
@@ -277,7 +277,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController · Impact · Woods Map",
+      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1",
       "version": "4.10.3",
       "violations": [],
@@ -286,7 +286,16 @@
       "png_height": 1796,
       "dpr": 1,
       "fonts": "loaded",
-      "http_status": 200
+      "http_status": 200,
+      "heading_readability": {
+        "textRight": 584.484375,
+        "weightLeft": 593.5
+      },
+      "keyboard_scroll": {
+        "left": 0,
+        "width": 554,
+        "scrollWidth": 760
+      }
     },
     {
       "pr": 151,
@@ -377,7 +386,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController · Impact · Woods Map",
+      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1",
       "version": "4.10.3",
       "violations": [],
@@ -386,7 +395,16 @@
       "png_height": 1974,
       "dpr": 1,
       "fonts": "loaded",
-      "http_status": 200
+      "http_status": 200,
+      "heading_readability": {
+        "textRight": 579.484375,
+        "weightLeft": 593.5
+      },
+      "keyboard_scroll": {
+        "left": 0,
+        "width": 304,
+        "scrollWidth": 760
+      }
     },
     {
       "pr": 151,
@@ -446,12 +464,6 @@
             },
             {
               "target": [
-                "abbr"
-              ],
-              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
-            },
-            {
-              "target": [
                 "td[data-h=\"flags\"] > .flag"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
@@ -471,7 +483,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController · Impact · Woods Map",
+      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1&show=with_docs",
       "version": "4.10.3",
       "violations": [],
@@ -480,7 +492,16 @@
       "png_height": 1577,
       "dpr": 1,
       "fonts": "loaded",
-      "http_status": 200
+      "http_status": 200,
+      "heading_readability": {
+        "textRight": 845.484375,
+        "weightLeft": 854.5
+      },
+      "keyboard_scroll": {
+        "left": 0,
+        "width": 1093,
+        "scrollWidth": 1093
+      }
     },
     {
       "pr": 151,
@@ -540,12 +561,6 @@
             },
             {
               "target": [
-                "abbr"
-              ],
-              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
-            },
-            {
-              "target": [
                 "#aff > .info[aria-label=\"Explain\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
@@ -559,7 +574,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController · Impact · Woods Map",
+      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1&show=with_docs",
       "version": "4.10.3",
       "violations": [],
@@ -568,7 +583,16 @@
       "png_height": 1758,
       "dpr": 1,
       "fonts": "loaded",
-      "http_status": 200
+      "http_status": 200,
+      "heading_readability": {
+        "textRight": 845.484375,
+        "weightLeft": 854.5
+      },
+      "keyboard_scroll": {
+        "left": 0,
+        "width": 613,
+        "scrollWidth": 760
+      }
     },
     {
       "pr": 151,
@@ -622,12 +646,6 @@
             },
             {
               "target": [
-                "abbr"
-              ],
-              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
-            },
-            {
-              "target": [
                 "#aff > .info[aria-label=\"Explain\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
@@ -647,7 +665,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController · Impact · Woods Map",
+      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1&show=with_docs",
       "version": "4.10.3",
       "violations": [],
@@ -656,7 +674,16 @@
       "png_height": 1796,
       "dpr": 1,
       "fonts": "loaded",
-      "http_status": 200
+      "http_status": 200,
+      "heading_readability": {
+        "textRight": 584.484375,
+        "weightLeft": 593.5
+      },
+      "keyboard_scroll": {
+        "left": 0,
+        "width": 554,
+        "scrollWidth": 760
+      }
     },
     {
       "pr": 151,
@@ -747,7 +774,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController · Impact · Woods Map",
+      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1&show=with_docs",
       "version": "4.10.3",
       "violations": [],
@@ -756,7 +783,16 @@
       "png_height": 1974,
       "dpr": 1,
       "fonts": "loaded",
-      "http_status": 200
+      "http_status": 200,
+      "heading_readability": {
+        "textRight": 579.484375,
+        "weightLeft": 593.5
+      },
+      "keyboard_scroll": {
+        "left": 0,
+        "width": 304,
+        "scrollWidth": 760
+      }
     },
     {
       "pr": 151,
@@ -823,7 +859,7 @@
           ]
         }
       ],
-      "title": "UsersController · Code · Woods Map",
+      "title": "UsersController \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3151/woods/units/controller/UsersController",
       "version": "4.10.3",
       "violations": [],
@@ -899,7 +935,7 @@
           ]
         }
       ],
-      "title": "UsersController · Code · Woods Map",
+      "title": "UsersController \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3151/woods/units/controller/UsersController",
       "version": "4.10.3",
       "violations": [],
@@ -969,7 +1005,7 @@
           ]
         }
       ],
-      "title": "UsersController · Code · Woods Map",
+      "title": "UsersController \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3151/woods/units/controller/UsersController",
       "version": "4.10.3",
       "violations": [],
@@ -1069,7 +1105,7 @@
           ]
         }
       ],
-      "title": "UsersController · Code · Woods Map",
+      "title": "UsersController \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3151/woods/units/controller/UsersController",
       "version": "4.10.3",
       "violations": [],
