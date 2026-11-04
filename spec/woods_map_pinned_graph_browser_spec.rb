@@ -17,10 +17,7 @@ RSpec.describe 'The pinned graph in Chromium', type: :request do
 
       report = pinned_report(width)
       canvas = report.fetch('canvas')
-      expect(canvas.fetch('width')).to be_positive
-      expect(canvas.fetch('width')).to be_within(1).of(report.fetch('available'))
-      expect(report.fetch('panning')).to be(true)
-      expect(report.fetch('drawn').size).to eq(2)
+      expect(report.fetch('fit')).to eq('fills' => true, 'panning' => true, 'nodes' => 2)
       %w[drawn fitted].each do |moment|
         report.fetch(moment).each do |box|
           expect(box.values_at('x1', 'y1')).to all(be >= 0)
@@ -53,7 +50,8 @@ RSpec.describe 'The pinned graph in Chromium', type: :request do
       const drawn = boxes()
       graph.fit()
       report({ canvas: { width: canvas.width, height: canvas.height }, available,
-               panning: graph.cy.userPanningEnabled(), drawn, fitted: boxes() })
+               fit: { fills: canvas.width > 0 && Math.abs(canvas.width - available) < 1,
+                      panning: graph.cy.userPanningEnabled(), nodes: drawn.length }, drawn, fitted: boxes() })
     JS
   end
 end
