@@ -129,6 +129,8 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
 .wm .frame-facts{margin:var(--s4) var(--s5) 0}
 /* The tiles share the row between them rather than leaving empty tracks, and a name breaks at its <wbr> before it breaks mid-word. */
 .wm .facts dd{overflow-wrap:break-word}
+/* Keep identifiers whole; oversized segments scroll inside the value rather than the document. */
+.wm .facts .fact-value{overflow-wrap:normal;overflow-x:auto;min-width:0}
 @container wm (min-width:960px){ .wm .frame-facts .facts{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)} }
 .wm .contents{display:contents}
 .wm .regular{font-weight:400}

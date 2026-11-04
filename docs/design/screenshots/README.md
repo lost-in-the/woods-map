@@ -12,6 +12,7 @@ instead of resizing or sharpening existing images.
 
 | Page | Board | Screenshots |
 |---|---|---|
+| Summary fact values, horizontal scrolling ([WDS-142](https://linear.app/lost-in-the/issue/WDS-142)); mounted User page with natural and explicitly synthetic oversized-name probes | [C5-Chrome](../boards/C5-Chrome.html), maintainer scrolling decision | Natural [1440](fact-values-natural-1440.png), [960](fact-values-natural-960.png), [640](fact-values-natural-640.png), [390](fact-values-natural-390.png); synthetic [1440](fact-values-synthetic-1440.png), [960](fact-values-synthetic-960.png), [640](fact-values-synthetic-640.png), [390](fact-values-synthetic-390.png); [axe, keyboard and provenance](fact-values-axe.json) |
 | Status page (`/woods`) | [B8-States](../boards/B8-States.html), *stale: the status page* panel | [1440](status-1440.png), [960](status-960.png), [390](status-390.png) |
 | First run, no index published | [B8-States](../boards/B8-States.html), *first run* panel | [1440](first-run-1440.png) |
 | Refused, non-loopback host without a token | [B8-States](../boards/B8-States.html), *non-loopback host without a token* panel | [1440](refused-1440.png), [640](refused-640.png), [390](refused-390.png) |
@@ -49,6 +50,7 @@ instead of resizing or sharpening existing images.
 | No such unit (404) | [B8-States](../boards/B8-States.html), *empty results* panel | [1440](missing-1440.png) |
 | Search page: name, code, empty | [B8-Search](../boards/B8-Search.html) | [name](search-name-1440.png), [code](search-code-1440.png), [empty](search-empty-1440.png), [390](search-390.png) |
 | Search palette | [B8-Search](../boards/B8-Search.html), *the palette* panel | [1440](search-palette-1440.png) |
+| Release palette route identities, query visual (Map code 0b8b243; extracted route draw-file probe) | [B8-Search](../boards/B8-Search.html) | [1440](release-palette-route-types-1440.png), [960](release-palette-route-types-960.png), [640](release-palette-route-types-640.png), [390](release-palette-route-types-390.png); [axe/provenance](release-palette-route-types-axe.json) |
 | Freshness words with Woods' reasons | [C5-Chrome](../boards/C5-Chrome.html), the bar | [tooltip open](freshness-tip-1440.png) |
 | Routes tab, controller (`…/UsersController/routes`) | [Routes tab note](../notes/routes-tab.md) (no board) | [1440](routes-1440.png), [390](routes-390.png), [helper → action, StaticPagesController](routes-helper-uses-1440.png) (Woods with woods#795) |
 | Hover card on a reference, Code tab (`…/model/User`, hovered at 1440, focused at 390) | [Hover card note](../notes/hover-card.md) (no board) | [1440](hover-card-1440.png), [390](hover-card-390.png) |
@@ -59,6 +61,9 @@ instead of resizing or sharpening existing images.
 | Passage filter matrix over the resolved chain (W-8): chain order, owners (← for a concern), a conditional filter marked (`…/UsersController/passage?action_name=index`; the testbed copy adds a `RequestTagging` concern and `skip_before_action :set_time_zone, only: :index` to show inherited, concern and skipped filters) | [B8-Passage](../boards/B8-Passage.html) (*Filter matrix*) | [1440](passage-filter-matrix-1440.png) |
 | Passage tab, mailer action | [B8-Passage](../boards/B8-Passage.html) (the mailer passage is undesigned; the controller passage is reused) | [1440](passage-mailer-1440.png) |
 | Impact, pre-change mode (`/woods/impact?focus=User&depth=2`): Changed with a path opened | [B8-Impact-Changed](../boards/B8-Impact-Changed.html), the frame with a focus title | [1440](impact-changed-open-1440.png), [390](impact-390.png) |
+| Release Impact documentation, default counts; doc details open (Map code f10d524) | [B8-Impact-Changed](../boards/B8-Impact-Changed.html) | [1440](release-impact-documentation-default-1440.png), [960](release-impact-documentation-default-960.png), [640](release-impact-documentation-default-640.png), [390](release-impact-documentation-default-390.png); [axe/provenance](release-impact-documentation-axe.json) |
+| Release Impact documentation, count-docs selected | [B8-Impact-Changed](../boards/B8-Impact-Changed.html) | [1440](release-impact-documentation-counted-1440.png), [960](release-impact-documentation-counted-960.png), [640](release-impact-documentation-counted-640.png), [390](release-impact-documentation-counted-390.png); [axe/provenance](release-impact-documentation-axe.json) |
+| Release Used by tile, separate documentation family | [C5-Chrome](../boards/C5-Chrome.html) | [1440](release-unit-documentation-tile-1440.png), [960](release-unit-documentation-tile-960.png), [640](release-unit-documentation-tile-640.png), [390](release-unit-documentation-tile-390.png); [axe/provenance](release-impact-documentation-axe.json) |
 | Impact, Risks | [B8-Impact-Risks](../boards/B8-Impact-Risks.html) | [1440](impact-risks-1440.png) |
 | Impact, Tests | [B8-Impact-Tests](../boards/B8-Impact-Tests.html) | [1440](impact-tests-1440.png) |
 | Impact, Unknown | [B8-Impact-Unknown](../boards/B8-Impact-Unknown.html) | [1440](impact-unknown-1440.png) |

@@ -1,0 +1,1 @@
+- List documentation separately from recorded dependents in Impact and Used by. Exclude it from Impact headline counts by default, offer a count-docs control, and omit test coverage claims on documentation rows.
