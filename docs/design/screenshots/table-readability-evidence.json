@@ -933,17 +933,20 @@
       "examples": 1399,
       "failures": 0,
       "pending": 120,
-      "seed": 3860
+      "seed": 3860,
+      "code_revision": "b066d54853a0b8e7e713a54c72ff627a7ba1c93e"
     },
     "table_browser_spec": {
       "examples": 8,
       "failures": 0,
-      "seed": 50425
+      "seed": 50425,
+      "code_revision": "b066d54853a0b8e7e713a54c72ff627a7ba1c93e"
     },
     "full_browser_suite": {
       "examples": 1399,
       "failures": 1,
-      "failure": "Existing Code-space guard expects hidden notes lane at 640px; actual lane=240px. Reproduced unchanged main in isolated archive: 8 examples, 1 failure, seed 29330."
+      "failure": "Existing Code-space guard expects hidden notes lane at 640px; actual lane=240px. Reproduced unchanged main in isolated archive: 8 examples, 1 failure, seed 29330.",
+      "code_revision": "d287305382de6665994ee39384b879bf082627e8"
     },
     "rubocop": "421 files, only pre-existing lib/woods_map/schema_view.rb:117 redundant Rails/CompactBlank suppression; new spec clean."
   },
