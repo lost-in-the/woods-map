@@ -14,6 +14,16 @@ RSpec.describe 'Full-page first-run layout', type: :request do
     expect(result.fetch('failures')).to eq([])
   end
 
+  it 'centers sign-in while keeping its form reachable in short windows' do
+    skip 'Set WOODS_MAP_BROWSER to run the Chromium layout regression' unless ENV['WOODS_MAP_BROWSER']
+
+    WoodsMap.configuration.token = 'local-test-token'
+    get '/woods/session/new', env: { 'REMOTE_ADDR' => '203.0.113.9' }
+    result = WoodsMap::BrowserSession.run(browser_fixture(response.body))
+    expect(result.fetch('cases')).to eq(8)
+    expect(result.fetch('failures')).to eq([])
+  end
+
   # Render the real response with shipped CSS, without network-dependent assets.
   # @param markup [String] server-rendered first-run response
   # @return [String] isolated browser fixture reporting layout measurements
