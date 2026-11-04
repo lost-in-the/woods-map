@@ -27,15 +27,16 @@ module WoodsMap
     # @param html [String] a self-contained browser fixture reporting JSON in #result
     # @param fragment [String] initial URL fragment, including its leading #
     # @param result_timeout [Numeric] maximum wall time for the fixture to report
+    # @param viewport [Array<Integer>, nil] exact CSS width and height at device scale 1
     # @return [Object] the fixture's parsed JSON report
-    def self.run(html, fragment: '', result_timeout: 10)
+    def self.run(html, fragment: '', result_timeout: 10, viewport: nil)
       Dir.mktmpdir('woods-map-session') do |directory|
         fixture = File.join(directory, 'page.html')
         File.write(fixture, html)
         session = new(directory)
         begin
           url = "file://#{URI::DEFAULT_PARSER.escape(fixture)}#{fragment}"
-          session.result(url, result_timeout)
+          session.result(url, result_timeout, viewport: viewport)
         ensure
           session.close
         end
@@ -66,13 +67,18 @@ module WoodsMap
 
     # @param url [String] fixture URL
     # @param timeout [Numeric] maximum time waiting for the JSON result
+    # @param viewport [Array<Integer>, nil] exact CSS width and height
     # @return [Object] the fixture's parsed JSON report
-    def result(url, timeout)
+    def result(url, timeout, viewport: nil)
       target = command('Target.createTarget', { url: 'about:blank' }).fetch('targetId')
       @session = command('Target.attachToTarget', { targetId: target, flatten: true }).fetch('sessionId')
       command('Page.enable')
       command('Runtime.enable')
       command('Page.setLifecycleEventsEnabled', { enabled: true })
+      if viewport
+        command('Emulation.setDeviceMetricsOverride',
+                { width: viewport.first, height: viewport.last, deviceScaleFactor: 1, mobile: false })
+      end
       navigation = command('Page.navigate', { url: url })
       raise navigation['errorText'] if navigation['errorText']
 
