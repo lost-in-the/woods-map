@@ -15,6 +15,29 @@ RSpec.describe 'The unit summary tiles in Chromium', type: :request do
     end
   end
 
+  it 'keeps an oversized fact inside a labeled, focusable horizontal scroll region' do
+    skip 'Set WOODS_MAP_BROWSER to run the Chromium regression' unless ENV['WOODS_MAP_BROWSER']
+
+    get '/woods/units/job/ApplicationJob/history'
+    result = run_page(response.body, width: 390, runner: scrolling_runner)
+    expect(result).to eq('region' => 'region', 'labeled' => true, 'focused' => true,
+                         'scrolled' => true, 'contained' => true)
+  end
+
+  # @return [String] measure containment, labeling and focus after a long-value probe
+  def scrolling_runner
+    <<~JS
+      const value = document.querySelector("dd .fact-value")
+      value.textContent = "OversizedPublishedIdentifier".repeat(10)
+      application.getControllerForElementAndIdentifier(value, "cliff").update()
+      value.focus()
+      value.scrollLeft = value.scrollWidth
+      report({ region: value.getAttribute("role"), labeled: !!value.getAttribute("aria-label"),
+               focused: value === document.activeElement, scrolled: value.scrollLeft > 0,
+               contained: document.documentElement.scrollWidth === innerWidth })
+    JS
+  end
+
   def tiles_runner
     <<~JS
       const facts = document.querySelector(".frame-facts .facts")
