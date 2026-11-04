@@ -95,7 +95,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
+      "title": "Blast radius of UsersController · Impact · Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1",
       "version": "4.10.3",
       "violations": [],
@@ -186,7 +186,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
+      "title": "Blast radius of UsersController · Impact · Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1",
       "version": "4.10.3",
       "violations": [],
@@ -277,7 +277,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
+      "title": "Blast radius of UsersController · Impact · Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1",
       "version": "4.10.3",
       "violations": [],
@@ -386,7 +386,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
+      "title": "Blast radius of UsersController · Impact · Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1",
       "version": "4.10.3",
       "violations": [],
@@ -483,7 +483,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
+      "title": "Blast radius of UsersController · Impact · Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1&show=with_docs",
       "version": "4.10.3",
       "violations": [],
@@ -574,7 +574,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
+      "title": "Blast radius of UsersController · Impact · Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1&show=with_docs",
       "version": "4.10.3",
       "violations": [],
@@ -665,7 +665,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
+      "title": "Blast radius of UsersController · Impact · Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1&show=with_docs",
       "version": "4.10.3",
       "violations": [],
@@ -774,7 +774,7 @@
           ]
         }
       ],
-      "title": "Blast radius of UsersController \u00b7 Impact \u00b7 Woods Map",
+      "title": "Blast radius of UsersController · Impact · Woods Map",
       "url": "http://localhost:3151/woods/impact?focus=UsersController&depth=1&show=with_docs",
       "version": "4.10.3",
       "violations": [],
@@ -859,7 +859,7 @@
           ]
         }
       ],
-      "title": "UsersController \u00b7 Code \u00b7 Woods Map",
+      "title": "UsersController · Code · Woods Map",
       "url": "http://localhost:3151/woods/units/controller/UsersController",
       "version": "4.10.3",
       "violations": [],
@@ -935,7 +935,7 @@
           ]
         }
       ],
-      "title": "UsersController \u00b7 Code \u00b7 Woods Map",
+      "title": "UsersController · Code · Woods Map",
       "url": "http://localhost:3151/woods/units/controller/UsersController",
       "version": "4.10.3",
       "violations": [],
@@ -1005,7 +1005,7 @@
           ]
         }
       ],
-      "title": "UsersController \u00b7 Code \u00b7 Woods Map",
+      "title": "UsersController · Code · Woods Map",
       "url": "http://localhost:3151/woods/units/controller/UsersController",
       "version": "4.10.3",
       "violations": [],
@@ -1105,7 +1105,7 @@
           ]
         }
       ],
-      "title": "UsersController \u00b7 Code \u00b7 Woods Map",
+      "title": "UsersController · Code · Woods Map",
       "url": "http://localhost:3151/woods/units/controller/UsersController",
       "version": "4.10.3",
       "violations": [],
@@ -1117,5 +1117,35 @@
       "http_status": 200
     }
   ],
-  "hosted_testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2"
+  "hosted_testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "keyboard_checks": [
+    {
+      "width": 1093,
+      "key": "ArrowRight",
+      "left": 0,
+      "scrollWidth": 1093,
+      "focused": false
+    },
+    {
+      "width": 613,
+      "key": "ArrowRight",
+      "left": 147,
+      "scrollWidth": 760,
+      "focused": true
+    },
+    {
+      "width": 554,
+      "key": "ArrowRight",
+      "left": 206,
+      "scrollWidth": 760,
+      "focused": true
+    },
+    {
+      "width": 304,
+      "key": "ArrowRight",
+      "left": 456,
+      "scrollWidth": 760,
+      "focused": true
+    }
+  ]
 }
