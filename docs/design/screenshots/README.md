@@ -5,7 +5,10 @@ What the engine renders, taken with Chromium-based browsers against the
 read beside the board that designs it. Every screenshot in this folder was
 taken on a page where axe-core (WCAG 2.0 A/AA, 2.1 AA, best practice) reported
 no violations. Regenerate with the runner described in each pull request; the
-widths are the tiers of D-19.
+widths are the tiers of D-19. Save native PNGs at device scale factor 1,
+verify pixel dimensions match the viewport, and inspect text at 100% before
+attaching. Wait for fonts to load; reject blurry captures and recapture
+instead of resizing or sharpening existing images.
 
 | Page | Board | Screenshots |
 |---|---|---|
