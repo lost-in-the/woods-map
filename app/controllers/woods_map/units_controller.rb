@@ -179,13 +179,13 @@ module WoodsMap
       render :entry_lifecycle
     end
 
-    # The Passage's callback ladder: the model and event. Only an event the action name implies
-    # is a step of the action (@ladder_linked); any other ladder is a related lifecycle.
+    # The Passage's callback ladder: the model and event. Only a write the published action flow names
+    # is linked to the action (@ladder_linked); any other ladder is a related lifecycle.
     def load_ladder
       @ladder_model = @passage.ladder_model
       @ladder = @ladder_model && lifecycle_for(@ladder_model)
       @ladder_event = ladder_event(@ladder)
-      @ladder_linked = @ladder.present? && @passage.ladder_event.present?
+      @ladder_linked = @ladder && WoodsMap::ActionWrite.published?(@repository, @passage, @ladder_model, @ladder_event)
     end
 
     # The ladder's event: ?event= when valid, else the one the action implies, else the first chain.

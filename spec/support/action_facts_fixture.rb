@@ -23,6 +23,7 @@ module ActionFactsFixture
     units.each { |unit| (graph['type_index'][unit['type']] ||= []) << unit['identifier'] }
     action_reverse_edges(graph, nodes, edges)
     repository = instance_double(WoodsMap::Repository, graph: graph, graph_analysis: {}, graph_node: nil,
+                                                       flow_document: nil,
                                                        flow_entry_points: nil,
                                                        flows_state: :absent,
                                                        generation_key: ['action facts fixture', graph.object_id],
