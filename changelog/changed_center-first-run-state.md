@@ -1,0 +1,1 @@
+- Center the no-index and sign-in pages within the available content area while preserving readable text and scrolling in short windows.

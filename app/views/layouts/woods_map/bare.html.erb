@@ -7,5 +7,5 @@
   <%= csrf_meta_tags %>
   <%= woods_map_stylesheet_tags %>
 </head>
-<body class="wm page" data-theme="dark"><main class="page-main"><%= yield %></main></body>
+<body class="wm page" data-theme="dark"><main class="page-main<%= ' centered-state' if content_for?(:centered_state) %>"><%= yield %></main></body>
 </html>

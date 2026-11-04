@@ -1,0 +1,658 @@
+{
+  "browser": "157.0.8103.38",
+  "axe_tags": [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21aa",
+    "best-practice"
+  ],
+  "capture_note": "Native PNGs, deviceScaleFactor 1, fonts ready, scale css, no resampling; native dimensions asserted.",
+  "rails": "8.0.0",
+  "ruby": "3.3.1",
+  "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed_base_revision": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
+  "testbed_probe_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "provisioning_note": "Isolated mounted Rails 8 testbed previously extracted normally (generation 3). index_dir points to an absent directory to exercise the real PublishedIndex unavailable response; long cases use an absent nested path. No reader stubs.",
+  "captures": [
+    {
+      "url": "http://localhost:3140/woods",
+      "status": 503,
+      "screenshot": "first-run-centered-1440.png",
+      "geometry": {
+        "width": 1440,
+        "height": 1000,
+        "dpr": 1,
+        "left": 465.765625,
+        "top": 367.546875,
+        "blockWidth": 508.46875,
+        "blockHeight": 316.90625,
+        "mainLeft": 0,
+        "mainTop": 52,
+        "mainWidth": 1440,
+        "mainHeight": 948,
+        "scrollWidth": 1440,
+        "scrollHeight": 1000,
+        "headingTop": 401.546875,
+        "align": "left"
+      },
+      "keyboard": {
+        "command": {
+          "left": 27,
+          "width": 464,
+          "scrollWidth": 491,
+          "focused": true
+        },
+        "link": {
+          "focused": true,
+          "top": 586.890625,
+          "bottom": 601.890625
+        },
+        "diagnostic": {
+          "top": 612.078125,
+          "bottom": 650.453125
+        }
+      },
+      "version": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".dim"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "http://localhost:3140/woods",
+      "status": 503,
+      "screenshot": "first-run-centered-960.png",
+      "geometry": {
+        "width": 960,
+        "height": 1000,
+        "dpr": 1,
+        "left": 225.765625,
+        "top": 367.546875,
+        "blockWidth": 508.46875,
+        "blockHeight": 316.90625,
+        "mainLeft": 0,
+        "mainTop": 52,
+        "mainWidth": 960,
+        "mainHeight": 948,
+        "scrollWidth": 960,
+        "scrollHeight": 1000,
+        "headingTop": 401.546875,
+        "align": "left"
+      },
+      "keyboard": {
+        "command": {
+          "left": 27,
+          "width": 464,
+          "scrollWidth": 491,
+          "focused": true
+        },
+        "link": {
+          "focused": true,
+          "top": 586.890625,
+          "bottom": 601.890625
+        },
+        "diagnostic": {
+          "top": 612.078125,
+          "bottom": 650.453125
+        }
+      },
+      "version": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".dim"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "http://localhost:3140/woods",
+      "status": 503,
+      "screenshot": "first-run-centered-640.png",
+      "geometry": {
+        "width": 640,
+        "height": 1000,
+        "dpr": 1,
+        "left": 65.765625,
+        "top": 367.546875,
+        "blockWidth": 508.46875,
+        "blockHeight": 316.90625,
+        "mainLeft": 0,
+        "mainTop": 52,
+        "mainWidth": 640,
+        "mainHeight": 948,
+        "scrollWidth": 640,
+        "scrollHeight": 1000,
+        "headingTop": 401.546875,
+        "align": "left"
+      },
+      "keyboard": {
+        "command": {
+          "left": 27,
+          "width": 464,
+          "scrollWidth": 491,
+          "focused": true
+        },
+        "link": {
+          "focused": true,
+          "top": 586.890625,
+          "bottom": 601.890625
+        },
+        "diagnostic": {
+          "top": 612.078125,
+          "bottom": 650.453125
+        }
+      },
+      "version": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".dim"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "http://localhost:3140/woods",
+      "status": 503,
+      "screenshot": "first-run-centered-390.png",
+      "geometry": {
+        "width": 390,
+        "height": 1000,
+        "dpr": 1,
+        "left": 0,
+        "top": 359.90625,
+        "blockWidth": 390,
+        "blockHeight": 332.203125,
+        "mainLeft": 0,
+        "mainTop": 52,
+        "mainWidth": 390,
+        "mainHeight": 948,
+        "scrollWidth": 390,
+        "scrollHeight": 1000,
+        "headingTop": 393.90625,
+        "align": "left"
+      },
+      "keyboard": {
+        "command": {
+          "left": 145,
+          "width": 346,
+          "scrollWidth": 491,
+          "focused": true
+        },
+        "link": {
+          "focused": true,
+          "top": 575.359375,
+          "bottom": 590.359375
+        },
+        "diagnostic": {
+          "top": 600.546875,
+          "bottom": 658.109375
+        }
+      },
+      "version": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".dim"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "pre"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "http://localhost:3140/woods",
+      "status": 503,
+      "screenshot": "first-run-centered-1440-h200.png",
+      "geometry": {
+        "width": 1440,
+        "height": 200,
+        "dpr": 1,
+        "left": 465.765625,
+        "top": 52,
+        "blockWidth": 508.46875,
+        "blockHeight": 316.90625,
+        "mainLeft": 0,
+        "mainTop": 52,
+        "mainWidth": 1440,
+        "mainHeight": 316.90625,
+        "scrollWidth": 1440,
+        "scrollHeight": 369,
+        "headingTop": 86,
+        "align": "left"
+      },
+      "keyboard": {
+        "command": {
+          "left": 27,
+          "width": 464,
+          "scrollWidth": 491,
+          "focused": true
+        },
+        "link": {
+          "focused": true,
+          "top": 102.34375,
+          "bottom": 117.34375
+        },
+        "diagnostic": {
+          "top": 127.53125,
+          "bottom": 165.90625
+        }
+      },
+      "version": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".dim"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "end_screenshot": "first-run-centered-1440-h200-end.png"
+    },
+    {
+      "url": "http://localhost:3140/woods",
+      "status": 503,
+      "screenshot": "first-run-centered-390-h200.png",
+      "geometry": {
+        "width": 390,
+        "height": 200,
+        "dpr": 1,
+        "left": 0,
+        "top": 52,
+        "blockWidth": 390,
+        "blockHeight": 332.203125,
+        "mainLeft": 0,
+        "mainTop": 52,
+        "mainWidth": 390,
+        "mainHeight": 332.203125,
+        "scrollWidth": 390,
+        "scrollHeight": 384,
+        "headingTop": 86,
+        "align": "left"
+      },
+      "keyboard": {
+        "command": {
+          "left": 145,
+          "width": 346,
+          "scrollWidth": 491,
+          "focused": true
+        },
+        "link": {
+          "focused": true,
+          "top": 92.453125,
+          "bottom": 107.453125
+        },
+        "diagnostic": {
+          "top": 108.640625,
+          "bottom": 166.203125
+        }
+      },
+      "version": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".dim"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "pre"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
+            }
+          ]
+        }
+      ],
+      "end_screenshot": "first-run-centered-390-h200-end.png"
+    },
+    {
+      "url": "http://localhost:3141/woods",
+      "status": 503,
+      "screenshot": "first-run-centered-1440-h120-long.png",
+      "geometry": {
+        "width": 1440,
+        "height": 120,
+        "dpr": 1,
+        "left": 465.765625,
+        "top": 52,
+        "blockWidth": 508.46875,
+        "blockHeight": 512.78125,
+        "mainLeft": 0,
+        "mainTop": 52,
+        "mainWidth": 1440,
+        "mainHeight": 512.78125,
+        "scrollWidth": 1440,
+        "scrollHeight": 565,
+        "headingTop": 86,
+        "align": "left"
+      },
+      "keyboard": {
+        "command": {
+          "left": 27,
+          "width": 464,
+          "scrollWidth": 491,
+          "focused": true
+        },
+        "link": {
+          "focused": true,
+          "top": 41.90625,
+          "bottom": 77.09375
+        },
+        "diagnostic": {
+          "top": -67.71875,
+          "bottom": 85.78125
+        }
+      },
+      "version": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".dim"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "end_screenshot": "first-run-centered-1440-h120-long-end.png"
+    },
+    {
+      "url": "http://localhost:3141/woods",
+      "status": 503,
+      "screenshot": "first-run-centered-390-h120-long.png",
+      "geometry": {
+        "width": 390,
+        "height": 120,
+        "dpr": 1,
+        "left": 0,
+        "top": 52,
+        "blockWidth": 390,
+        "blockHeight": 586.640625,
+        "mainLeft": 0,
+        "mainTop": 52,
+        "mainWidth": 390,
+        "mainHeight": 586.640625,
+        "scrollWidth": 390,
+        "scrollHeight": 639,
+        "headingTop": 86,
+        "align": "left"
+      },
+      "keyboard": {
+        "command": {
+          "left": 145,
+          "width": 346,
+          "scrollWidth": 491,
+          "focused": true
+        },
+        "link": {
+          "focused": true,
+          "top": 52.390625,
+          "bottom": 67.390625
+        },
+        "diagnostic": {
+          "top": -125.421875,
+          "bottom": 85.640625
+        }
+      },
+      "version": "4.10.3",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"wm-keyboard-help\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".menu-toggle"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                ".dim"
+              ],
+              "summary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "target": [
+                "pre"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
+            }
+          ]
+        }
+      ],
+      "end_screenshot": "first-run-centered-390-h120-long-end.png"
+    }
+  ],
+  "map_code_revision": "e60d8d286f4acc7d1f18d64d571bc4bd8e00c66d",
+  "map_revision_note": "Mounted source bytes match the three production files at this revision; screenshot metadata is committed separately."
+}
