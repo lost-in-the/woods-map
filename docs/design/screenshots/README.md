@@ -12,6 +12,7 @@ instead of resizing or sharpening existing images.
 
 | Page | Board | Screenshots |
 |---|---|---|
+| Summary fact values, horizontal scrolling ([WDS-142](https://linear.app/lost-in-the/issue/WDS-142)); mounted User page with natural and explicitly synthetic oversized-name probes | [C5-Chrome](../boards/C5-Chrome.html), maintainer scrolling decision | Natural [1440](fact-values-natural-1440.png), [960](fact-values-natural-960.png), [640](fact-values-natural-640.png), [390](fact-values-natural-390.png); synthetic [1440](fact-values-synthetic-1440.png), [960](fact-values-synthetic-960.png), [640](fact-values-synthetic-640.png), [390](fact-values-synthetic-390.png); [axe, keyboard and provenance](fact-values-axe.json) |
 | Status page (`/woods`) | [B8-States](../boards/B8-States.html), *stale: the status page* panel | [1440](status-1440.png), [960](status-960.png), [390](status-390.png) |
 | First run, no index published | [B8-States](../boards/B8-States.html), *first run* panel | [1440](first-run-1440.png) |
 | Refused, non-loopback host without a token | [B8-States](../boards/B8-States.html), *non-loopback host without a token* panel | [1440](refused-1440.png), [640](refused-640.png), [390](refused-390.png) |

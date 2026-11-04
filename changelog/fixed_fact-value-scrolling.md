@@ -1,0 +1,1 @@
+- Scroll oversized summary fact values horizontally instead of splitting class-name segments.
