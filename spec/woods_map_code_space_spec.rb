@@ -23,6 +23,15 @@ RSpec.describe 'Code view space in Chromium', type: :request do
     JS
   end
 
+  [1440, 960, 640, 390].each do |width|
+    it "keeps the activity ink thin within its gutter at #{width}px" do
+      report = run_page(response.body, width: width, runner: <<~JS)
+        report({ ink: document.querySelector(".cv .heat i").getBoundingClientRect().width })
+      JS
+      expect(report['ink']).to eq(4)
+    end
+  end
+
   it 'gives the wrapped source most of the region where a lane is shown' do
     report = measure(800)
     expect(report['lane']).to be <= 260

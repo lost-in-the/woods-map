@@ -1,0 +1,1 @@
+- Keep the code activity strip thin on narrow screens instead of filling the wider gutter.
