@@ -197,6 +197,9 @@ html.js .wm .tbl.grouped tr.sub:not(.open){display:none}
    becomes one screen tall and the page scrolls beside it; below 960 it covers the page. */
 .wm .page-row{display:flex;flex:1 0 auto;min-width:0;align-items:stretch}
 .wm .page-row > .page-main{flex:1 1 auto;min-width:0}
+/* Auto margins center full-page states when space permits; tall content grows the document. */
+.wm .page-main.centered-state{display:flex;flex-direction:column}
+.wm .centered-state > .empty-state{margin:auto;width:100%;box-sizing:border-box;overflow-wrap:anywhere}
 .wm .aside.guide-dock{flex:0 0 460px;max-width:460px;display:flex;flex-direction:column;min-height:0}
 .wm .aside.guide-dock[hidden]{display:none}
 .wm.page.guide-open{height:100vh;overflow:hidden}

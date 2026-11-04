@@ -16,7 +16,7 @@
   <%= yield :banner %>
   <% if guide_visible? && guide_status != :ready %><%= render 'woods_map/components/banner', severity: :mod, lead: 'Guide unavailable.', text: WoodsMap::Guide.notice(woods_map_config) %><% end %>
   <div class="page-row">
-    <main class="page-main">
+    <main class="page-main<%= ' centered-state' if content_for?(:centered_state) %>">
       <%= yield %>
     </main>
     <% if guide_status == :ready && current_repository %><%= render 'woods_map/guide/panel' %><% end %>
