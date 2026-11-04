@@ -1,0 +1,81 @@
+{
+  "map_code_revision": "df6b2a13786b8adc19bf02135300f32405b4e90c",
+  "base_revision": "f3ab741a965a3a8a94a22f0a92c9ed81742d110a",
+  "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "testbed_base_revision": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
+  "rails": "8.0.0",
+  "ruby": "3.3.1",
+  "index_generation": 3,
+  "injected_states": false,
+  "browser": "T3 Chromium preview; native Chrome157.0.8103.38 recapture at1440",
+  "capture_note": "960/640/390 native preview PNG dimensions checked;1440 preview output1280x889 rejected and recaptured at1440x1000 with scale1. No resampling or sharpening. Original-size representative text inspected. Native1440 capture waited for network idle including completed font requests, then paint settling. No page DOM evaluation or injected scripts.",
+  "axe": "Not run during the explicitly browser-interaction-only acceptance review; draft evidence, not accessibility acceptance.",
+  "manual_ui_results": [
+    "Before: older mounted78ef3b9 showed DELETE branch on create+destroy.",
+    "After: clicked create then destroy at1440/960/640/390; related lifecycle stays separate and C4 shows request/action/render/response without database branch.",
+    "Mermaid text toggled through the actual UI at all four widths; create+destroy text contains no SQL write.",
+    "Clicked C4 export: downloaded userscontroller-create-passage-dynamic.mmd, preserving action_name=create&event=destroy&view=dynamic. Download contents not read as browser-only acceptance.",
+    "At390: show and followers with selected destroy show no database branch.",
+    "At390: search User+Enter reaches search results; menu open/Escape/reopen and ERD link navigation succeed. Palette-hit selection and focus-return completeness were not established.",
+    "Existing event-change scroll reset and cramped table headings remain WDS-145/WDS-144."
+  ],
+  "captures": [
+    {
+      "width": 1440,
+      "state": "diagram",
+      "url": "http://localhost:3147/woods/units/controller/UsersController/passage?action_name=create&event=destroy",
+      "file": "action-lifecycle-diagram-1440.png",
+      "height": 1000
+    },
+    {
+      "width": 1440,
+      "state": "related",
+      "url": "http://localhost:3147/woods/units/controller/UsersController/passage?action_name=create&event=destroy",
+      "file": "action-lifecycle-related-1440.png",
+      "height": 1000
+    },
+    {
+      "width": 960,
+      "state": "diagram",
+      "url": "http://localhost:3147/woods/units/controller/UsersController/passage?action_name=create&event=destroy",
+      "file": "action-lifecycle-diagram-960.png",
+      "height": 1000
+    },
+    {
+      "width": 960,
+      "state": "related",
+      "url": "http://localhost:3147/woods/units/controller/UsersController/passage?action_name=create&event=destroy",
+      "file": "action-lifecycle-related-960.png",
+      "height": 1000
+    },
+    {
+      "width": 640,
+      "state": "diagram",
+      "url": "http://localhost:3147/woods/units/controller/UsersController/passage?action_name=create&event=destroy",
+      "file": "action-lifecycle-diagram-640.png",
+      "height": 1000
+    },
+    {
+      "width": 640,
+      "state": "related",
+      "url": "http://localhost:3147/woods/units/controller/UsersController/passage?action_name=create&event=destroy",
+      "file": "action-lifecycle-related-640.png",
+      "height": 1000
+    },
+    {
+      "width": 390,
+      "state": "diagram",
+      "url": "http://localhost:3147/woods/units/controller/UsersController/passage?action_name=create&event=destroy",
+      "file": "action-lifecycle-diagram-390.png",
+      "height": 1000
+    },
+    {
+      "width": 390,
+      "state": "related",
+      "url": "http://localhost:3147/woods/units/controller/UsersController/passage?action_name=create&event=destroy",
+      "file": "action-lifecycle-related-390.png",
+      "height": 1000
+    }
+  ]
+}

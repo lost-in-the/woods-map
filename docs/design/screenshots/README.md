@@ -2,8 +2,8 @@
 
 What the engine renders, taken with Chromium-based browsers against the
 `woods-testbed` `rails-8.0` variant after `woods:extract`, so each page can be
-read beside the board that designs it. Every screenshot in this folder was
-taken on a page where axe-core (WCAG 2.0 A/AA, 2.1 AA, best practice) reported
+read beside the board that designs it. Except rows explicitly labeled draft browser-only evidence, screenshots were
+taken on pages where axe-core (WCAG 2.0 A/AA, 2.1 AA, best practice) reported
 no violations. Regenerate with the runner described in each pull request; the
 widths are the tiers of D-19. Save native PNGs at device scale factor 1,
 verify pixel dimensions match the viewport, and inspect text at 100% before
@@ -12,6 +12,7 @@ instead of resizing or sharpening existing images.
 
 | Page | Board | Screenshots |
 |---|---|---|
+| DRAFT browser-only evidence: action create with exploratory destroy ([WDS-147](https://linear.app/lost-in-the/issue/WDS-147)); axe not run | [B8-Passage](../boards/B8-Passage.html), UX-014 | Diagram [1440](action-lifecycle-diagram-1440.png), [960](action-lifecycle-diagram-960.png), [640](action-lifecycle-diagram-640.png), [390](action-lifecycle-diagram-390.png); separate related lifecycle [1440](action-lifecycle-related-1440.png), [960](action-lifecycle-related-960.png), [640](action-lifecycle-related-640.png), [390](action-lifecycle-related-390.png); [UI observations and provenance](action-lifecycle-browser-evidence.json) |
 | Summary fact values, horizontal scrolling ([WDS-142](https://linear.app/lost-in-the/issue/WDS-142)); mounted User page with natural and explicitly synthetic oversized-name probes | [C5-Chrome](../boards/C5-Chrome.html), maintainer scrolling decision | Natural [1440](fact-values-natural-1440.png), [960](fact-values-natural-960.png), [640](fact-values-natural-640.png), [390](fact-values-natural-390.png); synthetic [1440](fact-values-synthetic-1440.png), [960](fact-values-synthetic-960.png), [640](fact-values-synthetic-640.png), [390](fact-values-synthetic-390.png); [axe, keyboard and provenance](fact-values-axe.json) |
 | Status page (`/woods`) | [B8-States](../boards/B8-States.html), *stale: the status page* panel | [1440](status-1440.png), [960](status-960.png), [390](status-390.png) |
 | Release build mismatch, status and branch bar (injected writer version 2.1.0 on a fresh Rails 8.0 testbed index; Map code 1a384a7) | [B8-States](../boards/B8-States.html), [C5-Chrome](../boards/C5-Chrome.html) | [1440](release-build-mismatch-status-1440.png), [960](release-build-mismatch-status-960.png), [640](release-build-mismatch-status-640.png), [390](release-build-mismatch-status-390.png); [axe/provenance](release-build-compatibility-axe.json) |
