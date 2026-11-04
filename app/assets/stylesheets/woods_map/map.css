@@ -492,3 +492,7 @@ html.no-js .wm .amb-pop[hidden]{display:block}
 
 /* Published route locations remain readable within the scrollable table. */
 .wm .tbl td.route-location{white-space:normal;overflow-wrap:anywhere}
+
+/* Opt-in table identities stay complete without changing the fixed column budget.
+   The cliff controller retains a keyboard stop only while a value overflows. */
+.wm .table-value{max-width:100%;overflow-x:auto;white-space:nowrap}
