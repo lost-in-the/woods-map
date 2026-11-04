@@ -1,0 +1,964 @@
+{
+  "browser": "157.0.8103.38",
+  "phase": "Mounted engineering geometry, input, screenshot and axe verification; normally extracted testbed index, no synthetic table content",
+  "map_revision": "b066d54853a0b8e7e713a54c72ff627a7ba1c93e",
+  "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "testbed_base": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
+  "ruby": "3.3.1",
+  "rails": "8.0.0",
+  "index_generation": 3,
+  "device_scale_factor": 1,
+  "captures": [
+    {
+      "name": "erd-table",
+      "url": "http://localhost:3144/woods/erd",
+      "width": 1440,
+      "height": 1000,
+      "files": [
+        "erd-table-1440.png",
+        "erd-table-right-1440.png"
+      ],
+      "geometry": {
+        "headers": [
+          {
+            "text": "table",
+            "width": 239,
+            "scroll_width": 239
+          },
+          {
+            "text": "model",
+            "width": 219,
+            "scroll_width": 219
+          },
+          {
+            "text": "columns",
+            "width": 89,
+            "scroll_width": 89
+          },
+          {
+            "text": "foreign keys",
+            "width": 249,
+            "scroll_width": 249
+          },
+          {
+            "text": "indexes",
+            "width": 139,
+            "scroll_width": 139
+          },
+          {
+            "text": "finding",
+            "width": 259,
+            "scroll_width": 259
+          }
+        ],
+        "notes": []
+      },
+      "keyboard": {
+        "tab_reached": true,
+        "scroll_left": 27,
+        "scroll_width": 240,
+        "client_width": 213,
+        "text": "active_storage_variant_records"
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".why > .dim"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                "text[x=\"126\"]"
+              ],
+              [
+                "text[x=\"425.38\"]"
+              ],
+              [
+                "g[data-id=\"active_storage_attachments\"] > .pele-label[x=\"0\"][y=\"-21.62\"]"
+              ],
+              [
+                ".pele-er-type[x=\"-106\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-17.9\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-keys[x=\"70.21\"][font-size=\"9\"]:nth-child(3)"
+              ],
+              [
+                ".pele-er-type[x=\"-106\"][y=\"35.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-17.9\"][y=\"35.35\"]"
+              ],
+              [
+                ".pele-er-keys[x=\"70.21\"][font-size=\"9\"]:nth-child(6)"
+              ],
+              [
+                "g[data-id=\"active_storage_blobs\"] > .pele-label[x=\"0\"][y=\"-21.62\"]"
+              ],
+              [
+                ".pele-er-type[x=\"-82.92\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-1.18\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-keys[x=\"53.49\"][font-size=\"9\"]:nth-child(3)"
+              ],
+              [
+                ".pele-er-type[x=\"-82.92\"][y=\"35.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-1.18\"][y=\"35.35\"]"
+              ],
+              [
+                ".pele-er-keys[x=\"53.49\"][font-size=\"9\"]:nth-child(6)"
+              ],
+              [
+                "g[data-id=\"active_storage_variant_records\"] > .pele-label[x=\"0\"][y=\"-21.62\"]"
+              ],
+              [
+                ".pele-er-type[x=\"-121.38\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-23.03\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-keys[x=\"75.33\"][font-size=\"9\"]:nth-child(3)"
+              ],
+              [
+                ".pele-er-type[x=\"-121.38\"][y=\"35.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-23.03\"][y=\"35.35\"]"
+              ],
+              [
+                ".pele-er-keys[x=\"75.33\"][font-size=\"9\"]:nth-child(6)"
+              ],
+              [
+                ".info"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "impact-notes",
+      "url": "http://localhost:3144/woods/impact?focus=User&depth=2",
+      "width": 1440,
+      "height": 1000,
+      "files": [
+        "impact-notes-1440.png"
+      ],
+      "geometry": {
+        "headers": [
+          {
+            "text": "unit",
+            "width": 275,
+            "scroll_width": 275
+          },
+          {
+            "text": "type",
+            "width": 125,
+            "scroll_width": 125
+          },
+          {
+            "text": "recorded dependents",
+            "width": 229,
+            "scroll_width": 229
+          },
+          {
+            "text": "weight",
+            "width": 91,
+            "scroll_width": 91
+          },
+          {
+            "text": "notes",
+            "width": 286,
+            "scroll_width": 286
+          },
+          {
+            "text": "flags",
+            "width": 80,
+            "scroll_width": 80
+          }
+        ],
+        "notes": [
+          {
+            "text": "hub, 19 dependents by identifier, in a cycle",
+            "width": 286,
+            "height": 56,
+            "scroll_width": 286
+          }
+        ]
+      },
+      "keyboard": null,
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".why > .dim"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                ".own > .flag"
+              ],
+              [
+                "#chg > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                "td[data-h=\"flags\"] > .flag"
+              ],
+              [
+                "#aff > .info[aria-label=\"Explain\"]"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "erd-table",
+      "url": "http://localhost:3144/woods/erd",
+      "width": 960,
+      "height": 1000,
+      "files": [
+        "erd-table-960.png",
+        "erd-table-right-960.png"
+      ],
+      "geometry": {
+        "headers": [
+          {
+            "text": "table",
+            "width": 239,
+            "scroll_width": 239
+          },
+          {
+            "text": "model",
+            "width": 219,
+            "scroll_width": 219
+          },
+          {
+            "text": "columns",
+            "width": 89,
+            "scroll_width": 89
+          },
+          {
+            "text": "foreign keys",
+            "width": 249,
+            "scroll_width": 249
+          },
+          {
+            "text": "indexes",
+            "width": 139,
+            "scroll_width": 139
+          },
+          {
+            "text": "finding",
+            "width": 259,
+            "scroll_width": 259
+          }
+        ],
+        "notes": []
+      },
+      "keyboard": {
+        "tab_reached": true,
+        "scroll_left": 27,
+        "scroll_width": 240,
+        "client_width": 213,
+        "text": "active_storage_variant_records"
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".why > .dim"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                "text[x=\"126\"]"
+              ],
+              [
+                "text[x=\"425.38\"]"
+              ],
+              [
+                "g[data-id=\"active_storage_attachments\"] > .pele-label[x=\"0\"][y=\"-21.62\"]"
+              ],
+              [
+                ".pele-er-type[x=\"-106\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-17.9\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-keys[x=\"70.21\"][font-size=\"9\"]:nth-child(3)"
+              ],
+              [
+                ".pele-er-type[x=\"-106\"][y=\"35.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-17.9\"][y=\"35.35\"]"
+              ],
+              [
+                ".pele-er-keys[x=\"70.21\"][font-size=\"9\"]:nth-child(6)"
+              ],
+              [
+                "g[data-id=\"active_storage_blobs\"] > .pele-label[x=\"0\"][y=\"-21.62\"]"
+              ],
+              [
+                ".pele-er-type[x=\"-82.92\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-1.18\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-keys[x=\"53.49\"][font-size=\"9\"]:nth-child(3)"
+              ],
+              [
+                ".pele-er-type[x=\"-82.92\"][y=\"35.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-1.18\"][y=\"35.35\"]"
+              ],
+              [
+                ".pele-er-keys[x=\"53.49\"][font-size=\"9\"]:nth-child(6)"
+              ],
+              [
+                "g[data-id=\"active_storage_variant_records\"] > .pele-label[x=\"0\"][y=\"-21.62\"]"
+              ],
+              [
+                ".pele-er-type[x=\"-121.38\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-23.03\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-keys[x=\"75.33\"][font-size=\"9\"]:nth-child(3)"
+              ],
+              [
+                ".pele-er-type[x=\"-121.38\"][y=\"35.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-23.03\"][y=\"35.35\"]"
+              ],
+              [
+                ".pele-er-keys[x=\"75.33\"][font-size=\"9\"]:nth-child(6)"
+              ],
+              [
+                ".info"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "impact-notes",
+      "url": "http://localhost:3144/woods/impact?focus=User&depth=2",
+      "width": 960,
+      "height": 1000,
+      "files": [
+        "impact-notes-960.png"
+      ],
+      "geometry": {
+        "headers": [
+          {
+            "text": "unit",
+            "width": 251,
+            "scroll_width": 251
+          },
+          {
+            "text": "type",
+            "width": 115,
+            "scroll_width": 115
+          },
+          {
+            "text": "recorded dependents",
+            "width": 209,
+            "scroll_width": 209
+          },
+          {
+            "text": "weight",
+            "width": 83,
+            "scroll_width": 83
+          },
+          {
+            "text": "notes",
+            "width": 262,
+            "scroll_width": 262
+          },
+          {
+            "text": "flags",
+            "width": 73,
+            "scroll_width": 73
+          }
+        ],
+        "notes": [
+          {
+            "text": "hub, 19 dependents by identifier, in a cycle",
+            "width": 262,
+            "height": 56,
+            "scroll_width": 262
+          }
+        ]
+      },
+      "keyboard": null,
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".why > .dim"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                ".own > .flag"
+              ],
+              [
+                "#chg > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                "td[data-h=\"flags\"] > .flag"
+              ],
+              [
+                "#aff > .info[aria-label=\"Explain\"]"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "erd-table",
+      "url": "http://localhost:3144/woods/erd",
+      "width": 640,
+      "height": 1000,
+      "files": [
+        "erd-table-640.png",
+        "erd-table-right-640.png"
+      ],
+      "geometry": {
+        "headers": [
+          {
+            "text": "table",
+            "width": 239,
+            "scroll_width": 239
+          },
+          {
+            "text": "model",
+            "width": 219,
+            "scroll_width": 219
+          },
+          {
+            "text": "columns",
+            "width": 89,
+            "scroll_width": 89
+          },
+          {
+            "text": "foreign keys",
+            "width": 249,
+            "scroll_width": 249
+          },
+          {
+            "text": "indexes",
+            "width": 139,
+            "scroll_width": 139
+          },
+          {
+            "text": "finding",
+            "width": 259,
+            "scroll_width": 259
+          }
+        ],
+        "notes": []
+      },
+      "keyboard": {
+        "tab_reached": true,
+        "scroll_left": 27,
+        "scroll_width": 240,
+        "client_width": 213,
+        "text": "active_storage_variant_records"
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "impact-notes",
+      "url": "http://localhost:3144/woods/impact?focus=User&depth=2",
+      "width": 640,
+      "height": 1000,
+      "files": [
+        "impact-notes-640.png"
+      ],
+      "geometry": {
+        "headers": [
+          {
+            "text": "unit",
+            "width": 251,
+            "scroll_width": 251
+          },
+          {
+            "text": "type",
+            "width": 115,
+            "scroll_width": 115
+          },
+          {
+            "text": "recorded dependents",
+            "width": 209,
+            "scroll_width": 209
+          },
+          {
+            "text": "weight",
+            "width": 83,
+            "scroll_width": 83
+          },
+          {
+            "text": "notes",
+            "width": 262,
+            "scroll_width": 262
+          },
+          {
+            "text": "flags",
+            "width": 73,
+            "scroll_width": 73
+          }
+        ],
+        "notes": [
+          {
+            "text": "hub, 19 dependents by identifier, in a cycle",
+            "width": 262,
+            "height": 56,
+            "scroll_width": 262
+          }
+        ]
+      },
+      "keyboard": null,
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".why > .dim"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                "#chg > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                "td[data-h=\"flags\"] > .flag"
+              ],
+              [
+                "#aff > .info[aria-label=\"Explain\"]"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "erd-table",
+      "url": "http://localhost:3144/woods/erd",
+      "width": 390,
+      "height": 1000,
+      "files": [
+        "erd-table-390.png",
+        "erd-table-right-390.png"
+      ],
+      "geometry": {
+        "headers": [
+          {
+            "text": "table",
+            "width": 239,
+            "scroll_width": 239
+          },
+          {
+            "text": "model",
+            "width": 219,
+            "scroll_width": 219
+          },
+          {
+            "text": "columns",
+            "width": 89,
+            "scroll_width": 89
+          },
+          {
+            "text": "foreign keys",
+            "width": 249,
+            "scroll_width": 249
+          },
+          {
+            "text": "indexes",
+            "width": 139,
+            "scroll_width": 139
+          },
+          {
+            "text": "finding",
+            "width": 259,
+            "scroll_width": 259
+          }
+        ],
+        "notes": []
+      },
+      "keyboard": {
+        "tab_reached": true,
+        "scroll_left": 17,
+        "scroll_width": 240,
+        "client_width": 223,
+        "text": "active_storage_variant_records"
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".why > .dim"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                "text[x=\"126\"]"
+              ],
+              [
+                "g[data-id=\"active_storage_attachments\"] > .pele-label[x=\"0\"][y=\"-21.62\"]"
+              ],
+              [
+                ".pele-er-type[x=\"-106\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-17.9\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-keys[x=\"70.21\"][font-size=\"9\"]:nth-child(3)"
+              ],
+              [
+                ".pele-er-type[x=\"-106\"][y=\"35.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-17.9\"][y=\"35.35\"]"
+              ],
+              [
+                ".pele-er-keys[x=\"70.21\"][font-size=\"9\"]:nth-child(6)"
+              ],
+              [
+                "g[data-id=\"active_storage_blobs\"] > .pele-label[x=\"0\"][y=\"-21.62\"]"
+              ],
+              [
+                ".pele-er-type[x=\"-82.92\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-1.18\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-type[x=\"-82.92\"][y=\"35.35\"]"
+              ],
+              [
+                ".pele-er-name[x=\"-1.18\"][y=\"35.35\"]"
+              ],
+              [
+                "g[data-id=\"active_storage_variant_records\"] > .pele-label[x=\"0\"][y=\"-21.62\"]"
+              ],
+              [
+                ".pele-er-type[x=\"-121.38\"][y=\"9.35\"]"
+              ],
+              [
+                ".pele-er-type[x=\"-121.38\"][y=\"35.35\"]"
+              ],
+              [
+                ".info"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "impact-notes",
+      "url": "http://localhost:3144/woods/impact?focus=User&depth=2",
+      "width": 390,
+      "height": 1000,
+      "files": [
+        "impact-notes-390.png"
+      ],
+      "geometry": {
+        "headers": [
+          {
+            "text": "unit",
+            "width": 251,
+            "scroll_width": 251
+          },
+          {
+            "text": "type",
+            "width": 115,
+            "scroll_width": 115
+          },
+          {
+            "text": "recorded dependents",
+            "width": 209,
+            "scroll_width": 209
+          },
+          {
+            "text": "weight",
+            "width": 83,
+            "scroll_width": 83
+          },
+          {
+            "text": "notes",
+            "width": 262,
+            "scroll_width": 262
+          },
+          {
+            "text": "flags",
+            "width": 73,
+            "scroll_width": 73
+          }
+        ],
+        "notes": [
+          {
+            "text": "hub, 19 dependents by identifier, in a cycle",
+            "width": 262,
+            "height": 56,
+            "scroll_width": 262
+          }
+        ]
+      },
+      "keyboard": null,
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".why > .dim"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                ".tab:nth-child(5)"
+              ],
+              [
+                ".tab:nth-child(5) > .cnt"
+              ],
+              [
+                ".tab:nth-child(6)"
+              ],
+              [
+                ".tab:nth-child(6) > .cnt"
+              ],
+              [
+                "#chg > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                "td[data-h=\"flags\"] > .flag"
+              ],
+              [
+                "#aff > .info[aria-label=\"Explain\"]"
+              ]
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "touch": {
+    "map_revision": "b066d54853a0b8e7e713a54c72ff627a7ba1c93e",
+    "browser": "157.0.8103.38",
+    "viewport": [
+      390,
+      1000
+    ],
+    "input": "CDP touchStart/touchMove/touchEnd in hasTouch context; native browser scrolling",
+    "result": {
+      "scroll_left": 17,
+      "client_width": 223,
+      "scroll_width": 240,
+      "text": "active_storage_variant_records"
+    }
+  },
+  "capture_note": "Fonts awaited with document.fonts.ready, native scale-1 PNGs, exact viewport pixel dimensions verified. Representative original-size text inspected. Two blurry shared-preview captures rejected; these are native Chrome recaptures with no resizing or sharpening. Horizontal scroll positions intentionally show identifiers, foreign-key headers, or Notes. No synthetic table values in mounted captures.",
+  "validation": {
+    "baseline_main": "e1e10fb5d167979907742f9dfc74b6a5314f8e2f",
+    "standard_suite": {
+      "examples": 1399,
+      "failures": 0,
+      "pending": 120,
+      "seed": 3860
+    },
+    "table_browser_spec": {
+      "examples": 8,
+      "failures": 0,
+      "seed": 50425
+    },
+    "full_browser_suite": {
+      "examples": 1399,
+      "failures": 1,
+      "failure": "Existing Code-space guard expects hidden notes lane at 640px; actual lane=240px. Reproduced unchanged main in isolated archive: 8 examples, 1 failure, seed 29330."
+    },
+    "rubocop": "421 files, only pre-existing lib/woods_map/schema_view.rb:117 redundant Rails/CompactBlank suppression; new spec clean."
+  },
+  "png_sha256": {
+    "erd-table-1440.png": "e285a278322450e42be3a4b955d12f3b91078e7757c2b452635734670c98f411",
+    "erd-table-right-640.png": "3b32ab4e17cfd48696578563c00dc8bd565fc210e7b0b9d1112804553a350564",
+    "erd-table-390.png": "31d065c10f277e1e2fb58039888fa154af5adf89568a2886b25708ddcd430897",
+    "erd-table-960.png": "a70e973788295472d7e50c16be085b9c98383c8b495f5d376c1d5d6da36e9867",
+    "erd-table-right-390.png": "b8665e06fd4bf58af94e9fe9d59577eedf925417e5c13602df9a0dfc762caebb",
+    "erd-table-640.png": "a8538313c211ad70e7354c513569dfd98e6a373b6d64f5d4663d2e6443bffd24",
+    "impact-notes-1440.png": "1c342520a622001cfdff29d01a77c38ca923be078a30dbcc3f893099e35c8fea",
+    "erd-table-right-960.png": "eafe5ee322dde4ffa7fdab8e6e9f8e3ab7539824793ac2191c4b38d2777a9584",
+    "erd-table-right-1440.png": "eb8c4ac3dc10fca24935e3f20d1b4757c786e57560c9d093ebb23db6b207af7e",
+    "impact-notes-640.png": "f25165a0d8415a87bf504eee708e334aaf835bb809e5ddfc4d704a17663da3b3",
+    "impact-notes-960.png": "6b7f7fe80502f67188613ec8445d34fb776641435431a17fcb4b195b5d20424c",
+    "impact-notes-390.png": "a51f9bbd0554928afa959395cf3eed63be01d9bbbe54aa26b591b9f7a2ad10bd"
+  }
+}
