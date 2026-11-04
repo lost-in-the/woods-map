@@ -56,6 +56,9 @@ use an API newer than Rails 6.0 without a guard.
 - Compose views from the partials in `app/views/woods_map/shared/` and `components/`. Engine-only rules go in `map.css`; never hard-code a colour or a size in a view.
 - To change a token, edit `docs/design/foundations/tokens.css` and copy it verbatim to the engine.
 - Every page must pass axe-core (WCAG 2.0 A/AA, 2.1 AA, best practice) at 1440, 960, 640 and 390. Validate on a `woods-testbed` variant with the engine mounted after `woods:extract`. Put screenshots of a changed page in `docs/design/screenshots/` with a row in its README beside the board it implements.
+- For a PR that changes rendered pages or interactions, embed a representative screenshot in the PR description and link the other required widths from `docs/design/screenshots/`. Capture the actual changed state on a mounted `woods-testbed` variant after extraction. Record the Map code revision, Woods revision, testbed revision, Rails/Ruby versions, viewport dimensions and axe version/results. Label injected index states or synthetic probe content explicitly; screenshots from another branch or revision do not verify the PR.
+- Save native, unscaled PNGs after fonts finish loading. For these captures, use device scale factor 1 and verify that PNG pixel dimensions match the CSS viewport dimensions. Inspect text at 100% before committing or attaching; reject blurry captures and recapture with a working browser capture path. Never enlarge or sharpen an existing screenshot to repair it.
+- If booting, capture or accessibility checks are blocked, keep the PR in draft and state the failed command, error and missing evidence. Request specs and static design boards do not replace mounted browser evidence.
 - JavaScript libraries are vendored under `vendor/javascript/` and pinned in `lib/woods_map/importmap.rb`. There is no Node, no build step and no asset pipeline.
 - Data the map needs that the index lacks is a Woods issue (a W-item), not a workaround in this gem.
 
@@ -64,7 +67,7 @@ use an API newer than Rails 6.0 without a guard.
 - [ ] The change is limited to the requested behaviour and matches its board and decisions.
 - [ ] A spec failed before the change and passes after it.
 - [ ] `bin/rake spec` and `bin/rubocop` pass, or the handoff explains why not.
-- [ ] Changed pages pass axe at the four widths on a testbed variant, with screenshots beside their boards.
+- [ ] Changed pages pass axe at the four widths on a testbed variant, with screenshots beside their boards and embedded or linked in the PR description.
 - [ ] `tokens.css` is identical in `docs/design/foundations/` and the engine.
 - [ ] `plan.md`, `coverage.md` and `decisions.md` are updated when an issue's scope or a decision changes.
 - [ ] The pull request names the requirement identifiers, links the milestone issue and reports the evidence.
