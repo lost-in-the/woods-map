@@ -14,11 +14,15 @@ RSpec.describe 'Code view space in Chromium', type: :request do
 
   def measure(width)
     run_page(response.body, width: width, runner: <<~JS)
-      document.querySelector(".wm").dataset.codeWrap = "on"
+      const container = document.querySelector(".wm")
+      // Pin the queried container too: non-overlay scrollbars can consume viewport width.
+      container.style.width = "#{width}px"
+      container.dataset.codeWrap = "on"
       await settle(100)
       const box = (selector) => document.querySelector(selector).getBoundingClientRect()
       const lane = document.querySelector(".cv .mg")
-      report({ source: box(".cv .src").width, region: box(".cvwrap").width, heat: box(".cv .heat").width,
+      report({ container: container.clientWidth, source: box(".cv .src").width,
+               region: box(".cvwrap").width, heat: box(".cv .heat").width,
                lane: getComputedStyle(lane).display === "none" ? 0 : lane.getBoundingClientRect().width })
     JS
   end
@@ -38,13 +42,22 @@ RSpec.describe 'Code view space in Chromium', type: :request do
     expect(report['source']).to be >= report['region'] * 0.6
   end
 
-  [390, 640].each do |width|
+  [390, 639].each do |width|
     it "keeps the source filling the region beside the narrow gutters at #{width}" do
       report = measure(width)
+      expect(report['container']).to eq(width)
       expect(report['lane']).to eq(0)
       expect(report['heat']).to eq(28)
       expect(report['source']).to eq(report['region'] - 28 - 40)
     end
+  end
+
+  it 'retains the tablet notes lane at the exact 640px container boundary' do
+    report = measure(640)
+    expect(report['container']).to eq(640)
+    expect(report['lane']).to eq(240)
+    expect(report['heat']).to eq(8)
+    expect(report['source']).to eq(report['region'] - 8 - 44 - 240)
   end
 
   it 'keeps the narrow gutters when an unannotated unit drops the lane at 390' do
