@@ -10,7 +10,7 @@
   "injected_states": false,
   "browser": "T3 Chromium preview; native Chrome157.0.8103.38 recapture at1440",
   "capture_note": "960/640/390 native preview PNG dimensions checked;1440 preview output1280x889 rejected and recaptured at1440x1000 with scale1. No resampling or sharpening. Original-size representative text inspected. Native1440 capture waited for network idle including completed font requests, then paint settling. No page DOM evaluation or injected scripts.",
-  "axe": "Not run during the explicitly browser-interaction-only acceptance review; draft evidence, not accessibility acceptance.",
+  "axe": "Separate automated engineering gate: four widths, zero violations. Not used as the browser-interaction acceptance review.",
   "manual_ui_results": [
     "Before: older mounted78ef3b9 showed DELETE branch on create+destroy.",
     "After: clicked create then destroy at1440/960/640/390; related lifecycle stays separate and C4 shows request/action/render/response without database branch.",
@@ -77,5 +77,6 @@
       "file": "action-lifecycle-related-390.png",
       "height": 1000
     }
-  ]
+  ],
+  "axe_audit": "action-lifecycle-axe.json"
 }
