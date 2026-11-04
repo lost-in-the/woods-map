@@ -14,7 +14,7 @@
   ],
   "capture_note": "Native PNG screenshots: device scale factor 1, one CSS pixel per PNG pixel, scale css, no resampling. Fonts loaded before capture. Pixel dimensions verified against viewport. Replaces blurred preview captures.",
   "incomplete_review_note": "axe incomplete results retained, including non-text glyph contrast and the closed keyboard-help dialog reference. Zero violations is not a complete WCAG certification.",
-  "map_code_revision": "a1efd4a02ea40995c7c1e80a4075ee03fd0bf958",
+  "map_code_revision": "a71e09acf67d0a2981bbc7081e86273903fe4abc",
   "provisioning_note": "Fresh woods-extract full on an isolated Rails 8.0 testbed copy. Route draw-file, Markdown and TypeScript JSX probe sources are committed in the isolated testbed and extracted normally. No reader stubs or graph edits.",
   "captures": [
     {
@@ -87,38 +87,38 @@
             },
             {
               "target": [
-                "tr:nth-child(1) > .uses[data-h=\"helper → action\"]"
+                "tr:nth-child(1) > .uses[data-h=\"helper \u2192 action\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
             },
             {
               "target": [
-                ".odd:nth-child(2) > .uses[data-h=\"helper → action\"]"
+                ".odd:nth-child(2) > .uses[data-h=\"helper \u2192 action\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
             },
             {
               "target": [
-                "tr:nth-child(3) > .uses[data-h=\"helper → action\"]"
+                "tr:nth-child(3) > .uses[data-h=\"helper \u2192 action\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
             },
             {
               "target": [
-                ".odd:nth-child(4) > .uses[data-h=\"helper → action\"]"
+                ".odd:nth-child(4) > .uses[data-h=\"helper \u2192 action\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
             },
             {
               "target": [
-                "tr:nth-child(5) > .uses[data-h=\"helper → action\"]"
+                "tr:nth-child(5) > .uses[data-h=\"helper \u2192 action\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
             }
           ]
         }
       ],
-      "title": "UsersController · Routes · Woods Map",
+      "title": "UsersController \u00b7 Routes \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/controller/UsersController/routes",
       "version": "4.10.3",
       "violations": [],
@@ -209,38 +209,38 @@
             },
             {
               "target": [
-                "tr:nth-child(1) > .uses[data-h=\"helper → action\"]"
+                "tr:nth-child(1) > .uses[data-h=\"helper \u2192 action\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
             },
             {
               "target": [
-                ".odd:nth-child(2) > .uses[data-h=\"helper → action\"]"
+                ".odd:nth-child(2) > .uses[data-h=\"helper \u2192 action\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
             },
             {
               "target": [
-                "tr:nth-child(3) > .uses[data-h=\"helper → action\"]"
+                "tr:nth-child(3) > .uses[data-h=\"helper \u2192 action\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
             },
             {
               "target": [
-                ".odd:nth-child(4) > .uses[data-h=\"helper → action\"]"
+                ".odd:nth-child(4) > .uses[data-h=\"helper \u2192 action\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
             },
             {
               "target": [
-                "tr:nth-child(5) > .uses[data-h=\"helper → action\"]"
+                "tr:nth-child(5) > .uses[data-h=\"helper \u2192 action\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
             }
           ]
         }
       ],
-      "title": "UsersController · Routes · Woods Map",
+      "title": "UsersController \u00b7 Routes \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/controller/UsersController/routes",
       "version": "4.10.3",
       "violations": [],
@@ -325,38 +325,38 @@
             },
             {
               "target": [
-                "tr:nth-child(1) > .uses[data-h=\"helper → action\"]"
+                "tr:nth-child(1) > .uses[data-h=\"helper \u2192 action\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
             },
             {
               "target": [
-                ".odd:nth-child(2) > .uses[data-h=\"helper → action\"]"
+                ".odd:nth-child(2) > .uses[data-h=\"helper \u2192 action\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
             },
             {
               "target": [
-                "tr:nth-child(3) > .uses[data-h=\"helper → action\"]"
+                "tr:nth-child(3) > .uses[data-h=\"helper \u2192 action\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
             },
             {
               "target": [
-                ".odd:nth-child(4) > .uses[data-h=\"helper → action\"]"
+                ".odd:nth-child(4) > .uses[data-h=\"helper \u2192 action\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
             },
             {
               "target": [
-                "tr:nth-child(5) > .uses[data-h=\"helper → action\"]"
+                "tr:nth-child(5) > .uses[data-h=\"helper \u2192 action\"]"
               ],
               "summary": "Fix any of the following:\n  Element content contains only non-text characters"
             }
           ]
         }
       ],
-      "title": "UsersController · Routes · Woods Map",
+      "title": "UsersController \u00b7 Routes \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/controller/UsersController/routes",
       "version": "4.10.3",
       "violations": [],
@@ -472,7 +472,7 @@
           ]
         }
       ],
-      "title": "UsersController · Routes · Woods Map",
+      "title": "UsersController \u00b7 Routes \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/controller/UsersController/routes",
       "version": "4.10.3",
       "violations": [],
@@ -558,7 +558,7 @@
           ]
         }
       ],
-      "title": "docs/visual-impact.md · Code · Woods Map",
+      "title": "docs/visual-impact.md \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/doc/docs/visual-impact.md",
       "version": "4.10.3",
       "violations": [],
@@ -634,7 +634,7 @@
           ]
         }
       ],
-      "title": "docs/visual-impact.md · Code · Woods Map",
+      "title": "docs/visual-impact.md \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/doc/docs/visual-impact.md",
       "version": "4.10.3",
       "violations": [],
@@ -704,7 +704,7 @@
           ]
         }
       ],
-      "title": "docs/visual-impact.md · Code · Woods Map",
+      "title": "docs/visual-impact.md \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/doc/docs/visual-impact.md",
       "version": "4.10.3",
       "violations": [],
@@ -774,7 +774,7 @@
           ]
         }
       ],
-      "title": "docs/visual-impact.md · Code · Woods Map",
+      "title": "docs/visual-impact.md \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/doc/docs/visual-impact.md",
       "version": "4.10.3",
       "violations": [],
@@ -850,7 +850,7 @@
           ]
         }
       ],
-      "title": "app/javascript/components/visual_card.tsx · Code · Woods Map",
+      "title": "app/javascript/components/visual_card.tsx \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/js_module/app/javascript/components/visual_card.tsx",
       "version": "4.10.3",
       "violations": [],
@@ -926,7 +926,7 @@
           ]
         }
       ],
-      "title": "app/javascript/components/visual_card.tsx · Code · Woods Map",
+      "title": "app/javascript/components/visual_card.tsx \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/js_module/app/javascript/components/visual_card.tsx",
       "version": "4.10.3",
       "violations": [],
@@ -996,7 +996,7 @@
           ]
         }
       ],
-      "title": "app/javascript/components/visual_card.tsx · Code · Woods Map",
+      "title": "app/javascript/components/visual_card.tsx \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/js_module/app/javascript/components/visual_card.tsx",
       "version": "4.10.3",
       "violations": [],
@@ -1072,7 +1072,7 @@
           ]
         }
       ],
-      "title": "app/javascript/components/visual_card.tsx · Code · Woods Map",
+      "title": "app/javascript/components/visual_card.tsx \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/js_module/app/javascript/components/visual_card.tsx",
       "version": "4.10.3",
       "violations": [],
@@ -1159,14 +1159,14 @@
             },
             {
               "target": [
-                "#wm-tip-mw1gwek9"
+                "#wm-tip-mw2frri5"
               ],
               "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
             }
           ]
         }
       ],
-      "title": "User · Code · Woods Map",
+      "title": "User \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/model/User",
       "version": "4.10.3",
       "violations": [],
@@ -1175,7 +1175,8 @@
       "png_height": 1000,
       "dpr": 1,
       "fonts": "loaded",
-      "http_status": 200
+      "http_status": 200,
+      "activity_ink": 4
     },
     {
       "pr": 153,
@@ -1254,7 +1255,7 @@
           ]
         }
       ],
-      "title": "User · Code · Woods Map",
+      "title": "User \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/model/User",
       "version": "4.10.3",
       "violations": [],
@@ -1263,7 +1264,8 @@
       "png_height": 1000,
       "dpr": 1,
       "fonts": "loaded",
-      "http_status": 200
+      "http_status": 200,
+      "activity_ink": 4
     },
     {
       "pr": 153,
@@ -1348,7 +1350,7 @@
           ]
         }
       ],
-      "title": "User · Code · Woods Map",
+      "title": "User \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/model/User",
       "version": "4.10.3",
       "violations": [],
@@ -1357,7 +1359,8 @@
       "png_height": 1000,
       "dpr": 1,
       "fonts": "loaded",
-      "http_status": 200
+      "http_status": 200,
+      "activity_ink": 4
     },
     {
       "pr": 153,
@@ -1442,7 +1445,7 @@
           ]
         }
       ],
-      "title": "User · Code · Woods Map",
+      "title": "User \u00b7 Code \u00b7 Woods Map",
       "url": "http://localhost:3153/woods/units/model/User",
       "version": "4.10.3",
       "violations": [],
@@ -1451,7 +1454,8 @@
       "png_height": 1000,
       "dpr": 1,
       "fonts": "loaded",
-      "http_status": 200
+      "http_status": 200,
+      "activity_ink": 4
     }
   ],
   "hosted_testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
