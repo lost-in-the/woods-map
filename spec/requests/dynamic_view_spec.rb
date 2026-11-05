@@ -41,6 +41,28 @@ RSpec.describe 'C4 dynamic views', type: :request do
       expect(response.body.strip).to eq(text.strip)
     end
 
+    it 'returns event navigation to the lifecycle without changing the action or event query' do
+      get '/woods/units/controller/UsersController/passage?action_name=edit&event=create'
+      document = html_response_document
+      links = document.css('.event-pick a')
+      expect(links.pluck('href')).to eq(
+        WoodsMap::Lifecycle::EVENTS.map do |event|
+          "/woods/units/controller/UsersController/passage?action_name=edit&event=#{event}#cl"
+        end
+      )
+      expect(document.at_css('#cl').text).to include('Related lifecycle, User')
+    end
+
+    it 'keeps the chosen event separate from the selected action after event navigation' do
+      get '/woods/units/controller/UsersController/passage?action_name=edit&event=create'
+      href = html_response_document.at_css('.event-pick a:last-child')['href']
+      get href.split('#').first
+      document = html_response_document
+      expect(document.at_css('.event-pick [aria-current=true]').text).to eq('destroy')
+      expect(document.at_css('#cl').text).to include('destroy')
+      expect(response.body).to include('not a step of edit')
+    end
+
     it 'does not attach a write based only on a CRUD action name' do
       allow(index).to receive(:flow_document).with('UsersController#create').and_return(nil)
       get '/woods/units/controller/UsersController/passage?action_name=create'
