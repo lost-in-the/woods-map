@@ -7,10 +7,11 @@ module WoodsMap
     # @param candidates [Array<String>] published identifiers
     # @return [ActiveSupport::SafeBuffer]
     def flow_candidates(candidates)
-      safe_join(Array(candidates).map do |identifier|
+      links = Array(candidates).map do |identifier|
         types = current_repository.identifier_types(identifier)
         types.one? ? unit_link(identifier, types.first) : ERB::Util.html_escape(identifier)
-      end, ', ')
+      end
+      tag.span(safe_join(links, ', '), class: 'flow-candidates')
     end
   end
 end

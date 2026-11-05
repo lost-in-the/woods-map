@@ -11,10 +11,13 @@ RSpec.describe 'Ambiguous published flow operations', type: :request do
     ] }
   end
 
+  after { WoodsMap::GenerationSnapshot.reset! }
+
   before do
+    WoodsMap::GenerationSnapshot.reset!
     allow(Woods::MCP::IndexReader).to receive(:new).and_wrap_original do |build, *args, **options|
       build.call(*args, **options).tap do |reader|
-        allow(reader).to receive(:dependency_graph).and_wrap_original do |read|
+        allow(reader).to receive(:raw_graph_data).and_wrap_original do |read|
           graph = Marshal.load(Marshal.dump(read.call))
           graph['nodes']['Shared'] = { 'type' => 'model' }
           graph['variants'] = [{ 'identifier' => 'Shared', 'type' => 'service' }]
@@ -41,6 +44,7 @@ RSpec.describe 'Ambiguous published flow operations', type: :request do
         .to include('/woods/units/model/User')
       expect(html.text).not_to include('Billing.run')
     end
+
     it "preserves an unambiguous operation at #{path}" do
       operation.delete('ambiguous_candidates')
       get path
