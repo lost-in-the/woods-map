@@ -114,7 +114,8 @@ module WoodsMap
     # @return [Integer] distinct tables the ER diagram draws, this one included
     def table_count
       # compact_blank arrived in Rails 6.1; the engine's floor is 6.0.
-      ([table_name] + er_associations.map { |a| target_table(a) }).reject(&:blank?).uniq.size # rubocop:disable Rails/CompactBlank
+      WoodsDiagrams.schema_table_count(@repository, @unit) ||
+        ([table_name] + er_associations.map { |a| target_table(a) }).reject(&:blank?).uniq.size # rubocop:disable Rails/CompactBlank
     end
 
     # @return [Boolean] whether the ER diagram would exceed {TABLE_BUDGET}

@@ -61,6 +61,19 @@ RSpec.describe WoodsMap::WoodsDiagrams do
     expect(Woods::Diagrams).to have_received(:build).at_least(100).times
   end
 
+  it 'counts the distinct tables Woods draws for a table unit, including incoming keys' do
+    skip 'This Woods has no diagram builders (woods#826)' unless described_class.available?
+
+    WoodsMap::Repository.open(FIXTURE_INDEX) do |repository|
+      %w[users microposts].each do |name|
+        unit = repository.unit("table:#{name}", type: 'database_table')
+        schema = WoodsMap::SchemaView.for(repository, unit)
+        expect(schema.mermaid).to include('"microposts"', '"users"')
+        expect(schema.table_count).to eq(2)
+      end
+    end
+  end
+
   it 'keeps the map\'s own text with a Woods that has no diagram builders' do
     allow(described_class).to receive(:available?).and_return(false)
     WoodsMap::Repository.open(FIXTURE_INDEX) do |repository|

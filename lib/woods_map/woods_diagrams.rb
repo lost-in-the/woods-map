@@ -32,6 +32,14 @@ module WoodsMap
       repository && text(repository, kind: 'schema', identifier: unit['identifier'], type: unit['type'], depth: 1)
     end
 
+    # @return [Integer, nil] distinct tables in a drawn table-unit ER, nil for the local fallback
+    def schema_table_count(repository, unit)
+      return unless repository && unit['type'] == 'database_table'
+
+      diagram = result(repository, kind: 'schema', identifier: unit['identifier'], type: unit['type'], depth: 1)
+      diagram.details.fetch('size') if diagram&.text
+    end
+
     # @param repository [WoodsMap::Repository, nil]
     # @param identifier [String] a model's identifier
     # @param event [String]
@@ -47,11 +55,16 @@ module WoodsMap
     # @return [String, nil] Woods' text; nil without the builders, or when Woods
     #   refuses or cannot answer, so the caller draws its own
     def text(repository, kind:, identifier:, **options)
+      result(repository, kind: kind, identifier: identifier, **options)&.text
+    end
+
+    # @return [Woods::Diagrams::Result, nil] published diagram text and size, from the same build
+    def result(repository, kind:, identifier:, **options)
       reader = repository.respond_to?(:index_reader) ? repository.index_reader : nil
       # Only a real reader: a repository whose graph is supplied some other way keeps the map's builders.
       return nil unless available? && reader.is_a?(Woods::MCP::IndexReader)
 
-      Woods::Diagrams.build(reader, kind: kind, identifier: identifier, **options.compact).text
+      Woods::Diagrams.build(reader, kind: kind, identifier: identifier, **options.compact)
     rescue Woods::Diagrams::InvalidRequest, Woods::Diagrams::UnitNotFound
       nil
     end
