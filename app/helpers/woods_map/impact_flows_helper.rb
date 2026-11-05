@@ -94,6 +94,8 @@ module WoodsMap
     def flow_line_item(line, depth)
       arrow = { response: :return, call: :call }[line.kind]
       text = %i[framework more].include?(line.kind) ? tag.span(line.text, class: 'mut') : line.text
+      text = safe_join([text, ': ', flow_candidates(line.candidates)]) if line.candidates
+      arrow = nil if line.candidates
       { n: '', depth: depth + line.depth, arrow: arrow, text: text, mech: line.mech }
     end
   end

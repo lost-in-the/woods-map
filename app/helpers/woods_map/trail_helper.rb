@@ -70,6 +70,11 @@ module WoodsMap
     # @param operation [Hash] a flow operation
     # @return [String] one line: kind, target and method
     def trail_operation_text(operation)
+      if operation.key?(:ambiguous_candidates)
+        return safe_join(["? ambiguous call .#{operation[:method]}: ",
+                          flow_candidates(operation[:ambiguous_candidates])])
+      end
+
       op = operation
       kind = op[:type].to_s
       word = OPERATION_WORDS.fetch(kind, kind)
@@ -83,6 +88,12 @@ module WoodsMap
         mailer = op[:mailer_action] ? " → #{op[:mailer_action]}" : ''
         "#{word} #{target}#{mailer}"
       end
+    end
+
+    # @param flag [TrailFlags::Flag]
+    # @return [ActiveSupport::SafeBuffer]
+    def trail_flag_text(flag)
+      safe_join([flag.text, (safe_join([': ', flow_candidates(flag.candidates)]) if flag.candidates)].compact)
     end
 
     # @param flag [TrailFlags::Flag]

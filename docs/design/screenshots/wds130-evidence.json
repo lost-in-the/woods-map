@@ -1,0 +1,465 @@
+{
+  "map_revision": "7ab5ba4a7e5e778499da7337d777ecef225fd715",
+  "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "base_revision": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
+  "rails": "8.0.0",
+  "ruby": "3.3.1",
+  "browser": "157.0.8103.38",
+  "device_scale_factor": 1,
+  "index_generation": 3,
+  "probe": "Synthetic PublishedIndex#flow_entry_points and #flow_document injection on UsersController#show over normally extracted gen3; Ambiguous call and async operations with User and Missing::Billing candidates; no payload edits. Engineering screenshot and axe verification, not physical-device/human/200% zoom acceptance.",
+  "records": [
+    {
+      "name": "impact",
+      "url": "/woods/impact?focus=User&lens=flows",
+      "width": 1440,
+      "height": 1000,
+      "file": "wds130-impact-1440.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".hot"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                ".flag"
+              ],
+              [
+                ".info"
+              ],
+              [
+                "th[width=\"120\"]"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "trail",
+      "url": "/woods/trail?entry=UsersController%23show",
+      "width": 1440,
+      "height": 1000,
+      "file": "wds130-trail-1440.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".hot"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                "#trail-flags > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-lanes > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                ".pele-cluster-label"
+              ],
+              [
+                ".pele-label"
+              ],
+              [
+                "#trail-steps > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-pins > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-graph > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-erd > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-cochange > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "impact",
+      "url": "/woods/impact?focus=User&lens=flows",
+      "width": 960,
+      "height": 1000,
+      "file": "wds130-impact-960.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".hot"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                ".flag"
+              ],
+              [
+                ".info"
+              ],
+              [
+                "th[width=\"120\"]"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "trail",
+      "url": "/woods/trail?entry=UsersController%23show",
+      "width": 960,
+      "height": 1000,
+      "file": "wds130-trail-960.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".hot"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                "#trail-flags > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-lanes > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                ".pele-cluster-label"
+              ],
+              [
+                ".pele-label"
+              ],
+              [
+                "#trail-steps > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-pins > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-graph > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-erd > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-cochange > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "impact",
+      "url": "/woods/impact?focus=User&lens=flows",
+      "width": 640,
+      "height": 1000,
+      "file": "wds130-impact-640.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".hot"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                ".info"
+              ],
+              [
+                "th[width=\"120\"]"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "trail",
+      "url": "/woods/trail?entry=UsersController%23show",
+      "width": 640,
+      "height": 1000,
+      "file": "wds130-trail-640.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".hot"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                "#trail-flags > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-lanes > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                ".pele-cluster-label"
+              ],
+              [
+                ".pele-label"
+              ],
+              [
+                "#trail-steps > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-pins > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-graph > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-erd > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-cochange > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "impact",
+      "url": "/woods/impact?focus=User&lens=flows",
+      "width": 390,
+      "height": 1000,
+      "file": "wds130-impact-390.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".hot"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                ".tab:nth-child(5)"
+              ],
+              [
+                ".tab:nth-child(5) > .cnt"
+              ],
+              [
+                ".tab:nth-child(6)"
+              ],
+              [
+                ".tab:nth-child(6) > .cnt"
+              ],
+              [
+                ".info"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "trail",
+      "url": "/woods/trail?entry=UsersController%23show",
+      "width": 390,
+      "height": 1000,
+      "file": "wds130-trail-390.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                ".bar-search > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".hot"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                "#trail-flags > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-lanes > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                ".pele-cluster-label"
+              ],
+              [
+                ".pele-label"
+              ],
+              [
+                "#trail-steps > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-pins > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-graph > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-erd > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ],
+              [
+                "#trail-cochange > .info[aria-label=\"Explain\"][type=\"button\"]"
+              ]
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -17,6 +17,8 @@ module WoodsMap
     # @param reach [Hash{String => Array}] label => [process, via, hop, caller label], filled in
     def map_operations(operations, label, process, reach)
       each_operation(operations) do |op|
+        next if op.key?(:ambiguous_candidates)
+
         case op[:type]&.to_sym
         when :async
           target = op[:target].to_s
