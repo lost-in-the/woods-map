@@ -1,0 +1,306 @@
+{
+  "map": "1259b885e7bba4929d1db7797e2891a07ca37f2c",
+  "woods": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "rails": "8.0.0",
+  "ruby": "3.3.1",
+  "generation": 3,
+  "syntheticIndex": false,
+  "browser": "157.0.8103.38",
+  "scale": 1,
+  "records": [
+    {
+      "width": 1440,
+      "keyboard": 0,
+      "states": [
+        {
+          "file": "code-1440-left.png",
+          "scroll": 0,
+          "max": 0,
+          "regionWidth": 1135,
+          "gutter": [
+            {
+              "selector": ".heat",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".ln",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".mg",
+              "bg": "rgb(34, 33, 38)"
+            }
+          ],
+          "nestedScrollers": 0
+        },
+        {
+          "file": "code-1440-right.png",
+          "scroll": 0,
+          "max": 0,
+          "regionWidth": 1135,
+          "gutter": [
+            {
+              "selector": ".heat",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".ln",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".mg",
+              "bg": "rgb(34, 33, 38)"
+            }
+          ],
+          "nestedScrollers": 0
+        },
+        {
+          "file": "code-1440-return.png",
+          "scroll": 0,
+          "max": 0,
+          "regionWidth": 1135,
+          "gutter": [
+            {
+              "selector": ".heat",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".ln",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".mg",
+              "bg": "rgb(34, 33, 38)"
+            }
+          ],
+          "nestedScrollers": 0
+        }
+      ],
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "width": 960,
+      "keyboard": 61,
+      "states": [
+        {
+          "file": "code-960-left.png",
+          "scroll": 0,
+          "max": 461,
+          "regionWidth": 655,
+          "gutter": [
+            {
+              "selector": ".heat",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".ln",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".mg",
+              "bg": "rgb(34, 33, 38)"
+            }
+          ],
+          "nestedScrollers": 0
+        },
+        {
+          "file": "code-960-right.png",
+          "scroll": 461,
+          "max": 461,
+          "regionWidth": 655,
+          "gutter": [
+            {
+              "selector": ".heat",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".ln",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".mg",
+              "bg": "rgb(34, 33, 38)"
+            }
+          ],
+          "nestedScrollers": 0
+        },
+        {
+          "file": "code-960-return.png",
+          "scroll": 0,
+          "max": 461,
+          "regionWidth": 655,
+          "gutter": [
+            {
+              "selector": ".heat",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".ln",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".mg",
+              "bg": "rgb(34, 33, 38)"
+            }
+          ],
+          "nestedScrollers": 0
+        }
+      ],
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "width": 640,
+      "keyboard": 92,
+      "states": [
+        {
+          "file": "code-640-left.png",
+          "scroll": 0,
+          "max": 520,
+          "regionWidth": 596,
+          "gutter": [
+            {
+              "selector": ".heat",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".ln",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".mg",
+              "bg": "rgb(34, 33, 38)"
+            }
+          ],
+          "nestedScrollers": 0
+        },
+        {
+          "file": "code-640-right.png",
+          "scroll": 520,
+          "max": 520,
+          "regionWidth": 596,
+          "gutter": [
+            {
+              "selector": ".heat",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".ln",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".mg",
+              "bg": "rgb(34, 33, 38)"
+            }
+          ],
+          "nestedScrollers": 0
+        },
+        {
+          "file": "code-640-return.png",
+          "scroll": 0,
+          "max": 520,
+          "regionWidth": 596,
+          "gutter": [
+            {
+              "selector": ".heat",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".ln",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".mg",
+              "bg": "rgb(34, 33, 38)"
+            }
+          ],
+          "nestedScrollers": 0
+        }
+      ],
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "width": 390,
+      "keyboard": 108,
+      "states": [
+        {
+          "file": "code-390-left.png",
+          "scroll": 0,
+          "max": 346,
+          "regionWidth": 346,
+          "gutter": [
+            {
+              "selector": ".heat",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".ln",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".mg",
+              "bg": "rgb(34, 33, 38)"
+            }
+          ],
+          "nestedScrollers": 0
+        },
+        {
+          "file": "code-390-right.png",
+          "scroll": 346,
+          "max": 346,
+          "regionWidth": 346,
+          "gutter": [
+            {
+              "selector": ".heat",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".ln",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".mg",
+              "bg": "rgb(34, 33, 38)"
+            }
+          ],
+          "nestedScrollers": 0
+        },
+        {
+          "file": "code-390-return.png",
+          "scroll": 0,
+          "max": 346,
+          "regionWidth": 346,
+          "gutter": [
+            {
+              "selector": ".heat",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".ln",
+              "bg": "rgb(34, 33, 38)"
+            },
+            {
+              "selector": ".mg",
+              "bg": "rgb(34, 33, 38)"
+            }
+          ],
+          "nestedScrollers": 0
+        }
+      ],
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    }
+  ],
+  "limits": "Automated native Chrome keyboard input and screenshots, plus separate axe/geometry gates. No human acceptance, real-device touch gesture, zoom, light-theme or effective-lens acceptance. At 1440 source fits, hence no horizontal scroll. Bottom has no local divider; source stays above Callers; no design boundary change."
+}

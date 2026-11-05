@@ -119,3 +119,26 @@ page before drawing.
 Fonts: the first-run, refused and session-form screenshots predate the vendored
 Inter and Fira Code (woods-map#23) and fall back to the system faces; the
 status and guidelines screenshots use the vendored faces.
+
+### WDS-143 highlighted sticky gutters
+
+[B8-Code](../boards/B8-Code.html), amended by D-24. Normal extracted generation 3,
+User as-written `#L103`. Map code revision `1259b885e7bba4929d1db7797e2891a07ca37f2c`;
+Woods `237ca7c547555437cd5d596b9a5c1d1d963cfa71`; testbed
+`c6dc2c2e14fc857f0c9b12883434a5a548dd0af2`, Rails 8.0.0/Ruby 3.3.1.
+No injected index states. Native 1x PNGs, fonts loaded, 1000px height.
+
+| Width | Left | Right | Return |
+|---|---|---|---|
+| 1440 | [left](wds143-code-1440-left.png) | [right](wds143-code-1440-right.png) | [return](wds143-code-1440-return.png) |
+| 960 | [left](wds143-code-960-left.png) | [right](wds143-code-960-right.png) | [return](wds143-code-960-return.png) |
+| 640 | [left](wds143-code-640-left.png) | [right](wds143-code-640-right.png) | [return](wds143-code-640-return.png) |
+| 390 | [left](wds143-code-390-left.png) | [right](wds143-code-390-right.png) | [return](wds143-code-390-return.png) |
+
+[Machine evidence](wds143-evidence.json): axe 4.10.3, zero violations at all four widths.
+At 1440px the source fits and does not scroll. Native keyboard ArrowRight moves
+the region at the other widths. Source extends offscreen by design; the fix masks
+it beneath highlighted sticky cells. The code ends above Callers without a local
+bottom divider; no boundary redesign is included. Automated input/screenshots and
+axe/geometry checks are separate evidence, not human acceptance or runtime truth.
+Real-device touch, zoom, light theme and effective-lens acceptance remain untested.
