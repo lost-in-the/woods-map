@@ -1,0 +1,1 @@
+- Impact Flows and Trail mark ambiguous calls and show their published candidates without choosing a target. Candidate links require exactly one typed identity in the pinned generation.

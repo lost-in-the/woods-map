@@ -28,6 +28,8 @@ module WoodsMap
     end
 
     def map_call(operation, label, process, reach)
+      return if operation.key?(:ambiguous_candidates)
+
       if operation[:mailer_action]
         later = LATER.include?(operation[:method].to_s)
         start_process(reach, [operation[:mailer_action]], [later ? process + 1 : process, :delivery, later],
