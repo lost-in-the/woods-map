@@ -1,0 +1,924 @@
+{
+  "map": "7b46eaa2b6e87a16d368290ba1c8f538465b4433",
+  "woods": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "testbedBase": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
+  "generation": 3,
+  "rails": "8.0.0",
+  "ruby": "3.3.1",
+  "scale": 1,
+  "records": [
+    {
+      "name": "erd",
+      "width": 390,
+      "file": "erd-390.png",
+      "geometry": {
+        "viewport": 390,
+        "body": [
+          {
+            "class": "body",
+            "width": 348,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "sec",
+            "width": 304,
+            "margin": "21px 21px 0px"
+          },
+          {
+            "class": "sec",
+            "width": 304,
+            "margin": "21px 21px 0px"
+          },
+          {
+            "class": "sec",
+            "width": 304,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Tables in this chunk",
+            "width": 304,
+            "scrollWidth": 1201,
+            "scrolled": 897,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          },
+          {
+            "label": "Schema findings",
+            "width": 304,
+            "scrollWidth": 860,
+            "scrolled": 556,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          }
+        ],
+        "controls": []
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "impact",
+      "width": 390,
+      "file": "impact-390.png",
+      "geometry": {
+        "viewport": 390,
+        "body": [
+          {
+            "class": "body",
+            "width": 348,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "sec",
+            "width": 304,
+            "margin": "21px 21px 0px"
+          },
+          {
+            "class": "sec",
+            "width": 304,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Focus units",
+            "width": 304,
+            "scrollWidth": 1000,
+            "scrolled": 696,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          },
+          {
+            "label": "Affected units",
+            "width": 304,
+            "scrollWidth": 1140,
+            "scrolled": 836,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          },
+          {
+            "label": "Documentation units",
+            "width": 304,
+            "scrollWidth": 1140,
+            "scrolled": 836,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          }
+        ],
+        "controls": [
+          38,
+          38,
+          38,
+          38,
+          38,
+          38
+        ]
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "code",
+      "width": 390,
+      "file": "code-390.png",
+      "geometry": {
+        "viewport": 390,
+        "body": [
+          {
+            "class": "body",
+            "width": 348,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "cvwrap more",
+            "width": 346,
+            "margin": "0px"
+          },
+          {
+            "class": "sec",
+            "width": 304,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Source of User, as written lens",
+            "width": 346,
+            "scrollWidth": 692,
+            "scrolled": 346,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          },
+          {
+            "label": "Callers of User",
+            "width": 304,
+            "scrollWidth": 640,
+            "scrolled": 336,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          }
+        ],
+        "controls": [
+          38,
+          38,
+          38,
+          38,
+          38
+        ]
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "code-wrap",
+      "width": 390,
+      "file": "code-wrap-390.png",
+      "geometry": {
+        "viewport": 390,
+        "body": [
+          {
+            "class": "body",
+            "width": 348,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "cvwrap",
+            "width": 346,
+            "margin": "0px"
+          },
+          {
+            "class": "sec",
+            "width": 304,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Source of User, as written lens",
+            "width": 346,
+            "scrollWidth": 346,
+            "scrolled": 0,
+            "focus": false,
+            "outline": "rgb(229, 232, 235) none 3px"
+          },
+          {
+            "label": "Callers of User",
+            "width": 304,
+            "scrollWidth": 640,
+            "scrolled": 336,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          }
+        ],
+        "controls": [
+          38,
+          38,
+          38,
+          38,
+          38
+        ]
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "erd",
+      "width": 640,
+      "file": "erd-640.png",
+      "geometry": {
+        "viewport": 640,
+        "body": [
+          {
+            "class": "body",
+            "width": 598,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "sec",
+            "width": 554,
+            "margin": "21px 21px 0px"
+          },
+          {
+            "class": "sec",
+            "width": 554,
+            "margin": "21px 21px 0px"
+          },
+          {
+            "class": "sec",
+            "width": 554,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Tables in this chunk",
+            "width": 554,
+            "scrollWidth": 1201,
+            "scrolled": 647,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          },
+          {
+            "label": "Schema findings",
+            "width": 554,
+            "scrollWidth": 860,
+            "scrolled": 306,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          }
+        ],
+        "controls": []
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "impact",
+      "width": 640,
+      "file": "impact-640.png",
+      "geometry": {
+        "viewport": 640,
+        "body": [
+          {
+            "class": "body",
+            "width": 598,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "sec",
+            "width": 554,
+            "margin": "21px 21px 0px"
+          },
+          {
+            "class": "sec",
+            "width": 554,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Focus units",
+            "width": 554,
+            "scrollWidth": 1000,
+            "scrolled": 446,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          },
+          {
+            "label": "Affected units",
+            "width": 554,
+            "scrollWidth": 1140,
+            "scrolled": 586,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          },
+          {
+            "label": "Documentation units",
+            "width": 554,
+            "scrollWidth": 1140,
+            "scrolled": 586,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          }
+        ],
+        "controls": [
+          38,
+          38,
+          38,
+          38,
+          38,
+          38
+        ]
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "code",
+      "width": 640,
+      "file": "code-640.png",
+      "geometry": {
+        "viewport": 640,
+        "body": [
+          {
+            "class": "body",
+            "width": 598,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "cvwrap more",
+            "width": 596,
+            "margin": "0px"
+          },
+          {
+            "class": "sec",
+            "width": 554,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Source of User, as written lens",
+            "width": 596,
+            "scrollWidth": 1116,
+            "scrolled": 520,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          },
+          {
+            "label": "Callers of User",
+            "width": 554,
+            "scrollWidth": 640,
+            "scrolled": 86,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          }
+        ],
+        "controls": [
+          38,
+          38,
+          38,
+          38,
+          38
+        ]
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "code-wrap",
+      "width": 640,
+      "file": "code-wrap-640.png",
+      "geometry": {
+        "viewport": 640,
+        "body": [
+          {
+            "class": "body",
+            "width": 598,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "cvwrap",
+            "width": 596,
+            "margin": "0px"
+          },
+          {
+            "class": "sec",
+            "width": 554,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Source of User, as written lens",
+            "width": 596,
+            "scrollWidth": 596,
+            "scrolled": 0,
+            "focus": false,
+            "outline": "rgb(229, 232, 235) none 3px"
+          },
+          {
+            "label": "Callers of User",
+            "width": 554,
+            "scrollWidth": 640,
+            "scrolled": 86,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          }
+        ],
+        "controls": [
+          38,
+          38,
+          38,
+          38,
+          38
+        ]
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "erd",
+      "width": 960,
+      "file": "erd-960.png",
+      "geometry": {
+        "viewport": 960,
+        "body": [
+          {
+            "class": "body",
+            "width": 918,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "sec",
+            "width": 613,
+            "margin": "21px 21px 0px"
+          },
+          {
+            "class": "sec",
+            "width": 613,
+            "margin": "21px 21px 0px"
+          },
+          {
+            "class": "sec",
+            "width": 613,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Tables in this chunk",
+            "width": 613,
+            "scrollWidth": 1201,
+            "scrolled": 588,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          },
+          {
+            "label": "Schema findings",
+            "width": 613,
+            "scrollWidth": 860,
+            "scrolled": 247,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          }
+        ],
+        "controls": []
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "impact",
+      "width": 960,
+      "file": "impact-960.png",
+      "geometry": {
+        "viewport": 960,
+        "body": [
+          {
+            "class": "body",
+            "width": 918,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "sec",
+            "width": 613,
+            "margin": "21px 21px 0px"
+          },
+          {
+            "class": "sec",
+            "width": 613,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Focus units",
+            "width": 613,
+            "scrollWidth": 1000,
+            "scrolled": 387,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          },
+          {
+            "label": "Affected units",
+            "width": 613,
+            "scrollWidth": 1140,
+            "scrolled": 527,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          },
+          {
+            "label": "Documentation units",
+            "width": 613,
+            "scrollWidth": 1140,
+            "scrolled": 527,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          }
+        ],
+        "controls": [
+          38,
+          38,
+          38,
+          38,
+          38,
+          38
+        ]
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "code",
+      "width": 960,
+      "file": "code-960.png",
+      "geometry": {
+        "viewport": 960,
+        "body": [
+          {
+            "class": "body",
+            "width": 918,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "cvwrap more",
+            "width": 655,
+            "margin": "0px"
+          },
+          {
+            "class": "sec",
+            "width": 613,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Source of User, as written lens",
+            "width": 655,
+            "scrollWidth": 1116,
+            "scrolled": 461,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          },
+          {
+            "label": "Callers of User",
+            "width": 613,
+            "scrollWidth": 640,
+            "scrolled": 27,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          }
+        ],
+        "controls": [
+          38,
+          38,
+          38,
+          38,
+          38
+        ]
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "code-wrap",
+      "width": 960,
+      "file": "code-wrap-960.png",
+      "geometry": {
+        "viewport": 960,
+        "body": [
+          {
+            "class": "body",
+            "width": 918,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "cvwrap",
+            "width": 655,
+            "margin": "0px"
+          },
+          {
+            "class": "sec",
+            "width": 613,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Source of User, as written lens",
+            "width": 655,
+            "scrollWidth": 655,
+            "scrolled": 0,
+            "focus": false,
+            "outline": "rgb(229, 232, 235) none 3px"
+          },
+          {
+            "label": "Callers of User",
+            "width": 613,
+            "scrollWidth": 640,
+            "scrolled": 27,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          }
+        ],
+        "controls": [
+          38,
+          38,
+          38,
+          38,
+          38
+        ]
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "erd",
+      "width": 1440,
+      "file": "erd-1440.png",
+      "geometry": {
+        "viewport": 1440,
+        "body": [
+          {
+            "class": "body",
+            "width": 1398,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "sec",
+            "width": 1093,
+            "margin": "21px 21px 0px"
+          },
+          {
+            "class": "sec",
+            "width": 1093,
+            "margin": "21px 21px 0px"
+          },
+          {
+            "class": "sec",
+            "width": 1093,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Tables in this chunk",
+            "width": 1093,
+            "scrollWidth": 1201,
+            "scrolled": 108,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          },
+          {
+            "label": "Schema findings",
+            "width": 1093,
+            "scrollWidth": 1093,
+            "scrolled": 0,
+            "focus": false,
+            "outline": "rgb(229, 232, 235) none 3px"
+          }
+        ],
+        "controls": []
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "impact",
+      "width": 1440,
+      "file": "impact-1440.png",
+      "geometry": {
+        "viewport": 1440,
+        "body": [
+          {
+            "class": "body",
+            "width": 1398,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "sec",
+            "width": 1093,
+            "margin": "21px 21px 0px"
+          },
+          {
+            "class": "sec",
+            "width": 1093,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Focus units",
+            "width": 1093,
+            "scrollWidth": 1093,
+            "scrolled": 0,
+            "focus": false,
+            "outline": "rgb(229, 232, 235) none 3px"
+          },
+          {
+            "label": "Affected units",
+            "width": 1093,
+            "scrollWidth": 1140,
+            "scrolled": 47,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          },
+          {
+            "label": "Documentation units",
+            "width": 1093,
+            "scrollWidth": 1140,
+            "scrolled": 47,
+            "focus": true,
+            "outline": "rgb(153, 200, 255) auto 1px"
+          }
+        ],
+        "controls": [
+          38,
+          38,
+          38,
+          38,
+          38,
+          38
+        ]
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "code",
+      "width": 1440,
+      "file": "code-1440.png",
+      "geometry": {
+        "viewport": 1440,
+        "body": [
+          {
+            "class": "body",
+            "width": 1398,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "cvwrap",
+            "width": 1135,
+            "margin": "0px"
+          },
+          {
+            "class": "sec",
+            "width": 1093,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Source of User, as written lens",
+            "width": 1135,
+            "scrollWidth": 1135,
+            "scrolled": 0,
+            "focus": false,
+            "outline": "rgb(229, 232, 235) none 3px"
+          },
+          {
+            "label": "Callers of User",
+            "width": 1093,
+            "scrollWidth": 1093,
+            "scrolled": 0,
+            "focus": false,
+            "outline": "rgb(229, 232, 235) none 3px"
+          }
+        ],
+        "controls": [
+          38,
+          38,
+          38,
+          38,
+          38
+        ]
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "code-wrap",
+      "width": 1440,
+      "file": "code-wrap-1440.png",
+      "geometry": {
+        "viewport": 1440,
+        "body": [
+          {
+            "class": "body",
+            "width": 1398,
+            "margin": "13px 21px 21px"
+          },
+          {
+            "class": "cvwrap",
+            "width": 1135,
+            "margin": "0px"
+          },
+          {
+            "class": "sec",
+            "width": 1093,
+            "margin": "21px"
+          }
+        ],
+        "contained": true,
+        "scrolls": [
+          {
+            "label": "Source of User, as written lens",
+            "width": 1135,
+            "scrollWidth": 1135,
+            "scrolled": 0,
+            "focus": false,
+            "outline": "rgb(229, 232, 235) none 3px"
+          },
+          {
+            "label": "Callers of User",
+            "width": 1093,
+            "scrollWidth": 1093,
+            "scrolled": 0,
+            "focus": false,
+            "outline": "rgb(229, 232, 235) none 3px"
+          }
+        ],
+        "controls": [
+          38,
+          38,
+          38,
+          38,
+          38
+        ]
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    }
+  ]
+}

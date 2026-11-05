@@ -208,7 +208,7 @@
         <header><h2 class="t2" id="cl">Related lifecycle, <%= unit_link(@ladder_model['identifier'], 'model') %> <span class="n">what a <%= @ladder_event %> runs</span><%= info_tip("The published action flow does not link this selected event to #{p.action}, so this lifecycle is related exploration. The model is the one #{p.permitted.any? ? 'the permitted params build' : 'the action references first'} and the event is selected for exploration; pick another. Nothing here says #{p.action} saves it.") %></h2></header>
         <p class="cap">Related lifecycle, not a step of <%= p.action %>: This selection does not establish that the action saves <%= @ladder_model['identifier'] %>. It shows what a <%= @ladder_event %> of that model runs.</p>
         <% end %>
-        <div class="event-pick"><span class="lbl">event</span><span class="seg" role="group" aria-label="entry"><% WoodsMap::Lifecycle::EVENTS.each do |e| %><%= link_to(e, woods_map.unit_passage_path(type: @page.type, identifier: @page.identifier, action_name: p.action, event: e), 'aria-current': (e == @ladder_event ? 'true' : nil)) %><% end %></span></div>
+        <div class="event-pick"><span class="lbl">event</span><span class="seg" role="group" aria-label="entry"><% WoodsMap::Lifecycle::EVENTS.each do |e| %><%= link_to(e, woods_map.unit_passage_path(type: @page.type, identifier: @page.identifier, action_name: p.action, event: e, anchor: 'cl'), 'aria-current': (e == @ladder_event ? 'true' : nil)) %><% end %></span></div>
         <%= render 'woods_map/units/ladder', steps: ladder_steps, owner: @ladder_model['identifier'], label: "Callback ladder, #{@ladder_model['identifier']} #{@ladder_event}", event: @ladder_event %>
       </section>
     <% end %>
