@@ -1,0 +1,121 @@
+{
+  "browser": "157.0.8103.38",
+  "results": [
+    {
+      "width": 1440,
+      "start": {
+        "text": "active_storage_variant_records",
+        "width": 213,
+        "scrollWidth": 240
+      },
+      "pointer": {
+        "left": 27,
+        "end": 27
+      },
+      "outerLeft": 108,
+      "keyboard": 27,
+      "tab": true,
+      "cue": "\u2194 Scroll value",
+      "before": "docs/design/screenshots/wds149-cue-1440.png",
+      "after": "docs/design/screenshots/wds149-suffix-1440.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "width": 960,
+      "start": {
+        "text": "active_storage_variant_records",
+        "width": 213,
+        "scrollWidth": 240
+      },
+      "pointer": {
+        "left": 27,
+        "end": 27
+      },
+      "outerLeft": 588,
+      "keyboard": 27,
+      "tab": true,
+      "cue": "\u2194 Scroll value",
+      "before": "docs/design/screenshots/wds149-cue-960.png",
+      "after": "docs/design/screenshots/wds149-suffix-960.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "width": 640,
+      "start": {
+        "text": "active_storage_variant_records",
+        "width": 213,
+        "scrollWidth": 240
+      },
+      "pointer": {
+        "left": 27,
+        "end": 27
+      },
+      "outerLeft": 595,
+      "keyboard": 27,
+      "tab": true,
+      "cue": "\u2194 Scroll value",
+      "before": "docs/design/screenshots/wds149-cue-640.png",
+      "after": "docs/design/screenshots/wds149-suffix-640.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "width": 390,
+      "start": {
+        "text": "active_storage_variant_records",
+        "width": 223,
+        "scrollWidth": 240
+      },
+      "pointer": {
+        "left": 17,
+        "end": 17
+      },
+      "outerLeft": 845,
+      "keyboard": 17,
+      "tab": true,
+      "cue": "\u2194 Scroll value",
+      "before": "docs/design/screenshots/wds149-cue-390.png",
+      "after": "docs/design/screenshots/wds149-suffix-390.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    }
+  ],
+  "map_revision": "7196d638700aa77634e2044f77a3ced478d7097d",
+  "base_revision": "8170cf3b45258056127352c6811587a08dc56341",
+  "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "testbed_base": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
+  "rails": "8.0.0",
+  "ruby": "3.3.1",
+  "index_generation": 3,
+  "index_content": "Normally extracted testbed, no injected names or payload changes",
+  "device_scale_factor": 1,
+  "height": 1000,
+  "fonts": "document.fonts.ready awaited; native unscaled screenshots inspected",
+  "acceptance": "Engineering input and visible-cue evidence only. First-time reader task acceptance and physical touch/human/200% zoom not established.",
+  "touch": {
+    "map_revision": "7196d638700aa77634e2044f77a3ced478d7097d",
+    "browser": "157.0.8103.38",
+    "viewport": [
+      390,
+      1000
+    ],
+    "input": "CDP touchStart/touchMove/touchEnd in hasTouch context; native browser scrolling",
+    "result": {
+      "scroll_left": 17,
+      "client_width": 223,
+      "scroll_width": 240,
+      "text": "active_storage_variant_records"
+    }
+  }
+}
