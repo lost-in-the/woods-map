@@ -12,8 +12,9 @@ module WoodsMap
     def self.capture(pid, pipes, proc_root: '/proc')
       state = { pid: pid, alive: alive?(pid), pipes: pipes.transform_values { |io| pipe(io) } }
       base = File.join(proc_root, pid.to_s)
-      state[:proc] = %w[stat status wchan fdinfo/3 fdinfo/4].each_with_object({}) do |name, files|
-        files[name] = read(File.join(base, name))
+      state[:proc] = {}
+      %w[stat status wchan fdinfo/3 fdinfo/4].each do |name|
+        state[:proc][name] = read(File.join(base, name))
       end
       state[:proc][:fd3] = link(File.join(base, 'fd/3'))
       state[:proc][:fd4] = link(File.join(base, 'fd/4'))
