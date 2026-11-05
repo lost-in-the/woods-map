@@ -1,0 +1,150 @@
+{
+  "map": "a2f3c0a3e02546cc5fb6350ae7aa6f9e28803866",
+  "browser": "157.0.8103.38",
+  "woods": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "base": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
+  "index": 3,
+  "rails": "8.0.0",
+  "ruby": "3.3.1",
+  "deviceScaleFactor": 1,
+  "proof": "Automated native browser input and engineering geometry/axe; no physical-device, human or 200% zoom acceptance",
+  "rows": [
+    {
+      "width": 1440,
+      "height": 1000,
+      "url": "http://localhost:3195/woods/units/controller/UsersController/passage?action_name=show&event=destroy#cl",
+      "clicked": {
+        "top": 850.234375,
+        "bottom": 873.625,
+        "scrollY": 1237,
+        "heading": "Related lifecycle, User what a destroy runsⓘ"
+      },
+      "reload": {
+        "top": 850.234375,
+        "bottom": 873.625,
+        "scrollY": 1237,
+        "heading": "Related lifecycle, User what a destroy runsⓘ"
+      },
+      "keyboard": {
+        "top": 916.234375,
+        "bottom": 939.625,
+        "scrollY": 1171,
+        "heading": "Related lifecycle, User what a update runsⓘ"
+      },
+      "back": {
+        "top": 850.234375,
+        "bottom": 873.625,
+        "scrollY": 1237,
+        "heading": "Related lifecycle, User what a destroy runsⓘ"
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      },
+      "file": "wds145-passage-1440.png"
+    },
+    {
+      "width": 960,
+      "height": 1000,
+      "url": "http://localhost:3195/woods/units/controller/UsersController/passage?action_name=show&event=destroy#cl",
+      "clicked": {
+        "top": 831.609375,
+        "bottom": 855,
+        "scrollY": 1757,
+        "heading": "Related lifecycle, User what a destroy runsⓘ"
+      },
+      "reload": {
+        "top": 831.609375,
+        "bottom": 855,
+        "scrollY": 1757,
+        "heading": "Related lifecycle, User what a destroy runsⓘ"
+      },
+      "keyboard": {
+        "top": 897.609375,
+        "bottom": 921,
+        "scrollY": 1691,
+        "heading": "Related lifecycle, User what a update runsⓘ"
+      },
+      "back": {
+        "top": 831.609375,
+        "bottom": 855,
+        "scrollY": 1757,
+        "heading": "Related lifecycle, User what a destroy runsⓘ"
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      },
+      "file": "wds145-passage-960.png"
+    },
+    {
+      "width": 640,
+      "height": 1000,
+      "url": "http://localhost:3195/woods/units/controller/UsersController/passage?action_name=show&event=destroy#cl",
+      "clicked": {
+        "top": 832.109375,
+        "bottom": 855.5,
+        "scrollY": 1963,
+        "heading": "Related lifecycle, User what a destroy runsⓘ"
+      },
+      "reload": {
+        "top": 832.109375,
+        "bottom": 855.5,
+        "scrollY": 1963,
+        "heading": "Related lifecycle, User what a destroy runsⓘ"
+      },
+      "keyboard": {
+        "top": 898.109375,
+        "bottom": 921.5,
+        "scrollY": 1897,
+        "heading": "Related lifecycle, User what a update runsⓘ"
+      },
+      "back": {
+        "top": 832.109375,
+        "bottom": 855.5,
+        "scrollY": 1963,
+        "heading": "Related lifecycle, User what a destroy runsⓘ"
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      },
+      "file": "wds145-passage-640.png"
+    },
+    {
+      "width": 390,
+      "height": 1000,
+      "url": "http://localhost:3195/woods/units/controller/UsersController/passage?action_name=show&event=destroy#cl",
+      "clicked": {
+        "top": 762.109375,
+        "bottom": 801.890625,
+        "scrollY": 3325,
+        "heading": "Related lifecycle, User what a destroy runsⓘ"
+      },
+      "reload": {
+        "top": 762.109375,
+        "bottom": 801.890625,
+        "scrollY": 3325,
+        "heading": "Related lifecycle, User what a destroy runsⓘ"
+      },
+      "keyboard": {
+        "top": 844.109375,
+        "bottom": 883.890625,
+        "scrollY": 3243,
+        "heading": "Related lifecycle, User what a update runsⓘ"
+      },
+      "back": {
+        "top": 762.109375,
+        "bottom": 801.890625,
+        "scrollY": 3325,
+        "heading": "Related lifecycle, User what a destroy runsⓘ"
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      },
+      "file": "wds145-passage-390.png"
+    }
+  ]
+}
