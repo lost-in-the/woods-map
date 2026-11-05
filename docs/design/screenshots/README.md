@@ -110,6 +110,8 @@ instead of resizing or sharpening existing images.
 | ERD table column budgets and full names in keyboard/touch scroll regions; header view is horizontally scrolled to Foreign keys | [B6-ERD](../boards/B6-ERD.html), D-17 | [1440](erd-table-1440.png), [960](erd-table-960.png), [640](erd-table-640.png), [390](erd-table-390.png); headers: [1440](erd-table-right-1440.png), [960](erd-table-right-960.png), [640](erd-table-right-640.png), [390](erd-table-right-390.png); [revision, input, geometry and axe evidence](table-readability-evidence.json) |
 | Impact Focus units with readable Notes (horizontally scrolled where needed), same fixed-layout contract | [B8-Impact-Changed](../boards/B8-Impact-Changed.html), D-17 | [1440](impact-notes-1440.png), [960](impact-notes-960.png), [640](impact-notes-640.png), [390](impact-notes-390.png); [revision, input, geometry and axe evidence](table-readability-evidence.json) |
 
+| Passage related lifecycle after destroy selection and Back; WDS-145 | [B8-Passage](../boards/B8-Passage.html), D-25 | [1440](wds145-passage-1440.png), [960](wds145-passage-960.png), [640](wds145-passage-640.png), [390](wds145-passage-390.png); [exact revisions, input, geometry and axe](wds145-evidence.json) |
+
 Diagram panels are drawn by the vendored Pele in the browser (D-21) on the
 blog scenario of the `rails-8.0` testbed; without JavaScript, or when Pele
 refuses a text, they show the Mermaid source. The engine ships dark only, so
