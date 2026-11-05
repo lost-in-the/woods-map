@@ -496,3 +496,9 @@ html.no-js .wm .amb-pop[hidden]{display:block}
 /* Opt-in table identities stay complete without changing the fixed column budget.
    The cliff controller retains a keyboard stop only while a value overflows. */
 .wm .table-value{max-width:100%;overflow-x:auto;white-space:nowrap}
+/* D-19 / WDS-148: reclaim the repeated horizontal inset on mobile while retaining
+   breathing room for focus rings. Vertical rhythm and scroll regions stay intact. */
+@container wm (max-width:959px){
+  .wm .body{margin-inline:var(--s3)}
+  .wm .main .sec{margin-inline:var(--s3)}
+}
