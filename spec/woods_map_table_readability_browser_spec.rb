@@ -24,7 +24,8 @@ RSpec.describe 'ERD, Impact and Passage table readability in Chromium', type: :r
     it "keeps ERD headers separated and full identifiers scrollable at #{width}px" do
       get '/woods/erd'
       report = run_page(response.body, width: width, runner: erd_runner)
-      expect(report).to eq('overlap' => [], 'fullValues' => true, 'contained' => true, 'uniqueLabels' => true)
+      expect(report).to eq('overlap' => [], 'fullValues' => true, 'contained' => true,
+                           'uniqueLabels' => true, 'cue' => true)
     end
 
     it "reserves readable notes and nonoverlapping headers in Impact at #{width}px" do
@@ -54,19 +55,29 @@ RSpec.describe 'ERD, Impact and Passage table readability in Chromium', type: :r
       #{table_measurements}
       const table = document.querySelector('table[aria-label="Tables in this chunk"]')
       const cells = [table.querySelector('td[data-h="table"]'), table.querySelector('td[data-h="model"]')]
+      let cue = true
       const fullValues = cells.every((cell) => {
         const value = cell.querySelector('[role="region"]')
         if (!value) return false
         const link = value.querySelector('a')
         link.textContent = "PublishedIdentifierWithoutBreaks".repeat(8)
         application.getControllerForElementAndIdentifier(value, "cliff").update()
+        const hint = value.nextElementSibling
+        cue = cue && !!hint && getComputedStyle(hint).display !== "none" && hint.textContent.includes("Scroll value")
         value.focus()
         value.scrollLeft = value.scrollWidth
+        application.getControllerForElementAndIdentifier(value, "cliff").update()
+        cue = cue && getComputedStyle(hint).display !== "none"
         return value.getAttribute("aria-label") && value === document.activeElement && value.scrollLeft > 0 &&
           value.scrollWidth > value.clientWidth && link.textContent === "PublishedIdentifierWithoutBreaks".repeat(8)
       })
+      const fitting = cells[0].querySelector('[role="region"]')
+      fitting.querySelector('a').textContent = "x"
+      fitting.scrollLeft = 0
+      application.getControllerForElementAndIdentifier(fitting, "cliff").update()
+      cue = cue && getComputedStyle(fitting.nextElementSibling).display === "none" && !fitting.hasAttribute("tabindex")
       const labels = [...table.querySelectorAll('[role="region"]')].map((el) => el.getAttribute("aria-label"))
-      report({ overlap, fullValues, contained, uniqueLabels: new Set(labels).size === labels.length })
+      report({ overlap, fullValues, contained, cue, uniqueLabels: new Set(labels).size === labels.length })
     JS
   end
 

@@ -1,0 +1,1 @@
+- Long table values now show “↔ Scroll value” while they overflow, distinguishing their native scroll area from the surrounding table (WDS-149). The conditional cue remains visible before JavaScript measures the value, and accessible scrolling instructions are removed when it fits.
