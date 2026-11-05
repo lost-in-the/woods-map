@@ -1,5 +1,5 @@
 {
-  "map_revision": "82ae575891ef7e0c851f2624b304a5fa2ef0094a",
+  "map_revision": "b9acaeb29b6a82d46121ed909be96fd7fb15d8f6",
   "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
   "testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
   "testbed_base": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
@@ -108,10 +108,7 @@
                 "form > span[aria-hidden=\"true\"]:nth-child(1)"
               ],
               [
-                ".fresh"
-              ],
-              [
-                ".files > span[aria-hidden=\"true\"]"
+                ".why > .dim"
               ],
               [
                 "button[aria-label=\"Copy path\"]"
@@ -281,10 +278,7 @@
                 "form > span[aria-hidden=\"true\"]:nth-child(1)"
               ],
               [
-                ".fresh"
-              ],
-              [
-                ".files > span[aria-hidden=\"true\"]"
+                ".why > .dim"
               ],
               [
                 "button[aria-label=\"Copy path\"]"
@@ -457,10 +451,7 @@
                 "form > span[aria-hidden=\"true\"]:nth-child(1)"
               ],
               [
-                ".fresh"
-              ],
-              [
-                ".files > span[aria-hidden=\"true\"]"
+                ".why > .dim"
               ],
               [
                 "#ps > .info[aria-label=\"Explain\"]"
@@ -621,10 +612,7 @@
                 "form > span[aria-hidden=\"true\"]:nth-child(1)"
               ],
               [
-                ".fresh"
-              ],
-              [
-                ".files > span[aria-hidden=\"true\"]"
+                ".why > .dim"
               ],
               [
                 ".tab:nth-child(5)"
