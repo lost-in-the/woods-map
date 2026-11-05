@@ -1,0 +1,123 @@
+{
+  "map_revision": "11de215f7f2a74d9652fa241e2b783c58b41dbb4",
+  "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "base_revision": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
+  "rails": "8.0.0",
+  "ruby": "3.3.1",
+  "browser": "157.0.8103.38",
+  "device_scale_factor": 1,
+  "index_generation": 3,
+  "probe": "Synthetic PublishedIndex#flow_entry_points and #flow_document injection on UsersController#show over normally extracted gen3; User and Missing::Billing candidates; no payload edits. Engineering screenshot and axe verification, not physical-device/human/200% zoom acceptance.",
+  "records": [
+    {
+      "name": "impact",
+      "url": "/woods/impact?focus=User&lens=flows",
+      "width": 1440,
+      "height": 1000,
+      "file": "wds130-impact-1440.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "trail",
+      "url": "/woods/trail?entry=UsersController%23show",
+      "width": 1440,
+      "height": 1000,
+      "file": "wds130-trail-1440.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "impact",
+      "url": "/woods/impact?focus=User&lens=flows",
+      "width": 960,
+      "height": 1000,
+      "file": "wds130-impact-960.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "trail",
+      "url": "/woods/trail?entry=UsersController%23show",
+      "width": 960,
+      "height": 1000,
+      "file": "wds130-trail-960.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "impact",
+      "url": "/woods/impact?focus=User&lens=flows",
+      "width": 640,
+      "height": 1000,
+      "file": "wds130-impact-640.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "trail",
+      "url": "/woods/trail?entry=UsersController%23show",
+      "width": 640,
+      "height": 1000,
+      "file": "wds130-trail-640.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "impact",
+      "url": "/woods/impact?focus=User&lens=flows",
+      "width": 390,
+      "height": 1000,
+      "file": "wds130-impact-390.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "name": "trail",
+      "url": "/woods/trail?entry=UsersController%23show",
+      "width": 390,
+      "height": 1000,
+      "file": "wds130-trail-390.png",
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    }
+  ],
+  "limitations": [
+    "Engineering captures and axe only; browser UI input acceptance not established.",
+    "Physical-device, human and 200% zoom acceptance remains WDS-87.",
+    "Generation 3 has no precomputed flow artifacts. The isolated testbed initializer supplies both membership and a flow document at the PublishedIndex boundary, with no payload edits.",
+    "Snapshot paths /tmp/woods-map-wds130-visual; container woods-map-wds130; localhost:3131.",
+    "Two Preview snapshot calls failed with Preview automation snapshot timed out after 15000ms; native Chrome fallback used."
+  ],
+  "synthetic_operation": {
+    "type": "call",
+    "target": "Billing",
+    "method": "run",
+    "ambiguous_candidates": [
+      "User",
+      "Missing::Billing"
+    ]
+  },
+  "validation": {
+    "suite": "1404 examples, 0 failures, 121 pending",
+    "lint": "Only pre-existing schema_view.rb:117 Lint/RedundantCopDisableDirective for Rails/CompactBlank",
+    "tokens": "copies identical"
+  }
+}
