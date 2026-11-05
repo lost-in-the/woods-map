@@ -49,9 +49,11 @@ RSpec.describe 'What the Schema tab says the evidence means', type: :request do
       expect(link&.text).to include('ERD')
     end
 
-    it 'counts a table once however many associations reach it' do
+    it 'counts the incoming FK table drawn beside the table unit' do
+      skip 'This Woods has no diagram builders (woods#826)' unless WoodsMap::WoodsDiagrams.available?
+
       get '/woods/units/database_table/table:users/schema'
-      expect(er_section.at_css('.dh').text).to include('1 table')
+      expect(er_section.at_css('.dh').text).to include('2 tables')
       expect(er_section.at_css('.dh').text).not_to include('1 tables')
     end
   end

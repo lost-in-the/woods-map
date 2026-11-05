@@ -158,3 +158,5 @@ Parent follow-up refreshed on the same merged runtime revision: emulated native 
 | WDS-148: ERD, Impact, Code and wrapped Code, all four widths | B6-ERD, B8-Impact-Changed, B8-Code, B8-Widths; D-19/D-24 | [Native captures, geometry and axe evidence](wds148/README.md) |
 
 | WDS-150 History timeline | [B6-History](../boards/B6-History.html), [History note](../notes/history.md) | [1440](history-wds150-after-1440.png), [960](history-wds150-after-960.png), [640](history-wds150-after-640.png), [640 right](history-wds150-after-640-right.png), [390](history-wds150-after-390.png) | Native scale 1, fonts loaded; normal extracted gen3; axe 4.10.3 zero violations at all four widths. [Exact provenance and proof limits](history-wds150-evidence.json). Separate synthetic multi-commit engineering span test; no human/200% zoom acceptance. |
+
+| WDS-152 table Schema distinct drawn count | [B6-Schema](../boards/B6-Schema.html), D-17 | [1440](wds152-table-schema-1440.png), [960](wds152-table-schema-960.png), [640](wds152-table-schema-640.png), [390](wds152-table-schema-390.png); [provenance and limits](wds152-evidence.json) |

@@ -1,0 +1,71 @@
+{
+  "map_revision": "cee7ec8b5c1a560ca1b45ea7fbe0446781582072",
+  "map_base": "7c64a1893233add0a167795ed5be4d876a74db8e",
+  "woods_gem_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "testbed_base": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
+  "extraction": {
+    "extracted_at": "2026-11-03T21:33:59Z",
+    "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+    "woods_revision_dirty": true,
+    "rails_version": "8.0.0",
+    "ruby_version": "3.3.1"
+  },
+  "host": "isolated copied app /tmp/woods-map-wds152-app, read-only Map /tmp/woods-map-wds152-map, port 3152; copied normal blog gen3, no new extraction",
+  "runtime": "Docker woods-testbed-rails-8.0; Ruby 3.3.1 / Rails 8.0.0",
+  "browser": "native Google Chrome 157.0.8103.38, headless Playwright-core",
+  "capture": "deviceScaleFactor 1; document.fonts.ready awaited; PNG dimensions checked; native unscaled PNGs inspected without sharpening",
+  "axe_injection": "addInitScript of supplied visual-axe.min.js; initial addScriptTag blocked by CSP, no CSP changes",
+  "results": [
+    {
+      "width": 1440,
+      "url": "http://localhost:3152/woods/units/database_table/table:users/schema",
+      "text": "Entity relationship\nusers\nmodel associations only\n2 tables\n\u2398 copy Mermaid\n\u2913 .mmd\n\u2398 copy for PR comment\nMermaid text\nuser_id\nusers\nmicroposts\n| one\n\u25cb zero or more\ncrow's foot many\nmodel metadata\ngen 3\n\nDrawn from this model's associations only. Foreign keys that no model association names are not drawn here; see the ERD for the database's own foreign keys.",
+      "axeVersion": "4.10.3",
+      "violations": [],
+      "png_dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "width": 960,
+      "url": "http://localhost:3152/woods/units/database_table/table:users/schema",
+      "text": "Entity relationship\nusers\nmodel associations only\n2 tables\n\u2398 copy Mermaid\n\u2913 .mmd\n\u2398 copy for PR comment\nMermaid text\nuser_id\nusers\nmicroposts\n| one\n\u25cb zero or more\ncrow's foot many\nmodel metadata\ngen 3\n\nDrawn from this model's associations only. Foreign keys that no model association names are not drawn here; see the ERD for the database's own foreign keys.",
+      "axeVersion": "4.10.3",
+      "violations": [],
+      "png_dimensions": [
+        960,
+        1000
+      ]
+    },
+    {
+      "width": 640,
+      "url": "http://localhost:3152/woods/units/database_table/table:users/schema",
+      "text": "Entity relationship\nusers\nmodel associations only\n2 tables\n\u2398 copy Mermaid\n\u2913 .mmd\n\u2398 copy for PR comment\nMermaid text\nuser_id\nusers\nmicroposts\n| one\n\u25cb zero or more\ncrow's foot many\nmodel metadata\ngen 3\n\nDrawn from this model's associations only. Foreign keys that no model association names are not drawn here; see the ERD for the database's own foreign keys.",
+      "axeVersion": "4.10.3",
+      "violations": [],
+      "png_dimensions": [
+        640,
+        1000
+      ]
+    },
+    {
+      "width": 390,
+      "url": "http://localhost:3152/woods/units/database_table/table:users/schema",
+      "text": "Entity relationship\nusers\nmodel associations only\n2 tables\n\u2398 copy Mermaid\n\u2913 .mmd\n\u2398 copy for PR comment\nMermaid text\nuser_id\nusers\nmicroposts\n| one\n\u25cb zero or more\ncrow's foot many\nmodel metadata\ngen 3\n\nDrawn from this model's associations only. Foreign keys that no model association names are not drawn here; see the ERD for the database's own foreign keys.",
+      "axeVersion": "4.10.3",
+      "violations": [],
+      "png_dimensions": [
+        390,
+        1000
+      ]
+    }
+  ],
+  "limits": [
+    "Count visually confirmed at 1440 and 390. At 960 and 640 header metadata remains clipped; DOM count and axe do not establish visible count acceptance.",
+    "No human, screen-reader, real device, 200% zoom, multi-database, missing-FK-scope or 40-table refusal acceptance.",
+    "Caption model-associations-only wording preserved as requested; this change does not adjudicate table FK provenance wording.",
+    "Parent port3189, index and Map snapshot unchanged. Synthetic token only; no injected index data."
+  ]
+}
