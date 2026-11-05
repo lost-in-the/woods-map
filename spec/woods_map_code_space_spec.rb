@@ -36,6 +36,20 @@ RSpec.describe 'Code view space in Chromium', type: :request do
     end
   end
 
+  it 'keeps highlighted sticky gutters opaque while source scrolls behind them' do
+    report = run_page(response.body, width: 390, runner: <<~JS)
+      const row = document.querySelector('.cv .row[id]')
+      location.hash = row.id
+      const region = document.querySelector('.cvwrap')
+      region.scrollLeft = region.scrollWidth
+      await settle(100)
+      report({ scroll: region.scrollLeft, backgrounds: ['.heat', '.ln'].map(selector =>
+        getComputedStyle(row.querySelector(selector)).backgroundColor) })
+    JS
+    expect(report['scroll']).to be_positive
+    expect(report['backgrounds']).to all(match(/\Argb\(/))
+  end
+
   it 'gives the wrapped source most of the region where a lane is shown' do
     report = measure(800)
     expect(report['lane']).to be <= 260

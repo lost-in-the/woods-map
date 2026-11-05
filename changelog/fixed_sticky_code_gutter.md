@@ -1,0 +1,1 @@
+- Keep highlighted Code gutters opaque so horizontally scrolled source does not paint over line numbers and activity ink.
