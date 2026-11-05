@@ -1,0 +1,1 @@
+- Long table values now show “↔ Scroll value” while they overflow, distinguishing their native scroll area from the surrounding table (WDS-149).

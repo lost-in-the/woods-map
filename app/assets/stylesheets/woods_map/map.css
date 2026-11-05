@@ -496,6 +496,10 @@ html.no-js .wm .amb-pop[hidden]{display:block}
 /* Opt-in table identities stay complete without changing the fixed column budget.
    The cliff controller retains a keyboard stop only while a value overflows. */
 .wm .table-value{max-width:100%;overflow-x:auto;white-space:nowrap}
+/* The cue belongs to the inner value, not the independently scrolling table.
+   Keep it visible at either end; no hover or duplicated identifier is needed. */
+.wm .table-value-hint{display:none;font-family:var(--ff-ui);font-size:var(--fs-11);font-weight:400;color:var(--mut)}
+.wm .table-value.more + .table-value-hint,.wm .table-value.more-left + .table-value-hint{display:block}
 /* D-19 / WDS-148: reclaim the repeated horizontal inset on mobile while retaining
    breathing room for focus rings. Vertical rhythm and scroll regions stay intact. */
 @container wm (max-width:959px){
