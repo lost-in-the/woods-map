@@ -4,7 +4,7 @@ Scope: C3-Navigation, C5-Chrome, D-18; NFR-3. No board draws these states.
 
 ## The tree is its own response
 
-No page carries the file tree. The sheet (☰ in the bar, *files* in the crumbs)
+No page carries the file tree. The sheet (the single “Files and sections” ☰ control in the bar)
 fetches `/woods/tree?gen=<n>[&since=<selector>]` the first time it opens. The
 fragment depends only on the pinned generation and the selector:
 
@@ -33,7 +33,8 @@ and is a polite live region.
 
 ## The sheet
 
-- ☰ opens the sheet at every width, with a 32px hit area.
+- The bar’s “Files and sections” ☰ opens the sheet at every width, with a 32px hit area.
+  The breadcrumb band contains navigation and the copyable path, without a second sheet opener.
 - The header stays put while the rest scrolls, and the tree's filter stays at the
   top of that scroll. Opening scrolls to the top and focuses Close.
 - Below 960, where the bar hides the primary nav, the sheet starts with it.
