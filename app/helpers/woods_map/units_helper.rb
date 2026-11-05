@@ -11,6 +11,13 @@ module WoodsMap
                                 'app' => ['application', 'not drawn: a proc or a macro'],
                                 'unknown' => %w[unknown-origin hidden] }.freeze
 
+    # Reserve uppercase header ink, letter spacing and cell padding in the fixed matrix.
+    # @param action [String] published action name
+    # @return [Integer] presentational column width in pixels
+    def passage_action_width(action)
+      [66, (action.length * 12) + 28].max
+    end
+
     # @param identifier [String]
     # @param type [String, nil]
     # @param label [String, nil]
