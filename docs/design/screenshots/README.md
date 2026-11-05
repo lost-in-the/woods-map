@@ -119,3 +119,5 @@ page before drawing.
 Fonts: the first-run, refused and session-form screenshots predate the vendored
 Inter and Fira Code (woods-map#23) and fall back to the system faces; the
 status and guidelines screenshots use the vendored faces.
+
+| Single files-sheet opener, User Code with sheet open (WDS-146) | [C5-Chrome](../boards/C5-Chrome.html), [files sheet note](../notes/files-sheet.md) | [1440](files-sheet-single-opener-1440.png), [960](files-sheet-single-opener-960.png), [640](files-sheet-single-opener-640.png), [390](files-sheet-single-opener-390.png); [revisions, keyboard and axe evidence](files-sheet-single-opener-evidence.json) |

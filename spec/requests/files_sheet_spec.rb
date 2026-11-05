@@ -45,7 +45,7 @@ RSpec.describe 'The files sheet', type: :request do
     expect(openers.size).to eq(1)
     expect(openers.first['aria-label']).to eq('Files and sections')
     expect(openers.first.ancestors.any? { |node| node['class'].to_s.split.include?('bar') }).to be(true)
-    expect(html_response_document.css('.crumbs a').map { |link| link['href'] }).to include('/woods/units')
+    expect(html_response_document.css('.crumbs a').pluck('href')).to include('/woods/units')
   end
 
   it 'serves the tree once per generation without framework or gem source' do

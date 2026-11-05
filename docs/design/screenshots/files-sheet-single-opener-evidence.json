@@ -1,0 +1,70 @@
+{
+  "browser": "157.0.8103.38",
+  "results": [
+    {
+      "width": 1440,
+      "height": 1000,
+      "container": 1440,
+      "one_opener": true,
+      "keyboard_trap": true,
+      "escape_focus_return": true,
+      "tree_requests": 1,
+      "sheet_nav": 0,
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "width": 960,
+      "height": 1000,
+      "container": 960,
+      "one_opener": true,
+      "keyboard_trap": true,
+      "escape_focus_return": true,
+      "tree_requests": 1,
+      "sheet_nav": 0,
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "width": 640,
+      "height": 1000,
+      "container": 640,
+      "one_opener": true,
+      "keyboard_trap": true,
+      "escape_focus_return": true,
+      "tree_requests": 1,
+      "sheet_nav": 7,
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "width": 390,
+      "height": 1000,
+      "container": 390,
+      "one_opener": true,
+      "keyboard_trap": true,
+      "escape_focus_return": true,
+      "tree_requests": 1,
+      "sheet_nav": 7,
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    }
+  ],
+  "map_revision": "5f619acf7889e72b33f18e2fe18eb82f73bd3f4a",
+  "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "testbed_base": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
+  "rails": "8.0.0",
+  "ruby": "3.3.1",
+  "generation": 3,
+  "device_scale_factor": 1,
+  "scope": "Normally extracted mounted testbed; no injected index states. Native Chrome keyboard input checks are separate from screenshot and axe engineering gates; neither establishes runtime truth or human acceptance. Fonts ready; PNG dimensions equal CSS viewport; original-size text inspected. Subsequent commits affect tests and evidence only."
+}
