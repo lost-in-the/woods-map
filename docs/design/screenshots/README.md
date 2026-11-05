@@ -119,3 +119,5 @@ page before drawing.
 Fonts: the first-run, refused and session-form screenshots predate the vendored
 Inter and Fira Code (woods-map#23) and fall back to the system faces; the
 status and guidelines screenshots use the vendored faces.
+
+| Passage Filter matrix on normally extracted UsersController, fixed action columns and keyboard scrolling | [B8-Passage](../boards/B8-Passage.html), D-17 | left: [1440](passage-matrix-left-1440.png), [960](passage-matrix-left-960.png), [640](passage-matrix-left-640.png), [390](passage-matrix-left-390.png); right: [1440](passage-matrix-right-1440.png), [960](passage-matrix-right-960.png), [640](passage-matrix-right-640.png), [390](passage-matrix-right-390.png); [provenance, geometry, keyboard and axe](passage-matrix-evidence.json) |

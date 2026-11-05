@@ -1,0 +1,692 @@
+{
+  "map_revision": "96de1057d533d19834a246422771b7a2f6a200f4",
+  "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "testbed_base": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
+  "rails": "8.0.0",
+  "ruby": "3.3.1",
+  "generation": 3,
+  "browser": "157.0.8103.38",
+  "device_scale_factor": 1,
+  "content": "Normally extracted UsersController, no synthetic content",
+  "limits": "Engineering verification only; no physical device, human acceptance or 200% zoom proof",
+  "captures": [
+    {
+      "width": 1440,
+      "height": 1000,
+      "files": [
+        "passage-matrix-left-1440.png",
+        "passage-matrix-right-1440.png"
+      ],
+      "headers": [
+        {
+          "text": "filter, owner",
+          "width": 200.359375,
+          "ink_width": 97.515625,
+          "fits": true
+        },
+        {
+          "text": "create",
+          "width": 100.171875,
+          "ink_width": 49.09375,
+          "fits": true
+        },
+        {
+          "text": "destroy",
+          "width": 112.203125,
+          "ink_width": 59.3125,
+          "fits": true
+        },
+        {
+          "text": "edit",
+          "width": 76.125,
+          "ink_width": 29.15625,
+          "fits": true
+        },
+        {
+          "text": "followers",
+          "width": 136.234375,
+          "ink_width": 77.1875,
+          "fits": true
+        },
+        {
+          "text": "following",
+          "width": 136.234375,
+          "ink_width": 75.859375,
+          "fits": true
+        },
+        {
+          "text": "index",
+          "width": 88.15625,
+          "ink_width": 39.109375,
+          "fits": true
+        },
+        {
+          "text": "new",
+          "width": 66.109375,
+          "ink_width": 29.296875,
+          "fits": true
+        },
+        {
+          "text": "show",
+          "width": 76.125,
+          "ink_width": 39.078125,
+          "fits": true
+        },
+        {
+          "text": "update",
+          "width": 100.28125,
+          "ink_width": 50,
+          "fits": true
+        }
+      ],
+      "keyboard": {
+        "focused": false,
+        "scroll_left": 0,
+        "client_width": 1093,
+        "scroll_width": 1093
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".why > .dim"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                "button[aria-label=\"Copy path\"]"
+              ],
+              [
+                "#ps > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                ".flag"
+              ],
+              [
+                "#c4 > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                ".pele-cluster-label"
+              ],
+              [
+                "g[data-id=\"request\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "g[data-id=\"action\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "g[data-id=\"t0\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "g[data-id=\"response\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "span:nth-child(2) > .ar"
+              ],
+              [
+                "span:nth-child(3) > .ar"
+              ],
+              [
+                "#fm > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                "tr:nth-child(1) > .on.c:nth-child(3)"
+              ],
+              [
+                "tr:nth-child(1) > .on.c:nth-child(4)"
+              ],
+              [
+                ".on.c:nth-child(5)"
+              ],
+              [
+                ".on.c:nth-child(6)"
+              ],
+              [
+                ".on.c:nth-child(7)"
+              ],
+              [
+                "tr:nth-child(1) > .on.c:nth-child(10)"
+              ],
+              [
+                ".on.c[title=\"only: edit, update\"]:nth-child(4)"
+              ],
+              [
+                ".on.c[title=\"only: edit, update\"]:nth-child(10)"
+              ],
+              [
+                "td[title=\"only: destroy\"]"
+              ],
+              [
+                "#cl > .info[aria-label=\"Explain\"]"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "width": 960,
+      "height": 1000,
+      "files": [
+        "passage-matrix-left-960.png",
+        "passage-matrix-right-960.png"
+      ],
+      "headers": [
+        {
+          "text": "filter, owner",
+          "width": 200,
+          "ink_width": 97.515625,
+          "fits": true
+        },
+        {
+          "text": "create",
+          "width": 100,
+          "ink_width": 49.09375,
+          "fits": true
+        },
+        {
+          "text": "destroy",
+          "width": 112,
+          "ink_width": 59.3125,
+          "fits": true
+        },
+        {
+          "text": "edit",
+          "width": 76,
+          "ink_width": 29.15625,
+          "fits": true
+        },
+        {
+          "text": "followers",
+          "width": 136,
+          "ink_width": 77.1875,
+          "fits": true
+        },
+        {
+          "text": "following",
+          "width": 136,
+          "ink_width": 75.859375,
+          "fits": true
+        },
+        {
+          "text": "index",
+          "width": 88,
+          "ink_width": 39.109375,
+          "fits": true
+        },
+        {
+          "text": "new",
+          "width": 66,
+          "ink_width": 29.296875,
+          "fits": true
+        },
+        {
+          "text": "show",
+          "width": 76,
+          "ink_width": 39.078125,
+          "fits": true
+        },
+        {
+          "text": "update",
+          "width": 100,
+          "ink_width": 50,
+          "fits": true
+        }
+      ],
+      "keyboard": {
+        "focused": true,
+        "scroll_left": 40,
+        "client_width": 613,
+        "scroll_width": 1091
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".why > .dim"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                "button[aria-label=\"Copy path\"]"
+              ],
+              [
+                "div[aria-label=\"Flags 0: rule\"]"
+              ],
+              [
+                "#ps > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                ".flag"
+              ],
+              [
+                "#c4 > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                ".pele-cluster-label"
+              ],
+              [
+                "g[data-id=\"request\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "g[data-id=\"action\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "g[data-id=\"t0\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "g[data-id=\"response\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "span:nth-child(2) > .ar"
+              ],
+              [
+                "span:nth-child(3) > .ar"
+              ],
+              [
+                "#fm > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                "tr:nth-child(1) > .on.c:nth-child(3)"
+              ],
+              [
+                "tr:nth-child(1) > .on.c:nth-child(4)"
+              ],
+              [
+                ".on.c:nth-child(5)"
+              ],
+              [
+                ".on.c:nth-child(6)"
+              ],
+              [
+                ".on.c:nth-child(7)"
+              ],
+              [
+                "tr:nth-child(1) > .on.c:nth-child(10)"
+              ],
+              [
+                ".on.c[title=\"only: edit, update\"]:nth-child(4)"
+              ],
+              [
+                ".on.c[title=\"only: edit, update\"]:nth-child(10)"
+              ],
+              [
+                "td[title=\"only: destroy\"]"
+              ],
+              [
+                "#cl > .info[aria-label=\"Explain\"]"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "width": 640,
+      "height": 1000,
+      "files": [
+        "passage-matrix-left-640.png",
+        "passage-matrix-right-640.png"
+      ],
+      "headers": [
+        {
+          "text": "filter, owner",
+          "width": 200,
+          "ink_width": 97.515625,
+          "fits": true
+        },
+        {
+          "text": "create",
+          "width": 100,
+          "ink_width": 49.09375,
+          "fits": true
+        },
+        {
+          "text": "destroy",
+          "width": 112,
+          "ink_width": 59.3125,
+          "fits": true
+        },
+        {
+          "text": "edit",
+          "width": 76,
+          "ink_width": 29.15625,
+          "fits": true
+        },
+        {
+          "text": "followers",
+          "width": 136,
+          "ink_width": 77.1875,
+          "fits": true
+        },
+        {
+          "text": "following",
+          "width": 136,
+          "ink_width": 75.859375,
+          "fits": true
+        },
+        {
+          "text": "index",
+          "width": 88,
+          "ink_width": 39.109375,
+          "fits": true
+        },
+        {
+          "text": "new",
+          "width": 66,
+          "ink_width": 29.296875,
+          "fits": true
+        },
+        {
+          "text": "show",
+          "width": 76,
+          "ink_width": 39.078125,
+          "fits": true
+        },
+        {
+          "text": "update",
+          "width": 100,
+          "ink_width": 50,
+          "fits": true
+        }
+      ],
+      "keyboard": {
+        "focused": true,
+        "scroll_left": 40,
+        "client_width": 554,
+        "scroll_width": 1091
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".why > .dim"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                "#ps > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                ".flag"
+              ],
+              [
+                "#c4 > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                ".pele-cluster-label"
+              ],
+              [
+                "g[data-id=\"request\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "g[data-id=\"action\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "g[data-id=\"t0\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "g[data-id=\"response\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "span:nth-child(2) > .ar"
+              ],
+              [
+                "span:nth-child(3) > .ar"
+              ],
+              [
+                "#fm > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                ".on.c:nth-child(5)"
+              ],
+              [
+                ".on.c:nth-child(6)"
+              ],
+              [
+                ".on.c:nth-child(7)"
+              ],
+              [
+                "tr:nth-child(1) > .on.c:nth-child(10)"
+              ],
+              [
+                ".on.c[title=\"only: edit, update\"]:nth-child(10)"
+              ],
+              [
+                "#cl > .info[aria-label=\"Explain\"]"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "width": 390,
+      "height": 1000,
+      "files": [
+        "passage-matrix-left-390.png",
+        "passage-matrix-right-390.png"
+      ],
+      "headers": [
+        {
+          "text": "filter, owner",
+          "width": 200,
+          "ink_width": 97.515625,
+          "fits": true
+        },
+        {
+          "text": "create",
+          "width": 100,
+          "ink_width": 49.09375,
+          "fits": true
+        },
+        {
+          "text": "destroy",
+          "width": 112,
+          "ink_width": 59.3125,
+          "fits": true
+        },
+        {
+          "text": "edit",
+          "width": 76,
+          "ink_width": 29.15625,
+          "fits": true
+        },
+        {
+          "text": "followers",
+          "width": 136,
+          "ink_width": 77.1875,
+          "fits": true
+        },
+        {
+          "text": "following",
+          "width": 136,
+          "ink_width": 75.859375,
+          "fits": true
+        },
+        {
+          "text": "index",
+          "width": 88,
+          "ink_width": 39.109375,
+          "fits": true
+        },
+        {
+          "text": "new",
+          "width": 66,
+          "ink_width": 29.296875,
+          "fits": true
+        },
+        {
+          "text": "show",
+          "width": 76,
+          "ink_width": 39.078125,
+          "fits": true
+        },
+        {
+          "text": "update",
+          "width": 100,
+          "ink_width": 50,
+          "fits": true
+        }
+      ],
+      "keyboard": {
+        "focused": true,
+        "scroll_left": 40,
+        "client_width": 304,
+        "scroll_width": 1091
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "targets": [
+              [
+                "button[aria-label=\"Keyboard shortcuts\"]"
+              ]
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "targets": [
+              [
+                ".menu-toggle"
+              ],
+              [
+                "form > span[aria-hidden=\"true\"]:nth-child(1)"
+              ],
+              [
+                ".why > .dim"
+              ],
+              [
+                ".files > span[aria-hidden=\"true\"]"
+              ],
+              [
+                ".tab:nth-child(5)"
+              ],
+              [
+                ".tab:nth-child(5) > .cnt"
+              ],
+              [
+                ".tab:nth-child(6)"
+              ],
+              [
+                ".tab:nth-child(6) > .cnt"
+              ],
+              [
+                ".ctx-path"
+              ],
+              [
+                ".ctx-top"
+              ],
+              [
+                "#ps > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                ".flag"
+              ],
+              [
+                "#c4 > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                ".pele-cluster-label"
+              ],
+              [
+                "g[data-id=\"request\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "g[data-id=\"action\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "g[data-id=\"t0\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "g[data-id=\"response\"] > .pele-label[x=\"0\"][y=\"4.38\"]"
+              ],
+              [
+                "span:nth-child(2) > .ar"
+              ],
+              [
+                "span:nth-child(3) > .ar"
+              ],
+              [
+                "#fm > .info[aria-label=\"Explain\"]"
+              ],
+              [
+                ".on.c:nth-child(7)"
+              ],
+              [
+                "tr:nth-child(1) > .on.c:nth-child(10)"
+              ],
+              [
+                ".on.c[title=\"only: edit, update\"]:nth-child(10)"
+              ],
+              [
+                "#cl > .info[aria-label=\"Explain\"]"
+              ]
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
