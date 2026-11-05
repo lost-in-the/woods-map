@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# CI environment preparation, not a replacement for any browser-spec deadline.
+artifacts=tmp/browser-failures
+mkdir -p "$artifacts"
+profile=$(mktemp -d)
+trap 'rm -rf -- "$profile"' EXIT
+started=$(date +%s%3N)
+status=0
+timeout --kill-after=5s 45s "$WOODS_MAP_BROWSER" --headless --disable-gpu \
+  --disable-background-networking --no-first-run --user-data-dir="$profile" \
+  --dump-dom about:blank > "$artifacts/preflight.html" 2> "$artifacts/preflight.log" || status=$?
+chrome_status=$status
+if [[ $status -eq 0 ]] && ! grep -qi '<html' "$artifacts/preflight.html"; then
+  status=65
+fi
+elapsed=$(( $(date +%s%3N) - started ))
+printf 'chrome_status=%s preflight_status=%s preflight_elapsed_ms=%s\n' \
+  "$chrome_status" "$status" "$elapsed" | tee -a "$artifacts/runtime.txt"
+exit "$status"

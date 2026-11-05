@@ -6,6 +6,11 @@ require_relative 'browser_process_snapshot'
 module WoodsMap
   # Failure-only observations around the unchanged session lifecycle.
   module BrowserSessionDiagnostics
+    # @return [Integer] process-local ordinal of this isolated browser launch
+    def self.next_launch_ordinal
+      @launch_ordinal = (@launch_ordinal || 0) + 1
+    end
+
     # Capture while this session still owns its live process and open pipes.
     # @return [void]
     def capture_failure
@@ -22,7 +27,8 @@ module WoodsMap
     # @return [void]
     def retain_failure(directory, error)
       BrowserFailure.save(directory, error, { command: @last_command, events: @events.last(50),
-                                              timing: @timing, live: @live, buffered_bytes: @buffer.bytesize })
+                                              timing: @timing, live: @live, launch_ordinal: @timing[:launch_ordinal],
+                                              buffered_bytes: @buffer.bytesize })
     end
 
     private

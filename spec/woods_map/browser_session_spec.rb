@@ -32,7 +32,8 @@ RSpec.describe WoodsMap::BrowserSession do
       saved = Dir.glob(File.join(root, '*')).first
       expect(File.read(File.join(saved, 'page.html'))).to include('result')
       details = JSON.parse(File.read(File.join(saved, 'failure.json')))
-      expect(details).to include('command' => 'Runtime.evaluate', 'error' => 'RuntimeError')
+      expect(details).to include('command' => 'Runtime.evaluate', 'error' => 'RuntimeError',
+                                 'launch_ordinal' => be_positive)
       expect(details.fetch('live')).to include('alive' => true, 'pid' => be_positive)
       expect(details.fetch('live').fetch('pipes').values).to all(include('closed' => false))
       times = details.fetch('timing')

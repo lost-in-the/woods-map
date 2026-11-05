@@ -53,7 +53,7 @@ module WoodsMap
 
     # @param directory [String] temporary fixture, profile and diagnostic directory
     def initialize(directory)
-      @timing = {}
+      @timing = { launch_ordinal: BrowserSessionDiagnostics.next_launch_ordinal }
       @command_reader, @commands = IO.pipe
       @replies, @reply_writer = IO.pipe
       @log = File.open(File.join(directory, 'chromium.log'), 'w+')
