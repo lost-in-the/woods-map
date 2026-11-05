@@ -1,0 +1,344 @@
+{
+  "map_code_revision": "11d152dddc0c7b91ab3e89db0a9dd9d7823ddede",
+  "base": "8170cf3b45258056127352c6811587a08dc56341",
+  "woods": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
+  "testbed_probe": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
+  "testbed_base": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
+  "rails": "8.0.0",
+  "ruby": "3.3.1",
+  "chrome": "157.0.8103.38",
+  "device_scale_factor": 1,
+  "height": 1000,
+  "fonts": "document.fonts.ready awaited; native unscaled PNGs visually inspected",
+  "index": "Normally extracted generation 3; no injected index content in captures. One published commit.",
+  "before": [
+    {
+      "width": 1440,
+      "file": "history-wds150-before-1440.png",
+      "geometry": {
+        "labels": [
+          {
+            "text": "Oct 2025",
+            "left": 414.328125,
+            "right": 468.484375
+          },
+          {
+            "text": "Jan 2026",
+            "left": 557.3504638671875,
+            "right": 611.5067138671875
+          },
+          {
+            "text": "Apr",
+            "left": 819.9403076171875,
+            "right": 840.2528076171875
+          },
+          {
+            "text": "Jul",
+            "left": 1065.6082763671875,
+            "right": 1085.9207763671875
+          },
+          {
+            "text": "Oct",
+            "left": 1311.2762451171875,
+            "right": 1331.5887451171875
+          },
+          {
+            "text": "Nov 2026",
+            "left": 1342.84375,
+            "right": 1397
+          }
+        ],
+        "overlaps": []
+      },
+      "axe": null
+    },
+    {
+      "width": 960,
+      "file": "history-wds150-before-960.png",
+      "geometry": {
+        "labels": [
+          {
+            "text": "Oct 2025",
+            "left": 414.328125,
+            "right": 468.484375
+          },
+          {
+            "text": "Jan 2026",
+            "left": 474.26251220703125,
+            "right": 528.4187622070312
+          },
+          {
+            "text": "Apr",
+            "left": 616.8523559570312,
+            "right": 637.1648559570312
+          },
+          {
+            "text": "Jul",
+            "left": 742.5203247070312,
+            "right": 762.8328247070312
+          },
+          {
+            "text": "Oct",
+            "left": 868.1882934570312,
+            "right": 888.5007934570312
+          },
+          {
+            "text": "Nov 2026",
+            "left": 862.84375,
+            "right": 917
+          }
+        ],
+        "overlaps": [
+          [
+            "Oct",
+            "Nov 2026"
+          ]
+        ]
+      },
+      "axe": null
+    },
+    {
+      "width": 640,
+      "file": "history-wds150-before-640.png",
+      "geometry": {
+        "labels": [
+          {
+            "text": "Oct 2025",
+            "left": 388.328125,
+            "right": 442.484375
+          },
+          {
+            "text": "Jan 2026",
+            "left": 418.37298583984375,
+            "right": 472.52923583984375
+          },
+          {
+            "text": "Apr",
+            "left": 517.7948608398438,
+            "right": 538.1073608398438
+          },
+          {
+            "text": "Jul",
+            "left": 600.2948608398438,
+            "right": 620.6073608398438
+          },
+          {
+            "text": "Oct",
+            "left": 682.7948608398438,
+            "right": 703.1073608398438
+          },
+          {
+            "text": "Nov 2026",
+            "left": 664.171875,
+            "right": 718.328125
+          }
+        ],
+        "overlaps": [
+          [
+            "Oct 2025",
+            "Jan 2026"
+          ],
+          [
+            "Oct",
+            "Nov 2026"
+          ]
+        ]
+      },
+      "axe": null
+    },
+    {
+      "width": 390,
+      "file": "history-wds150-before-390.png",
+      "geometry": {
+        "labels": [
+          {
+            "text": "Oct 2025",
+            "left": 185,
+            "right": 239.15625
+          },
+          {
+            "text": "Jan 2026",
+            "left": 190.46466064453125,
+            "right": 244.62091064453125
+          },
+          {
+            "text": "Apr",
+            "left": 254.3865509033203,
+            "right": 274.69903564453125
+          },
+          {
+            "text": "Jul",
+            "left": 301.38653564453125,
+            "right": 321.69903564453125
+          },
+          {
+            "text": "Oct",
+            "left": 348.38653564453125,
+            "right": 368.69903564453125
+          },
+          {
+            "text": "Nov 2026",
+            "left": 318.84375,
+            "right": 373
+          }
+        ],
+        "overlaps": [
+          [
+            "Oct 2025",
+            "Jan 2026"
+          ],
+          [
+            "Jul",
+            "Nov 2026"
+          ],
+          [
+            "Oct",
+            "Nov 2026"
+          ]
+        ]
+      },
+      "axe": null
+    }
+  ],
+  "after": [
+    {
+      "width": 1440,
+      "file": "history-wds150-after-1440.png",
+      "geometry": {
+        "labels": [
+          {
+            "text": "Oct 2025",
+            "left": 414.328125,
+            "right": 468.484375
+          },
+          {
+            "text": "Jan 2026",
+            "left": 557.3504638671875,
+            "right": 611.5067138671875
+          },
+          {
+            "text": "Apr",
+            "left": 819.9403076171875,
+            "right": 840.2528076171875
+          },
+          {
+            "text": "Jul",
+            "left": 1065.6082763671875,
+            "right": 1085.9207763671875
+          },
+          {
+            "text": "Nov 2026",
+            "left": 1342.84375,
+            "right": 1397
+          }
+        ],
+        "overlaps": []
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "width": 960,
+      "file": "history-wds150-after-960.png",
+      "geometry": {
+        "labels": [
+          {
+            "text": "Oct 2025",
+            "left": 414.328125,
+            "right": 468.484375
+          },
+          {
+            "text": "Apr",
+            "left": 616.8523559570312,
+            "right": 637.1648559570312
+          },
+          {
+            "text": "Jul",
+            "left": 742.5203247070312,
+            "right": 762.8328247070312
+          },
+          {
+            "text": "Nov 2026",
+            "left": 862.84375,
+            "right": 917
+          }
+        ],
+        "overlaps": []
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "width": 640,
+      "file": "history-wds150-after-640.png",
+      "geometry": {
+        "labels": [
+          {
+            "text": "Oct 2025",
+            "left": 388.328125,
+            "right": 442.484375
+          },
+          {
+            "text": "Apr",
+            "left": 517.7948608398438,
+            "right": 538.1073608398438
+          },
+          {
+            "text": "Jul",
+            "left": 600.2948608398438,
+            "right": 620.6073608398438
+          },
+          {
+            "text": "Nov 2026",
+            "left": 664.171875,
+            "right": 718.328125
+          }
+        ],
+        "overlaps": []
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    },
+    {
+      "width": 390,
+      "file": "history-wds150-after-390.png",
+      "geometry": {
+        "labels": [
+          {
+            "text": "Oct 2025",
+            "left": 185,
+            "right": 239.15625
+          },
+          {
+            "text": "Apr",
+            "left": 254.3865509033203,
+            "right": 274.69903564453125
+          },
+          {
+            "text": "Nov 2026",
+            "left": 318.84375,
+            "right": 373
+          }
+        ],
+        "overlaps": []
+      },
+      "axe": {
+        "version": "4.10.3",
+        "violations": []
+      }
+    }
+  ],
+  "synthetic_span": "Separate BrowserPage request fixture using shipped fixture index, three ApplicationJob commits in distinct buckets. Shift+Right across buckets then Enter; captured span URL served through request stack and all three commits retained. Dispatched keyboard events; not native UI-input or human acceptance.",
+  "limits": "No physical/human input or 200% browser zoom claim. At 640 the existing timeline horizontal scroller remains; right capture shows endpoint. Preview unavailable.",
+  "checks": {
+    "suite": "1419 examples, 0 failures, 138 pending",
+    "focused_browser": "5 examples, 0 failures",
+    "lint": "known schema_view.rb:117 redundant Rails/CompactBlank disable only"
+  }
+}
