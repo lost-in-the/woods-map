@@ -17,6 +17,8 @@ module WoodsMap
     # @param reach [Hash{String => Array}] label => [process, via, hop, caller label], filled in
     def map_operations(operations, label, process, reach)
       each_operation(operations) do |op|
+        next if op.key?(:ambiguous_candidates)
+
         case op[:type]&.to_sym
         when :async
           target = op[:target].to_s
@@ -28,8 +30,6 @@ module WoodsMap
     end
 
     def map_call(operation, label, process, reach)
-      return if operation.key?(:ambiguous_candidates)
-
       if operation[:mailer_action]
         later = LATER.include?(operation[:method].to_s)
         start_process(reach, [operation[:mailer_action]], [later ? process + 1 : process, :delivery, later],
