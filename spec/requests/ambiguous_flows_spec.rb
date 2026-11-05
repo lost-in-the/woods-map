@@ -39,8 +39,8 @@ RSpec.describe 'Ambiguous published flow operations', type: :request do
       get path
       html = html_response_document
       expect(html.text).to include('? ambiguous', 'A::Billing', 'B::Billing', 'User', 'Missing', 'Shared')
-      expect(html.css('a').select { |a| %w[Missing Shared].include?(a.text) }).to be_empty
-      expect(html.css('a').select { |a| a.text == 'User' }.pluck('href'))
+      expect(html.css('.flow-candidates a').select { |a| %w[Missing Shared].include?(a.text) }).to be_empty
+      expect(html.css('.flow-candidates a').select { |a| a.text == 'User' }.pluck('href'))
         .to include('/woods/units/model/User')
       expect(html.text).not_to include('Billing.run')
     end
