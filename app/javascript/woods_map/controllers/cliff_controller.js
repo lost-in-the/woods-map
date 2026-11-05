@@ -33,6 +33,12 @@ export default class extends Controller {
     const overflow = el.scrollWidth - el.clientWidth
     el.classList.toggle("more", overflow > 1 && el.scrollLeft < overflow - 1)
     el.classList.toggle("more-left", el.scrollLeft > 1)
+    // Keep optional value guidance truthful as content and its container resize.
+    const label = el.dataset.cliffScrollLabel
+    if (label) {
+      el.setAttribute("aria-label", label + (overflow > 1 ? "; scroll horizontally within this value" : ""))
+      el.classList.add("cliff-ready")
+    }
     // A region that scrolls must be reachable with the keyboard.
     if (overflow > 1 || el.scrollHeight - el.clientHeight > 1) el.setAttribute("tabindex", "0")
     else el.removeAttribute("tabindex")
