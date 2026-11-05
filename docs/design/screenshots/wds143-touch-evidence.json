@@ -1,5 +1,5 @@
 {
-  "map_revision": "5dc2263a1259a7afbba1b4a6bd2e0cd9207a29c5",
+  "map_revision": "c547ca4a61425f7ed98cc14e06027aac2800373d",
   "browser": "157.0.8103.38",
   "phase": "Separate engineering touch input/scroll geometry gate; not physical-device or human acceptance",
   "results": [
@@ -26,7 +26,7 @@
         "extent": 1116
       },
       "after": {
-        "left": 285,
+        "left": 293,
         "width": 655,
         "extent": 1116
       }
@@ -40,7 +40,7 @@
         "extent": 1116
       },
       "after": {
-        "left": 320,
+        "left": 322,
         "width": 622,
         "extent": 1116
       }

@@ -1,5 +1,5 @@
 {
-  "map": "5dc2263a1259a7afbba1b4a6bd2e0cd9207a29c5",
+  "map": "c547ca4a61425f7ed98cc14e06027aac2800373d",
   "woods": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
   "testbed": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
   "rails": "8.0.0",
@@ -157,7 +157,7 @@
     },
     {
       "width": 640,
-      "keyboard": 91,
+      "keyboard": 92,
       "states": [
         {
           "file": "code-640-left.png",

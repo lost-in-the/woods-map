@@ -124,7 +124,7 @@ status and guidelines screenshots use the vendored faces.
 ### WDS-143 highlighted sticky gutters
 
 [B8-Code](../boards/B8-Code.html), amended by D-24. Normal extracted generation 3,
-User as-written `#L103`. Map code revision `5dc2263a1259a7afbba1b4a6bd2e0cd9207a29c5`;
+User as-written `#L103`. Map code revision `c547ca4a61425f7ed98cc14e06027aac2800373d`;
 Woods `237ca7c547555437cd5d596b9a5c1d1d963cfa71`; testbed
 `c6dc2c2e14fc857f0c9b12883434a5a548dd0af2`, Rails 8.0.0/Ruby 3.3.1.
 No injected index states. Native 1x PNGs, fonts loaded, 1000px height.
