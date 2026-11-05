@@ -40,7 +40,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.4'
+          ruby-version: '4.0'
           bundler-cache: true
       # The specs pass no sandbox flag and the runner's user namespaces are
       # restricted, so they get Chrome through a wrapper (see AGENTS.md).
@@ -94,6 +94,6 @@ jobs:
       - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.4'
+          ruby-version: '4.0'
           bundler-cache: true
       - run: bundle exec rubocop
