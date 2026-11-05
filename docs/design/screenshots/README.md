@@ -119,3 +119,5 @@ page before drawing.
 Fonts: the first-run, refused and session-form screenshots predate the vendored
 Inter and Fira Code (woods-map#23) and fall back to the system faces; the
 status and guidelines screenshots use the vendored faces.
+
+| WDS-148: ERD, Impact, Code and wrapped Code, all four widths | B6-ERD, B8-Impact-Changed, B8-Code, B8-Widths; D-19/D-24 | [Native captures, geometry and axe evidence](wds148/README.md) |
