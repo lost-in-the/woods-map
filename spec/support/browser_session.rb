@@ -6,13 +6,15 @@ require 'io/nonblock'
 require 'tmpdir'
 require 'timeout'
 require 'uri'
-require_relative 'browser_failure'
+require_relative 'browser_session_diagnostics'
 
 module WoodsMap
   # Runs frame- and focus-sensitive fixtures in real time. Chromium's virtual-time
   # DOM dump can advance timers before a frame or native focus event is delivered.
   # The DevTools pipe needs neither a listening port nor a browser-driver gem.
   class BrowserSession
+    include BrowserSessionDiagnostics
+
     RESULT = <<~JS
       new Promise((resolve) => {
         const read = () => {
@@ -40,6 +42,7 @@ module WoodsMap
           session.result(url, result_timeout, viewport: viewport)
         rescue StandardError => e
           failure = e
+          session.capture_failure
           raise
         ensure
           session.close
@@ -50,16 +53,19 @@ module WoodsMap
 
     # @param directory [String] temporary fixture, profile and diagnostic directory
     def initialize(directory)
+      @timing = { launch_ordinal: BrowserSessionDiagnostics.next_launch_ordinal }
       @command_reader, @commands = IO.pipe
       @replies, @reply_writer = IO.pipe
       @log = File.open(File.join(directory, 'chromium.log'), 'w+')
       # Ruby creates nonblocking pipes; Chromium treats EAGAIN as a closed pipe.
       @command_reader.nonblock = false
       @reply_writer.nonblock = false
+      @timing[:spawn_start] = clock
       @pid = Process.spawn(ENV.fetch('WOODS_MAP_BROWSER'), '--headless', '--disable-gpu',
                            '--disable-background-networking', '--no-first-run', '--remote-debugging-pipe',
                            "--user-data-dir=#{File.join(directory, 'profile')}",
                            3 => @command_reader, 4 => @reply_writer, out: @log, err: @log, pgroup: true)
+      @timing[:spawn_end] = clock
       @command_reader.close
       @reply_writer.close
       @buffer = +''
@@ -98,6 +104,7 @@ module WoodsMap
     # Close the pipes and reap only this session's isolated browser process group.
     # @return [void]
     def close
+      @timing[:cleanup_start] = clock
       @commands.close unless @commands.closed?
       terminate('TERM')
       Timeout.timeout(2) { Process.wait(@pid) }
@@ -108,40 +115,25 @@ module WoodsMap
       Process.wait(@pid)
     ensure
       close_pipes
-    end
-
-    # @param directory [String] temporary fixture and closed browser log directory
-    # @param error [StandardError] original session failure
-    # @return [void]
-    def retain_failure(directory, error)
-      BrowserFailure.save(directory, error, { command: @last_command, events: @events.last(50) })
+      @timing[:cleanup_end] = clock
     end
 
     private
-
-    def close_pipes
-      [@command_reader, @commands, @replies, @reply_writer, @log].compact.each do |io|
-        io.close unless io.closed?
-      end
-    end
-
-    def terminate(signal)
-      Process.kill(signal, -@pid)
-    rescue Errno::ESRCH
-      nil
-    end
 
     def command(method, params = {}, timeout: 10)
       @last_command = method
       id = @sequence += 1
       message = { id: id, method: method, params: params }
       message[:sessionId] = @session if @session
+      @timing.delete(:command_reply)
+      @timing[:command_send] = clock
       @commands.write("#{JSON.generate(message)}\0")
       @commands.flush
       deadline = clock + timeout
       loop do
         reply = receive(deadline)
         if reply['id'] == id
+          @timing[:command_reply] = clock
           raise "DevTools #{method} failed: #{reply['error']}" if reply['error']
 
           return reply.fetch('result')
@@ -179,6 +171,7 @@ module WoodsMap
         end
 
         @buffer << @replies.readpartial(65_536)
+        @timing[:first_byte] ||= clock
       end
     rescue EOFError
       @log.rewind
