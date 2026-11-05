@@ -6,6 +6,7 @@ require 'io/nonblock'
 require 'tmpdir'
 require 'timeout'
 require 'uri'
+require_relative 'browser_failure'
 
 module WoodsMap
   # Runs frame- and focus-sensitive fixtures in real time. Chromium's virtual-time
@@ -37,8 +38,12 @@ module WoodsMap
         begin
           url = "file://#{URI::DEFAULT_PARSER.escape(fixture)}#{fragment}"
           session.result(url, result_timeout, viewport: viewport)
+        rescue StandardError => e
+          failure = e
+          raise
         ensure
           session.close
+          session.retain_failure(directory, failure) if failure
         end
       end
     end
@@ -105,6 +110,13 @@ module WoodsMap
       close_pipes
     end
 
+    # @param directory [String] temporary fixture and closed browser log directory
+    # @param error [StandardError] original session failure
+    # @return [void]
+    def retain_failure(directory, error)
+      BrowserFailure.save(directory, error, { command: @last_command, events: @events.last(50) })
+    end
+
     private
 
     def close_pipes
@@ -120,6 +132,7 @@ module WoodsMap
     end
 
     def command(method, params = {}, timeout: 10)
+      @last_command = method
       id = @sequence += 1
       message = { id: id, method: method, params: params }
       message[:sessionId] = @session if @session
