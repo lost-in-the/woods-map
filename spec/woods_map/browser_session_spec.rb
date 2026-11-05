@@ -22,6 +22,29 @@ RSpec.describe WoodsMap::BrowserSession do
       .to raise_error(RuntimeError, /wall-time deadline/)
   end
 
+  it 'retains timeout evidence after cleanup without changing the deadline failure' do
+    Dir.mktmpdir do |root|
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with('WOODS_MAP_BROWSER_ARTIFACTS', nil).and_return(root)
+      expect { described_class.run('<pre id="result"></pre>', result_timeout: 0.1) }
+        .to raise_error(RuntimeError, /wall-time deadline/)
+      expect(Dir.children(root).size).to eq(1)
+      saved = Dir.glob(File.join(root, '*')).first
+      expect(File.read(File.join(saved, 'page.html'))).to include('result')
+      expect(JSON.parse(File.read(File.join(saved, 'failure.json'))))
+        .to include('command' => 'Runtime.evaluate', 'error' => 'RuntimeError')
+    end
+  end
+
+  it 'does not retain successful sessions when collection is enabled' do
+    Dir.mktmpdir do |root|
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with('WOODS_MAP_BROWSER_ARTIFACTS', nil).and_return(root)
+      expect(described_class.run('<pre id="result">{"ok":true}</pre>')).to eq('ok' => true)
+      expect(Dir.children(root)).to be_empty
+    end
+  end
+
   it 'closes its pipes and log when the browser cannot start' do
     opened = []
     allow(IO).to(receive(:pipe).and_wrap_original { |method| method.call.tap { |ends| opened.concat(ends) } })

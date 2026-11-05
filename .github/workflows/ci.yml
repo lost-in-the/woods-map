@@ -55,6 +55,15 @@ jobs:
       - run: bundle exec rspec $(grep -rl --include='*_spec.rb' WOODS_MAP_BROWSER spec | sort)
         env:
           WOODS_MAP_RENDER_SPEC: '1'
+          WOODS_MAP_BROWSER_ARTIFACTS: tmp/browser-failures
+      - name: Upload browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-failures-${{ github.run_attempt }}
+          path: tmp/browser-failures
+          if-no-files-found: ignore
+          retention-days: 7
   lint:
     name: RuboCop
     runs-on: ubuntu-latest
