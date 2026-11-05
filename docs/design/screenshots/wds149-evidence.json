@@ -90,8 +90,8 @@
       }
     }
   ],
-  "map_revision": "fa00013dff7294373e157187971946cdd6624f33",
-  "base_revision": "a54ad0a4d91f03c8b86aad1a126be35c45323179",
+  "map_revision": "f0577578e6779bf01ca931876df23d4a64c4801f",
+  "base_revision": "fdefd1c4fbf43289122ab2fb6ba986bb168dc601",
   "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
   "testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
   "testbed_base": "e6c2fdd218b15537d4e962597c2e01628f3b325e",
@@ -104,7 +104,7 @@
   "fonts": "document.fonts.ready awaited; native unscaled screenshots inspected",
   "acceptance": "Engineering input/geometry/axe evidence. Independent reader found pointer hint helpful; isolated keyboard discoverability remains unestablished. Not human/physical-device/200% zoom acceptance.",
   "touch": {
-    "map_revision": "fa00013dff7294373e157187971946cdd6624f33",
+    "map_revision": "f0577578e6779bf01ca931876df23d4a64c4801f",
     "browser": "157.0.8103.38",
     "viewport": [
       390,
