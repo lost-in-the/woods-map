@@ -39,6 +39,15 @@ RSpec.describe 'The files sheet', type: :request do
     expect(html_response_document.css('a.f')).to be_empty
   end
 
+  it 'offers one named sheet opener in the bar while preserving breadcrumb navigation' do
+    get '/woods/units/model/User'
+    openers = html_response_document.css('[data-action~="sheet#open"]')
+    expect(openers.size).to eq(1)
+    expect(openers.first['aria-label']).to eq('Files and sections')
+    expect(openers.first.ancestors.any? { |node| node['class'].to_s.split.include?('bar') }).to be(true)
+    expect(html_response_document.css('.crumbs a').pluck('href')).to include('/woods/units')
+  end
+
   it 'serves the tree once per generation without framework or gem source' do
     generated_index
     get '/woods/tree', params: { gen: 1 }
