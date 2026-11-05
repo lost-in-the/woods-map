@@ -1,12 +1,16 @@
 # frozen_string_literal: true
 
+require_relative 'trail_operation_flags'
+
 module WoodsMap
   # Derived flags of the Trail (C-2, notes/trail.md): facts the generation
   # publishes, each flag naming its evidence. A flag whose fact is absent is
   # a limit naming the W-item that adds it, never a guess.
   class TrailFlags
+    include TrailOperationFlags
+
     # One flag on a typed unit; +line+ and +file+ when an operation has them.
-    Flag = Struct.new(:identity, :severity, :rule, :text, :evidence, :file, :line, keyword_init: true)
+    Flag = Struct.new(:identity, :severity, :rule, :text, :evidence, :file, :line, :candidates, keyword_init: true)
 
     RULES = {
       retry: 'no retry_on or discard_on',
@@ -14,6 +18,7 @@ module WoodsMap
       conditional_callback: 'conditional callback',
       no_else: 'if without else',
       dynamic: 'dynamic dispatch',
+      ambiguous: 'ambiguous call',
       cross_db: 'cross-database association',
       hub: 'hub',
       ivar: 'template reads an unassigned ivar'
@@ -110,23 +115,6 @@ module WoodsMap
         flag([step.unit, 'model'], :conditional_callback, "#{op[:callback]} #{op[:method]} runs only #{text}",
              'conditions on the published callback')
       end
-    end
-
-    def operation_flags(step)
-      flags = []
-      each_operation(step.operations) do |op|
-        case op[:type]&.to_sym
-        when :conditional
-          if op[:kind].to_s == 'if' && Array(op[:else_ops]).empty?
-            flags << flag(step.identity, :no_else, "if #{op[:condition]} has no else operations",
-                          'flow conditional', op)
-          end
-        when :dynamic_dispatch
-          flags << flag(step.identity, :dynamic, "#{op[:target]}.#{op[:method]}: the target is not resolved",
-                        'flow dynamic_dispatch', op)
-        end
-      end
-      flags
     end
 
     def template_flags(step)

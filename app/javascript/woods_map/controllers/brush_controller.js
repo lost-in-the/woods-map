@@ -8,6 +8,19 @@ import { Controller } from "@hotwired/stimulus"
 // attribute, CSP); an aria-live line says what is selected.
 export default class extends Controller {
   connect() {
+    this.axis = this.element.matches(".tl-plot") && this.element.querySelector(".strip-axis")
+    if (this.axis) {
+      this.fitAxis = this.fitAxis.bind(this)
+      if (typeof ResizeObserver !== "undefined") {
+        this.axisObserver = new ResizeObserver(this.fitAxis)
+        this.axisObserver.observe(this.axis)
+      }
+      window.addEventListener("resize", this.fitAxis)
+      this.fitAxis()
+      if (document.fonts) document.fonts.ready.then(() => {
+        if (this.element.isConnected) this.fitAxis()
+      })
+    }
     this.buckets = JSON.parse(this.element.dataset.brushBuckets || "[]")
     this.svg = this.element.querySelector("svg")
     this.band = this.element.querySelector("[data-brush-band]")
@@ -30,12 +43,31 @@ export default class extends Controller {
   }
 
   disconnect() {
+    if (this.axisObserver) this.axisObserver.disconnect()
+    if (this.axis) window.removeEventListener("resize", this.fitAxis)
     if (!this.svg) return
     this.svg.removeEventListener("pointerdown", this.onDown)
     this.svg.removeEventListener("pointermove", this.onMove)
     this.svg.removeEventListener("pointerup", this.onUp)
     this.svg.removeEventListener("click", this.onClick, true)
     this.element.removeEventListener("keydown", this.onKey)
+  }
+
+  // Keep endpoint dates, then admit interior ticks only where their measured
+  // ink fits. Visibility preserves SVG geometry for the next resize/font pass.
+  fitAxis() {
+    const labels = [...this.axis.querySelectorAll("text")]
+    labels.forEach(label => label.setAttribute("visibility", "visible"))
+    if (labels.length < 2) return
+    const gap = parseFloat(getComputedStyle(this.axis).fontSize) || 11
+    let right = labels[0].getBoundingClientRect().right
+    const end = labels[labels.length - 1].getBoundingClientRect().left
+    labels.slice(1, -1).forEach(label => {
+      const box = label.getBoundingClientRect()
+      const fits = box.left >= right + gap && box.right <= end - gap
+      label.setAttribute("visibility", fits ? "visible" : "hidden")
+      if (fits) right = box.right
+    })
   }
 
   // The bucket under a pointer, by its share of the plot's width.

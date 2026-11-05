@@ -187,7 +187,7 @@
         <p class="cap matrix-tools" data-needs-js><button class="tool" type="button" aria-pressed="false" data-matrix-target="toggle" data-action="matrix#toggle">only filters on <%= p.action %></button> <span role="status" data-matrix-target="status"></span></p>
         <div class="tblwrap" role="region" aria-label="Filter matrix" tabindex="0" data-controller="cliff">
           <table class="tbl matrix fixed fit" aria-label="Filter matrix">
-            <thead><tr><th width="200"><%= resolved ? 'filter, owner' : 'filter, declared in' %></th><% p.actions.each do |a| %><th class="c<%= ' cur' if a == p.action %>" width="66"><%= a %></th><% end %></tr></thead>
+            <thead><tr><th width="200"><%= resolved ? 'filter, owner' : 'filter, declared in' %></th><% p.actions.each do |a| %><th class="c<%= ' cur' if a == p.action %>" width="<%= passage_action_width(a) %>"><%= a %></th><% end %></tr></thead>
             <tbody>
               <% p.filters.each do |f| %>
                 <% cell_title = resolved ? [f.condition, (f.scope == 'every action' ? nil : f.scope)].compact.join('; ').presence : nil %>

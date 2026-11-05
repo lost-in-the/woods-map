@@ -32,7 +32,7 @@ module WoodsMap
     Step = Struct.new(:identifier, :type, :label, :distance, :lines, :cycle, :linkable, keyword_init: true)
 
     # One operation line under a step, already bounded.
-    Line = Struct.new(:depth, :kind, :text, :mech, keyword_init: true)
+    Line = Struct.new(:depth, :kind, :text, :mech, :candidates, keyword_init: true)
 
     # Line kinds by flow operation type; anything else is :other.
     KINDS = { 'call' => :call, 'conditional' => :branch, 'response' => :response }.freeze
@@ -141,6 +141,8 @@ module WoodsMap
         shown << Line.new(depth: 0, kind: :framework, text: "#{framework} untargeted calls",
                           mech: 'framework or dynamic, not shown')
       end
+      ambiguous = all.count(&:candidates)
+      shown << Line.new(depth: 0, kind: :framework, text: "#{ambiguous} ambiguous steps") if ambiguous.positive?
       shown
     end
 
@@ -151,16 +153,24 @@ module WoodsMap
     end
 
     def flatten_one(operation, depth, out)
-      return 1 if operation['type'] == 'call' && operation['target'].to_s.empty?
+      return 1 if untargeted?(operation)
 
-      out << Line.new(depth: depth, kind: KINDS.fetch(operation['type'], :other), text: operation_text(operation),
+      candidates = operation['ambiguous_candidates'] if operation.key?('ambiguous_candidates')
+      out << Line.new(candidates: candidates, depth: depth, kind: KINDS.fetch(operation['type'], :other),
+                      text: operation_text(operation),
                       mech: line_of(operation))
       return 0 unless operation['type'] == 'conditional'
 
       flatten(Array(operation['then_ops']), depth + 1, out) + flatten(Array(operation['else_ops']), depth + 1, out)
     end
 
+    def untargeted?(operation)
+      operation['type'] == 'call' && operation['target'].to_s.empty? && !operation.key?('ambiguous_candidates')
+    end
+
     def operation_text(operation)
+      return "? ambiguous call .#{operation['method']}" if operation.key?('ambiguous_candidates')
+
       case operation['type']
       when 'call' then "#{operation['target']}.#{operation['method']}"
       when 'conditional' then "#{operation['kind'] || 'if'} #{operation['condition']}".strip
