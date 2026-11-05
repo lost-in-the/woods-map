@@ -124,7 +124,7 @@ status and guidelines screenshots use the vendored faces.
 ### WDS-143 highlighted sticky gutters
 
 [B8-Code](../boards/B8-Code.html), amended by D-24. Normal extracted generation 3,
-User as-written `#L103`. Map code revision `1259b885e7bba4929d1db7797e2891a07ca37f2c`;
+User as-written `#L103`. Map code revision `5dc2263a1259a7afbba1b4a6bd2e0cd9207a29c5`;
 Woods `237ca7c547555437cd5d596b9a5c1d1d963cfa71`; testbed
 `c6dc2c2e14fc857f0c9b12883434a5a548dd0af2`, Rails 8.0.0/Ruby 3.3.1.
 No injected index states. Native 1x PNGs, fonts loaded, 1000px height.
@@ -144,7 +144,7 @@ bottom divider; no boundary redesign is included. Automated input/screenshots an
 axe/geometry checks are separate evidence, not human acceptance or runtime truth.
 Real-device touch, zoom, light theme and effective-lens acceptance remain untested.
 
-Parent follow-up on the same WDS-143 runtime revision: emulated native browser touch swipes move the sole Code scroll region at 960/640/390; 1440 fits without horizontal overflow. [Touch receipt](wds143-touch-evidence.json), [390px capture](wds143-touch-390.png). This is a separate engineering input/geometry check, not physical-device, zoom or human acceptance.
+Parent follow-up refreshed on the same merged runtime revision: emulated native browser touch swipes move the sole Code scroll region at 960/640/390; 1440 fits without horizontal overflow. [Touch receipt](wds143-touch-evidence.json), [390px capture](wds143-touch-390.png). This is a separate engineering input/geometry check, not physical-device, zoom or human acceptance.
 
 | State | Board | Evidence |
 |---|---|---|

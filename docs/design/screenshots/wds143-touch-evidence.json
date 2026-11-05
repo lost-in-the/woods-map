@@ -1,5 +1,5 @@
 {
-  "map_revision": "1259b885e7bba4929d1db7797e2891a07ca37f2c",
+  "map_revision": "5dc2263a1259a7afbba1b4a6bd2e0cd9207a29c5",
   "browser": "157.0.8103.38",
   "phase": "Separate engineering touch input/scroll geometry gate; not physical-device or human acceptance",
   "results": [
@@ -26,7 +26,7 @@
         "extent": 1116
       },
       "after": {
-        "left": 299,
+        "left": 285,
         "width": 655,
         "extent": 1116
       }
@@ -36,12 +36,12 @@
       "height": 1000,
       "before": {
         "left": 52,
-        "width": 596,
+        "width": 622,
         "extent": 1116
       },
       "after": {
-        "left": 306,
-        "width": 596,
+        "left": 320,
+        "width": 622,
         "extent": 1116
       }
     },
@@ -50,12 +50,12 @@
       "height": 1000,
       "before": {
         "left": 68,
-        "width": 346,
+        "width": 372,
         "extent": 692
       },
       "after": {
-        "left": 338,
-        "width": 346,
+        "left": 320,
+        "width": 372,
         "extent": 692
       }
     }
