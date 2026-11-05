@@ -15,7 +15,7 @@
       "outerLeft": 108,
       "keyboard": 27,
       "tab": true,
-      "cue": "\u2194 Scroll value",
+      "cue": "\u2194 Scroll value if clipped",
       "before": "docs/design/screenshots/wds149-cue-1440.png",
       "after": "docs/design/screenshots/wds149-suffix-1440.png",
       "axe": {
@@ -37,7 +37,7 @@
       "outerLeft": 588,
       "keyboard": 27,
       "tab": true,
-      "cue": "\u2194 Scroll value",
+      "cue": "\u2194 Scroll value if clipped",
       "before": "docs/design/screenshots/wds149-cue-960.png",
       "after": "docs/design/screenshots/wds149-suffix-960.png",
       "axe": {
@@ -59,7 +59,7 @@
       "outerLeft": 595,
       "keyboard": 27,
       "tab": true,
-      "cue": "\u2194 Scroll value",
+      "cue": "\u2194 Scroll value if clipped",
       "before": "docs/design/screenshots/wds149-cue-640.png",
       "after": "docs/design/screenshots/wds149-suffix-640.png",
       "axe": {
@@ -81,7 +81,7 @@
       "outerLeft": 845,
       "keyboard": 17,
       "tab": true,
-      "cue": "\u2194 Scroll value",
+      "cue": "\u2194 Scroll value if clipped",
       "before": "docs/design/screenshots/wds149-cue-390.png",
       "after": "docs/design/screenshots/wds149-suffix-390.png",
       "axe": {
@@ -90,7 +90,7 @@
       }
     }
   ],
-  "map_revision": "f0577578e6779bf01ca931876df23d4a64c4801f",
+  "map_revision": "267fe0928399a0dd6e6b95b6a325af0d19eac80a",
   "base_revision": "fdefd1c4fbf43289122ab2fb6ba986bb168dc601",
   "woods_revision": "237ca7c547555437cd5d596b9a5c1d1d963cfa71",
   "testbed_revision": "c6dc2c2e14fc857f0c9b12883434a5a548dd0af2",
@@ -104,7 +104,7 @@
   "fonts": "document.fonts.ready awaited; native unscaled screenshots inspected",
   "acceptance": "Engineering input/geometry/axe evidence. Independent reader found pointer hint helpful; isolated keyboard discoverability remains unestablished. Not human/physical-device/200% zoom acceptance.",
   "touch": {
-    "map_revision": "f0577578e6779bf01ca931876df23d4a64c4801f",
+    "map_revision": "267fe0928399a0dd6e6b95b6a325af0d19eac80a",
     "browser": "157.0.8103.38",
     "viewport": [
       390,
@@ -117,5 +117,63 @@
       "scroll_width": 240,
       "text": "active_storage_variant_records"
     }
+  },
+  "no_javascript": {
+    "map_revision": "267fe0928399a0dd6e6b95b6a325af0d19eac80a",
+    "browser": "157.0.8103.38",
+    "javascript_enabled": false,
+    "device_scale_factor": 1,
+    "phase": "Native no-JS input/screenshot evidence; axe runs separately with JS",
+    "results": [
+      {
+        "width": 1440,
+        "height": 1000,
+        "file": "docs/design/screenshots/wds149-no-js-1440.png",
+        "geometry": {
+          "left": 27,
+          "extent": 240,
+          "width": 213,
+          "ready": false
+        },
+        "hint": "\u2194 Scroll value if clipped"
+      },
+      {
+        "width": 960,
+        "height": 1000,
+        "file": "docs/design/screenshots/wds149-no-js-960.png",
+        "geometry": {
+          "left": 27,
+          "extent": 240,
+          "width": 213,
+          "ready": false
+        },
+        "hint": "\u2194 Scroll value if clipped"
+      },
+      {
+        "width": 640,
+        "height": 1000,
+        "file": "docs/design/screenshots/wds149-no-js-640.png",
+        "geometry": {
+          "left": 27,
+          "extent": 240,
+          "width": 213,
+          "ready": false
+        },
+        "hint": "\u2194 Scroll value if clipped"
+      },
+      {
+        "width": 390,
+        "height": 1000,
+        "file": "docs/design/screenshots/wds149-no-js-390.png",
+        "geometry": {
+          "left": 17,
+          "extent": 240,
+          "width": 223,
+          "ready": false
+        },
+        "hint": "\u2194 Scroll value if clipped"
+      }
+    ],
+    "probe_correction": "Initial native wheel probes could leave the target at the viewport edge or scroll the raw diagram vertically. Scroll over the visible table heading to bring the value to mid-viewport, then hover it. Original horizontal-scroll assertion retained."
   }
 }
