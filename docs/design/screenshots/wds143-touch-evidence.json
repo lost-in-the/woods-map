@@ -1,0 +1,63 @@
+{
+  "map_revision": "1259b885e7bba4929d1db7797e2891a07ca37f2c",
+  "browser": "157.0.8103.38",
+  "phase": "Separate engineering touch input/scroll geometry gate; not physical-device or human acceptance",
+  "results": [
+    {
+      "width": 1440,
+      "height": 1000,
+      "before": {
+        "left": 0,
+        "width": 1135,
+        "extent": 1135
+      },
+      "after": {
+        "left": 0,
+        "width": 1135,
+        "extent": 1135
+      }
+    },
+    {
+      "width": 960,
+      "height": 1000,
+      "before": {
+        "left": 21,
+        "width": 655,
+        "extent": 1116
+      },
+      "after": {
+        "left": 299,
+        "width": 655,
+        "extent": 1116
+      }
+    },
+    {
+      "width": 640,
+      "height": 1000,
+      "before": {
+        "left": 52,
+        "width": 596,
+        "extent": 1116
+      },
+      "after": {
+        "left": 306,
+        "width": 596,
+        "extent": 1116
+      }
+    },
+    {
+      "width": 390,
+      "height": 1000,
+      "before": {
+        "left": 68,
+        "width": 346,
+        "extent": 692
+      },
+      "after": {
+        "left": 338,
+        "width": 346,
+        "extent": 692
+      }
+    }
+  ]
+}

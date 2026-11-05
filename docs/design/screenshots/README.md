@@ -142,3 +142,5 @@ it beneath highlighted sticky cells. The code ends above Callers without a local
 bottom divider; no boundary redesign is included. Automated input/screenshots and
 axe/geometry checks are separate evidence, not human acceptance or runtime truth.
 Real-device touch, zoom, light theme and effective-lens acceptance remain untested.
+
+Parent follow-up on the same WDS-143 runtime revision: emulated native browser touch swipes move the sole Code scroll region at 960/640/390; 1440 fits without horizontal overflow. [Touch receipt](wds143-touch-evidence.json), [390px capture](wds143-touch-390.png). This is a separate engineering input/geometry check, not physical-device, zoom or human acceptance.
