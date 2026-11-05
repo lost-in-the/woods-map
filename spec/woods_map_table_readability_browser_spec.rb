@@ -2,7 +2,7 @@
 
 require_relative 'support/browser_page'
 
-RSpec.describe 'ERD and Impact table readability in Chromium', type: :request do
+RSpec.describe 'ERD, Impact and Passage table readability in Chromium', type: :request do
   include WoodsMap::BrowserPage
 
   before do
@@ -10,6 +10,17 @@ RSpec.describe 'ERD and Impact table readability in Chromium', type: :request do
   end
 
   [1440, 960, 640, 390].each do |width|
+    it "keeps Passage action headings within their padded cells at #{width}px" do
+      get '/woods/units/controller/UsersController/passage'
+      report = run_page(response.body, width: width, runner: <<~JS)
+        await document.fonts.ready
+        #{table_measurements}
+        const matrix = document.querySelector('table.matrix')
+        report({ overlap, contained, fixed: getComputedStyle(matrix).tableLayout === 'fixed' })
+      JS
+      expect(report).to eq('overlap' => [], 'contained' => true, 'fixed' => true)
+    end
+
     it "keeps ERD headers separated and full identifiers scrollable at #{width}px" do
       get '/woods/erd'
       report = run_page(response.body, width: width, runner: erd_runner)
