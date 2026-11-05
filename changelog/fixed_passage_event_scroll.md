@@ -1,0 +1,1 @@
+- Keep the Passage lifecycle section in view when switching events, including keyboard navigation, reload and Back, while preserving action and export context (WDS-145).
