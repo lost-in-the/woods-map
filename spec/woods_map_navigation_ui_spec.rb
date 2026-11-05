@@ -37,6 +37,16 @@ RSpec.describe 'Navigation in Chromium', type: :request do
     expect(result['none']).to start_with('No files match')
   end
 
+  [1440, 960, 640, 390].each do |width|
+    it "keeps one sheet opener, keyboard trapping and focus return at #{width}" do
+      html = page_html('/woods/units/model/User')
+      result = run_page(html, runner: sheet_focus_runner, width: width,
+                              fetches: { '/woods/tree' => tree_fragment })
+      expect(result).to include('openers' => 1, 'visible' => true, 'closeFocused' => true,
+                                'trapped' => true, 'wrapped' => true, 'returned' => true, 'trees' => 1)
+    end
+  end
+
   it 'keeps search, the primary nav, the status bar and the sheet header usable at 390' do
     html = page_html('/woods/units/model/User')
     runner = phone_runner
@@ -105,6 +115,25 @@ RSpec.describe 'Navigation in Chromium', type: :request do
         current: current?.dataset.path, currentShown: shown(current), none, restored: visible() === start,
         cleared: document.querySelector(".sheet nav.tree [data-tree-target=status]").textContent
       })
+    JS
+  end
+
+  def sheet_focus_runner
+    <<~JS
+      const toggle = document.querySelector('.bar .menu-toggle')
+      toggle.focus(); toggle.click(); await settle(100)
+      const close = document.querySelector('[data-sheet-target=close]')
+      const closeFocused = document.activeElement === close
+      key(close, { key: 'Tab', shiftKey: true })
+      const trapped = document.querySelector('.sheet').contains(document.activeElement)
+      key(document.activeElement, { key: 'Tab' })
+      const wrapped = document.activeElement === close
+      key(close, { key: 'Escape' })
+      const returned = document.activeElement === toggle && toggle.getAttribute('aria-expanded') === 'false'
+      toggle.click(); await settle(100)
+      report({ openers: document.querySelectorAll('[data-action~="sheet#open"]').length,
+        visible: shown(toggle), closeFocused, trapped, wrapped, returned,
+        trees: document.querySelectorAll('.sheet nav.tree').length })
     JS
   end
 
