@@ -22,7 +22,7 @@ RSpec.describe WoodsMap::BrowserSession do
       .to raise_error(RuntimeError, /wall-time deadline/)
   end
 
-  it 'retains timeout evidence after cleanup without changing the deadline failure' do
+  it 'retains timeout evidence after cleanup without changing the deadline failure' do # rubocop:disable RSpec/ExampleLength, RSpec/MultipleExpectations
     Dir.mktmpdir do |root|
       allow(ENV).to receive(:fetch).and_call_original
       allow(ENV).to receive(:fetch).with('WOODS_MAP_BROWSER_ARTIFACTS', nil).and_return(root)
@@ -31,8 +31,15 @@ RSpec.describe WoodsMap::BrowserSession do
       expect(Dir.children(root).size).to eq(1)
       saved = Dir.glob(File.join(root, '*')).first
       expect(File.read(File.join(saved, 'page.html'))).to include('result')
-      expect(JSON.parse(File.read(File.join(saved, 'failure.json'))))
-        .to include('command' => 'Runtime.evaluate', 'error' => 'RuntimeError')
+      details = JSON.parse(File.read(File.join(saved, 'failure.json')))
+      expect(details).to include('command' => 'Runtime.evaluate', 'error' => 'RuntimeError')
+      expect(details.fetch('live')).to include('alive' => true, 'pid' => be_positive)
+      expect(details.fetch('live').fetch('pipes').values).to all(include('closed' => false))
+      times = details.fetch('timing')
+      expect(times.fetch('failure')).to be < times.fetch('cleanup_start')
+      expect(times.fetch('cleanup_start')).to be <= times.fetch('cleanup_end')
+      expect(times.fetch('spawn_start')).to be <= times.fetch('spawn_end')
+      expect(times.fetch('first_byte')).to be < times.fetch('failure')
     end
   end
 

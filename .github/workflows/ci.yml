@@ -50,6 +50,21 @@ jobs:
           printf '#!/bin/sh\nexec google-chrome --no-sandbox "$@"\n' > "$wrapper"
           chmod +x "$wrapper"
           echo "WOODS_MAP_BROWSER=$wrapper" >> "$GITHUB_ENV"
+      - name: Browser runtime metadata
+        continue-on-error: true
+        timeout-minutes: 1
+        run: |
+          mkdir -p tmp/browser-failures
+          {
+            printf 'wrapper: %s\n' "$WOODS_MAP_BROWSER"
+            head -c 2048 "$WOODS_MAP_BROWSER"
+            command -v google-chrome
+            readlink -f "$(command -v google-chrome)"
+            timeout 5s google-chrome --version || true
+            ruby --version
+            uname -srm
+            head -c 2048 /etc/os-release
+          } > tmp/browser-failures/runtime.txt 2>&1
       # Every spec file that gates on WOODS_MAP_BROWSER; the Specs jobs skip
       # them, so nothing runs twice and a new browser spec is picked up.
       - run: bundle exec rspec $(grep -rl --include='*_spec.rb' WOODS_MAP_BROWSER spec | sort)
