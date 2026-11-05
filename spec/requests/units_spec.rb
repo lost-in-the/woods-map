@@ -163,7 +163,7 @@ RSpec.describe 'Unit pages', type: :request do
     title = '<h1 class="t1">UsersController#edit<span class="sub">GET /users/:id/edit</span></h1>'
     expect(response.body).to include(title).and include('Filter matrix')
     expect(response.body).to include('href="/woods/units/controller/UsersController#L2">logged_in_user</a>')
-    expect(Nokogiri::HTML(response.body).at_css('table.matrix th.cur').text).to eq('edit')
+    expect(html_response_document.at_css('table.matrix th.cur').text).to eq('edit')
     expect(response.body).to include('Related lifecycle, <a href="/woods/units/model/User">User</a>')
   end
 
