@@ -24,6 +24,31 @@ RSpec.describe 'Trail reading walkthrough', type: :request do
     expect(section.css('a').pluck('href')).to include('#walkthrough-2')
   end
 
+  it 'escapes source markup rather than executing it' do
+    rewrite_source(1, '<script>alert("source")</script>')
+    section = walkthrough
+    expect(section.css('script')).to be_empty
+    expect(section.at_css('pre').text).to eq('<script>alert("source")</script>')
+  end
+
+  it 'reads retained source while labeling the current-unit navigation honestly' do
+    FileUtils.cp_r(trail_root.join('payloads/gen-1'), trail_root.join('payloads/gen-2'))
+    rewrite_source(1, 'retained source')
+    rewrite_source(2, 'current source')
+    trail_root.join('generation.json').write({ number: 2, token: 'walkthrough2',
+                                               payload: 'payloads/gen-2' }.to_json)
+    section = walkthrough
+    expect(section.at_css('pre').text).to eq('retained source')
+    expect(section.text).to include('unit page reads the current generation')
+    expect(html_response_document.at_css('a[href="#trail-walkthrough"]')).not_to be_nil
+  end
+
+  def rewrite_source(generation, source)
+    path = trail_root.glob("payloads/gen-#{generation}/jobs/NotifySubscribersJob_*.json").first
+    unit = JSON.parse(path.read).merge('source_code' => source)
+    path.write(unit.to_json)
+  end
+
   it 'does not show a walkthrough without pins' do
     get '/woods/trail', params: { entry: 'NotifySubscribersJob' }
     expect(html_response_document.at_css('[aria-labelledby=trail-walkthrough]')).to be_nil
