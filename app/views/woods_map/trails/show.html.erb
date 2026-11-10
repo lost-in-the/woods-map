@@ -34,6 +34,7 @@
         { label: 'sections', count: 7, items: [['flags', 'trail-flags'], ['lanes', 'trail-lanes'], ['steps', 'trail-steps'], ['pinboard', 'trail-pins'], ['graph of pinned', 'trail-graph'], ['ERD of pinned', 'trail-erd'], ['changed together', 'trail-cochange']].map { |text, id| { text: text, href: "##{id}" } } }
       ] %>
   <div class="main">
+    <%= render 'woods_map/trails/walkthrough', walkthrough: @walkthrough, gen: gen %>
     <section class="sec" aria-labelledby="trail-flags">
       <header><h2 class="t2" id="trail-flags">Flags <%= count_tag(flags.size) %><%= info_tip('Derived from published facts only: job resilience (W-4), callback conditions, flow conditionals and dynamic dispatch, cross-database edges, hubs, and template ivars against the mailer action (advisory). Each names its evidence.') %></h2></header>
       <% if flags.any? %>

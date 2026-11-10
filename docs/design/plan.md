@@ -163,3 +163,9 @@ could not add them to the Woods Development project (organization project
 fields are not accessible to it). Add them from the project board, or enable
 the project's auto-add workflow for the three repositories, and record the
 result in [woods-map#1](https://github.com/lost-in-the/woods-map/issues/1).
+
+## Exploratory follow-up
+
+[WDS-157](https://linear.app/lost-in-the/issue/WDS-157/spike-source-linked-trail-walkthroughs-with-no-new-build-dependencies):
+source-linked reading walkthrough on existing Trail pins; experimental, not a
+0.1 release gate. Mounted acceptance and workflow benefit remain to measure.

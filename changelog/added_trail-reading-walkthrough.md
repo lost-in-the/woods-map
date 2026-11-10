@@ -1,0 +1,1 @@
+- Add an experimental, no-JavaScript reading walkthrough over Trail pins, with bounded published-source excerpts and explicit generation and evidence limits (WDS-157).
