@@ -48,6 +48,24 @@ RSpec.describe WoodsMap::UnitPage do
   end
 
   it 'repeats no unit that reaches the page by two edges' do
-    expect(linked(tile([%w[A model], %w[A model], %w[B job]]))).to eq(%w[A B])
+    expect(linked(tile([%w[A model], %w[A model], %w[B job]]))).to match_array(%w[A B])
+  end
+
+  it 'ranks a type by the units its row shows, not by the edges that reach the page' do
+    edges = [%w[A model], %w[A model], %w[A model], %w[B model], %w[B model], %w[B model],
+             %w[C job], %w[D job], %w[E job]]
+    shown = tile(edges)
+    expect(shown[:rows].map(&:first)).to eq(%w[jobs models])
+    expect(shown[:rows].map { |_, value| value[:links].size }).to eq([3, 2])
+  end
+
+  it 'decides which types keep a row by units, so one unit reached many times goes to "other"' do
+    edges = Array.new(5) { %w[A model] } +
+            [%w[C1 controller], %w[C2 controller], %w[J1 job], %w[J2 job], %w[M1 mailer], %w[M2 mailer],
+             %w[S1 service]]
+    shown = tile(edges)
+    expect(shown[:rows].map(&:first)).to eq(%w[controllers jobs mailers other])
+    expect(shown[:rows].last.last[:links]).to eq([%w[A model], %w[S1 service]])
+    expect(tile(edges.reverse)[:rows].map(&:first)).to eq(shown[:rows].map(&:first))
   end
 end

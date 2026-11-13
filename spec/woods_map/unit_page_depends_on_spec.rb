@@ -62,4 +62,41 @@ RSpec.describe WoodsMap::UnitPage do
     other = tile(overflow)[:rows].last.last[:links]
     expect(other.count(%w[PostMailer mailer])).to eq(1)
   end
+
+  it 'decides which relationships keep a row by distinct targets, not by edges' do
+    edges = [%w[User model belongs_to]] + Array.new(5) { %w[Tag model code_reference] } +
+            [%w[posts/_a view_template render], %w[posts/_b view_template render], %w[AJob job job_enqueue],
+             %w[BJob job job_enqueue], %w[AController controller route_dispatch],
+             %w[BController controller route_dispatch], %w[AMailer mailer mailer_call],
+             %w[BMailer mailer mailer_call]]
+    shown = tile(edges)
+    expect(shown[:rows].map(&:first)).to eq(%w[enqueue render route mail other])
+    expect(shown[:rows].last.last[:links]).to eq([%w[User model], %w[Tag model]])
+    expect(tile(edges.reverse)[:rows].map(&:first)).to eq(shown[:rows].map(&:first))
+  end
+
+  it 'links a target under each named relationship that reaches it' do
+    shown = tile([%w[User model belongs_to], %w[User model code_reference], %w[Tag model code_reference]])
+    expect(shown[:rows]).to eq([['belongs_to', { links: [%w[User model]] }],
+                                ['references', { links: [%w[User model], %w[Tag model]] }]])
+    expect(shown[:eyebrow]).to eq('Depends on 2')
+  end
+
+  it 'repeats in "other" no target a named row already links' do
+    shown = tile(edges + [%w[Tag model link_to]])
+    expect(shown[:rows].map(&:first)).to eq(%w[belongs_to has_many render references other])
+    expect(shown[:rows].last.last[:links])
+      .to eq([%w[Taggable concern], %w[NotifySubscribersJob job], %w[PostsController controller],
+              %w[PostMailer mailer]])
+  end
+
+  it 'omits "other" when every target it would hold is linked in a named row' do
+    edges = [%w[posts/_a view_template render], %w[posts/_b view_template render], %w[Tag model code_reference],
+             %w[Tagging model code_reference], %w[AJob job job_enqueue], %w[BJob job job_enqueue],
+             %w[AController controller route_dispatch], %w[BController controller route_dispatch],
+             %w[Tag model link_to], %w[AController controller test_coverage]]
+    shown = tile(edges)
+    expect(shown[:rows].map(&:first)).to eq(%w[enqueue render references route])
+    expect(linked(shown)).to match_array(edges.map(&:first).uniq)
+  end
 end
