@@ -21,6 +21,23 @@ RSpec.describe WoodsMap::UnitPage do
      %w[PostMailer mailer mailer_call]]
   end
 
+  # Six relationships: four of two units each, and two of one unit, one of them reached by three edges.
+  let(:repeated_edges) do
+    [%w[Author model belongs_to], %w[Comment model has_many], %w[Reply model has_many],
+     %w[posts/_post view_template render], %w[posts/show view_template view_render],
+     %w[Tag model code_reference], %w[Tagging model code_reference],
+     %w[DigestMailer mailer mailer_call], %w[ReplyMailer mailer mailer_call]] +
+      ([%w[ArchiveJob job job_enqueue]] * 3)
+  end
+
+  # Six relationships: references three, render two, and four of one each.
+  let(:shared_edges) do
+    [%w[Tag model code_reference], %w[Tagging model code_reference], %w[PostsController controller code_reference],
+     %w[posts/_post view_template render], %w[posts/show view_template view_render],
+     %w[Author model belongs_to], %w[Comment model has_many], %w[Taggable concern include],
+     %w[PostsController controller route_dispatch]]
+  end
+
   it 'gives each relationship a row when they fit, associations first whatever their size' do
     rows = tile([%w[User model belongs_to], %w[Tag model code_reference], %w[Tagging model code_reference],
                  %w[Comment model has_many]])[:rows]
@@ -61,5 +78,35 @@ RSpec.describe WoodsMap::UnitPage do
     overflow = edges + [%w[PostMailer mailer link_to]]
     other = tile(overflow)[:rows].last.last[:links]
     expect(other.count(%w[PostMailer mailer])).to eq(1)
+  end
+
+  it 'decides which relationships keep a row by their units, not their edges' do
+    shown = tile(repeated_edges)
+    expect(shown[:rows].map(&:first)).to eq(%w[has_many render references mail other])
+    expect(shown[:rows].last.last[:links]).to eq([%w[Author model], %w[ArchiveJob job]])
+  end
+
+  it 'keeps the units ranking whatever order the edges were published in' do
+    expect(tile(repeated_edges.reverse)[:rows].map(&:first)).to eq(tile(repeated_edges)[:rows].map(&:first))
+    expect(tile(repeated_edges.reverse)[:rows].map { |_, v| v[:links].sort })
+      .to eq(tile(repeated_edges)[:rows].map { |_, v| v[:links].sort })
+  end
+
+  it 'does not repeat in "other" a target that a named row links' do
+    shown = tile(shared_edges)
+    expect(shown[:rows].map(&:first)).to eq(%w[belongs_to has_many render references other])
+    expect(shown[:rows].last.last[:links]).to eq([%w[Taggable concern]])
+  end
+
+  it 'omits "other" when every target it would hold is linked by a named row' do
+    shown = tile(shared_edges + [%w[Taggable concern code_reference]])
+    expect(shown[:rows].map(&:first)).to eq(%w[belongs_to has_many render references])
+    expect(linked(shown)).to match_array(shared_edges.map(&:first).uniq)
+  end
+
+  it 'links a target under each named relationship that reaches it' do
+    rows = tile([%w[Author model belongs_to], %w[Author model code_reference], %w[Tag model code_reference]])[:rows]
+    expect(rows.to_h.transform_values { |v| v[:links] })
+      .to eq('belongs_to' => [%w[Author model]], 'references' => [%w[Author model], %w[Tag model]])
   end
 end
