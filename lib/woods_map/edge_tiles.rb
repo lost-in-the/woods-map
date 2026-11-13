@@ -30,16 +30,17 @@ module WoodsMap
       { eyebrow: used_by_label(groups), rows: rows }
     end
 
-    # Relationships rank by {UnitPage::DEPENDENCY_GROUPS}' order (associations,
-    # then includes, enqueues, renders, references, navigation, routes, tests,
-    # mail), the order the tile has always read them in; unmapped ones after.
+    # Rows read in {UnitPage::DEPENDENCY_GROUPS}' order (associations, then includes, enqueues,
+    # renders, references, navigation, routes, tests, mail; unmapped ones after), as the
+    # guidelines board draws them. Size only decides which relationships keep a row of their
+    # own when there are more than the tile holds.
     #
     # @return [Hash, nil] eyebrow and rows, nil without dependencies
     def depends_on
       groups = @dependencies.group_by { |d| UnitPage::DEPENDENCY_GROUPS.fetch(d['via'].to_s, d['via'].to_s) }
       return nil if groups.empty?
 
-      rows = capped(ranked(groups, DEPENDENCY_RANK), DEPENDS_ON_ROWS).map do |label, list|
+      rows = in_reading_order(capped(ranked(groups, DEPENDENCY_RANK), DEPENDS_ON_ROWS)).map do |label, list|
         [label, { links: list.map { |d| [d['target'], d['type']] }.uniq }]
       end
       { eyebrow: "Depends on #{@dependencies.pluck('target').uniq.size}", rows: rows }
@@ -58,6 +59,14 @@ module WoodsMap
       rows = capped(code.map { |type, list| [type.pluralize.tr('_', ' '), list] }, limit)
       rows << ['documentation', groups['doc']] if groups.key?('doc')
       rows
+    end
+
+    # @param rows [Array<Array(String, Array<Hash>)>] the rows the tile keeps
+    # @return [Array<Array(String, Array<Hash>)>] by relationship rank, then name, "other" last
+    def in_reading_order(rows)
+      rows.sort_by do |label, _|
+        label == 'other' ? [1, 0, label] : [0, DEPENDENCY_RANK.index(label) || DEPENDENCY_RANK.size, label]
+      end
     end
 
     # @param groups [Hash] edges by group name

@@ -21,15 +21,15 @@ RSpec.describe WoodsMap::UnitPage do
      %w[PostMailer mailer mailer_call]]
   end
 
-  it 'gives each relationship a row when they fit, largest first' do
+  it 'gives each relationship a row when they fit, associations first whatever their size' do
     rows = tile([%w[User model belongs_to], %w[Tag model code_reference], %w[Tagging model code_reference],
                  %w[Comment model has_many]])[:rows]
-    expect(rows.map(&:first)).to eq(%w[references belongs_to has_many])
+    expect(rows.map(&:first)).to eq(%w[belongs_to has_many references])
   end
 
   it 'collects the relationships beyond the row limit under "other" instead of dropping them' do
     shown = tile(edges)
-    expect(shown[:rows].map(&:first)).to eq(%w[references render belongs_to has_many other])
+    expect(shown[:rows].map(&:first)).to eq(%w[belongs_to has_many render references other])
     expect(shown[:rows].last.last[:links])
       .to eq([%w[Taggable concern], %w[NotifySubscribersJob job], %w[PostsController controller],
               %w[PostMailer mailer]])
@@ -54,7 +54,7 @@ RSpec.describe WoodsMap::UnitPage do
 
   it 'repeats no target that the unit reaches by two edges in one row' do
     shown = tile([%w[Tag model code_reference], %w[Tag model code_reference], %w[User model belongs_to]])
-    expect(linked(shown)).to eq(%w[Tag User])
+    expect(linked(shown)).to eq(%w[User Tag])
   end
 
   it 'repeats no target in "other" when two overflowing relationships reach it' do
