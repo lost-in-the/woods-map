@@ -19,6 +19,14 @@ RSpec.describe WoodsMap::UnitPage do
      %w[NotifySubscribersJob job], %w[PostsController controller], %w[README.md doc], %w[db/seeds.rb configuration]]
   end
 
+  # One edge per unit, except ArchiveJob, which reaches the page five times.
+  let(:repeated_edges) do
+    [%w[Author model], %w[Comment model], %w[Reply model], %w[Tag model],
+     %w[AuthorsController controller], %w[CommentsController controller], %w[TagsController controller],
+     %w[Publisher service], %w[Search service], %w[Tagger service],
+     %w[DigestMailer mailer], %w[ReplyMailer mailer]] + ([%w[ArchiveJob job]] * 5)
+  end
+
   it 'gives each type a row when they fit' do
     rows = tile([%w[A model], %w[B model], %w[C job], %w[D controller], %w[E service]])[:rows]
     expect(rows.map(&:first)).to eq(%w[models controllers jobs services])
@@ -48,6 +56,24 @@ RSpec.describe WoodsMap::UnitPage do
   end
 
   it 'repeats no unit that reaches the page by two edges' do
-    expect(linked(tile([%w[A model], %w[A model], %w[B job]]))).to eq(%w[A B])
+    expect(linked(tile([%w[A model], %w[A model], %w[B job]]))).to contain_exactly('A', 'B')
+  end
+
+  it 'ranks a type with more units above a type with more edges but fewer units' do
+    rows = tile([%w[A model], %w[B model], %w[C model]] + ([%w[D job], %w[E job]] * 3))[:rows]
+    expect(rows.map(&:first)).to eq(%w[models jobs])
+  end
+
+  it 'decides which types keep a row by their units, not their edges' do
+    shown = tile(repeated_edges)
+    expect(shown[:rows].map(&:first)).to eq(%w[models controllers services other])
+    expect(shown[:rows].last.last[:links])
+      .to eq([%w[DigestMailer mailer], %w[ReplyMailer mailer], %w[ArchiveJob job]])
+  end
+
+  it 'ranks by units whatever order the edges were published in' do
+    expect(tile(repeated_edges.reverse)[:rows].map(&:first)).to eq(tile(repeated_edges)[:rows].map(&:first))
+    expect(tile(repeated_edges.reverse)[:rows].map { |_, v| v[:links].sort })
+      .to eq(tile(repeated_edges)[:rows].map { |_, v| v[:links].sort })
   end
 end
