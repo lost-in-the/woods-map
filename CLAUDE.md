@@ -44,6 +44,7 @@ lib/woods_map/unit_facts.rb       # type-specific tiles from published unit meta
 lib/woods_map/{unit_page,code_view,composite_source,highlighter,marginalia,references,outline}.rb  # the unit page and Code tab
 lib/woods_map/{span_validation,method_line,callers}.rb  # reference spans (W-1) checked, method-level link targets (W-6), the callers panel (B-13)
 lib/woods_map/{date_span,history_view,history_generations,commit_rows,commit_strip,generation_strip,commit_ledger,generation_facets,unit_co_changes,unit_paths,path_heat,history_mermaid,history_timeline,unit_diff,source_diff,repository_history}.rb  # M4 History: the tab, the strips by time and by generation, the generation ledger, facets moved, co-change, gutter heat, exports, /woods/history, the unit diff and Woods' unified source diff
+lib/woods_map/edge_tiles.rb      # the "Used by" and "Depends on" tiles: largest groups keep a row, the rest collect under "other"
 lib/woods_map/hover_card.rb      # B-3 hover cards: graph node, PageRank place and metadata.git of each linked unit
 lib/woods_map/{schema_view,schema_class_diagram,lifecycle,neighbourhood}.rb  # the Schema (ER and class diagram), Lifecycle and Graph tabs
 lib/woods_map/{lifecycle_chart,state_machine_view,lifecycle_callbacks,callback_origin}.rb  # the Lifecycle flowchart and lanes; a model's published state machines; steps vs undrawn callbacks; the published callback/filter origin (woods#936)
