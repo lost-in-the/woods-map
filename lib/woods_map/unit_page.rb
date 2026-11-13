@@ -118,7 +118,8 @@ module WoodsMap
 
     # @return [Array<Hash>] the facts tiles (eyebrow, rows)
     def tiles
-      [UnitFacts.new(@unit).tile || table_tile, used_by_tile, depends_on_tile, history_tile].compact
+      edges = EdgeTiles.new(dependents: dependents, dependencies: dependencies)
+      [UnitFacts.new(@unit).tile || table_tile, edges.used_by, edges.depends_on, history_tile].compact
     end
 
     # @return [Hash, nil] the database table unit behind a model
@@ -128,10 +129,6 @@ module WoodsMap
 
       @table ||= @repository.unit("table:#{name}", type: 'database_table')
     end
-
-    # Rows the "Used by" tile shows at most.
-    USED_BY_ROWS = 4
-    private_constant :USED_BY_ROWS
 
     private
 
@@ -157,52 +154,6 @@ module WoodsMap
         ['FK', fks.any? ? fks.map { |fk| "#{fk['column']} → #{fk['to_table']}" }.join(', ') : 'none'],
         ['source', { layer: 'model metadata' }]
       ] }
-    end
-
-    def used_by_tile
-      groups = dependents.group_by { |d| d['source_type'].to_s }
-      return nil if groups.empty?
-
-      rows = used_by_groups(groups).map do |label, list|
-        [label, { links: list.map { |d| [d['source'], d['source_type'].to_s] }.uniq }]
-      end
-      { eyebrow: used_by_label(groups), rows: rows }
-    end
-
-    # The largest source types get a row each. When there are more types than rows, the last
-    # row collects the rest as "other", so no dependent is left off the tile. Equal sizes
-    # order by {Landscape::TYPE_ORDER}, then by name: the published edge order decides nothing.
-    #
-    # @param groups [Hash] reverse edges grouped by published source type
-    # @return [Array<Array(String, Array<Hash>)>] row label and its edges, documentation last
-    def used_by_groups(groups)
-      code = groups.except('doc').sort_by { |type, list| [-list.size, used_by_rank(type), type] }
-      limit = groups.key?('doc') ? USED_BY_ROWS - 1 : USED_BY_ROWS
-      shown, rest = code.size > limit ? [code.first(limit - 1), code.drop(limit - 1)] : [code, []]
-      rows = shown.map { |type, list| [type.pluralize.tr('_', ' '), list] }
-      rows << ['other', rest.flat_map(&:last)] if rest.any?
-      rows << ['documentation', groups['doc']] if groups.key?('doc')
-      rows
-    end
-
-    def used_by_rank(type)
-      Landscape::TYPE_ORDER.index(type) || Landscape::TYPE_ORDER.size
-    end
-
-    # @param groups [Hash] reverse edges grouped by published source type
-    # @return [String] code and documentation counts labelled apart
-    def used_by_label(groups)
-      count = groups.except('doc').values.flatten.pluck('source').uniq.size
-      docs = groups.fetch('doc', []).pluck('source').uniq.size
-      ["Used by #{count}", ("#{docs} documentation" if docs.positive?)].compact.join(', ')
-    end
-
-    def depends_on_tile
-      groups = dependencies.group_by { |d| DEPENDENCY_GROUPS.fetch(d['via'].to_s, d['via'].to_s) }
-      return nil if groups.empty?
-
-      rows = groups.first(5).map { |via, list| [via, { links: list.map { |d| [d['target'], d['type']] }.uniq }] }
-      { eyebrow: "Depends on #{dependencies.pluck('target').uniq.size}", rows: rows }
     end
 
     def history_tile

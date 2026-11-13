@@ -1,0 +1,87 @@
+# frozen_string_literal: true
+
+module WoodsMap
+  # The "Used by" and "Depends on" tiles of a unit page's facts. Each groups
+  # the unit's edges into a few rows, largest first; when there are more
+  # groups than rows, the last row collects the rest as "other", so every
+  # unit the eyebrow counts is linked. Equal sizes order by a fixed rank,
+  # then by name: the published edge order decides nothing.
+  class EdgeTiles
+    # Rows the "Used by" tile shows at most.
+    USED_BY_ROWS = 4
+    # Rows the "Depends on" tile shows at most.
+    DEPENDS_ON_ROWS = 5
+
+    # @param dependents [Array<Hash>] reverse edges (source, source_type, via)
+    # @param dependencies [Array<Hash>] forward edges (target, type, via)
+    def initialize(dependents:, dependencies:)
+      @dependents = dependents
+      @dependencies = dependencies
+    end
+
+    # @return [Hash, nil] eyebrow and rows, nil without dependents
+    def used_by
+      groups = @dependents.group_by { |d| d['source_type'].to_s }
+      return nil if groups.empty?
+
+      rows = used_by_groups(groups).map do |label, list|
+        [label, { links: list.map { |d| [d['source'], d['source_type'].to_s] }.uniq }]
+      end
+      { eyebrow: used_by_label(groups), rows: rows }
+    end
+
+    # Relationships rank by {UnitPage::DEPENDENCY_GROUPS}' order (associations,
+    # then includes, enqueues, renders, references, navigation, routes, tests,
+    # mail), the order the tile has always read them in; unmapped ones after.
+    #
+    # @return [Hash, nil] eyebrow and rows, nil without dependencies
+    def depends_on
+      groups = @dependencies.group_by { |d| UnitPage::DEPENDENCY_GROUPS.fetch(d['via'].to_s, d['via'].to_s) }
+      return nil if groups.empty?
+
+      rows = capped(ranked(groups, DEPENDENCY_RANK), DEPENDS_ON_ROWS).map do |label, list|
+        [label, { links: list.map { |d| [d['target'], d['type']] }.uniq }]
+      end
+      { eyebrow: "Depends on #{@dependencies.pluck('target').uniq.size}", rows: rows }
+    end
+
+    DEPENDENCY_RANK = UnitPage::DEPENDENCY_GROUPS.values.uniq.freeze
+    private_constant :DEPENDENCY_RANK
+
+    private
+
+    # @param groups [Hash] reverse edges grouped by published source type
+    # @return [Array<Array(String, Array<Hash>)>] row label and its edges, documentation last
+    def used_by_groups(groups)
+      limit = groups.key?('doc') ? USED_BY_ROWS - 1 : USED_BY_ROWS
+      code = ranked(groups.except('doc'), Landscape::TYPE_ORDER)
+      rows = capped(code.map { |type, list| [type.pluralize.tr('_', ' '), list] }, limit)
+      rows << ['documentation', groups['doc']] if groups.key?('doc')
+      rows
+    end
+
+    # @param groups [Hash] edges by group name
+    # @param order [Array<String>] the rank of known names
+    # @return [Array<Array(String, Array<Hash>)>] largest first, then by rank, then by name
+    def ranked(groups, order)
+      groups.sort_by { |name, list| [-list.size, order.index(name) || order.size, name] }
+    end
+
+    # @param sorted [Array<Array(String, Array<Hash>)>]
+    # @param limit [Integer] rows at most
+    # @return [Array<Array(String, Array<Hash>)>] the first rows, and "other" holding the rest
+    def capped(sorted, limit)
+      return sorted if sorted.size <= limit
+
+      sorted.first(limit - 1) << ['other', sorted.drop(limit - 1).flat_map(&:last)]
+    end
+
+    # @param groups [Hash] reverse edges grouped by published source type
+    # @return [String] code and documentation counts labelled apart
+    def used_by_label(groups)
+      count = groups.except('doc').values.flatten.pluck('source').uniq.size
+      docs = groups.fetch('doc', []).pluck('source').uniq.size
+      ["Used by #{count}", ("#{docs} documentation" if docs.positive?)].compact.join(', ')
+    end
+  end
+end
