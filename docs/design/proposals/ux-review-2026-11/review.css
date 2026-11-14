@@ -50,8 +50,7 @@
 /* ===== spike: system-level changes 1 to 4, plus nav, nesting and status ===== */
 /* 1. Inter is the default; mono is the exception */
 .wm{font-family:var(--ff-ui);
-/* 2. stretched scale: 12 / 14 / 16 / 20 / 32 */
-  --fs-11:12px; --fs-12:12px; --fs-13:14px; --fs-15:16px; --fs-18:20px; --fs-24:32px; line-height:1.5}
+  line-height:1.5}
 .wm .id,.wm .mono,.wm code,.wm .sub,.wm .cnt,.wm .kbd,.wm .tbl td.id,.wm .hb .v,.wm .bar-fresh,.wm .dbox .num{font-family:var(--ff-data)}
 .wm .tbl td,.wm .tbl th,.wm .crumbs,.wm .bar-search{font-family:var(--ff-ui)}
 .wm .t1{letter-spacing:-.015em;line-height:1.1}

@@ -41,7 +41,9 @@ On the board, `†` marks anything Woods does not publish as a fact today.
 |---|---|
 | Filters that apply to an action, templates rendered, jobs enqueued | Published today |
 | Halting branches, and whether an action writes | Needs Woods work. Marked `†` on the board |
-| Callers of one method | Known for a call written on a constant (`Lodging.available`, `PricingService.call`): the reference records the method called, and the map already counts callers per method. Not known for a call on a variable (`booking.price`): Woods does not know the variable's class. Those are listed as unknown |
+| `rescue_from` on a controller | Not published. Woods publishes rescue facts for jobs and services only, so the board leaves it out |
+| Models an action touches | Woods knows references, not reads. The board says "references" |
+| Callers of one method | Known for a call written on a constant (`Lodging.available`, `PricingService.call`): the reference records the method called, and the map already counts callers per method. Callers are not known for a call on a variable (`booking.price`): Woods does not know the variable's class, and records no reference for it. Listing such calls as unknown needs Woods work |
 | Changed methods in a pull request | The data exists; the join from changed lines to method line ranges is not built |
 | Units grouped by part of the product | Feasible from namespace and directory. The grouping is whatever those yield, or a configured mapping |
 | Who knows an area | Recent commit authors. Woods stores author names; no ownership source is read |
@@ -54,13 +56,16 @@ a pull request head took 11 s and the comparison under 3 s.
 ## Not in this proposal
 
 These were explored in the same review and are held back. Each needs its own
-`needs-decision` issue before it returns.
+`needs-decision` issue before it returns. Those issues are drafted and not
+yet filed.
 
 - **Colour.** The board uses an extended palette to show unit kind. It is
   illustrative. No colour decision is proposed until the light and
   colour-vision themes exist. It touches D-10, D-11 and D-23.
-- **Typefaces and type scale.** D-12 and D-14.
+- **Typefaces and type scale.** D-12 and D-14. The board keeps the token
+  sizes and sets Inter as the default text face, which is illustrative.
 - **The landing page and the navigation labels.** FR-1 and `coverage.md`.
+  The board keeps today's navigation.
 - **Boards for Blast radius, Review and Diagnose.** They rest on method-level
   callers and pull request data that Woods does not supply yet.
 - **Diagram rendering.** The board is hand-placed boxes. D-21 requires Mermaid
