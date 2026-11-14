@@ -81,7 +81,7 @@ jobs:
           WOODS_MAP_BROWSER_ARTIFACTS: tmp/browser-failures
       - name: Upload browser failure evidence
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: browser-failures-${{ github.run_attempt }}
           path: tmp/browser-failures
