@@ -18,6 +18,7 @@ invented sample data. The impact report board shows the public testbed.
 | [`../../notes/users-and-journeys.md`](../../notes/users-and-journeys.md) | Purpose, audience, the four journeys and the page rules |
 | [`boards/passage.html`](boards/passage.html), `.png` | The page pattern, drawn for one controller action |
 | [`boards/impact-report.html`](boards/impact-report.html), `.png` | The page pattern, drawn for a saved impact report. `impact-report-before.png` is the page today, same report |
+| [`boards/lifecycle.html`](boards/lifecycle.html), `.png` | The page pattern, drawn for a model's Lifecycle tab. `lifecycle-before.png` is the page today, same unit |
 | [`review.css`](review.css) | Proposal styles. Loads after `foundations/tokens.css` |
 
 The board links `foundations/tokens.css` and `review.css` by relative path, so
@@ -76,11 +77,28 @@ not marked: the map already joins hunks to method extents for `?since=`
 does not call it yet. The source panel gives file lines and unit lines: a
 hunk is in the unit's published-source lines, with concerns inlined.
 
+## The Lifecycle board
+
+The board redraws the Lifecycle tab of the `Article` model, on create, from
+the public testbed large variant. Every name and count comes from that index.
+
+| Today | On the board |
+|---|---|
+| Facts tiles above the diagram, which starts at 565px on a 900px screen | One line of unit facts with a link to the tiles. B-4 is not changed (#193) |
+| A sequence of two callbacks | Sequence stays the default (R-4, #192). Lanes are drawn as the alternative: validation, in the transaction, after commit, another process |
+| Side effects only in the steps table | Chips on each step: what it writes and what it calls |
+| Validations not drawn | A `validates` step, from the validations Woods publishes |
+| The write not drawn | An `INSERT articles` step |
+
+`◇` marks what is new in the map. `†` marks what needs Woods work: custom
+`validate` blocks are not published. The validation lane sits inside the
+save transaction, as Rails runs it. The limits row and the header buttons
+stay as they are today.
+
 ## Not in this proposal
 
 These were explored in the same review and are held back. Each needs its own
-`needs-decision` issue before it returns. Those issues are drafted and not
-yet filed.
+`needs-decision` issue before it returns. Those issues are filed: #185 to #193.
 
 - **Colour.** The board uses an extended palette to show unit kind. It is
   illustrative. No colour decision is proposed until the light and
