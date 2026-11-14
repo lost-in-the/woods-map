@@ -8,8 +8,8 @@ A review of Woods Map at real scale found that the pages work on a small sample
 application and turn into inventories on a large one. This proposal answers
 with a stated audience, four journeys and one page pattern.
 
-All names, commits, pull request numbers and people on the board are invented
-sample data.
+All names, commits, pull request numbers and people on the Passage board are
+invented sample data. The impact report board shows the public testbed.
 
 ## Files
 
@@ -17,6 +17,7 @@ sample data.
 |---|---|
 | [`../../notes/users-and-journeys.md`](../../notes/users-and-journeys.md) | Purpose, audience, the four journeys and the page rules |
 | [`boards/passage.html`](boards/passage.html), `.png` | The page pattern, drawn for one controller action |
+| [`boards/impact-report.html`](boards/impact-report.html), `.png` | The page pattern, drawn for a saved impact report. `impact-report-before.png` is the page today, same report |
 | [`review.css`](review.css) | Proposal styles. Loads after `foundations/tokens.css` |
 
 The board links `foundations/tokens.css` and `review.css` by relative path, so
@@ -53,6 +54,24 @@ On the board, `†` marks anything Woods does not publish as a fact today.
 Measured on the testbed large variant (8,894 units): an incremental extract of
 a pull request head took 11 s and the comparison under 3 s.
 
+## The impact report board
+
+The board redraws `/woods/impacts/<id>` from one real report on the public
+testbed large variant: one model and its spec changed, 121 units affected.
+Every name and count comes from that report.
+
+| Today | On the board |
+|---|---|
+| Title is `gen 1 → gen 2` | Title is the changed unit |
+| First screen is a table of the report's own sections | First screen is the changed units and what references them, by kind |
+| Affected units listed in alphabetical order | Highest-weight names first in each kind, then a count |
+| 89 risks, none caused by the change | Structure facts in one row, marked as not caused by the change |
+| Three warnings before the content | One line under the content, linking to the Unknown tab |
+| Endpoints, coverage and budgets fill half the page | One closed row at the foot. Nothing is removed |
+
+The tabs keep today's names and counts. `†` marks the changed method name,
+commits and Mermaid text for a range, which Woods does not publish today.
+
 ## Not in this proposal
 
 These were explored in the same review and are held back. Each needs its own
@@ -67,7 +86,8 @@ yet filed.
 - **The landing page and the navigation labels.** FR-1 and `coverage.md`.
   The board keeps today's navigation.
 - **Boards for Blast radius, Review and Diagnose.** They rest on method-level
-  callers and pull request data that Woods does not supply yet.
+  callers and pull request data that Woods does not supply yet. The impact
+  report board uses only what a report holds today.
 - **Diagram rendering.** The board is hand-placed boxes. D-21 requires Mermaid
   text drawn by Pele, which cannot colour a chip inside a node.
 
