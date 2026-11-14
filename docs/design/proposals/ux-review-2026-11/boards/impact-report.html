@@ -4,9 +4,8 @@
 <link rel="stylesheet" href="../../../foundations/tokens.css">
 <link rel="stylesheet" href="../review.css">
 <style>body{margin:0;background:#222126}
-.wm{--kind-spec:var(--l-green)} .wm .k-spec{--kc:var(--kind-spec)}
 .wm .dbox{align-items:flex-start;padding-top:var(--s3)}
-.wm .lim{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);align-items:center;margin-top:var(--s5);padding:var(--s3) var(--s4);border-left:3px solid var(--l-orange);background:var(--panel);font-size:var(--fs-12);color:var(--text)}
+.wm .lim{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);align-items:center;margin-top:var(--s5);padding:var(--s3) var(--s4);border-top:1px solid var(--rule2);background:var(--panel);font-size:var(--fs-12);color:var(--text)}
 .wm .lim b{color:var(--l-orange);font-weight:700} .wm .lim a{margin-left:auto}
 .wm .more{display:flex;gap:var(--s5);margin-top:var(--s5);padding-top:var(--s4);border-top:1px solid var(--rule);font-size:var(--fs-12);color:var(--mut)}
 </style></head>
@@ -16,16 +15,16 @@
 <div class="ident"><div><p class="ctx">impact report · <span class="id">c0b077e → 7c3ba5a</span> · gen 1 → gen 2 · depth 2</p><h1 class="t1">Article <span class="sub">model · modified · +4 lines</span></h1></div><div class="ctl"><button class="btn" type="button">Copy Mermaid †</button><button class="btn primary" type="button">Copy link</button></div></div>
 <div class="tabs page-tabs" role="tablist"><button class="tab" role="tab" type="button" aria-selected="true">Overview</button><button class="tab" role="tab" type="button" aria-selected="false">Changed <span class="cnt">2</span></button><button class="tab" role="tab" type="button" aria-selected="false">Risks <span class="cnt">89</span></button><button class="tab" role="tab" type="button" aria-selected="false">Flows <span class="cnt">0</span></button><button class="tab" role="tab" type="button" aria-selected="false">Tests <span class="cnt">3</span></button><button class="tab" role="tab" type="button" aria-selected="false">Graph <span class="cnt">123</span></button><button class="tab" role="tab" type="button" aria-selected="false">Unknown <span class="cnt">38</span></button></div>
 <div class="r4">
-<p class="sum"><b>1 model changed</b><span class="sep">·</span><b>1 spec changed</b><span class="sep">·</span>44 units reference Article<span class="sep">·</span>77 one hop further<span class="sep">·</span>no callback, schema or association change<span class="sep">·</span>3 specs name 3 units</p>
+<p class="sum"><b>1 model changed</b><span class="sep">·</span><b>1 spec changed</b><span class="sep">·</span>44 units reference Article<span class="sep">·</span>77 one hop further<span class="sep">·</span>89 risks: at least 87 cycles, 1 hub, 1 callback line shift<span class="sep">·</span>3 specs name 3 units</p>
 <div class="dia"><div class="dhost" role="img" aria-label="Article and its spec changed. 44 units reference Article directly, grouped by kind. 77 more units are one hop further." style="width:1320px;height:590px;margin:var(--s4) auto">
 <div class="dgroup" style="left:10px;top:16px;width:290px;height:560px"><span>Changed · 2</span><em>gen 1 → gen 2 · +9 lines</em></div>
-<div class="dgroup" style="left:350px;top:16px;width:620px;height:560px"><span>References Article · 44</span><em>distance 1 · has_many, belongs_to, code reference</em></div>
+<div class="dgroup" style="left:350px;top:16px;width:620px;height:560px"><span>References Article · 44</span><em>distance 1 · code reference, belongs_to, has_many +7 more</em></div>
 <div class="dgroup" style="left:1020px;top:16px;width:290px;height:560px"><span>One hop further · 77</span><em>distance 2 · class-level links</em></div>
 <svg aria-hidden="true" width="54" height="8" style="position:absolute;left:296px;top:292px;overflow:visible;fill:none;stroke:#9BA5B0;stroke-width:2;stroke-linecap:round"><defs><marker id="ah" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" style="stroke:none;fill:#9BA5B0"/></marker></defs><path d="M 4 4 L 50 4" marker-end="url(#ah)"></path></svg>
 <svg aria-hidden="true" width="54" height="8" style="position:absolute;left:966px;top:292px;overflow:visible;fill:none;stroke:#9BA5B0;stroke-width:2;stroke-linecap:round;stroke-dasharray:6 6"><defs><marker id="ah" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" style="stroke:none;fill:#9BA5B0"/></marker></defs><path d="M 4 4 L 50 4" marker-end="url(#ah)"></path></svg>
-<div class="dbox k-model chgd" style="left:26px;top:56px;width:258px;height:124px"><span><span class="kd">model</span><b>Article</b><span class="names">app/models/article.rb</span><span class="chips"><span class="sv m">M +4 −0</span><span class="sv ok">✓ spec changed</span><span class="sv q">method †</span></span></span></div>
-<div class="dbox k-spec chgd" style="left:26px;top:196px;width:258px;height:100px"><span><span class="kd">spec</span><b>article_spec.rb</b><span class="names">spec/models/</span><span class="chips"><span class="sv m">M +5 −0</span></span></span></div>
-<div class="dlab" style="left:26px;top:316px;width:258px;text-align:left">callbacks: 28, none changed<br>schema: no change<br>associations: no change</div>
+<div class="dbox k-model chgd" style="left:26px;top:56px;width:258px;height:124px"><span><span class="kd">model</span><b>Article</b><span class="names">app/models/article.rb</span><span class="chips"><span class="sv m">M +4 −0</span><span class="sv a">A #reading_minutes</span><span class="sv ok">✓ spec changed</span></span></span></div>
+<div class="dbox k-route chgd" style="left:26px;top:196px;width:258px;height:100px"><span><span class="kd">spec</span><b>article_spec.rb</b><span class="names">spec/models/</span><span class="chips"><span class="sv m">M +5 −0</span></span></span></div>
+<div class="dlab" style="left:26px;top:316px;width:258px;text-align:left">metadata changed: methods, references,<br>callbacks (one operation line only)</div>
 <div class="dbox k-model " style="left:366px;top:56px;width:290px;height:100px"><span><span class="kd">models · 13</span><b>Author</b><span class="names">Comment · Publication · Syndication::License +9</span></span></div>
 <div class="dbox k-controller " style="left:664px;top:56px;width:290px;height:100px"><span><span class="kd">controllers · 6</span><b>ArticlesController</b><span class="names">PublicArticlesController · CommentsController +3</span></span></div>
 <div class="dbox k-service " style="left:366px;top:168px;width:290px;height:100px"><span><span class="kd">services · 4</span><b>PublishArticle</b><span class="names">EditorialWorkflow · Payouts::AccrueEarning +1</span><span class="chips"><span class="sv ok">✓ 2 named by a spec</span></span></span></div>
@@ -40,11 +39,11 @@
 <div class="dbox k-controller " style="left:1036px;top:326px;width:258px;height:106px"><span><span class="kd">controllers · 4</span><b>ApplicationController</b><span class="names">DemoSessionsController +2</span><span class="chips"><span class="sv w">⚠ hub · 423 dependents</span></span></span></div>
 <div class="dbox k-route " style="left:1036px;top:440px;width:258px;height:82px"><span><span class="kd">other · 15</span><b>RequiresAuthor</b><span class="names">Types::QueryType · article.published +12</span></span></div>
 </div>
-<div class="keys"><b>kind</b><span class="k-model"><i></i>model</span><span class="k-controller"><i></i>controller</span><span class="k-service"><i></i>service</span><span class="k-job"><i></i>job</span><span class="k-filter"><i></i>policy</span><span class="k-view"><i></i>view, GraphQL</span><span class="k-spec"><i></i>spec</span><span class="k-route"><i></i>route, migration, other</span></div>
-<div class="keys two"><b>status</b><span class="sv m">M modified</span><span class="sv ok">✓ named by a spec</span><span class="sv w">⚠ check</span><span>yellow tint: changed</span><span>── references Article</span><span>- - class-level link: the method called is not known</span><span>† needs Woods work</span></div></div>
+<div class="keys"><b>kind</b><span class="k-model"><i></i>model</span><span class="k-controller"><i></i>controller</span><span class="k-service"><i></i>service</span><span class="k-job"><i></i>job</span><span class="k-filter"><i></i>policy</span><span class="k-view"><i></i>view, GraphQL</span><span class="k-route"><i></i>route, migration, spec, other</span></div>
+<div class="keys two"><b>status</b><span class="sv m">M modified</span><span class="sv a">A added</span><span class="sv ok">✓ named by a spec</span><span class="sv w">⚠ check</span><span>yellow tint: changed</span><span>── references Article</span><span>- - class-level link: the method called is not known</span><span>† needs Woods work</span></div><div class="keys two"><span>Illustrative and held back: the palette, and Inter as the default text face. Fonts load from a CDN for this mock.</span></div></div>
 
 <div class="under">
-<div class="src"><header><b>Article</b><span>app/models/article.rb · +4</span><a href="#">open unit</a></header>
+<div class="src"><header><b>Article</b><span>app/models/article.rb · file lines 32 to 35 · unit lines 97 to 100</span><a href="#">open unit</a></header>
 <pre><span class="ln">28</span><span class="kw">def</span> word_count
 <span class="ln">29</span>  <span class="cn">WordCount</span>.new(body.to_s).total
 <span class="ln">30</span><span class="kw">end</span>
@@ -55,11 +54,12 @@
 <span class="add"><span class="ln">35</span></span>
 <span class="ln">36</span><span class="kw">def</span> latest_revision</pre></div>
 <table class="facts2">
-<tr><th>Callers</th><td>none recorded for <b>#reading_minutes</b> <span class="q">· new method †</span></td></tr>
+<tr><th>Callers</th><td>none recorded for <b>#reading_minutes</b> <span class="q">· added in this range</span></td></tr>
 <tr><th>Specs</th><td>article_spec.rb changed in the same range <span class="q">· 2 more name Payouts services</span></td></tr>
 <tr><th>Tables</th><td>articles <span class="q">· 40 more through associations</span></td></tr>
 <tr><th>Templates</th><td>articles/show · articles/_form <span class="q">+13</span></td></tr>
-<tr><th>Structure</th><td>87 cycles and 1 hub among these units <span class="q">· not caused by this change</span></td></tr>
+<tr><th>Callbacks</th><td>1 callback risk: an operation's line moved <span class="q">· woods#1085 · 28 callbacks, same filters and order</span></td></tr>
+<tr><th>Structure</th><td>at least 87 cycles · 1 hub <span class="q">· present at gen 2; not compared with gen 1</span></td></tr>
 <tr><th>Commits</th><td><span class="q">not computed †</span></td></tr>
 </table>
 </div>

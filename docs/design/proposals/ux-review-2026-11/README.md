@@ -65,12 +65,16 @@ Every name and count comes from that report.
 | Title is `gen 1 → gen 2` | Title is the changed unit |
 | First screen is a table of the report's own sections | First screen is the changed units and what references them, by kind |
 | Affected units listed in alphabetical order | Highest-weight names first in each kind, then a count |
-| 89 risks, none caused by the change | Structure facts in one row, marked as not caused by the change |
+| 89 risks in one count | The same 89, named: at least 87 cycles, 1 hub, and 1 callback risk that is a line shift (woods#1085). Cycles and hubs are read at gen 2 and are not compared with gen 1 |
 | Three warnings before the content | One line under the content, linking to the Unknown tab |
 | Endpoints, coverage and budgets fill half the page | One closed row at the foot. Nothing is removed |
 
-The tabs keep today's names and counts. `†` marks the changed method name,
-commits and Mermaid text for a range, which Woods does not publish today.
+The tabs keep today's names and counts. `†` marks commits and Mermaid text
+for a range, which Woods does not publish today. The changed method name is
+not marked: the map already joins hunks to method extents for `?since=`
+(`Since#changed_members` in `lib/woods_map/since.rb`), and the impact page
+does not call it yet. The source panel gives file lines and unit lines: a
+hunk is in the unit's published-source lines, with concerns inlined.
 
 ## Not in this proposal
 
