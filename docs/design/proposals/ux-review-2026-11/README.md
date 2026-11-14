@@ -8,8 +8,8 @@ A review of Woods Map at real scale found that the pages work on a small sample
 application and turn into inventories on a large one. This proposal answers
 with a stated audience, four journeys and one page pattern.
 
-All names, commits, pull request numbers and people on the board are invented
-sample data.
+All names, commits, pull request numbers and people on the Passage board are
+invented sample data. The impact report board shows the public testbed.
 
 ## Files
 
@@ -17,6 +17,7 @@ sample data.
 |---|---|
 | [`../../notes/users-and-journeys.md`](../../notes/users-and-journeys.md) | Purpose, audience, the four journeys and the page rules |
 | [`boards/passage.html`](boards/passage.html), `.png` | The page pattern, drawn for one controller action |
+| [`boards/impact-report.html`](boards/impact-report.html), `.png` | The page pattern, drawn for a saved impact report. `impact-report-before.png` is the page today, same report |
 | [`review.css`](review.css) | Proposal styles. Loads after `foundations/tokens.css` |
 
 The board links `foundations/tokens.css` and `review.css` by relative path, so
@@ -44,7 +45,7 @@ On the board, `†` marks anything Woods does not publish as a fact today.
 | `rescue_from` on a controller | Not published. Woods publishes rescue facts for jobs and services only, so the board leaves it out |
 | Models an action touches | Woods knows references, not reads. The board says "references" |
 | Callers of one method | Known for a call written on a constant (`Lodging.available`, `PricingService.call`): the reference records the method called, and the map already counts callers per method. Callers are not known for a call on a variable (`booking.price`): Woods does not know the variable's class, and records no reference for it. Listing such calls as unknown needs Woods work |
-| Changed methods in a pull request | The data exists; the join from changed lines to method line ranges is not built |
+| Changed methods in a pull request | Built in the map for `?since=` on a unit page: `Since#changed_members` in `lib/woods_map/since.rb` matches a report's changed lines to each method's published extent. The impact page does not call it yet |
 | Units grouped by part of the product | Feasible from namespace and directory. The grouping is whatever those yield, or a configured mapping |
 | Who knows an area | Recent commit authors. Woods stores author names; no ownership source is read |
 | Whether a spec names a unit | Spec mapping is static and per file. It says a spec names a unit, never that it covers a change |
@@ -52,6 +53,28 @@ On the board, `†` marks anything Woods does not publish as a fact today.
 
 Measured on the testbed large variant (8,894 units): an incremental extract of
 a pull request head took 11 s and the comparison under 3 s.
+
+## The impact report board
+
+The board redraws `/woods/impacts/<id>` from one real report on the public
+testbed large variant: one model and its spec changed, 121 units affected.
+Every name and count comes from that report.
+
+| Today | On the board |
+|---|---|
+| Title is `gen 1 → gen 2` | Title is the changed unit |
+| First screen is a table of the report's own sections | First screen is the changed units and what references them, by kind |
+| Affected units listed in alphabetical order | Highest-weight names first in each kind, then a count |
+| 89 risks in one count | The same 89, named: at least 87 cycles, 1 hub, and 1 callback risk that is a line shift (woods#1085). Cycles and hubs are read at gen 2 and are not compared with gen 1 |
+| Three warnings before the content | One line under the content, linking to the Unknown tab |
+| Endpoints, coverage and budgets fill half the page | One closed row at the foot. Nothing is removed |
+
+The tabs keep today's names and counts. `†` marks commits and Mermaid text
+for a range, which Woods does not publish today. The changed method name is
+not marked: the map already joins hunks to method extents for `?since=`
+(`Since#changed_members` in `lib/woods_map/since.rb`), and the impact page
+does not call it yet. The source panel gives file lines and unit lines: a
+hunk is in the unit's published-source lines, with concerns inlined.
 
 ## Not in this proposal
 
@@ -67,7 +90,8 @@ yet filed.
 - **The landing page and the navigation labels.** FR-1 and `coverage.md`.
   The board keeps today's navigation.
 - **Boards for Blast radius, Review and Diagnose.** They rest on method-level
-  callers and pull request data that Woods does not supply yet.
+  callers and pull request data that Woods does not supply yet. The impact
+  report board uses only what a report holds today.
 - **Diagram rendering.** The board is hand-placed boxes. D-21 requires Mermaid
   text drawn by Pele, which cannot colour a chip inside a node.
 
