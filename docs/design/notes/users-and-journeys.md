@@ -34,7 +34,7 @@ request, a ticket, a chat thread or an incident note.
 | Role on the team | Moment | Comes to | The page fails when |
 |---|---|---|---|
 | **Tech lead** | Scoping a piece of work | Decide what a change involves and brief a person or an agent | It gives counts, or a claim it cannot back |
-| **Reviewer** | A pull request is open | See what the change reaches beyond the diff, before merge | It needs a local lodging, or buries the point in noise |
+| **Reviewer** | A pull request is open | See what the change reaches beyond the diff, before merge | It needs a local clone, or buries the point in noise |
 | **New teammate** | First weeks, or first time in an area | Learn how one part of the product works | It hides the structure behind prose or a wall of rows |
 | **On-call engineer** | Something is wrong in production | Find where a symptom comes from, in code they may not own | It has no way in from a symptom, or cannot say who knows the area |
 
@@ -82,7 +82,7 @@ flowchart LR
 
 ### Plan: "What should the agent watch for?"
 
-- **Starts from:** a change not yet made. A method, a column, an association, not a whole class.
+- **Starts from:** a change not yet made. A method, a column, an association, not a whole class. Today Woods resolves callers of a method only for calls written on a constant; a column cannot be a focus yet.
 - **Mostly:** Tech lead.
 - **Orient:** the thing to be changed and how widely it is used.
 - **Follow:** the named units most likely to be affected, grouped by part of the application.
@@ -127,7 +127,7 @@ is a question each journey asks at the Judge step.
 4. **It ends in a hand-off.** Every page offers the link, brief or note its journey produces.
 5. **No editor needed.** The line of code is shown where it matters.
 6. **Rails vocabulary, terse.** The page names things as the code does. It does not explain Rails, speak for the reader or prescribe a workflow.
-7. **Two colour channels, never mixed.** *Kind* (what a unit is: model, controller, view, job) is the bar on a box. *Status* (what happened to it: modified, added, covered, check, gap) is a chip with a glyph. Each channel has its own key and its own tokens (`--kind-*`, `--st-*`), mapped onto the palette in one place, so the palette and its associations can change without touching a page. Text stays light on a dark ground; no light text on a coloured fill.
+7. **Colour separates kind from status.** If colour encodes what a unit is, it does so in one shape (the bar on a box), and what happened to it in another (a chip with a glyph). The palette and its roles are not decided here.
 8. **Lanes are parts of the product.** A diagram groups units by the area they belong to and names who knows it, so a change that crosses into another team's area is visible as a crossing.
 
 ## Where today's pages sit
