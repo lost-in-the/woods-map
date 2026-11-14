@@ -9,7 +9,8 @@ application and turn into inventories on a large one. This proposal answers
 with a stated audience, four journeys and one page pattern.
 
 All names, commits, pull request numbers and people on the Passage board are
-invented sample data. The impact report board shows the public testbed.
+invented sample data. The impact report board and the Lifecycle board show
+the public testbed.
 
 ## Files
 
@@ -84,7 +85,7 @@ the public testbed large variant. Every name and count comes from that index.
 
 | Today | On the board |
 |---|---|
-| Facts tiles above the diagram, which starts at 565px on a 900px screen | One line of unit facts with a link to the tiles. B-4 is not changed (#193) |
+| Facts tiles above the diagram, which starts at 565px on a 900px screen | One line of unit facts, drawn as an option. Whether it replaces the tiles is undecided (B-4, #193) |
 | A sequence of two callbacks | Sequence stays the default (R-4, #192). Lanes are drawn as the alternative: validation, in the transaction, after commit, another process |
 | Side effects only in the steps table | Chips on each step: what it writes and what it calls |
 | Validations not drawn | A `validates` step, from the validations Woods publishes |
