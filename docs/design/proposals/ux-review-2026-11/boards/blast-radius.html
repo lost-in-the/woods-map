@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Blast radius · what a unit affects (Plan)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../../foundations/tokens.css">
+<link rel="stylesheet" href="../review.css">
+<style>body{margin:0;background:#222126}</style></head>
+<body><div class="wm" data-theme="dark">
+<header class="bar"><a href="#" class="brand"><svg viewBox="0 0 120 120" width="22" height="22" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-width="3.4"><circle cx="62" cy="58" r="49"/><circle cx="59" cy="61" r="38"/><circle cx="63" cy="57" r="27"/><circle cx="60" cy="60" r="16"/></g><circle cx="61" cy="59" r="4.4" fill="currentColor"/></svg>woods</a><label class="bar-search"><span aria-hidden="true">⌕</span><span class="q">Search a class, file, commit or merged PR</span><span class="kbd">/</span></label><nav aria-label="Primary"><a href="#">How it works</a><a href="#" aria-current="page">What it affects</a><a href="#">What changed</a><a href="#">Browse</a></nav><span class="bar-fresh"><span><span class="fresh">●</span><span class="w"> index up to date</span></span></span></header>
+<div class="crumbs"><span>What it affects › <span class="bright">Booking</span> › ChargeBuilder</span></div>
+<div class="ident"><div><p class="ctx">model · <span class="id">app/models/booking.rb</span> · table bookings</p><h1 class="t1"><span class="id">Booking</span></h1></div><div class="ctl"><span class="lbl">links</span><span class="seg" role="group" aria-label="links"><button type="button" aria-pressed="true">strong</button><button type="button" aria-pressed="false">all</button></span><button class="btn" type="button">Copy brief</button><button class="btn" type="button">Copy Mermaid</button><button class="btn primary" type="button">Copy link</button></div></div>
+<div class="tabs page-tabs" role="tablist"><button class="tab" role="tab" type="button" aria-selected="false">Code <span class="cnt">540</span></button><button class="tab" role="tab" type="button" aria-selected="false">Schema <span class="cnt">18</span></button><button class="tab" role="tab" type="button" aria-selected="false">Lifecycle <span class="cnt">6</span></button><button class="tab" role="tab" type="button" aria-selected="true">Blast radius <span class="cnt">34</span></button><button class="tab" role="tab" type="button" aria-selected="false">Graph</button><button class="tab" role="tab" type="button" aria-selected="false">History <span class="cnt">21</span></button></div>
+<div class="r4">
+<p class="sum"><b>34 classes use Booking</b><span class="sep">·</span><b>4 areas, 2 other owners</b><span class="sep">·</span>2 with no spec<span class="sep">·</span>4 callbacks run on save<span class="sep">·</span>changes most with Bookings::Tariff<span class="sep">·</span>class level: the method called is not known</p>
+<div class="dia"><div class="dhost" role="img" aria-label="Units in Lodging, Ledger, Bulletins and Figures use the Booking class. Booking runs two before_validation and two after_save callbacks on save. ChargeBuilder and a lodging partial have no spec. BookingEvent is a name match only." style="width:1330px;height:480px;margin:var(--s4) auto">
+<svg aria-hidden="true" width="8" height="24" viewBox="0 0 8 24" preserveAspectRatio="none" style="position: absolute; left: 416px; top: 416px; width: 8px; height: 24px; overflow: visible; fill: none; stroke: #9BA5B0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 6 6"><path d="M 4 0 L 4 24"></path></svg>
+<svg aria-hidden="true" width="8" height="24" viewBox="0 0 8 24" preserveAspectRatio="none" style="position: absolute; left: 676px; top: 416px; width: 8px; height: 24px; overflow: visible; fill: none; stroke: #9BA5B0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 6 6"><path d="M 4 0 L 4 24"></path></svg>
+<svg aria-hidden="true" width="8" height="24" viewBox="0 0 8 24" preserveAspectRatio="none" style="position: absolute; left: 936px; top: 416px; width: 8px; height: 24px; overflow: visible; fill: none; stroke: #9BA5B0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 6 6"><path d="M 4 0 L 4 24"></path></svg>
+<svg aria-hidden="true" width="8" height="24" viewBox="0 0 8 24" preserveAspectRatio="none" style="position: absolute; left: 1196px; top: 416px; width: 8px; height: 24px; overflow: visible; fill: none; stroke: #9BA5B0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 6 6"><path d="M 4 0 L 4 24"></path></svg>
+<svg aria-hidden="true" width="1060" height="8" viewBox="0 0 1060 8" preserveAspectRatio="none" style="position: absolute; left: 140px; top: 436px; width: 1060px; height: 8px; overflow: visible; fill: none; stroke: #9BA5B0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 6 6"><path d="M 0 4 L 1060 4"></path></svg>
+<svg aria-hidden="true" width="8" height="23" viewBox="0 0 8 23" preserveAspectRatio="none" style="position: absolute; left: 136px; top: 417px; width: 8px; height: 23px; overflow: visible; fill: none; stroke: #9BA5B0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 6 6"><defs><marker id="dc-arrow-head-filled-6" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#9BA5B0" stroke="none" style="stroke: none; fill: #9BA5B0; fill: context-stroke"/></marker></defs><path d="M 4 23 L 4 4" marker-end="url(#dc-arrow-head-filled-6)"></path></svg>
+<div class="dgroup" style="left:10px;top:16px;width:260px;height:400px"><span>Booking</span><em>96 methods · Bo 14 · Cy 4</em></div>
+<div class="dgroup" style="left:300px;top:16px;width:240px;height:400px"><span>Lodging</span><em>Ana Bo · last 3w</em></div>
+<div class="dgroup" style="left:560px;top:16px;width:240px;height:400px"><span>Ledger</span><em>Cy · last 2mo</em></div>
+<div class="dgroup" style="left:820px;top:16px;width:240px;height:400px"><span>Bulletins</span><em>Ana · last 5mo</em></div>
+<div class="dgroup" style="left:1080px;top:16px;width:240px;height:400px"><span>Figures</span><em>Cy · last 4w</em></div>
+<div class="dbox k-subject " style="left:26px;top:56px;width:228px;height:56px"><span><span class="kd">model</span><b>Booking</b></span></div>
+<div class="dbox k-filter " style="left:26px;top:124px;width:228px;height:56px"><span><span class="kd">before_validation</span><b>×2 on save</b></span></div>
+<div class="dbox k-filter " style="left:26px;top:192px;width:228px;height:56px"><span><span class="kd">after_save</span><b>×2 on save</b></span></div>
+<div class="dbox k-model " style="left:26px;top:260px;width:228px;height:56px"><span><span class="kd">has_many</span><b>guests · rooms</b></span></div>
+<div class="dbox k-model " style="left:316px;top:56px;width:208px;height:56px"><span><span class="kd">model</span><b>Lodging</b></span></div>
+<div class="dbox k-controller " style="left:316px;top:124px;width:208px;height:56px"><span><span class="kd">controller</span><b>LodgingsController</b></span></div>
+<div class="dbox k-view " style="left:316px;top:192px;width:208px;height:76px"><span><span class="kd">view</span><b>lodging/_summary</b><span class="chips"><span class="sv no">✕ no spec</span></span></span></div>
+<div class="dbox k-service on" style="left:576px;top:56px;width:208px;height:76px"><span><span class="kd">service</span><b>ChargeBuilder</b><span class="chips"><span class="sv no">✕ no spec</span></span></span></div>
+<div class="dbox k-service " style="left:576px;top:144px;width:208px;height:56px"><span><span class="kd">service</span><b>RefundPolicy</b></span></div>
+<div class="dbox k-job " style="left:836px;top:56px;width:208px;height:56px"><span><span class="kd">mailer</span><b>GuestMailer</b></span></div>
+<div class="dbox k-view " style="left:836px;top:124px;width:208px;height:56px"><span><span class="kd">view</span><b>guest_mailer/confirmation</b></span></div>
+<div class="dbox k-service " style="left:1096px;top:56px;width:208px;height:76px"><span><span class="kd">service</span><b>BookingEvent</b><span class="chips"><span class="sv q">? name match</span></span></span></div>
+<div class="dbox k-service " style="left:1096px;top:144px;width:208px;height:56px"><span><span class="kd">presenter</span><b>BookingPresenter</b></span></div>
+<div class="dlab" style="left:316px;top:284px;width:208px">+ 1 more</div>
+<div class="dlab" style="left:1096px;top:214px;width:208px">+ 2 more</div>
+<div class="dlab" style="left:540px;top:446px;width:260px">use Booking · class-level links</div>
+</div>
+<div class="keys"><b>kind</b><span class="k-model"><i></i>model</span><span class="k-filter"><i></i>callback</span><span class="k-controller"><i></i>controller</span><span class="k-view"><i></i>view</span><span class="k-service"><i></i>service</span><span class="k-job"><i></i>job, mailer</span></div>
+<div class="keys two"><b>status</b><span class="sv no">✕ no spec</span><span class="sv q">? name match only</span><span>purple fill: this unit</span><span>purple outline: selected</span><span>- - class-level link</span></div></div>
+
+<div class="under">
+<div class="src"><header><b>ChargeBuilder</b><span>app/services/charge_builder.rb · 2 references to Booking</span><a href="#">open in Code</a></header>
+<pre><span class="ln">12</span><span class="kw">def</span> initialize(booking)
+<span class="hl"><span class="ln">13</span>  @booking = booking</span>
+<span class="ln">14</span><span class="kw">end</span>
+<span class="ln">15</span>
+<span class="ln">16</span><span class="kw">def</span> amount
+<span class="hl"><span class="ln">18</span>  (@booking.price * <span class="cn">100</span>).round</span>
+<span class="ln">19</span><span class="kw">end</span></pre></div>
+<table class="facts2">
+<tr><th>used by</th><td>7 models · 5 services · 5 controllers · 8 views · 4 jobs, mailers · 5 other</td></tr>
+<tr><th>no spec</th><td>ChargeBuilder · lodging/_summary</td></tr>
+<tr><th>ask</th><td>Ana <span class="q">Lodging, Bulletins</span> · Cy <span class="q">Ledger, Figures</span></td></tr>
+<tr><th>changes with</th><td>Bookings::Tariff <span class="q">12</span> · Booking::Reprice <span class="q">9</span> · Booking::RoomAllocator <span class="q">7</span></td></tr>
+<tr><th>run first</th><td>spec/models/booking_spec.rb · lodging_spec.rb · guest_mailer_spec.rb <span class="q">· 3 of 41</span></td></tr>
+<tr><th>not followed</th><td>public_send at booking.rb:301 <span class="q">· </span>which methods each caller uses</td></tr>
+</table>
+</div>
+</div>
+</div></body></html>

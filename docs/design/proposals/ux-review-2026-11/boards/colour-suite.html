@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Colour suite · brand base and lifted values</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../../foundations/tokens.css">
+<style>body{margin:0;background:#222126}
+
+.wm{font-family:var(--ff-ui);--b-purple:#7E4384;--l-purple:#B580BC;--on-purple:#FCFCFD;--b-green:#436961;--l-green:#7DAA9E;--on-green:#FCFCFD;--b-yellow:#F1B73A;--l-yellow:#F1B73A;--on-yellow:#222126;--b-orange:#E66747;--l-orange:#EF8A3C;--on-orange:#222126;--b-red:#E64D47;--l-red:#EE665F;--on-red:#222126;--b-blue:#4D597A;--l-blue:#7EB1D4;--on-blue:#FCFCFD;--b-gray:#6E7987;--l-gray:#9BA5B0;--on-gray:#FCFCFD;--b-teal:#2F6F7A;--l-teal:#6FC3CC;--on-teal:#FCFCFD;--b-indigo:#565A9C;--l-indigo:#A3A9F0;--on-indigo:#FCFCFD;--b-plum:#8E4468;--l-plum:#E29BBB;--on-plum:#FCFCFD;--b-olive:#5E6B34;--l-olive:#B3C47A;--on-olive:#FCFCFD;--b-umber:#7A5A3A;--l-umber:#D3B58A;--on-umber:#FCFCFD;}
+.wm .pad{padding:var(--s6)}
+.wm .t2{margin:var(--s6) 0 var(--s4);font-size:var(--fs-15)} .wm .t2 .n{font-weight:400;color:var(--mut);font-size:var(--fs-12);margin-left:var(--s3)}
+.wm .hues{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:var(--s4)}
+.wm .hue .fill,.wm .hue .lift{padding:var(--s4);font-family:var(--ff-data);font-size:11px;line-height:1.6}
+.wm .hue .fill{border-radius:var(--r-ctl) var(--r-ctl) 0 0;min-height:76px}
+.wm .hue .lift{background:var(--panel);border:1px solid var(--rule);border-top:0;border-radius:0 0 var(--r-ctl) var(--r-ctl);color:var(--mut)}
+.wm .hue b{display:block;font-family:var(--ff-ui);font-size:var(--fs-15)} .wm .hue span{display:block}
+.wm .hue small{display:block;margin-top:var(--s2);color:var(--mut);font-size:var(--fs-12)}
+.wm .row{display:flex;flex-wrap:wrap;gap:var(--s4);margin-bottom:var(--s4);align-items:center}
+.wm .bx{box-sizing:border-box;min-width:160px;padding:var(--s3) var(--s4);border:1px solid var(--rule2);border-radius:var(--r-ctl);background:var(--panel);box-shadow:inset 4px 0 0 var(--kc);font-family:var(--ff-data);font-size:var(--fs-13);color:var(--bright)}
+.wm .bx b{display:block} .wm .bx .kd{display:block;font-family:var(--ff-ui);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--kc)}
+.wm .bx.subject{background:var(--b-purple);border-color:var(--b-purple);color:var(--on-purple);box-shadow:none} .wm .bx.subject .kd{color:var(--on-purple);opacity:.85}
+.wm .bx.sel{border-color:var(--l-purple);background:var(--select-tint);box-shadow:inset 4px 0 0 var(--kc),0 0 0 1px var(--l-purple)}
+.wm .bx.chg{background:color-mix(in srgb,var(--b-yellow) 12%,var(--panel))}
+.wm .sv{display:inline-block;padding:0 var(--s3);border-radius:var(--r-chip);font-family:var(--ff-data);font-size:11px;line-height:18px;border:1px solid var(--c)}
+.wm .sv.solid{background:var(--f);border-color:var(--f);color:var(--o);font-weight:700}
+.wm .sv.line{color:var(--c)}
+.wm .sv.tint{color:var(--c);border-color:transparent;background:color-mix(in srgb,var(--c) 16%,var(--bg))}
+.wm .lbl{font-size:var(--fs-12);color:var(--mut);width:70px}
+</style></head>
+<body><div class="wm" data-theme="dark"><div class="pad">
+<h1 class="t1">Colour suite v2 · from the brand palette</h1>
+<p class="lead" style="margin-top:var(--s3)">Each hue has two values. The <b class="bright">base</b> is the brand colour, used as a fill with the text colour that passes on it. The <b class="bright">lifted</b> value is for text and bars on the dark ground.</p>
+<h2 class="t2">Brand hues <span class="n">7 · base values unchanged from the source</span></h2><div class="hues"><div class="hue"><div class="fill" style="background:#7E4384;color:#FCFCFD"><b>purple</b><span>#7E4384</span><span>white text · 6.8 · AA</span></div>
+<div class="lift"><b style="color:#B580BC">purple</b><span>#B580BC</span><span>on dark · 4.8 · AA</span></div><small>selection · subject · primary</small></div><div class="hue"><div class="fill" style="background:#436961;color:#FCFCFD"><b>green</b><span>#436961</span><span>white text · 6.0 · AA</span></div>
+<div class="lift"><b style="color:#7DAA9E">green</b><span>#7DAA9E</span><span>on dark · 5.7 · AA</span></div><small>status: added, covered</small></div><div class="hue"><div class="fill" style="background:#F1B73A;color:#222126"><b>yellow</b><span>#F1B73A</span><span>black text · 8.8 · AAA</span></div>
+<div class="lift"><b style="color:#F1B73A">yellow</b><span>#F1B73A</span><span>on dark · 8.2 · AAA</span></div><small>status: modified</small></div><div class="hue"><div class="fill" style="background:#E66747;color:#222126"><b>orange</b><span>#E66747</span><span>black text · 4.9 · AA</span></div>
+<div class="lift"><b style="color:#EF8A3C">orange</b><span>#EF8A3C</span><span>on dark · 5.9 · AA</span></div><small>status: check</small></div><div class="hue"><div class="fill" style="background:#E64D47;color:#222126"><b>red</b><span>#E64D47</span><span>black text · 4.2 · AA LG</span></div>
+<div class="lift"><b style="color:#EE665F">red</b><span>#EE665F</span><span>on dark · 4.7 · AA</span></div><small>status: gap, risk</small></div><div class="hue"><div class="fill" style="background:#4D597A;color:#FCFCFD"><b>blue</b><span>#4D597A</span><span>white text · 6.8 · AA</span></div>
+<div class="lift"><b style="color:#7EB1D4">blue</b><span>#7EB1D4</span><span>on dark · 6.4 · AA</span></div><small>kind: view</small></div><div class="hue"><div class="fill" style="background:#6E7987;color:#FCFCFD"><b>gray</b><span>#6E7987</span><span>white text · 4.3 · AA LG</span></div>
+<div class="lift"><b style="color:#9BA5B0">gray</b><span>#9BA5B0</span><span>on dark · 5.9 · AA</span></div><small>kind: route, config</small></div></div>
+<h2 class="t2">New hues <span class="n">5 · same depth and saturation as the brand set</span></h2><div class="hues"><div class="hue"><div class="fill" style="background:#2F6F7A;color:#FCFCFD"><b>teal</b><span>#2F6F7A</span><span>white text · 5.6 · AA</span></div>
+<div class="lift"><b style="color:#6FC3CC">teal</b><span>#6FC3CC</span><span>on dark · 7.3 · AAA</span></div><small>new · kind: model</small></div><div class="hue"><div class="fill" style="background:#565A9C;color:#FCFCFD"><b>indigo</b><span>#565A9C</span><span>white text · 6.1 · AA</span></div>
+<div class="lift"><b style="color:#A3A9F0">indigo</b><span>#A3A9F0</span><span>on dark · 6.7 · AA</span></div><small>new · kind: controller</small></div><div class="hue"><div class="fill" style="background:#8E4468;color:#FCFCFD"><b>plum</b><span>#8E4468</span><span>white text · 6.4 · AA</span></div>
+<div class="lift"><b style="color:#E29BBB">plum</b><span>#E29BBB</span><span>on dark · 6.8 · AA</span></div><small>new · kind: callback, filter</small></div><div class="hue"><div class="fill" style="background:#5E6B34;color:#FCFCFD"><b>olive</b><span>#5E6B34</span><span>white text · 5.6 · AA</span></div>
+<div class="lift"><b style="color:#B3C47A">olive</b><span>#B3C47A</span><span>on dark · 7.8 · AAA</span></div><small>new · kind: service, PORO</small></div><div class="hue"><div class="fill" style="background:#7A5A3A;color:#FCFCFD"><b>umber</b><span>#7A5A3A</span><span>white text · 6.1 · AA</span></div>
+<div class="lift"><b style="color:#D3B58A">umber</b><span>#D3B58A</span><span>on dark · 7.6 · AAA</span></div><small>new · kind: job, mailer</small></div></div>
+
+<h2 class="t2">Kind <span class="n">the bar on a box · lifted values</span></h2>
+<div class="row"><div class="bx " style="--kc:var(--l-gray)"><span class="kd">route</span><b>GET /lodging</b></div><div class="bx " style="--kc:var(--l-indigo)"><span class="kd">controller</span><b>LodgingsController</b></div><div class="bx " style="--kc:var(--l-plum)"><span class="kd">before_action</span><b>load_booking</b></div><div class="bx " style="--kc:var(--l-teal)"><span class="kd">model</span><b>Booking</b></div><div class="bx " style="--kc:var(--l-blue)"><span class="kd">view</span><b>lodging/show</b></div><div class="bx " style="--kc:var(--l-olive)"><span class="kd">service</span><b>ChargeBuilder</b></div><div class="bx " style="--kc:var(--l-umber)"><span class="kd">job</span><b>MetricsJob</b></div></div>
+
+<h2 class="t2">Status <span class="n">a chip with a glyph · three strengths</span></h2>
+<div class="row"><span class="lbl">solid</span>
+<span class="sv solid" style="--f:var(--l-red);--o:#222126">✕ gap</span><span class="sv solid" style="--f:var(--b-orange);--o:var(--on-orange)">⚠ check</span><span class="sv solid" style="--f:var(--b-yellow);--o:var(--on-yellow)">M modified</span><span class="sv solid" style="--f:var(--b-green);--o:var(--on-green)">A added</span></div>
+<div class="row"><span class="lbl">outline</span>
+<span class="sv line" style="--c:var(--l-red)">✕ gap</span><span class="sv line" style="--c:var(--l-orange)">⚠ check</span><span class="sv line" style="--c:var(--l-yellow)">M modified</span><span class="sv line" style="--c:var(--l-green)">A added</span></div>
+<div class="row"><span class="lbl">tint</span>
+<span class="sv tint" style="--c:var(--l-red)">✕ gap</span><span class="sv tint" style="--c:var(--l-orange)">⚠ check</span><span class="sv tint" style="--c:var(--l-yellow)">M modified</span><span class="sv tint" style="--c:var(--l-green)">A added</span></div>
+
+<h2 class="t2">Subject, selected, changed <span class="n">no white borders</span></h2>
+<div class="row">
+<div class="bx subject"><span class="kd">subject · brand purple fill</span><b>Booking#price</b></div>
+<div class="bx sel" style="--kc:var(--l-plum)"><span class="kd">selected · purple outline</span><b>load_booking</b></div>
+<div class="bx chg" style="--kc:var(--l-teal)"><span class="kd">changed · yellow tint</span><b>#apply_voucher</b></div>
+<div class="bx " style="--kc:var(--l-teal)"><span class="kd">unchanged</span><b>#night_count</b></div>
+</div>
+</div></div></body></html>

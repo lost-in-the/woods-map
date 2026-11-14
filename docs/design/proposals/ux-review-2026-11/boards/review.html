@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Review · a pull request before merge</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../../foundations/tokens.css">
+<link rel="stylesheet" href="../review.css">
+<style>body{margin:0;background:#222126}</style></head>
+<body><div class="wm" data-theme="dark">
+<header class="bar"><a href="#" class="brand"><svg viewBox="0 0 120 120" width="22" height="22" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-width="3.4"><circle cx="62" cy="58" r="49"/><circle cx="59" cy="61" r="38"/><circle cx="63" cy="57" r="27"/><circle cx="60" cy="60" r="16"/></g><circle cx="61" cy="59" r="4.4" fill="currentColor"/></svg>woods</a><label class="bar-search"><span aria-hidden="true">⌕</span><span class="q">Search a class, file, commit or merged PR</span><span class="kbd">/</span></label><nav aria-label="Primary"><a href="#">How it works</a><a href="#">What it affects</a><a href="#" aria-current="page">What changed</a><a href="#">Browse</a></nav><span class="bar-fresh"><span><span class="fresh">●</span><span class="w"> index up to date</span></span></span></header>
+<div class="crumbs"><span>What changed › <span class="bright">PR #482</span> › Booking#voucher_amount</span></div>
+<div class="ident"><div><p class="ctx">pull request #482 · <span class="id">main a1b2c3d → head 7c1e9a2</span> · compared in 14s</p><h1 class="t1">Let a guest correct a declined card</h1></div><div class="ctl"><button class="btn" type="button">Copy review note</button><button class="btn" type="button">Copy Mermaid</button><button class="btn primary" type="button">Copy link</button></div></div>
+<div class="tabs page-tabs" role="tablist"><button class="tab" role="tab" type="button" aria-selected="true">Review</button><button class="tab" role="tab" type="button" aria-selected="false">Changed <span class="cnt">19</span></button><button class="tab" role="tab" type="button" aria-selected="false">Reached <span class="cnt">34</span></button><button class="tab" role="tab" type="button" aria-selected="false">Checks <span class="cnt">2</span></button><button class="tab" role="tab" type="button" aria-selected="false">Specs <span class="cnt">41</span></button><button class="tab" role="tab" type="button" aria-selected="false">Diff</button></div>
+<div class="r4">
+<p class="sum"><b>3 methods changed on Booking</b><span class="sep">·</span><b>1 without a spec</b><span class="sep">·</span>1 not in the description<span class="sep">·</span>reaches Lodging, Ledger, Bulletins<span class="sep">·</span>3 other owners<span class="sep">·</span>16 more units: scripts, API types, specs</p>
+<div class="dia"><div class="dhost" role="img" aria-label="The pull request changes three methods on Booking: price, apply_voucher and a new voucher_amount with no spec. Units in Lodging, Ledger and Bulletins use the Booking class." style="width:1320px;height:480px;margin:var(--s4) auto">
+<svg aria-hidden="true" width="8" height="24" viewBox="0 0 8 24" preserveAspectRatio="none" style="position: absolute; left: 521px; top: 416px; width: 8px; height: 24px; overflow: visible; fill: none; stroke: #9BA5B0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 6 6"><path d="M 4 0 L 4 24"></path></svg>
+<svg aria-hidden="true" width="8" height="24" viewBox="0 0 8 24" preserveAspectRatio="none" style="position: absolute; left: 841px; top: 416px; width: 8px; height: 24px; overflow: visible; fill: none; stroke: #9BA5B0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 6 6"><path d="M 4 0 L 4 24"></path></svg>
+<svg aria-hidden="true" width="8" height="24" viewBox="0 0 8 24" preserveAspectRatio="none" style="position: absolute; left: 1161px; top: 416px; width: 8px; height: 24px; overflow: visible; fill: none; stroke: #9BA5B0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 6 6"><path d="M 4 0 L 4 24"></path></svg>
+<svg aria-hidden="true" width="1005" height="8" viewBox="0 0 1005 8" preserveAspectRatio="none" style="position: absolute; left: 160px; top: 436px; width: 1005px; height: 8px; overflow: visible; fill: none; stroke: #9BA5B0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 6 6"><path d="M 0 4 L 1005 4"></path></svg>
+<svg aria-hidden="true" width="8" height="23" viewBox="0 0 8 23" preserveAspectRatio="none" style="position: absolute; left: 156px; top: 417px; width: 8px; height: 23px; overflow: visible; fill: none; stroke: #9BA5B0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 6 6"><defs><marker id="dc-arrow-head-filled-5" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#9BA5B0" stroke="none" style="stroke: none; fill: #9BA5B0; fill: context-stroke"/></marker></defs><path d="M 4 23 L 4 4" marker-end="url(#dc-arrow-head-filled-5)"></path></svg>
+<div class="dgroup" style="left:10px;top:16px;width:300px;height:400px"><span>Booking · changed in this PR</span><em>models/booking.rb · Bo 14 · Cy 4</em></div>
+<div class="dgroup" style="left:380px;top:16px;width:290px;height:400px"><span>Lodging</span><em>owners Ana Bo · last 3w</em></div>
+<div class="dgroup" style="left:700px;top:16px;width:290px;height:400px"><span>Ledger</span><em>owners Cy · last 2mo</em></div>
+<div class="dgroup" style="left:1020px;top:16px;width:290px;height:400px"><span>Bulletins</span><em>owners Ana · last 5mo</em></div>
+<div class="dbox k-model chgd" style="left:26px;top:56px;width:268px;height:84px"><span><span class="kd">method</span><b>#price</b><span class="chips"><span class="sv m">M +3 −1</span><span class="sv ok">✓ spec changed</span></span></span></div>
+<div class="dbox k-model chgd" style="left:26px;top:156px;width:268px;height:84px"><span><span class="kd">method</span><b>#apply_voucher</b><span class="chips"><span class="sv m">M +6 −3</span><span class="sv w">⚠ not in description</span></span></span></div>
+<div class="dbox k-model chgd" style="left:26px;top:256px;width:268px;height:84px"><span><span class="kd">method</span><b>#voucher_amount</b><span class="chips"><span class="sv a">A +7</span><span class="sv no">✕ no spec</span></span></span></div>
+<div class="dbox k-model " style="left:396px;top:56px;width:258px;height:56px"><span><span class="kd">model</span><b>Lodging</b></span></div>
+<div class="dbox k-controller " style="left:396px;top:124px;width:258px;height:56px"><span><span class="kd">controller</span><b>LodgingsController</b></span></div>
+<div class="dbox k-view " style="left:396px;top:192px;width:258px;height:56px"><span><span class="kd">view</span><b>lodging/_summary</b></span></div>
+<div class="dbox k-service " style="left:716px;top:56px;width:258px;height:56px"><span><span class="kd">service</span><b>ChargeBuilder</b></span></div>
+<div class="dbox k-service " style="left:716px;top:124px;width:258px;height:56px"><span><span class="kd">service</span><b>RefundPolicy</b></span></div>
+<div class="dbox k-job " style="left:1036px;top:56px;width:258px;height:56px"><span><span class="kd">mailer</span><b>GuestMailer</b></span></div>
+<div class="dbox k-view " style="left:1036px;top:124px;width:258px;height:56px"><span><span class="kd">view</span><b>guest_mailer/confirmation</b></span></div>
+<div class="dlab" style="left:396px;top:262px;width:258px">+ 1 more</div>
+<div class="dlab" style="left:560px;top:446px;width:260px">use Booking · class-level links</div>
+</div>
+<div class="keys"><b>kind</b><span class="k-model"><i></i>model</span><span class="k-controller"><i></i>controller</span><span class="k-view"><i></i>view</span><span class="k-service"><i></i>service</span><span class="k-job"><i></i>job, mailer</span></div>
+<div class="keys two"><b>status</b><span class="sv m">M modified</span><span class="sv a">A added</span><span class="sv ok">✓ covered</span><span class="sv w">⚠ check</span><span class="sv no">✕ gap</span><span>yellow tint: changed in this PR</span><span>- - class-level link: the method called is not known</span></div></div>
+
+<div class="under">
+<div class="src"><header><b>Booking#voucher_amount</b><span>app/models/booking.rb:229 · added</span><a href="#">open in Diff</a></header>
+<pre><span class="add"><span class="ln">229</span><span class="kw">def</span> voucher_amount</span>
+<span class="add"><span class="ln">230</span>  <span class="kw">return</span> <span class="cn">0</span> <span class="kw">unless</span> applied_voucher</span>
+<span class="add"><span class="ln">231</span></span>
+<span class="add"><span class="ln">232</span>  applied_voucher.worth_of(<span class="kw">self</span>)</span>
+<span class="add"><span class="ln">233</span><span class="kw">end</span></span></pre></div>
+<table class="facts2">
+<tr><th>specs</th><td>#price <span class="q">spec changed</span> · #apply_voucher <span class="q">spec exists, unchanged</span> · #voucher_amount <span class="q">none</span></td></tr>
+<tr><th>description</th><td><span class="q">mentions</span> #price, #voucher_amount <span class="q">· omits</span> #apply_voucher</td></tr>
+<tr><th>crosses into</th><td>Lodging <span class="q">4 units</span> · Ledger <span class="q">2</span> · Bulletins <span class="q">2</span></td></tr>
+<tr><th>ask</th><td>Ana <span class="q">Lodging, Bulletins</span> · Cy <span class="q">Ledger</span></td></tr>
+<tr><th>not followed</th><td>public_send at booking.rb:301 <span class="q">· 3 files with no unit</span></td></tr>
+<tr><th>snapshots</th><td>gen 41 <span class="q">pinned base</span> → gen 42 <span class="q">this link stays on these two</span></td></tr>
+</table>
+</div>
+</div>
+</div></body></html>
