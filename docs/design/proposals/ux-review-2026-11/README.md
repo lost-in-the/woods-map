@@ -45,7 +45,7 @@ On the board, `†` marks anything Woods does not publish as a fact today.
 | `rescue_from` on a controller | Not published. Woods publishes rescue facts for jobs and services only, so the board leaves it out |
 | Models an action touches | Woods knows references, not reads. The board says "references" |
 | Callers of one method | Known for a call written on a constant (`Lodging.available`, `PricingService.call`): the reference records the method called, and the map already counts callers per method. Callers are not known for a call on a variable (`booking.price`): Woods does not know the variable's class, and records no reference for it. Listing such calls as unknown needs Woods work |
-| Changed methods in a pull request | The data exists; the join from changed lines to method line ranges is not built |
+| Changed methods in a pull request | Built in the map for `?since=` on a unit page: `Since#changed_members` in `lib/woods_map/since.rb` matches a report's changed lines to each method's published extent. The impact page does not call it yet |
 | Units grouped by part of the product | Feasible from namespace and directory. The grouping is whatever those yield, or a configured mapping |
 | Who knows an area | Recent commit authors. Woods stores author names; no ownership source is read |
 | Whether a spec names a unit | Spec mapping is static and per file. It says a spec names a unit, never that it covers a change |
