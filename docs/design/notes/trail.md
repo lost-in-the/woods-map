@@ -103,3 +103,42 @@ A recipient of a scope-only link loses the sender's reasoning, and free text in 
 - Graph-only hops show no call site.
 - Model events are assembled on demand. Woods precomputes flows for controller actions only.
 - "Explain this investigation" is the guide's action on this page (M7, #9), offered when the guide is enabled; the guide's answers hand units back with *pin* and *open as investigation* ([M7 note](m7-guide.md)).
+
+## Reading walkthrough spike (WDS-157)
+
+The ordered pin list can also be read as a source-backed walkthrough. A
+collapsed disclosure above the existing board contains an ordered stop list,
+previous/next anchors and published source excerpts. It works without
+JavaScript. This is a reading order selected by the reader, not a runtime
+execution trace or an AI explanation. Notes remain in the existing pinboard.
+
+Each stop retains its typed identity even if the generation no longer has the
+unit. Excerpts come from the request's pinned repository and are limited to
+20 lines / 4,000 characters each, at most 24 stops. Missing source is named;
+there is no host source-file read. The current-unit link explicitly names its
+current-generation behavior: unit pages do not implement historical source
+navigation. This spike does not claim to repair that larger reader contract.
+
+### Hosting options
+
+The present engine already needs no Node, asset compilation or asset pipeline.
+This spike adds no dependency, endpoint, index schema, JavaScript or stylesheet.
+It adds at most 24 unit reads to a Trail request and at most 96,000 source
+characters to the HTML before escaping. Collapsing the disclosure saves screen
+space, not server work. Lazy loading is a useful follow-up if real measurements
+show the request cost matters.
+
+Keep the mounted engine for the first experiment: existing auth, generation
+locks and published-index readers remain intact. An off-server-built static
+snapshot could remove Ruby/Rails from the serving machine, but requires a
+separate export and access-control contract, explicit stale-generation labels,
+and a review of source disclosure. A minimal Rails reader host could avoid
+booting the client application, but is outside the current engine-only contract
+and needs measurements and a relocated-root freshness decision (WDS-131).
+Neither deployment option is implemented or benchmarked here.
+
+Adoption gate: compare completion time and wrong turns for the same cross-unit
+reading task with ordinary pinboard navigation versus walkthrough stops. Keep
+it if users can explain the selected evidence faster without mistaking reading
+order for execution. Mounted testbed axe, screenshots and human acceptance are
+separate from request specs and Chromium fixture checks.

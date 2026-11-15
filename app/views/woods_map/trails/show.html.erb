@@ -31,9 +31,10 @@
 <div class="body" data-controller="trail pinboard" data-trail-url-value="<%= trail_url %>" data-trail-title-value="Trail <%= title %>" data-pinboard-key-value="<%= board.key %>" data-pinboard-title-value="<%= title %>" data-pinboard-url-value="<%= focus_url %>" data-pinboard-generation-value="<%= gen %>" data-pinboard-units-value="<%= board.pins.map { |pin| { pin: pin.to_param, label: pin.identifier, type: pin.type, url: (@pinned.identities.include?(pin.identity) ? public_url_for(woods_map.unit_path(type: pin.type, identifier: pin.identifier)) : nil) } }.to_json %>">
   <%= render 'woods_map/components/rail', label: 'Board', heading: 'On this board', groups: [
         { label: 'pins', count: board.pins.size, items: board.pins.map { |pin| { key: (@flags.for(pin.identity).any? ? WoodsMap::Glyphs[:flag] : '·'), text: unit_link(pin.identifier, pin.type), own: pin.type.tr('_', ' ') } } },
-        { label: 'sections', count: 7, items: [['flags', 'trail-flags'], ['lanes', 'trail-lanes'], ['steps', 'trail-steps'], ['pinboard', 'trail-pins'], ['graph of pinned', 'trail-graph'], ['ERD of pinned', 'trail-erd'], ['changed together', 'trail-cochange']].map { |text, id| { text: text, href: "##{id}" } } }
+        { label: 'sections', count: (board.pins.any? ? 8 : 7), items: ((board.pins.any? ? [['reading walkthrough', 'trail-walkthrough']] : []) + [['flags', 'trail-flags'], ['lanes', 'trail-lanes'], ['steps', 'trail-steps'], ['pinboard', 'trail-pins'], ['graph of pinned', 'trail-graph'], ['ERD of pinned', 'trail-erd'], ['changed together', 'trail-cochange']]).map { |text, id| { text: text, href: "##{id}" } } }
       ] %>
   <div class="main">
+    <%= render 'woods_map/trails/walkthrough', walkthrough: @walkthrough, gen: gen %>
     <section class="sec" aria-labelledby="trail-flags">
       <header><h2 class="t2" id="trail-flags">Flags <%= count_tag(flags.size) %><%= info_tip('Derived from published facts only: job resilience (W-4), callback conditions, flow conditionals and dynamic dispatch, cross-database edges, hubs, and template ivars against the mailer action (advisory). Each names its evidence.') %></h2></header>
       <% if flags.any? %>

@@ -90,3 +90,7 @@ them. Each is a comment on that issue, so the issue owns it.
 - One application: Blog, Rails 8.0, 412 units, 4 packages, gen 42 at `361468d`; the impact report compares gen 40 `a1b2c3d` to gen 42 `9f8e7d6`.
 - The primary button on a unit page is *Code at L18* (open the code view at the definition); on the Code tab itself it becomes *In editor at L61*, which exists only when the host configures an editor URL scheme.
 - *No retry_on* on `NotifySubscribersJob` is a warning (orange) everywhere; an unmatched template ivar mention is an advisory note: lexical metadata and analyzed action/filter bodies cannot prove a runtime value. The original board uses red; the engine qualifies that evidence.
+
+Trail reading-walkthrough spike (WDS-157): the [Trail contract](notes/trail.md)
+composes existing lifecycle typography and source regions; request and browser
+fixture coverage is not mounted or human acceptance. No new visual board.

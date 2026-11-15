@@ -1,0 +1,34 @@
+<% if walkthrough.cards.any? %>
+  <section class="sec" aria-labelledby="trail-walkthrough">
+    <header><h2 class="t2" id="trail-walkthrough">Reading walkthrough <%= count_tag(walkthrough.cards.size) %></h2></header>
+    <p class="cap">Reading order, not an execution trace. These are your pins in URL order, with published source from gen <%= gen %>. No AI explanation is generated. Use the pinboard below to record your interpretation.</p>
+    <details>
+      <summary>Read the pinned source, one stop at a time</summary>
+      <nav aria-label="Walkthrough stops">
+        <ol><% walkthrough.cards.each_with_index do |card, index| %>
+          <li><%= link_to(card[:pin].identifier, "#walkthrough-#{index + 1}") %></li>
+        <% end %></ol>
+      </nav>
+      <% walkthrough.cards.each_with_index do |card, index| %>
+        <% pin = card[:pin] %>
+        <article class="sec" aria-labelledby="walkthrough-<%= index + 1 %>">
+          <h3 class="t3" id="walkthrough-<%= index + 1 %>"><%= index + 1 %>. <%= pin.identifier %></h3>
+          <p class="cap"><%= pin.type.tr('_', ' ') %> · published source · gen <%= gen %></p>
+          <% if !card[:present] %>
+            <p class="cap">Not present in this generation. This stop is kept so the reading order does not silently change.</p>
+          <% elsif card[:excerpt].blank? %>
+            <p class="cap">No source published for this unit.</p>
+          <% else %>
+            <pre class="cmd" role="region" aria-label="Published source of <%= pin.identifier %>" tabindex="0"><code><%= card[:excerpt] %></code></pre>
+            <% if card[:truncated] %><p class="cap">Opening excerpt only: limited to <%= WoodsMap::TrailWalkthrough::MAX_LINES %> lines and <%= WoodsMap::TrailWalkthrough::MAX_CHARACTERS %> characters.</p><% end %>
+          <% end %>
+          <p class="cap">
+            <% if card[:present] %><%= link_to('Open current unit', woods_map.unit_path(type: pin.type, identifier: pin.identifier)) %> (the unit page reads the current generation).<% end %>
+            <% if index.positive? %><%= link_to('Previous stop', "#walkthrough-#{index}") %><% end %>
+            <% if index + 1 < walkthrough.cards.size %><%= link_to('Next stop', "#walkthrough-#{index + 2}") %><% end %>
+          </p>
+        </article>
+      <% end %>
+    </details>
+  </section>
+<% end %>

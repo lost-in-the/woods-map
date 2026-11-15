@@ -68,6 +68,7 @@ module WoodsMap
     def build_board(repository)
       @lifecycle = @board.entry && WoodsMap::LifecycleBuilder.new(repository, @board.entry, hops: @board.hops)
       @pinned = WoodsMap::PinnedViews.new(repository, @board.pins)
+      @walkthrough = WoodsMap::TrailWalkthrough.new(repository, @board.pins)
       @flags = WoodsMap::TrailFlags.new(repository, @lifecycle&.steps || [], pins: @pinned.identities)
       @co_changes = WoodsMap::TrailCoChanges.new(repository, @pinned.identities)
     end
